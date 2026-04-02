@@ -1,0 +1,545 @@
+% =============================================================================
+% Lecture 01: Introduction, Exponential Smoothing & Forecast Evaluation
+% BSAD 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+% ---- Lecture metadata --------------------------------------------------------
+\title{Introduction, Exponential Smoothing \& Forecast Evaluation}
+\subtitle{BSAD 8310: Business Forecasting --- Lecture 1}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+\date{Spring 2026}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---- Outline ----------------------------------------------------------------
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Why Forecasting Matters}
+% =============================================================================
+
+\sectionslide{Why Forecasting Matters}{%
+  Every business decision made today depends on expectations about tomorrow.}
+
+% --- Slide: The pervasiveness of forecasting ---------------------------------
+\begin{frame}{Forecasting Is Everywhere in Business}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Operations \& Supply Chain}
+      \begin{itemize}
+        \item How much inventory should Walmart order for Black Friday?
+        \item How many nurses does a hospital need next Tuesday night?
+        \item When will this machine component fail?
+      \end{itemize}
+      \vspace{0.2cm}
+      \textbf{Finance \& Risk}
+      \begin{itemize}
+        \item Will credit card defaults rise next quarter?
+        \item What will the Fed Funds rate be in 6 months?
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Marketing \& Strategy}
+      \begin{itemize}
+        \item How many units will this new product sell in year one?
+        \item What is the customer lifetime value of this cohort?
+      \end{itemize}
+      \vspace{0.2cm}
+      \textbf{Macro \& Public Policy}
+      \begin{itemize}
+        \item Will GDP grow by 2\% or 3\% next year?
+        \item What will unemployment be in Q4?
+      \end{itemize}
+      \vspace{0.1cm}
+      \begin{keybox}
+        A decision is only as good as the forecast it rests on.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Forecasting setup ------------------------------------------------
+\begin{frame}{The Basic Setup}
+  \begin{definitionbox}{Time Series}
+    A \key{time series} is an ordered sequence of observations
+    $\{y_1, y_2, \ldots, y_T\}$ where $t$ indexes time.
+  \end{definitionbox}
+  \vspace{0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Key notation:}
+      \begin{itemize}
+        \item $y_t$ --- observed value at time $t$
+        \item $h$ --- \key{forecast horizon} (periods ahead)
+        \item $\hat{y}_{t+h|t}$ --- forecast of $y_{t+h}$ made at time $t$
+        \item $e_t = y_t - \hat{y}_{t|t-1}$ --- \key{forecast error}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{examplebox}{Example}
+        Forecasting monthly retail sales:\\
+        $h=1$: next month's sales\\
+        $h=12$: sales 12 months from now\\
+        \medskip
+        Harder problem as $h$ grows ---
+        uncertainty compounds.
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    Under squared error loss, the optimal forecast is the
+    \textbf{conditional expectation}:
+    $\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]$
+    where $\mathcal{F}_t$ is all information available at time $t$.
+  \end{keybox}
+\end{frame}
+
+% --- Slide: Time series components -------------------------------------------
+\begin{frame}{Components of a Time Series}
+  Any time series can be decomposed (additive form):
+  \[
+    y_t = T_t + S_t + C_t + I_t
+  \]
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item \key{$T_t$: Trend} --- long-run direction
+        \item \key{$S_t$: Seasonality} --- regular calendar-driven pattern
+        \item \key{$C_t$: Cycle} --- medium-run business cycle swings
+        \item \key{$I_t$: Irregular} --- random shocks
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{examplebox}{Which Components Matter?}
+        \begin{itemize}
+          \item \textbf{Retail sales:} strong trend + seasonality
+          \item \textbf{Quarterly GDP:} trend + cycle
+          \item \textbf{Daily stock returns:} mostly irregular
+          \item \textbf{Energy demand:} all four components
+        \end{itemize}
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{warningbox}
+    \textbf{Ignoring seasonality causes large, systematic errors.}
+    A non-seasonal model applied to monthly retail data will
+    consistently under-forecast in December and over-forecast in January.
+  \end{warningbox}
+\end{frame}
+
+% --- Slide: Naive benchmarks -------------------------------------------------
+\begin{frame}{Always Beat a Benchmark First}
+  \begin{keybox}
+    Before presenting any forecast model, check that it beats a
+    \textbf{naive benchmark}. A model that cannot beat the baseline
+    has zero value.
+  \end{keybox}
+  \vspace{0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Standard benchmarks:}
+      \begin{description}
+        \item[Na\"{i}ve:] $\hat{y}_{t+h|t} = y_t$
+        \item[Seasonal na\"{i}ve:] $\hat{y}_{t+h|t} = y_{t+h-m}$
+        \item[Mean:] $\hat{y}_{t+h|t} = \bar{y}_t$
+        \item[Drift:] $\hat{y}_{t+h|t} = y_t + h\hat{c}$
+      \end{description}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{examplebox}{Which to Use?}
+        \begin{itemize}
+          \item No trend, no season $\rightarrow$ Mean
+          \item Trend, no season $\rightarrow$ Drift
+          \item Season $\rightarrow$ Seasonal na\"{i}ve
+          \item Asset prices $\rightarrow$ Na\"{i}ve
+        \end{itemize}
+      \end{examplebox}
+      \muted{\small The M4 Competition: many ML models
+      \emph{failed} to beat simple ETS methods
+      \parencite{Makridakis2020}.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Exponential Smoothing}
+% =============================================================================
+
+\sectionslide{Exponential Smoothing}{%
+  Recent observations should carry more weight than old ones.}
+
+% --- Slide: The equal-weight problem -----------------------------------------
+\begin{frame}{The Problem with Equal Weights}
+  Most classical methods treat every historical observation equally ---
+  but what if the world \textbf{changes}?
+  \begin{examplebox}{Business Context}
+    A retailer's sales pattern shifts after a store renovation.
+    A method that treats pre-renovation data equally will take months to adapt,
+    systematically over- or under-forecasting throughout.
+  \end{examplebox}
+  \vspace{0.2cm}
+  \textbf{Exponential weighting idea:} assign geometrically declining weights
+  to past observations so that \emph{recent} observations matter more.
+  \begin{center}
+    \begin{tabular}{lcc}
+      \toprule
+      Observation & Age & Weight \\
+      \midrule
+      $y_T$     & 0 & $\alpha$ \\
+      $y_{T-1}$ & 1 & $\alpha(1-\alpha)$ \\
+      $y_{T-2}$ & 2 & $\alpha(1-\alpha)^2$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \muted{\small Parameter $\alpha \in (0,1]$ controls how fast old data is
+  \textbf{forgotten}. High $\alpha$ = short memory; low $\alpha$ = long memory.}
+\end{frame}
+
+% --- Slide: SES ---------------------------------------------------------------
+\begin{frame}{Simple Exponential Smoothing (SES)}
+  \begin{definitionbox}{SES Update Equation}
+    Let $\ell_t$ be the \textbf{level} at time $t$:
+    \[
+      \ell_t \;=\; \alpha\, y_t \;+\; (1-\alpha)\,\ell_{t-1},
+      \qquad 0 < \alpha \leq 1
+    \]
+    \textbf{Forecast:} $\hat{y}_{T+h|T} = \ell_T$ for all horizons $h \geq 1$ (flat)
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Large $\alpha$ (e.g.\ 0.8):}
+      \begin{itemize}\small
+        \item Reacts quickly to shocks
+        \item Noisy, volatile forecasts
+        \item Good for rapidly changing series
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Small $\alpha$ (e.g.\ 0.1):}
+      \begin{itemize}\small
+        \item Slow to adapt
+        \item Smooth, stable forecasts
+        \item Good for slowly evolving series
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    Special cases: $\alpha = 1$ $\Rightarrow$ na\"{i}ve forecast.
+    $\alpha \to 0$ $\Rightarrow$ historical mean.
+    SES \textbf{nests} both benchmarks.
+  \end{keybox}
+  \muted{\footnotesize\itshape Use when: no trend, no seasonality.}
+\end{frame}
+
+% --- Slide: Holt ---------------------------------------------------------------
+\begin{frame}{Holt's Method: Adding Trend}
+  SES produces a \emph{flat} forecast. If the series has a trend, we need
+  to track both level and slope.
+  \begin{definitionbox}{Holt's Linear Exponential Smoothing \parencite{Holt2004}}
+    {\small
+    \textbf{Level:} $\;\ell_t = \alpha\, y_t + (1-\alpha)\,(\ell_{t-1} + b_{t-1})$\\[3pt]
+    \textbf{Trend:} $\;b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}$\\[3pt]
+    \textbf{Forecast:} $\hat{y}_{T+h|T} = \ell_T + h\,b_T$
+    }
+  \end{definitionbox}
+  \vspace{0.1cm}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \begin{warningbox}
+        \textbf{Linear extrapolation can be unrealistic for long horizons.}
+        Trends rarely continue forever.
+        Use the \textbf{damped trend} variant for $h > 6$:
+        $\hat{y}_{T+h|T} = \ell_T + \sum_{j=1}^{h}\phi^j b_T$,
+        where $0 < \phi < 1$ causes the trend to taper off.
+      \end{warningbox}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{examplebox}{Interpretation}
+        $\ell_t$: where the series \emph{is} now\\
+        $b_t$: the current growth rate\\
+        $\phi$: how fast the trend fades
+        \medskip
+
+        \textbf{$\phi = 0.85$}: the long-run
+        forecast converges to a finite ceiling
+        rather than growing forever.
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Holt-Winters -------------------------------------------------------
+\begin{frame}{Holt-Winters: Level, Trend, and Seasonality}
+  For series with \emph{both} trend and seasonality, add a third component.
+  \begin{definitionbox}{Holt-Winters Additive Method \parencite{Winters1960}}
+    {\small
+    $\ell_t = \alpha(y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})$\\[2pt]
+    $b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}$\\[2pt]
+    $s_t = \gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma)\,s_{t-m}$\\[2pt]
+    \textbf{Forecast:} $\hat{y}_{T+h|T} = \ell_T + h\,b_T + s_{T+h-m}$
+    \quad ($m$ = seasonal period)
+    }
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Additive vs.\ Multiplicative:}
+      \begin{itemize}\small
+        \item \textbf{Additive:} seasonal swings are constant in size
+        \item \textbf{Multiplicative:} seasonal swings grow with the level
+              (use for retail sales, tourism)
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{examplebox}{US Retail Sales}
+        The December holiday spike grows each year
+        as overall sales grow $\Rightarrow$
+        \textbf{multiplicative seasonality}.
+      \end{examplebox}
+      \muted{\small Requires $\geq 2m$ obs. to initialize;
+      $m=12$ for monthly data.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: ETS framework -----------------------------------------------------
+\begin{frame}{The ETS Framework: A Unified View}
+  \textcite{Hyndman2021} unify all exponential smoothing models as
+  \textbf{state space models}: Error $\times$ Trend $\times$ Seasonal.
+  \begin{center}
+    {\small
+    \begin{tabular}{lll}
+      \toprule
+      \textbf{Component} & \textbf{Options} & \textbf{Meaning} \\
+      \midrule
+      Error ($E$)    & A, M & Additive / Multiplicative \\
+      Trend ($T$)    & N, A, A\textsubscript{d} & None / Additive / Damped \\
+      Seasonal ($S$) & N, A, M & None / Additive / Multiplicative \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  15 valid combinations. Common examples:
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+      \textbf{ETS(A,N,N)} $=$ SES\\
+      \textbf{ETS(A,A,N)} $=$ Holt linear\\
+      \textbf{ETS(A,A\textsubscript{d},N)} $=$ Holt damped
+    \column{0.48\textwidth}
+      \textbf{ETS(A,A,A)} $=$ Holt-Winters additive\\
+      \textbf{ETS(A,A,M)} $=$ Holt-Winters multiplicative
+  \end{columns}
+  \vspace{0.15cm}
+  \begin{keybox}
+    \textbf{Automatic selection:} fit all 15 models; pick the one with
+    minimum AIC. In Python: \texttt{statsmodels.tsa.exponential\_smoothing.ets.ETSModel}
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{Forecast Evaluation}
+% =============================================================================
+
+\sectionslide{Forecast Evaluation}{%
+  Forecasting without evaluation is not science --- it is storytelling.}
+
+% --- Slide: Accuracy metrics --------------------------------------------------
+\begin{frame}{How Do We Measure Forecast Accuracy?}
+  Given out-of-sample errors $e_{T+h} = y_{T+h} - \hat{y}_{T+h|T}$:
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \textbf{Scale-dependent:}
+      \[
+        \RMSE = \sqrt{\frac{1}{H}\sum_{h=1}^{H} e_{T+h}^2}
+      \]
+      \[
+        \MAE  = \frac{1}{H}\sum_{h=1}^{H} |e_{T+h}|
+      \]
+      \muted{\small Same units as $y_t$. Use to compare models on
+      the \emph{same} series.}\\[4pt]
+      \textbf{RMSE vs.\ MAE:} RMSE penalizes large errors more
+      heavily. If big misses are especially costly (e.g., stockouts),
+      prefer RMSE.
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \textbf{Scale-free (cross-series comparison):}
+      \[
+        \text{MAPE} = \frac{100\%}{H}\sum_{h=1}^{H}
+                      \left|\frac{e_{T+h}}{y_{T+h}}\right|
+      \]
+      \[
+        \text{MASE} = \frac{\MAE}{\text{MAE}_{\text{seasonal na\"{i}ve}}}
+      \]
+      \begin{keybox}
+        \small
+        $\text{MASE} < 1$: beats seasonal na\"{i}ve.\\
+        $\text{MASE} > 1$: \negc{worse} than na\"{i}ve.\\
+        Standard in M-Competitions \parencite{Makridakis2020}.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Out-of-sample principle -------------------------------------------
+\begin{frame}{The Golden Rule: Always Evaluate Out-of-Sample}
+  \begin{keybox}
+    \textbf{Never evaluate a forecast model on the data used to fit it.}
+    In-sample fit measures how well the model memorized the past,
+    not how well it can predict the future.
+  \end{keybox}
+  \vspace{0.2cm}
+  \textbf{Correct time series train/test split:}
+  \begin{center}
+    \begin{tikzpicture}[scale=0.9]
+      \draw[->, thick, color=unoblue] (0,0) -- (11,0) node[right] {$t$};
+      \fill[unolightblue] (0.1, 0.2) rectangle (7.5, 0.8);
+      \draw[unoblue, thick] (0.1, 0.2) rectangle (7.5, 0.8);
+      \node at (3.8, 0.5) {\textbf{Training set}};
+      \node[below, color=unogray, font=\small] at (0.1, -0.1) {$t=1$};
+      \node[below, color=unogray, font=\small] at (7.5, -0.1) {$t=T$};
+      \fill[unolightred] (7.5, 0.2) rectangle (10.5, 0.8);
+      \draw[unored, thick] (7.5, 0.2) rectangle (10.5, 0.8);
+      \node at (9.0, 0.5) {\textbf{Test set}};
+      \node[below, color=unogray, font=\small] at (10.5, -0.1) {$t=T+H$};
+      \draw[dashed, color=unored, thick] (7.5, -0.05) -- (7.5, 1.2);
+      \node[above, color=unored] at (7.5, 1.2) {\footnotesize Forecast origin};
+    \end{tikzpicture}
+  \end{center}
+  \begin{warningbox}
+    \textbf{Never randomly shuffle time series observations.}
+    Always use \texttt{TimeSeriesSplit} in scikit-learn, not \texttt{KFold}.
+    Shuffling allows future data to ``train'' the model --- a form of
+    data leakage that makes results artificially good.
+  \end{warningbox}
+\end{frame}
+
+% =============================================================================
+\section{Course Roadmap}
+% =============================================================================
+
+\sectionslide{Course Roadmap}{%
+  What we will cover, and how it fits together.}
+
+% --- Slide: Course structure -------------------------------------------------
+\begin{frame}{BSAD 8310: Four-Part Structure}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Part I: Time Series Models}
+      \begin{enumerate}
+        \item Intro, ETS \& Evaluation \muted{$\leftarrow$ today}
+        \item ARIMA \& VAR
+        \item Generalized Additive Models
+      \end{enumerate}
+      \vspace{0.15cm}
+      \textbf{Part II: Tree-Based Models}
+      \begin{enumerate}
+        \setcounter{enumi}{3}
+        \item Decision Trees
+        \item Random Forests
+        \item Boosted Trees \& Regularization
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Part III: Deep Learning}
+      \begin{enumerate}
+        \setcounter{enumi}{6}
+        \item Neural Networks (PyTorch)
+        \item CNN Architectures
+        \item RNNs, LSTMs \& Transformers
+      \end{enumerate}
+      \vspace{0.15cm}
+      \textbf{Part IV: Bayesian Models}
+      \begin{enumerate}
+        \setcounter{enumi}{9}
+        \item Bayesian Statistics I: Foundations
+        \item Bayesian Statistics II: Time Series
+        \item Bayesian Statistics III: Linear Regression
+      \end{enumerate}
+    \end{column}
+  \end{columns}
+  \vspace{0.1cm}
+  \muted{\small Python throughout: statsmodels, scikit-learn, xgboost,
+  PyTorch, prophet, pyGAM, pymc.}
+\end{frame}
+
+% --- Slide: Tools and expectations -------------------------------------------
+\begin{frame}{Tools and What You Will Be Able to Do}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Python libraries we will use:}
+      \begin{itemize}
+        \item \texttt{statsmodels} --- ETS, ARIMA, VAR
+        \item \texttt{scikit-learn} --- ML models, pipelines, CV
+        \item \texttt{xgboost} --- gradient boosting
+        \item \texttt{torch} (PyTorch) --- neural networks
+        \item \texttt{prophet} / \texttt{pygam} --- GAMs
+        \item \texttt{pymc} --- Bayesian models
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{By the end of this course, you will:}
+      \begin{itemize}
+        \item[\pos{$\checkmark$}] Choose the right method for a business problem
+        \item[\pos{$\checkmark$}] Implement and tune models in Python
+        \item[\pos{$\checkmark$}] Evaluate models rigorously out-of-sample
+        \item[\pos{$\checkmark$}] Interpret results for non-technical stakeholders
+        \item[\pos{$\checkmark$}] Use AI tools (ChatGPT, Claude) effectively
+              to accelerate analysis
+        \item[\pos{$\checkmark$}] Avoid the most common forecasting mistakes
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Key Takeaways -----------------------------------------------
+\begin{frame}{Lecture 1: Key Takeaways}
+  \begin{keybox}
+    {\small
+    \begin{enumerate}
+      \item Forecasting underpins every forward-looking business decision.
+            The optimal point forecast (under squared loss) is the
+            \textbf{conditional expectation}.
+
+      \item \textbf{Always beat a benchmark first.}
+            Na\"{i}ve, seasonal na\"{i}ve, mean, drift.
+
+      \item Exponential smoothing assigns \textbf{geometrically declining weights}
+            to past observations. $\alpha$ controls how fast old data is forgotten.
+
+      \item SES (level only) $\to$ Holt (+ trend) $\to$ Holt-Winters (+ season).
+            The \textbf{ETS framework} unifies all variants; AIC selects automatically.
+
+      \item \textbf{Evaluate out-of-sample only.}
+            RMSE penalizes large errors; MASE benchmarks against seasonal na\"{i}ve.
+            Never shuffle time series data.
+    \end{enumerate}
+    }
+  \end{keybox}
+  \muted{\itshape Next: ARIMA \& VAR ---
+  a regression-based approach to time series with rich autocorrelation structure.}
+\end{frame}
+
+% --- References ---------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+% =============================================================================
+\end{document}
+% =============================================================================

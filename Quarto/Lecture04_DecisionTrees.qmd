@@ -1,0 +1,405 @@
+---
+title: "Decision Trees"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 4"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Why Go Beyond Linear Models?
+2. How Decision Trees Work
+3. Implementing Decision Trees in Python
+4. Limitations and Preview: Ensembles
+
+---
+
+# Why Go Beyond Linear Models?
+
+Real-world relationships are often nonlinear, involve interactions, and shift with context.
+
+---
+
+## The Limits of Linear Models
+
+Linear models (ETS, ARIMA, regression) assume a **constant slope**: $\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots$
+
+:::: {.columns}
+::: {.column width="50%"}
+**Problems with linear models:**
+
+- **No interactions:** the effect of advertising on sales may be larger during holiday season — a linear model cannot capture this
+- **No threshold effects:** consumer spending may be flat until unemployment drops below 5%, then jump
+- **Symmetric predictions:** extreme values drive coefficients in both directions equally
+:::
+::: {.column width="46%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Retail Sales Example
+:::
+Monthly sales depend on:
+
+- Last year's same-month sales (trend)
+- Whether it's December (seasonality)
+- Unemployment rate (economic conditions)
+
+The December effect is much *larger* when the economy is strong. This is an interaction that linear models miss.
+:::
+:::
+::::
+
+::: {.keybox}
+Decision trees and ensemble methods capture nonlinear relationships and interactions **automatically**, without needing to specify them.
+:::
+
+---
+
+## The Bias--Variance Tradeoff
+
+Every forecasting model faces a fundamental tension:
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Bias--Variance Decomposition
+:::
+$$\text{Expected MSE} = \underbrace{\text{Bias}^2}_{\text{systematic error}} + \underbrace{\text{Variance}}_{\text{sensitivity to data}} + \underbrace{\sigma^2}_{\text{irreducible noise}}$$
+:::
+
+:::: {.columns}
+::: {.column width="48%"}
+**High bias (underfitting):**
+
+- Model is too simple
+- Misses real patterns in the data
+- Bad on both training AND test sets
+- Example: linear model on a curved relationship
+:::
+::: {.column width="48%"}
+**High variance (overfitting):**
+
+- Model is too complex
+- Memorizes training data noise
+- Great on training, bad on test set
+- Example: a very deep decision tree
+:::
+::::
+
+::: {.keybox}
+**Goal:** find the right complexity that balances bias and variance. This is why we always evaluate *out-of-sample*.
+:::
+
+---
+
+# How Decision Trees Work
+
+Partition the feature space into rectangles; predict the mean in each region.
+
+---
+
+## What Is a Decision Tree?
+
+A decision tree works like a flowchart: ask a series of yes/no questions about the input features to arrive at a prediction.
+
+**Example: forecasting retail sales**
+
+```
+                  y_{t-12} ≤ 38,000?
+                  /               \
+               Yes                 No
+                |           y_{t-1} ≤ 52,000?
+          ŷ = 28,400          /             \
+                            Yes              No
+                        ŷ = 44,100       ŷ = 61,300
+```
+
+:::: {.columns}
+::: {.column width="50%"}
+**Key properties:**
+
+- **Non-parametric** — no functional form assumed
+- **Nonlinear** — can capture threshold effects
+- **Interpretable** — decision path is readable
+- **Scale-invariant** — no need to standardize
+:::
+::: {.column width="46%"}
+::: {.warningbox}
+A single *deep* tree **overfits severely**. Ensembles (Random Forests, XGBoost) fix this — coming in Lectures 5 and 6.
+:::
+:::
+::::
+
+---
+
+## The CART Algorithm (Regression)
+
+**CART (Classification and Regression Trees)** builds the tree greedily from top to bottom:
+
+**At each node, find the best split $(j, t)$:**
+
+$$\min_{j,\, t} \left[ \sum_{i: x_{ij} \leq t} (y_i - \bar{y}_{L})^2 + \sum_{i: x_{ij} > t} (y_i - \bar{y}_{R})^2 \right]$$
+
+Choose the feature $j$ and threshold $t$ that most reduces within-region variance.
+
+:::: {.columns}
+::: {.column width="52%"}
+**Algorithm steps:**
+
+1. Start with all data at the root
+2. For every feature $j$ and threshold $t$: compute the split criterion
+3. Split on the $(j^*, t^*)$ giving the largest reduction
+4. Recurse on left and right children
+5. Stop when nodes are too small or depth limit reached
+6. **Predict:** mean of observations in the leaf
+:::
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Business Intuition
+:::
+Think of it as asking:
+
+*"What is the single yes/no question that best separates high-sales months from low-sales months?"*
+
+Then repeat within each group.
+:::
+
+[For classification, replace variance with Gini impurity or entropy (information gain).]{.neutral .smaller}
+:::
+::::
+
+---
+
+## Depth Controls the Bias--Variance Tradeoff
+
+:::: {.columns}
+::: {.column width="52%"}
+**Tree depth and complexity:**
+
+- **Depth 1** (stump): one question — high bias, low variance
+- **Depth 5–10**: balanced
+- **Full tree** (one obs. per leaf): memorizes data — zero bias, extreme variance
+
+**Why trees have high variance:**
+
+A single changed training observation can alter the split at the root, changing every prediction below it. Trees are inherently *unstable*.
+:::
+::: {.column width="44%"}
+[Bias-Variance Tradeoff Curve]{.neutral .smaller}
+
+```
+error
+  |
+  |\ Bias²
+  | \
+  |  \___
+  |      \___         /
+  |          \___   /  Var
+  |              \/
+  |         Total
+  |________________________ depth
+              ↑
+          optimal
+```
+
+::: {.keybox}
+Tune with `max_depth` and `min_samples_leaf`. Select via `TimeSeriesSplit` cross-validation.
+:::
+:::
+::::
+
+---
+
+# Implementing Decision Trees in Python
+
+One class, a few hyperparameters, interpretable results.
+
+---
+
+## Decision Tree Regression in Python
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+sklearn Code Template
+:::
+```python
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import TimeSeriesSplit
+
+# Build features
+X = make_lag_features(df, lags=[1,2,3,12])
+y = df['sales']
+
+# Fit a tree
+tree = DecisionTreeRegressor(
+    max_depth=5,
+    min_samples_leaf=10,
+    random_state=42
+)
+tree.fit(X_train, y_train)
+
+# Predict
+y_hat = tree.predict(X_test)
+```
+:::
+:::
+::: {.column width="44%"}
+**Key hyperparameters:**
+
+| Parameter | Effect |
+|-----------|--------|
+| `max_depth` | Cap tree depth |
+| `min_samples_leaf` | Min obs. per leaf |
+| `max_features` | Feature subsampling |
+| `ccp_alpha` | Cost-complexity pruning |
+
+::: {.warningbox}
+Always use `TimeSeriesSplit` for cross-validation. Never use `KFold` on time series — it leaks future data.
+:::
+:::
+::::
+
+---
+
+## Feature Importance
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Impurity-Based Feature Importance
+:::
+For each feature $j$: sum the total reduction in variance across all splits where feature $j$ was used, weighted by the fraction of observations in each node. Normalize to sum to 1.
+:::
+
+:::: {.columns}
+::: {.column width="52%"}
+**Example: retail sales tree**
+
+| Feature | Importance |
+|---------|-----------|
+| Lag 12 (same month last year) | 0.41 |
+| Lag 1 (previous month) | 0.27 |
+| Lag 2 | 0.13 |
+| December dummy | 0.10 |
+| Unemployment rate | 0.09 |
+:::
+::: {.column width="44%"}
+::: {.keybox}
+Feature importance tells you **which variables the tree found most useful** for splitting — a quick way to screen which predictors matter.
+:::
+
+::: {.warningbox}
+Feature importance can be biased toward high-cardinality features. SHAP values give more reliable individual-level attributions.
+:::
+:::
+::::
+
+---
+
+## Interpreting and Communicating Tree Predictions
+
+One of the main advantages of decision trees is explaining *why* a specific prediction was made.
+
+::: {.examplebox}
+::: {.examplebox-title}
+Explaining a Prediction to a Manager
+:::
+"Our model forecasts \$61,300 in sales for next month because:
+
+1. Last year's same-month sales were above \$38,000 (economy growing)
+2. Last month's sales were above \$52,000 (current momentum strong)
+3. When both conditions hold, the average outcome in our training data was \$61,300."
+:::
+
+**Visualizing the tree in Python:**
+
+```python
+from sklearn.tree import plot_tree, export_text
+plot_tree(tree, feature_names=feature_names, filled=True)
+print(export_text(tree, feature_names=feature_names))
+```
+
+[A decision path tells you which conditions led to the forecast. This is useful for business buy-in — managers can validate that the tree is using sensible splits.]{.neutral .smaller}
+
+---
+
+# Limitations and Preview: Ensembles
+
+A single tree is a weak learner. Combine hundreds to build a strong one.
+
+---
+
+## When a Single Tree Falls Short
+
+:::: {.columns}
+::: {.column width="52%"}
+**Strengths:**
+
+- [✓]{.positive} Interpretable (can show the path)
+- [✓]{.positive} No feature scaling needed
+- [✓]{.positive} Captures nonlinear relationships
+- [✓]{.positive} Fast to train
+
+**Weaknesses:**
+
+- [✗]{.negative} High variance — small data changes ⟹ very different tree
+- [✗]{.negative} Flat predictions within each leaf
+- [✗]{.negative} Cannot extrapolate beyond training range
+- [✗]{.negative} Sensitive to outliers
+:::
+::: {.column width="44%"}
+::: {.keybox}
+**The ensemble solution:**
+
+Instead of trusting one tree, average many trees trained on different bootstrap samples of the data.
+
+This reduces variance dramatically while keeping the feature importance benefits.
+:::
+
+[On standard benchmarks, Random Forests improve over single trees by 20–40% in RMSE.]{.neutral .smaller}
+:::
+::::
+
+---
+
+## Lecture 4: Key Takeaways
+
+::: {.keybox}
+1. Linear models cannot capture **interactions** or **threshold effects**. Decision trees can, without needing to specify these relationships in advance.
+
+2. The **bias–variance tradeoff**: a too-simple tree underfits (high bias) and a too-deep tree overfits (high variance). Tune with `max_depth` and `min_samples_leaf`.
+
+3. **CART** greedily minimizes within-region variance at each split. Prediction = mean of observations in the leaf.
+
+4. Decision trees are **interpretable**: you can trace the exact decision path that led to any prediction.
+
+5. Single trees have **high variance** — they change dramatically when the data changes slightly. Ensembles (Random Forests, XGBoost) solve this.
+:::
+
+*Next: Random Forests — variance reduction through bootstrap aggregation and random feature selection.*
+
+---
+
+## References
+
+::: {#refs}
+:::

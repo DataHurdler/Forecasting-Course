@@ -1,0 +1,491 @@
+% =============================================================================
+% Lecture 07: Introduction to Neural Networks (PyTorch)
+% BSAD 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+% ---- Lecture metadata --------------------------------------------------------
+\title{Introduction to Neural Networks}
+\subtitle{BSAD 8310: Business Forecasting --- Lecture 7}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+\date{Spring 2026}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---- Outline ----------------------------------------------------------------
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{From Trees to Neural Networks}
+% =============================================================================
+
+\sectionslide{From Trees to Neural Networks}{%
+  Tree-based methods are powerful but limited by their piecewise-constant
+  predictions. Neural networks learn smooth, continuous functions of
+  arbitrary complexity.}
+
+% --- Slide: Motivation -------------------------------------------------------
+\begin{frame}{Why Go Beyond Trees?}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Tree-based models (L04--L06):}
+      \begin{itemize}\small
+        \item Excellent for tabular data with many features
+        \item Each row treated \textbf{independently} ---
+              no built-in notion of order or sequence
+        \item Predictions are piecewise constant:
+              cannot extrapolate beyond training range
+        \item Feature engineering required for temporal patterns
+              (lag columns, rolling means, etc.)
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{What neural networks add:}
+      \begin{itemize}\small
+        \item Learn \textbf{smooth, continuous} functions directly
+        \item Flexible architecture: can be adapted
+              for sequences, images, text
+        \item Can learn hierarchical feature representations
+              automatically
+        \item PyTorch enables custom architectures and
+              GPU-accelerated training
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    Neural networks are not always better than XGBoost on tabular data.
+    They shine when:
+    (1) the data is a sequence (time series, text),
+    (2) raw inputs are images or audio, or
+    (3) you have very large amounts of data ($n > 100\text{K}$).
+  \end{keybox}
+\end{frame}
+
+% --- Slide: From regression to a neuron ---------------------------------------
+\begin{frame}{From Linear Regression to a Single Neuron}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Linear regression} (Lecture 02):
+      \[
+        \hat{y} = \mathbf{w}^\top \mathbf{x} + b
+      \]
+      \textbf{One neuron} wraps the linear combination in a nonlinear
+      \textbf{activation function} $\sigma(\cdot)$:
+      \[
+        a = \sigma(\mathbf{w}^\top \mathbf{x} + b)
+      \]
+      \begin{center}
+        {\footnotesize
+        \begin{tabular}{lll}
+          \toprule
+          \textbf{Activation} & \textbf{Formula} & \textbf{Typical use} \\
+          \midrule
+          ReLU    & $\max(0,z)$       & Hidden layers \\
+          Sigmoid & $1/(1+e^{-z})$    & Binary output / gates \\
+          Tanh    & $\tanh(z)$        & Sequence hidden states \\
+          Linear  & $z$               & Regression output \\
+          \bottomrule
+        \end{tabular}
+        }
+      \end{center}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{definitionbox}{Why Non-Linearity?}
+        Without $\sigma(\cdot)$, stacking layers is equivalent
+        to a single linear model --- the composition of linear
+        functions is still linear.
+
+        Non-linearity enables a network to approximate
+        \textbf{any continuous function} to arbitrary accuracy
+        (universal approximation theorem).
+      \end{definitionbox}
+      \vspace{0.1cm}
+      \begin{examplebox}{Business intuition}
+        A neuron asks: ``Is this pattern present?''
+        If yes (large positive $z$), activate.
+        If no, stay off. ReLU makes this literal.
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Feedforward Networks}
+% =============================================================================
+
+\sectionslide{Feedforward Networks}{%
+  Stack layers of neurons. Each layer learns higher-level
+  representations of the input.}
+
+% --- Slide: Layers and forward pass ------------------------------------------
+\begin{frame}{Feedforward Network: Layers and Forward Pass}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      A \textbf{feedforward network} (FFN / MLP) has:
+      \begin{itemize}\small
+        \item \textbf{Input layer:} raw features
+              $\mathbf{x} \in \mathbb{R}^p$
+        \item \textbf{Hidden layers:} $H$ layers, each applying
+              $\mathbf{a}^{(\ell)} = \sigma(\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)} + \mathbf{b}^{(\ell)})$
+        \item \textbf{Output layer:} linear (regression)
+              or softmax (classification)
+      \end{itemize}
+      \vspace{0.2cm}
+      \textbf{Notation:}
+      \begin{itemize}\small
+        \item $\mathbf{W}^{(\ell)}$: weight matrix for layer $\ell$
+        \item $\mathbf{b}^{(\ell)}$: bias vector for layer $\ell$
+        \item Width = number of neurons per layer
+        \item Depth = number of hidden layers
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        \small
+        \textbf{Practical sizing for forecasting:}
+        \begin{itemize}\small
+          \item 2--3 hidden layers
+          \item 64--256 neurons per layer
+          \item ReLU activations
+          \item Dropout 0.2--0.5 for regularization
+        \end{itemize}
+        Wider/deeper networks need more data
+        and more regularization.
+      \end{keybox}
+      \vspace{0.1cm}
+      \begin{warningbox}
+        \small Bigger is not always better.
+        Start small, add capacity only if
+        the validation error is still too high.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Training: Loss and Backpropagation}
+% =============================================================================
+
+\sectionslide{Training: Loss and Backpropagation}{%
+  How does the network learn? By computing the error,
+  then propagating it backward to update weights.}
+
+% --- Slide: Loss and SGD -----------------------------------------------------
+\begin{frame}{Training a Network: Loss, Gradients, and SGD}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Step 1: Define a loss function}
+
+      For regression: $\mathcal{L} = \frac{1}{n}\sum_i (y_i - \hat{y}_i)^2$
+      \hfill (Mean Squared Error)
+
+      \vspace{0.2cm}
+      \textbf{Step 2: Backpropagation}
+
+      Apply the chain rule to compute $\frac{\partial \mathcal{L}}{\partial \mathbf{W}^{(\ell)}}$
+      for every weight matrix. PyTorch does this automatically.
+
+      \vspace{0.2cm}
+      \textbf{Step 3: Update weights (SGD step)}
+      \[
+        \mathbf{W} \leftarrow \mathbf{W} - \eta \frac{\partial \mathcal{L}}{\partial \mathbf{W}}
+      \]
+      where $\eta$ is the \textbf{learning rate}.
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{definitionbox}{Stochastic Gradient Descent}
+        Instead of computing the gradient on all $n$ observations
+        at once (slow), use a random \textbf{mini-batch} of size
+        32--256 per step. One pass through all mini-batches
+        is one \textbf{epoch}.
+      \end{definitionbox}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small
+        \textbf{In practice, use Adam optimizer}
+        instead of plain SGD. Adam adapts the learning rate
+        per parameter and converges much faster.
+        \texttt{torch.optim.Adam(lr=1e-3)}
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Overfitting and regularization ------------------------------------
+\begin{frame}{Preventing Overfitting: Dropout and Early Stopping}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{definitionbox}{Dropout}
+        During training, randomly set a fraction $p$
+        of neuron outputs to zero on each forward pass.
+        This prevents co-adaptation: neurons cannot
+        rely on specific other neurons being present.
+
+        At test time, all neurons are active
+        and outputs are scaled by $(1-p)$.
+      \end{definitionbox}
+      \vspace{0.1cm}
+      PyTorch: \texttt{nn.Dropout(p=0.3)}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{warningbox}
+        \textbf{Early stopping} is essential.
+        Monitor validation loss after every epoch.
+        Stop training when validation loss stops
+        improving for $k$ consecutive epochs (patience).
+        Save the model at the best validation epoch.
+      \end{warningbox}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small
+        \textbf{Standard regularization toolkit:}
+        \begin{itemize}\small
+          \item Dropout (p = 0.2--0.5)
+          \item Weight decay in Adam
+                (\texttt{weight\_decay=1e-4})
+          \item Early stopping (patience = 10--20)
+          \item Batch normalization (deeper nets)
+        \end{itemize}
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{PyTorch Implementation}
+% =============================================================================
+
+\sectionslide{PyTorch Implementation}{%
+  Dataset, DataLoader, model definition, and training loop.}
+
+% --- Slide: PyTorch Dataset and DataLoader -----------------------------------
+\begin{frame}{PyTorch: Dataset and DataLoader}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{Custom Dataset}
+        {\small
+        \texttt{import torch}\\
+        \texttt{from torch.utils.data import Dataset, DataLoader}\\[4pt]
+        \texttt{class ForecastDataset(Dataset):}\\
+        \texttt{  def \_\_init\_\_(self, X, y):}\\
+        \texttt{    self.X = torch.tensor(X, dtype=torch.float32)}\\
+        \texttt{    self.y = torch.tensor(y, dtype=torch.float32)}\\[4pt]
+        \texttt{  def \_\_len\_\_(self):}\\
+        \texttt{    return len(self.X)}\\[4pt]
+        \texttt{  def \_\_getitem\_\_(self, idx):}\\
+        \texttt{    return self.X[idx], self.y[idx]}\\[4pt]
+        \texttt{train\_ds = ForecastDataset(X\_train, y\_train)}\\
+        \texttt{train\_loader = DataLoader(}\\
+        \texttt{  train\_ds, batch\_size=64, shuffle=True)}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Why Dataset and DataLoader?}
+      \begin{itemize}\small
+        \item \texttt{Dataset}: wraps your data and
+              defines how to get one sample
+        \item \texttt{DataLoader}: handles mini-batching,
+              shuffling, and parallel loading
+        \item Separates data handling from model logic ---
+              easy to swap in different datasets
+      \end{itemize}
+      \vspace{0.2cm}
+      \begin{warningbox}
+        \small
+        \textbf{Time series:} do NOT shuffle.
+        Set \texttt{shuffle=False} and use
+        \texttt{TimeSeriesSplit} splits on the
+        underlying indices before creating the
+        Dataset.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Model definition -------------------------------------------------
+\begin{frame}{PyTorch: Defining the Model}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{Feedforward Regressor}
+        {\small
+        \texttt{import torch.nn as nn}\\[4pt]
+        \texttt{class FFNRegressor(nn.Module):}\\
+        \texttt{  def \_\_init\_\_(self, in\_dim):}\\
+        \texttt{    super().\_\_init\_\_()}\\
+        \texttt{    self.net = nn.Sequential(}\\
+        \texttt{      nn.Linear(in\_dim, 128),}\\
+        \texttt{      nn.ReLU(),}\\
+        \texttt{      nn.Dropout(0.3),}\\
+        \texttt{      nn.Linear(128, 64),}\\
+        \texttt{      nn.ReLU(),}\\
+        \texttt{      nn.Dropout(0.3),}\\
+        \texttt{      nn.Linear(64, 1)}\\
+        \texttt{    )}\\[4pt]
+        \texttt{  def forward(self, x):}\\
+        \texttt{    return self.net(x).squeeze(-1)}\\[4pt]
+        \texttt{model = FFNRegressor(in\_dim=X\_train.shape[1])}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Key PyTorch concepts:}
+      \begin{itemize}\small
+        \item \texttt{nn.Module}: base class for all models.
+              Override \texttt{\_\_init\_\_} and \texttt{forward}.
+        \item \texttt{nn.Sequential}: chains layers in order
+        \item \texttt{nn.Linear(in, out)}: fully connected layer
+              with $in \times out$ weights + bias
+        \item \texttt{nn.ReLU()}: element-wise ReLU activation
+        \item \texttt{nn.Dropout(p)}: dropout layer
+      \end{itemize}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small The \texttt{forward} method defines what
+        happens on each pass through the network.
+        PyTorch automatically computes gradients
+        via \texttt{autograd}.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Training loop ----------------------------------------------------
+\begin{frame}{PyTorch: The Training Loop}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{Training Loop}
+        {\small
+        \texttt{optimizer = torch.optim.Adam(}\\
+        \texttt{  model.parameters(), lr=1e-3)}\\
+        \texttt{criterion = nn.MSELoss()}\\[4pt]
+        \texttt{for epoch in range(100):}\\
+        \texttt{  model.train()}\\
+        \texttt{  for X\_batch, y\_batch in train\_loader:}\\
+        \texttt{    optimizer.zero\_grad()}\\
+        \texttt{    y\_hat = model(X\_batch)}\\
+        \texttt{    loss = criterion(y\_hat, y\_batch)}\\
+        \texttt{    loss.backward()}\\
+        \texttt{    optimizer.step()}\\[4pt]
+        \texttt{  \# Evaluate on validation set}\\
+        \texttt{  model.eval()}\\
+        \texttt{  with torch.no\_grad():}\\
+        \texttt{    val\_hat = model(X\_val\_t)}\\
+        \texttt{    val\_loss = criterion(val\_hat, y\_val\_t)}\\
+        \texttt{  print(f"Epoch \{epoch\}: val={val\_loss:.2f}")}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Four required steps per mini-batch:}
+      \begin{enumerate}\small
+        \item \texttt{zero\_grad()}: clear accumulated gradients
+        \item Forward pass: compute $\hat{y}$
+        \item \texttt{loss.backward()}: compute gradients
+        \item \texttt{optimizer.step()}: update weights
+      \end{enumerate}
+      \vspace{0.2cm}
+      \begin{warningbox}
+        \small Always call \texttt{model.eval()} before
+        validation to disable dropout.
+        Use \texttt{torch.no\_grad()} to skip
+        gradient computation during evaluation
+        (saves memory and time).
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Key Takeaways}
+% =============================================================================
+
+\sectionslide{Key Takeaways}{%
+  Neural networks are flexible function approximators.
+  PyTorch provides the building blocks; the training loop
+  is always the same four steps.}
+
+% --- Slide: Method comparison ------------------------------------------------
+\begin{frame}{Neural Networks vs.\ Tree Methods}
+  \begin{center}
+    {\small
+    \begin{tabular}{lllll}
+      \toprule
+      \textbf{Method} & \textbf{Handles sequences} & \textbf{Extrapolates} & \textbf{Tuning burden} & \textbf{Best for} \\
+      \midrule
+      Random Forest & No (needs lags) & No & Low & Tabular, fast baseline \\
+      XGBoost & No (needs lags) & No & Medium & Tabular, best accuracy \\
+      FFN (MLP) & Partially & Yes & Medium & Tabular + smooth functions \\
+      RNN / LSTM & Yes & Yes & High & Sequences, time series \\
+      \midrule
+      \multicolumn{5}{l}{\footnotesize Lectures 08--09 extend FFN to sequences and images.} \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \begin{keybox}
+    \small
+    \textbf{When to use an FFN for forecasting:}
+    \begin{itemize}\small
+      \item You have engineered lag and rolling features (same as XGBoost)
+      \item You want a smooth, continuous forecast function
+      \item Baseline: XGBoost usually wins on small-to-medium tabular data;
+            FFN may win with larger data or more complex patterns
+    \end{itemize}
+  \end{keybox}
+\end{frame}
+
+% --- Slide: Key takeaways ---------------------------------------------------
+\begin{frame}{Lecture 7: Key Takeaways}
+  \begin{keybox}
+    {\small
+    \begin{enumerate}
+      \item A \textbf{neuron} combines inputs linearly, then applies a nonlinear
+            \textbf{activation function} (ReLU, sigmoid, tanh). Without
+            non-linearity, stacking layers is equivalent to one linear layer.
+
+      \item A \textbf{feedforward network} stacks layers of neurons.
+            Each layer learns higher-level representations.
+            Depth adds capacity; width adds breadth.
+
+      \item \textbf{Training} is iterative: compute loss, backpropagate gradients,
+            update weights with Adam. Use mini-batches for efficiency.
+
+      \item The \textbf{four mandatory steps} per mini-batch in PyTorch:
+            \texttt{zero\_grad()} $\to$ forward pass $\to$
+            \texttt{loss.backward()} $\to$ \texttt{optimizer.step()}.
+
+      \item Prevent overfitting with \textbf{dropout}, \textbf{weight decay},
+            and \textbf{early stopping} on a held-out validation set.
+
+      \item For time series, do not shuffle the DataLoader.
+            Use \textbf{TimeSeriesSplit} to create train/val splits.
+    \end{enumerate}
+    }
+  \end{keybox}
+  \muted{\itshape Next: CNN Architectures --- convolutional filters, pooling,
+  and residual connections for structured data.}
+\end{frame}
+
+% --- References ---------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+% =============================================================================
+\end{document}
+% =============================================================================

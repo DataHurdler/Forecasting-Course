@@ -1,0 +1,320 @@
+---
+title: "Boosted Trees & Regularization"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 6"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Gradient Boosting
+2. XGBoost
+3. Regularization for Linear Models
+4. Key Takeaways
+
+---
+
+# Gradient Boosting
+
+Instead of averaging independent trees, fit each new tree to the errors of all previous trees.
+
+---
+
+## Boosting vs. Bagging: The Core Difference
+
+:::: {.columns}
+::: {.column width="48%"}
+**Bagging (Random Forest):**
+
+- Trees built **in parallel**, independently
+- Each tree tries to predict $y$ directly
+- Average reduces variance
+- Adding more trees does not reduce bias
+:::
+::: {.column width="48%"}
+**Boosting:**
+
+- Trees built **sequentially**
+- Each tree fits the *errors* of the previous ensemble
+- Adding more trees reduces both bias AND variance (carefully)
+- Risk: can overfit if trees are too deep or too many
+:::
+::::
+
+::: {.examplebox}
+::: {.examplebox-title}
+Analogy: Correcting a Forecast Iteratively
+:::
+Forecast 1: "Sales will be \$50,000." &emsp; Actual: \$60,000. &emsp; Error: +\$10,000.
+
+Forecast 2: "The first model was short by \$10,000."
+
+Combined prediction: \$50,000 + \$10,000 = **\$60,000**.
+
+Each stage corrects the remaining error from all previous stages.
+:::
+
+---
+
+## The Gradient Boosting Algorithm
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Gradient Boosting (for squared-error loss)
+:::
+Initialize $F_0(\mathbf{x}) = \bar{y}$. For $b = 1, \ldots, B$:
+
+1. Compute residuals: $r_i^{(b)} = y_i - F_{b-1}(\mathbf{x}_i)$
+2. Fit a **shallow tree** $T_b$ to the residuals $\{(\mathbf{x}_i, r_i^{(b)})\}$
+3. Update: $F_b = F_{b-1} + \eta\, T_b$
+
+Final prediction: $\hat{y} = F_B(\mathbf{x})$
+:::
+
+:::: {.columns}
+::: {.column width="52%"}
+**The learning rate $\eta$:**
+
+- Small $\eta$ (0.01–0.1): each tree makes a tiny step — requires many trees but more robust
+- Large $\eta$ (> 0.3): fast but risky — can overshoot
+- **Rule:** smaller $\eta$ + more trees + early stopping typically wins
+:::
+::: {.column width="44%"}
+::: {.keybox}
+Trees are **shallow** (depth 3–6). Each corrects a small fraction of the total error. The ensemble slowly converges to a good prediction.
+:::
+
+::: {.warningbox}
+Always use **early stopping** on a validation set. Without it, boosting will overfit.
+:::
+:::
+::::
+
+---
+
+# XGBoost
+
+Three improvements over vanilla boosting: second-order optimization, explicit regularization, and column subsampling.
+
+---
+
+## XGBoost: Three Advances
+
+::: {.interpretation}
+*XGBoost dominated Kaggle competitions from 2014–2018. It consistently outperforms vanilla gradient boosting on tabular data [@Chen2016].*
+:::
+
+:::: {.columns}
+::: {.column width="56%"}
+1. **Newton step (2nd-order optimization):** Uses the gradient *and* curvature (Hessian) of the loss function. Converges faster than first-order boosting.
+
+2. **Explicit regularization:** Penalizes the number of leaves ($\gamma$) and the magnitude of leaf weights ($\lambda$) directly in the objective. Guards against overfitting without relying on early stopping alone.
+
+3. **Column subsampling:** Like Random Forests, randomly samples features per tree and per split. Reduces correlation and improves generalization.
+:::
+::: {.column width="40%"}
+::: {.keybox}
+Newton step ⟹ more precise gradient direction.
+
+Regularization ⟹ guards against overfitting.
+
+Together: XGBoost outperforms vanilla GBM on most benchmarks.
+:::
+
+**Other popular options:**
+
+- `LightGBM` — faster on large datasets
+- `CatBoost` — handles categorical features natively
+:::
+::::
+
+---
+
+## XGBoost: Key Hyperparameters
+
+| Parameter | XGB name | Typical | Effect |
+|-----------|---------|---------|--------|
+| Number of trees | `n_estimators` | 500–2000 | More + small $\eta$ = better |
+| Learning rate | `learning_rate` | 0.01–0.1 | Smaller = more robust |
+| Tree depth | `max_depth` | 3–6 | Shallow preferred |
+| Row subsample | `subsample` | 0.7–0.9 | Fraction of training rows per tree |
+| Col. subsample | `colsample_bytree` | 0.7–0.9 | Feature fraction per tree |
+| L2 leaf penalty | `reg_lambda` | 1 | Ridge on leaf weights |
+
+::: {.keybox}
+**Practical starting point:** `learning_rate=0.05`, `max_depth=4`, `n_estimators=1000` with early stopping on validation RMSE. Tune `max_depth` and `subsample` via `TimeSeriesSplit`.
+:::
+
+---
+
+## XGBoost in Python
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Code Template
+:::
+```python
+import xgboost as xgb
+
+model = xgb.XGBRegressor(
+    n_estimators=1000,
+    learning_rate=0.05,
+    max_depth=4,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    early_stopping_rounds=50,
+    random_state=42
+)
+
+model.fit(
+    X_train, y_train,
+    eval_set=[(X_val, y_val)],
+    verbose=False
+)
+```
+:::
+:::
+::: {.column width="44%"}
+**Cross-validation for time series:**
+
+- Use `TimeSeriesSplit` with the sklearn API
+- Reserve last 20% of data as final test set
+- `early_stopping_rounds=50`: stops training when validation RMSE does not improve for 50 consecutive rounds
+
+[Typical RSXFS result: XGBoost RMSE ≈ 1,500–1,700 (vs. RF ≈ 1,800)]{.neutral .smaller}
+:::
+::::
+
+---
+
+# Regularization for Linear Models
+
+When you have many predictors, penalize the size of coefficients to prevent overfitting.
+
+---
+
+## Why Regularize?
+
+Ordinary least squares (OLS) minimizes: $\sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2$
+
+This can overfit badly when the number of predictors $k$ is large relative to $n$.
+
+**Regularization idea:** add a penalty on the size of coefficients:
+
+$$\text{minimize } \underbrace{\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}$$
+
+$\lambda > 0$ controls the strength of the penalty.
+
+::: {.keybox}
+The penalty **shrinks** coefficients toward zero, reducing variance at the cost of a small increase in bias. With the right $\lambda$ (tuned by cross-validation), the net effect is a more accurate out-of-sample forecast.
+:::
+
+---
+
+## Ridge, LASSO, and Elastic Net
+
+:::: {.columns}
+::: {.column width="33%"}
+**Ridge ($\ell_2$):**
+
+$$\lambda \sum_j \beta_j^2$$
+
+- Shrinks all coefficients toward zero
+- Keeps all predictors in the model
+- Best when many predictors are all somewhat relevant
+
+[@HoerlKennard1970]
+:::
+::: {.column width="33%"}
+**LASSO ($\ell_1$):**
+
+$$\lambda \sum_j |\beta_j|$$
+
+- Sets some coefficients **exactly to zero**
+- Performs automatic variable selection
+- Best when only a few predictors matter
+
+[@Tibshirani1996]
+:::
+::: {.column width="33%"}
+**Elastic Net:**
+
+$$\lambda_1 \sum_j |\beta_j| + \lambda_2 \sum_j \beta_j^2$$
+
+- Combination of LASSO + Ridge
+- Groups correlated predictors together
+- Best with many correlated features
+
+[@ZouHastie2005]
+:::
+::::
+
+::: {.keybox}
+In all cases, $\lambda$ is chosen by **cross-validation** (`TimeSeriesSplit`). Python: `Ridge`, `Lasso`, `ElasticNet` in `sklearn.linear_model`.
+:::
+
+---
+
+## Tree-Based Methods: Comparison
+
+| Method | Parallelism | Interpretable | Tuning | Typical accuracy |
+|--------|------------|--------------|--------|-----------------|
+| Decision Tree | Single tree | High | Low | Baseline |
+| Random Forest | Parallel ($B$ trees) | Medium | Low | Good |
+| XGBoost | Sequential ($B$ trees) | Low | Higher | Best |
+| Ridge / LASSO | N/A (linear) | High | Low | Good (linear data) |
+
+::: {.keybox}
+**When to use what:**
+
+- **Interpretability needed:** Decision Tree
+- **Robust first model:** Random Forest
+- **Best accuracy on tabular data:** XGBoost
+- **Many correlated linear predictors:** Elastic Net / LASSO
+:::
+
+---
+
+## Lecture 6: Key Takeaways
+
+::: {.keybox}
+1. **Boosting** builds trees *sequentially*, each fitting the errors of the previous ensemble. It reduces both bias and variance when properly tuned.
+
+2. **XGBoost** improves on vanilla boosting with second-order optimization, explicit regularization, and column subsampling.
+
+3. Use **early stopping** with XGBoost: always set aside a validation set and stop when validation RMSE stops improving.
+
+4. **Regularization** (Ridge, LASSO, Elastic Net) penalizes coefficient size to prevent overfitting in linear models with many predictors. LASSO performs automatic variable selection.
+
+5. Choose by cross-validation: $\lambda$ for regularization, tree depth and learning rate for boosting. Always use `TimeSeriesSplit`.
+:::
+
+*Next: Introduction to Neural Networks (PyTorch) — beyond trees to flexible function approximators for sequence data.*
+
+---
+
+## References
+
+::: {#refs}
+:::

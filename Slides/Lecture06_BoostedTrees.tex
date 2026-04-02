@@ -1,0 +1,369 @@
+% =============================================================================
+% Lecture 06: Boosted Trees & Regularization
+% BSAD 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+% ---- Lecture metadata --------------------------------------------------------
+\title{Boosted Trees \& Regularization}
+\subtitle{BSAD 8310: Business Forecasting --- Lecture 6}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+\date{Spring 2026}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---- Outline ----------------------------------------------------------------
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Gradient Boosting}
+% =============================================================================
+
+\sectionslide{Gradient Boosting}{%
+  Instead of averaging independent trees, fit each new tree to the errors
+  of all previous trees.}
+
+% --- Slide: Boosting vs. bagging ---------------------------------------------
+\begin{frame}{Boosting vs.\ Bagging: The Core Difference}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Bagging (Random Forest):}
+      \begin{itemize}\small
+        \item Trees built \textbf{in parallel}, independently
+        \item Each tree tries to predict $y$ directly
+        \item Average reduces variance
+        \item Adding more trees does not reduce bias
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Boosting:}
+      \begin{itemize}\small
+        \item Trees built \textbf{sequentially}
+        \item Each tree fits the \emph{errors} of the previous ensemble
+        \item Adding more trees reduces both bias AND variance (carefully)
+        \item Risk: can overfit if trees are too deep or too many
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.3cm}
+  \begin{examplebox}{Analogy: Correcting a Forecast Iteratively}
+    Forecast 1: ``Sales will be \$50,000.'' \quad Actual: \$60,000.\\
+    Error: $+$\$10,000.\\[3pt]
+    Forecast 2: ``The first model was short by \$10,000.''\\
+    Combined prediction: \$50,000 $+$ \$10,000 $=$ \textbf{\$60,000}.\\[3pt]
+    Each stage corrects the remaining error from all previous stages.
+  \end{examplebox}
+\end{frame}
+
+% --- Slide: Boosting algorithm -----------------------------------------------
+\begin{frame}{The Gradient Boosting Algorithm}
+  \begin{definitionbox}{Gradient Boosting (for squared-error loss)}
+    {\small
+    Initialize $F_0(\mathbf{x}) = \bar{y}$. \quad For $b = 1, \ldots, B$:
+    \begin{enumerate}
+      \item Compute residuals: $r_i^{(b)} = y_i - F_{b-1}(\mathbf{x}_i)$
+      \item Fit a shallow tree $T_b$ to the residuals $\{(\mathbf{x}_i, r_i^{(b)})\}$
+      \item Update: $F_b = F_{b-1} + \eta\, T_b$
+    \end{enumerate}
+    Final prediction: $\hat{y} = F_B(\mathbf{x})$
+    }
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{The learning rate $\eta$:}
+      \begin{itemize}\small
+        \item Small $\eta$ (0.01--0.1): each tree makes a tiny step ---
+              requires many trees but more robust
+        \item Large $\eta$ ($> 0.3$): fast but risky --- can overshoot
+        \item \textbf{Rule:} smaller $\eta$ + more trees + early stopping
+              typically wins
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        Trees are \textbf{shallow} (depth 3--6).
+        Each corrects a small fraction of the total error.
+        The ensemble slowly converges to a good prediction.
+      \end{keybox}
+      \begin{warningbox}
+        \small Always use \textbf{early stopping} on a
+        validation set. Without it, boosting will overfit.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{XGBoost}
+% =============================================================================
+
+\sectionslide{XGBoost}{%
+  Three improvements over vanilla boosting: second-order optimization,
+  explicit regularization, and column subsampling.}
+
+% --- Slide: XGBoost innovations -----------------------------------------------
+\begin{frame}{XGBoost: Three Advances \parencite{Chen2016}}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      \begin{enumerate}
+        \item \textbf{Newton step (2nd-order optimization):}
+              Uses the gradient \emph{and} curvature (Hessian)
+              of the loss function to compute more precise tree-fitting directions.
+              Converges faster than first-order boosting.
+
+        \item \textbf{Explicit regularization:}
+              Penalizes the number of leaves ($\gamma$) and the magnitude
+              of leaf weights ($\lambda$) directly in the objective.
+              Guards against overfitting without relying on early stopping alone.
+
+        \item \textbf{Column subsampling:}
+              Like Random Forests, randomly samples features per tree and per split.
+              Reduces correlation and improves generalization.
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \begin{keybox}
+        XGBoost dominated Kaggle competitions from 2014--2018.
+        It consistently outperforms vanilla gradient boosting
+        on tabular data.
+      \end{keybox}
+      \vspace{0.2cm}
+      \textbf{Other popular options:}
+      \begin{itemize}\small
+        \item \texttt{LightGBM} --- faster on large datasets
+        \item \texttt{CatBoost} --- handles categorical features natively
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: XGBoost key hyperparameters --------------------------------------
+\begin{frame}{XGBoost: Key Hyperparameters}
+  \begin{center}
+    {\small
+    \begin{tabular}{p{2.6cm}p{2.8cm}p{1.8cm}p{4.0cm}}
+      \toprule
+      \textbf{Parameter} & \textbf{XGB name} & \textbf{Typical} & \textbf{Effect} \\
+      \midrule
+      Number of trees & \texttt{n\_estimators} & 500--2000 & More + small $\eta$ = better (use early stopping) \\
+      Learning rate & \texttt{learning\_rate} & 0.01--0.1 & Smaller = more robust; needs more trees \\
+      Tree depth & \texttt{max\_depth} & 3--6 & Shallow preferred; depth $>$6 risks overfit \\
+      Row subsample & \texttt{subsample} & 0.7--0.9 & Fraction of training rows per tree \\
+      Col.\ subsample & \texttt{colsample\_bytree} & 0.7--0.9 & Feature fraction per tree (like RF) \\
+      L2 leaf penalty & \texttt{reg\_lambda} & 1 & Ridge on leaf weights; stabilizes \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \begin{keybox}
+    \small \textbf{Practical starting point:}
+    \texttt{learning\_rate=0.05}, \texttt{max\_depth=4},
+    \texttt{n\_estimators=1000} with early stopping on validation RMSE.
+    Tune \texttt{max\_depth} and \texttt{subsample} via \texttt{TimeSeriesSplit}.
+  \end{keybox}
+\end{frame}
+
+% --- Slide: XGBoost Python ---------------------------------------------------
+\begin{frame}{XGBoost in Python}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{Code Template}
+        {\small
+        \texttt{import xgboost as xgb}\\[4pt]
+        \texttt{model = xgb.XGBRegressor(}\\
+        \texttt{  n\_estimators=1000,}\\
+        \texttt{  learning\_rate=0.05,}\\
+        \texttt{  max\_depth=4,}\\
+        \texttt{  subsample=0.8,}\\
+        \texttt{  colsample\_bytree=0.8,}\\
+        \texttt{  early\_stopping\_rounds=50,}\\
+        \texttt{  random\_state=42}\\
+        \texttt{)}\\[4pt]
+        \texttt{model.fit(}\\
+        \texttt{  X\_train, y\_train,}\\
+        \texttt{  eval\_set=[(X\_val, y\_val)],}\\
+        \texttt{  verbose=False}\\
+        \texttt{)}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Cross-validation for time series:}
+      \begin{itemize}\small
+        \item Use \texttt{TimeSeriesSplit} with the sklearn API
+        \item Reserve last 20\% of data as final test set
+        \item Use \texttt{early\_stopping\_rounds=50}:
+              stops training when validation RMSE does not improve
+              for 50 consecutive rounds
+      \end{itemize}
+      \vspace{0.1cm}
+      \muted{\small Typical RSXFS result:\\
+      XGBoost RMSE $\approx$ 1,500--1,700\\
+      (vs.\ RF $\approx$ 1,800)}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Regularization for Linear Models}
+% =============================================================================
+
+\sectionslide{Regularization for Linear Models}{%
+  When you have many predictors, penalize the size of coefficients
+  to prevent overfitting.}
+
+% --- Slide: Why regularize ---------------------------------------------------
+\begin{frame}{Why Regularize?}
+  Ordinary least squares (OLS) minimizes:
+  \[
+    \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2
+  \]
+  This can overfit badly when the number of predictors $k$ is large
+  relative to $n$.
+
+  \textbf{Regularization idea:} add a penalty on the size of coefficients:
+  \[
+    \text{minimize } \underbrace{\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}
+  \]
+  $\lambda > 0$ controls the strength of the penalty.
+  \begin{keybox}
+    The penalty \textbf{shrinks} coefficients toward zero,
+    reducing variance at the cost of a small increase in bias.
+    With the right $\lambda$ (tuned by cross-validation), the
+    net effect is a more accurate out-of-sample forecast.
+  \end{keybox}
+\end{frame}
+
+% --- Slide: Ridge, LASSO, Elastic Net ----------------------------------------
+\begin{frame}{Ridge, LASSO, and Elastic Net}
+  \begin{columns}[T]
+    \begin{column}{0.33\textwidth}
+      \textbf{Ridge ($\ell_2$):}
+      \[
+        \lambda \sum_j \beta_j^2
+      \]
+      \begin{itemize}\small
+        \item Shrinks all coefficients toward zero
+        \item Keeps all predictors in the model
+        \item Best when many predictors are all
+              somewhat relevant
+        \parencite{HoerlKennard1970}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \textbf{LASSO ($\ell_1$):}
+      \[
+        \lambda \sum_j |\beta_j|
+      \]
+      \begin{itemize}\small
+        \item Sets some coefficients \emph{exactly to zero}
+        \item Performs automatic variable selection
+        \item Best when only a few predictors matter
+        \parencite{Tibshirani1996}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \textbf{Elastic Net:}
+      \[
+        \lambda_1 \sum_j |\beta_j| + \lambda_2 \sum_j \beta_j^2
+      \]
+      \begin{itemize}\small
+        \item Combination of LASSO + Ridge
+        \item Groups correlated predictors together
+        \item Best with many correlated features
+        \parencite{ZouHastie2005}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    In all cases, $\lambda$ is chosen by \textbf{cross-validation}
+    (use \texttt{TimeSeriesSplit}).
+    Python: \texttt{Ridge}, \texttt{Lasso}, \texttt{ElasticNet}
+    in \texttt{sklearn.linear\_model}.
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{Key Takeaways and Roadmap}
+% =============================================================================
+
+\sectionslide{Key Takeaways and Roadmap}{%
+  Tree-Based Methods: a complete toolkit for nonlinear forecasting.}
+
+% --- Slide: Method comparison ------------------------------------------------
+\begin{frame}{Tree-Based Methods: Comparison}
+  \begin{center}
+    {\small
+    \begin{tabular}{lllll}
+      \toprule
+      \textbf{Method} & \textbf{Parallelism} & \textbf{Interpretable} & \textbf{Tuning} & \textbf{Typical accuracy} \\
+      \midrule
+      Decision Tree & Parallel (1 tree) & High & Low & Baseline \\
+      Random Forest & Parallel ($B$ trees) & Medium & Low & Good \\
+      XGBoost & Sequential ($B$ trees) & Low & Higher & Best \\
+      \midrule
+      Ridge / LASSO & N/A (linear) & High & Low & Good (linear data) \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \begin{keybox}
+    \textbf{When to use what:}
+    \begin{itemize}\small
+      \item \textbf{Interpretability needed:} Decision Tree
+      \item \textbf{Robust first model:} Random Forest
+      \item \textbf{Best accuracy on tabular data:} XGBoost
+      \item \textbf{Many correlated linear predictors:} Elastic Net / LASSO
+    \end{itemize}
+  \end{keybox}
+\end{frame}
+
+% --- Slide: Key takeaways ---------------------------------------------------
+\begin{frame}{Lecture 6: Key Takeaways}
+  \begin{keybox}
+    {\small
+    \begin{enumerate}
+      \item \textbf{Boosting} builds trees \emph{sequentially}, each fitting the errors
+            of the previous ensemble. It reduces both bias and variance when properly tuned.
+
+      \item \textbf{XGBoost} improves on vanilla boosting with second-order optimization,
+            explicit regularization on leaf weights/count, and column subsampling.
+
+      \item Use \textbf{early stopping} with XGBoost: always set aside a validation set
+            and stop when validation RMSE stops improving.
+
+      \item \textbf{Regularization} (Ridge, LASSO, Elastic Net) penalizes coefficient size
+            to prevent overfitting in linear models with many predictors.
+            LASSO performs automatic variable selection.
+
+      \item Choose by cross-validation: $\lambda$ for regularization, tree depth and
+            learning rate for boosting. Always use \texttt{TimeSeriesSplit}.
+    \end{enumerate}
+    }
+  \end{keybox}
+  \muted{\itshape Next: Introduction to Neural Networks (PyTorch) ---
+  beyond trees to flexible function approximators for sequence data.}
+\end{frame}
+
+% --- References ---------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+% =============================================================================
+\end{document}
+% =============================================================================

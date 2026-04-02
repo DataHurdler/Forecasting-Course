@@ -1,0 +1,289 @@
+---
+title: "Random Forests"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 5"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. From Single Trees to Ensembles
+2. Bagging: Bootstrap Aggregating
+3. Random Forests: Decorrelating the Trees
+4. Feature Importance and Interpretation
+5. Key Takeaways
+
+---
+
+# From Single Trees to Ensembles
+
+Averaging many imperfect models can outperform any single model.
+
+---
+
+## The Wisdom of Crowds
+
+A single expert can be wrong. But average many independent estimates and errors tend to cancel out.
+
+::: {.examplebox}
+::: {.examplebox-title}
+Classic Example: Guessing the Ox's Weight
+:::
+At a 1907 county fair, 800 people guessed the weight of an ox. No individual was very accurate. But the **average of all 800 guesses** was within 1 pound of the true weight.
+:::
+
+**The same principle applies to models:**
+
+- A single decision tree is unstable and noisy (high variance)
+- Average many trees trained on different versions of the data and the noise cancels out
+- The combined forecast is far more stable than any individual tree
+
+::: {.keybox}
+**Ensembles work because:** independent errors tend to cancel. The more independent (uncorrelated) the individual predictions, the more variance is reduced by averaging.
+:::
+
+---
+
+# Bagging: Bootstrap Aggregating
+
+Train many trees on bootstrap samples; average their predictions.
+
+---
+
+## Bagging: The Big Idea
+
+**Problem from Lecture 4:** a single decision tree has very high variance — change a few training points and you get a completely different tree.
+
+**Bagging solution [@Breiman1996]:**
+
+1. Draw $B$ **bootstrap samples** from the training data (sample with replacement, same size as original)
+2. Fit one deep decision tree on each bootstrap sample
+3. **Average** all $B$ predictions:
+
+$$\hat{y}_{\text{bag}} = \frac{1}{B}\sum_{b=1}^{B} \hat{f}^{(b)}(\mathbf{x})$$
+
+:::: {.columns}
+::: {.column width="52%"}
+**Why does this work?**
+
+$$\text{Var}(\bar{f}) = \rho\sigma^2 + \frac{1-\rho}{B}\sigma^2$$
+
+where $\rho$ = pairwise prediction correlation. As $B \to \infty$, variance $\to \rho\sigma^2$.
+:::
+::: {.column width="44%"}
+::: {.keybox}
+**Key insight:** more trees always helps (never hurts). The variance floor is $\rho\sigma^2$ — determined by how correlated the trees are, not by the number of trees.
+:::
+:::
+::::
+
+---
+
+## Out-of-Bag (OOB) Error: Free Cross-Validation
+
+Each bootstrap sample uses about **63%** of the training observations. The **out-of-bag (OOB)** observations are those *not* in a given bootstrap sample.
+
+:::: {.columns}
+::: {.column width="52%"}
+**OOB error estimate:**
+
+1. For each observation $i$, collect predictions from all trees where $i$ was NOT in the bootstrap sample (~37% of all trees)
+2. Average those predictions → $\hat{y}_i^{\text{OOB}}$
+3. Compute RMSE across all observations: OOB RMSE ≈ 5-fold CV RMSE
+:::
+::: {.column width="44%"}
+::: {.keybox}
+OOB error is essentially **free cross-validation**. No need to set aside a separate validation set or run CV.
+
+```python
+RandomForestRegressor(oob_score=True)
+```
+:::
+:::
+::::
+
+::: {.examplebox}
+::: {.examplebox-title}
+Practical Tip
+:::
+With large datasets, OOB error is very close to 5-fold CV. With small datasets (< 1000 obs.), use CV — OOB may be noisy.
+:::
+
+---
+
+# Random Forests: Decorrelating the Trees
+
+Restrict each split to a random subset of features so trees are less alike.
+
+---
+
+## The Problem Bagging Does Not Fully Solve
+
+Recall: $\text{Var}(\bar{f}) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2$
+
+Even with many trees, the variance floor is $\rho\sigma^2$ — determined by how *correlated* the trees are.
+
+::: {.warningbox}
+**The correlation problem:** if one feature strongly dominates (e.g., last year's sales always gives the best first split), then almost all trees use that feature at the root. The trees end up highly correlated ($\rho$ stays large), and bagging provides little variance reduction.
+:::
+
+**Random Forest solution [@Breiman2001]:** at each split, randomly sample only $m < p$ features and find the best split *among those $m$* only.
+
+::: {.keybox}
+Random feature subsampling **forces diversity** among trees: the dominant feature cannot always be chosen, so trees take different paths ⟹ lower $\rho$ ⟹ lower ensemble variance.
+:::
+
+---
+
+## Random Forest Hyperparameters
+
+| Parameter | sklearn name | Default | Effect |
+|-----------|-------------|---------|--------|
+| Number of trees | `n_estimators` | 100 | More = lower variance; plateau after ~500 |
+| Max features/split | `max_features` | `'sqrt'` | Lower = more decorrelated |
+| Max depth | `max_depth` | None | None = full tree; limit to reduce memory |
+| Min samples/leaf | `min_samples_leaf` | 1 | Higher = smoother predictions |
+| OOB score | `oob_score` | False | Set True for free CV error |
+
+:::: {.columns}
+::: {.column width="52%"}
+**Recommended starting point:**
+
+- `n_estimators=500`, `max_features='sqrt'`
+- `min_samples_leaf=5` for smooth time series predictions
+- `oob_score=True` to monitor without separate CV
+:::
+::: {.column width="44%"}
+::: {.warningbox}
+Set `random_state=42` for reproducibility. Random forests use randomness in both bootstrap sampling and feature selection.
+:::
+:::
+::::
+
+---
+
+# Feature Importance and Interpretation
+
+Which predictors matter most? RF gives a data-driven answer.
+
+---
+
+## Random Forest Feature Importance
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Mean Decrease in Impurity (MDI)
+:::
+For each feature $j$: average the total reduction in node impurity (variance for regression) across all splits on feature $j$, weighted by the fraction of observations in each node. Normalize to sum to 1.
+:::
+
+:::: {.columns}
+::: {.column width="52%"}
+**Example: retail sales RF**
+
+| Feature | Importance |
+|---------|-----------|
+| Lag 12 (same month last year) | 0.38 |
+| Lag 1 (previous month) | 0.24 |
+| Rolling mean (12m) | 0.15 |
+| Lag 2 | 0.10 |
+| December dummy | 0.08 |
+| Unemployment rate | 0.05 |
+:::
+::: {.column width="44%"}
+::: {.keybox}
+RF importance aggregates across **hundreds of trees**. It is more stable than a single tree's importance.
+:::
+
+::: {.warningbox}
+MDI can be biased toward high-cardinality features. Use **permutation importance** (`inspection.permutation_importance`) for a less biased measure on the test set.
+:::
+:::
+::::
+
+---
+
+## Random Forest in Python
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+sklearn Code Template
+:::
+```python
+from sklearn.ensemble import RandomForestRegressor
+
+rf = RandomForestRegressor(
+    n_estimators=500,
+    max_features='sqrt',
+    min_samples_leaf=5,
+    oob_score=True,
+    random_state=42
+)
+rf.fit(X_train, y_train)
+
+# OOB error (free CV)
+print(f"OOB R²: {rf.oob_score_:.3f}")
+
+# Feature importance
+importances = rf.feature_importances_
+```
+:::
+:::
+::: {.column width="44%"}
+**Typical performance on RSXFS:**
+
+| Model | Test RMSE |
+|-------|----------|
+| Seasonal naïve | ~3,800 |
+| Single deep tree | ~2,900 |
+| Random Forest | ~1,800 |
+
+[RF reduces RMSE by ~35–40% vs. a single tree on this dataset.]{.neutral .smaller}
+:::
+::::
+
+---
+
+## Lecture 5: Key Takeaways
+
+::: {.keybox}
+1. **Ensembles** work because independent errors cancel. Averaging many imperfect models outperforms any single model.
+
+2. **Bagging** trains $B$ trees on bootstrap samples and averages. Variance reduces as $B$ grows, but floors at $\rho\sigma^2$.
+
+3. **Random Forests** add random feature subsampling at each split to reduce $\rho$ (pairwise tree correlation) — the key innovation over plain bagging.
+
+4. **OOB error** is free cross-validation: each observation is left out of ~37% of trees, providing an unbiased estimate of generalization error.
+
+5. **Feature importance** (averaged across all trees) is a stable, data-driven way to identify which predictors matter most for forecasting.
+:::
+
+*Next: Boosted Trees & Regularization — sequential error correction with XGBoost, and Ridge/LASSO for linear models.*
+
+---
+
+## References
+
+::: {#refs}
+:::

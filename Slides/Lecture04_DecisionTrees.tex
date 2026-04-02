@@ -1,0 +1,464 @@
+% =============================================================================
+% Lecture 04: Decision Trees
+% BSAD 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+% ---- Lecture metadata --------------------------------------------------------
+\title{Decision Trees}
+\subtitle{BSAD 8310: Business Forecasting --- Lecture 4}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+\date{Spring 2026}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---- Outline ----------------------------------------------------------------
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Why Go Beyond Linear Models?}
+% =============================================================================
+
+\sectionslide{Why Go Beyond Linear Models?}{%
+  Real-world relationships are often nonlinear, involve interactions,
+  and shift with context.}
+
+% --- Slide: Linear model limitation ------------------------------------------
+\begin{frame}{The Limits of Linear Models}
+  Lectures 1--3 used models of the form
+  $\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots$ ---
+  a \textbf{constant slope} for every value of $x$.
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \textbf{Problems with linear models:}
+      \begin{itemize}
+        \item \textbf{No interactions:} the effect of advertising on sales
+              may be larger during holiday season ---
+              a linear model cannot capture this
+        \item \textbf{No threshold effects:} consumer spending may be flat
+              until unemployment drops below 5\%, then jump
+        \item \textbf{Symmetric predictions:} extreme values drive
+              coefficients in both directions equally
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{examplebox}{Retail Sales Example}
+        Monthly sales depend on:
+        \begin{itemize}\small
+          \item Last year's same-month sales (trend)
+          \item Whether it's December (seasonality)
+          \item Unemployment rate (economic conditions)
+        \end{itemize}
+        \medskip
+        The December effect is much \emph{larger} when the economy
+        is strong. This is an interaction that linear models miss.
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+  \begin{keybox}
+    Decision trees and ensemble methods capture nonlinear relationships
+    and interactions \textbf{automatically}, without needing to specify them.
+  \end{keybox}
+\end{frame}
+
+% --- Slide: Bias-variance tradeoff overview ----------------------------------
+\begin{frame}{The Bias--Variance Tradeoff}
+  Every forecasting model faces a fundamental tension:
+  \begin{definitionbox}{Bias--Variance Decomposition}
+    \[
+      \text{Expected MSE} = \underbrace{\text{Bias}^2}_{\text{systematic error}}
+                           + \underbrace{\text{Variance}}_{\text{sensitivity to data}}
+                           + \underbrace{\sigma^2}_{\text{irreducible noise}}
+    \]
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{High bias (underfitting):}
+      \begin{itemize}\small
+        \item Model is too simple
+        \item Misses real patterns in the data
+        \item Bad on both training AND test sets
+        \item Example: linear model on a curved relationship
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{High variance (overfitting):}
+      \begin{itemize}\small
+        \item Model is too complex
+        \item Memorizes training data noise
+        \item Great on training, bad on test set
+        \item Example: a very deep decision tree
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    \textbf{Goal:} find the right complexity level that balances bias and variance.
+    This is why we always evaluate \emph{out-of-sample}.
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{How Decision Trees Work}
+% =============================================================================
+
+\sectionslide{How Decision Trees Work}{%
+  Partition the feature space into rectangles; predict the mean in each region.}
+
+% --- Slide: The tree metaphor ------------------------------------------------
+\begin{frame}{What Is a Decision Tree?}
+  A decision tree works like a flowchart: ask a series of yes/no questions
+  about the input features to arrive at a prediction.
+
+  \vspace{0.3cm}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \textbf{Example: forecasting retail sales}
+      \begin{tikzpicture}[
+        every node/.style={font=\small},
+        internal/.style={rectangle, rounded corners=3pt,
+          fill=unolightblue, draw=unoblue, line width=0.8pt,
+          align=center, inner sep=4pt,
+          minimum width=2.4cm, minimum height=0.6cm},
+        leaf/.style={rectangle, rounded corners=3pt,
+          fill=unolightgreen, draw=unogreen, line width=0.8pt,
+          align=center, inner sep=4pt,
+          minimum width=1.8cm, minimum height=0.6cm},
+      ]
+        \node[internal] (root) at (2.5, 0) {$y_{t-12} \leq 38{,}000$?};
+        \node[leaf] (l1) at (0.8, -1.5) {\footnotesize $\hat{y} = 28{,}400$};
+        \node[internal] (r1) at (4.2, -1.5) {$y_{t-1} \leq 52{,}000$?};
+        \node[leaf] (l2) at (3.0, -3.0) {\footnotesize $\hat{y} = 44{,}100$};
+        \node[leaf] (r2) at (5.4, -3.0) {\footnotesize $\hat{y} = 61{,}300$};
+        \draw[->, gray] (root) -- (l1) node[midway, left, font=\tiny]{Yes};
+        \draw[->, gray] (root) -- (r1) node[midway, right, font=\tiny]{No};
+        \draw[->, gray] (r1) -- (l2) node[midway, left, font=\tiny]{Yes};
+        \draw[->, gray] (r1) -- (r2) node[midway, right, font=\tiny]{No};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \textbf{Key properties:}
+      \begin{itemize}\small
+        \item \textbf{Non-parametric} --- no functional form assumed
+        \item \textbf{Nonlinear} --- can capture threshold effects
+        \item \textbf{Interpretable} --- decision path is readable
+        \item \textbf{Handles mixed features} --- lags, rolling stats,
+              dummies all treated equally
+        \item \textbf{Scale-invariant} --- no need to standardize
+      \end{itemize}
+      \begin{warningbox}
+        A single \emph{deep} tree \textbf{overfits severely}.
+        Ensembles (Random Forests, XGBoost) fix this.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: CART algorithm ---------------------------------------------------
+\begin{frame}{The CART Algorithm (Regression)}
+  \textbf{CART (Classification and Regression Trees)} builds the tree
+  greedily from top to bottom:
+
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{At each node, find the best split $(j, t)$:}
+      \[
+        \min_{j,\, t}
+        \left[
+          \sum_{i: x_{ij} \leq t} (y_i - \bar{y}_{L})^2
+          +
+          \sum_{i: x_{ij} > t} (y_i - \bar{y}_{R})^2
+        \right]
+      \]
+      Choose the feature $j$ and threshold $t$ that most reduces
+      the within-region variance.
+      \begin{itemize}\small
+        \item Start with all data at the root
+        \item Split until nodes are too small or max depth reached
+        \item \textbf{Prediction:} mean of observations in the leaf
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{examplebox}{Business Intuition}
+        Think of it as asking:
+        \emph{``What is the single yes/no question
+        that best separates high-sales months
+        from low-sales months?''}
+
+        Then repeat within each group.
+      \end{examplebox}
+      \vspace{0.1cm}
+      \muted{\small For classification, replace variance
+      with Gini impurity or entropy (information gain).}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Bias-variance in trees -------------------------------------------
+\begin{frame}{Depth Controls the Bias--Variance Tradeoff}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Tree depth and complexity:}
+      \begin{itemize}
+        \item \textbf{Depth 1} (stump): one question --- high bias, low variance
+        \item \textbf{Depth 5--10}: balanced
+        \item \textbf{Full tree} (one obs.\ per leaf): memorizes data ---
+              zero bias, extreme variance
+      \end{itemize}
+      \vspace{0.2cm}
+      \textbf{Why trees have high variance:}
+      A single changed training observation can alter the split at the root,
+      changing every prediction below it.
+      Trees are inherently \emph{unstable}.
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{tikzpicture}[xscale=1.5, yscale=2.0]
+        \draw[->, thick] (0,0) -- (2.6,0)
+          node[right, font=\small]{depth};
+        \draw[->, thick] (0,0) -- (0,1.4)
+          node[above, font=\small]{error};
+        \draw[unored, thick]
+          (0.1,1.2) .. controls (0.5,0.7) and (1.0,0.2) .. (2.4,0.04);
+        \node[font=\tiny, unored] at (0.5, 0.95) {Bias$^2$};
+        \draw[unoblue, thick]
+          (0.1,0.05) .. controls (0.8,0.1) and (1.5,0.4) .. (2.4,1.1);
+        \node[font=\tiny, unoblue] at (2.2, 0.95) {Var};
+        \draw[unogray, thick, dashed]
+          (0.1,1.25) .. controls (0.6,0.6) and (1.0,0.35) ..
+          (1.3,0.35) .. controls (1.6,0.38) and (2.0,0.7) .. (2.4,1.14);
+        \node[font=\tiny, unogray] at (1.75, 0.6) {Total};
+        \draw[dashed, unogray] (1.3,0) -- (1.3,0.35);
+        \node[font=\tiny, below] at (1.3, 0) {opt.\ depth};
+      \end{tikzpicture}
+      \begin{keybox}
+        \small Tune with \texttt{max\_depth} and \texttt{min\_samples\_leaf}.
+        Select via \texttt{TimeSeriesSplit} cross-validation.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Implementing Decision Trees in Python}
+% =============================================================================
+
+\sectionslide{Implementing Decision Trees in Python}{%
+  One class, a few hyperparameters, interpretable results.}
+
+% --- Slide: sklearn implementation -------------------------------------------
+\begin{frame}{Decision Tree Regression in Python}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{sklearn Code Template}
+        {\small
+        \texttt{from sklearn.tree import DecisionTreeRegressor}\\
+        \texttt{from sklearn.model\_selection import TimeSeriesSplit}\\[4pt]
+        \texttt{\# Build features}\\
+        \texttt{X = make\_lag\_features(df, lags=[1,2,3,12])}\\
+        \texttt{y = df['sales']}\\[4pt]
+        \texttt{\# Fit a tree}\\
+        \texttt{tree = DecisionTreeRegressor(}\\
+        \texttt{  max\_depth=5,}\\
+        \texttt{  min\_samples\_leaf=10,}\\
+        \texttt{  random\_state=42}\\
+        \texttt{)}\\
+        \texttt{tree.fit(X\_train, y\_train)}\\[4pt]
+        \texttt{\# Predict}\\
+        \texttt{y\_hat = tree.predict(X\_test)}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Key hyperparameters:}
+      \begin{center}
+        {\small
+        \begin{tabular}{ll}
+          \toprule
+          \textbf{Parameter} & \textbf{Effect} \\
+          \midrule
+          \texttt{max\_depth} & Cap tree depth \\
+          \texttt{min\_samples\_leaf} & Min obs.\ per leaf \\
+          \texttt{max\_features} & Feature subsampling \\
+          \texttt{ccp\_alpha} & Cost-complexity pruning \\
+          \bottomrule
+        \end{tabular}
+        }
+      \end{center}
+      \vspace{0.2cm}
+      \begin{warningbox}
+        \small Always use \texttt{TimeSeriesSplit}
+        for cross-validation.
+        Never use \texttt{KFold} on time series ---
+        it leaks future data.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Feature importance -----------------------------------------------
+\begin{frame}{Feature Importance}
+  \begin{definitionbox}{Impurity-Based Feature Importance}
+    For each feature $j$, sum the total reduction in variance across all splits
+    where feature $j$ was used, weighted by the fraction of observations in each node.
+    Normalize to sum to 1.
+  \end{definitionbox}
+  \vspace{0.1cm}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Example: retail sales tree}
+      \begin{center}
+        {\small
+        \begin{tabular}{ll}
+          \toprule
+          \textbf{Feature} & \textbf{Importance} \\
+          \midrule
+          Lag 12 (same month last year) & 0.41 \\
+          Lag 1 (previous month)        & 0.27 \\
+          Lag 2                          & 0.13 \\
+          December dummy                 & 0.10 \\
+          Unemployment rate              & 0.09 \\
+          \bottomrule
+        \end{tabular}
+        }
+      \end{center}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        Feature importance tells you \textbf{which variables the tree
+        found most useful} for splitting. This is a quick way to
+        screen which predictors matter most.
+      \end{keybox}
+      \begin{warningbox}
+        \small Feature importance can be biased toward
+        high-cardinality (many-valued) features.
+        SHAP values give more reliable individual-level
+        attributions for important decisions.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Interpreting tree predictions ------------------------------------
+\begin{frame}{Interpreting and Communicating Tree Predictions}
+  One of the main advantages of decision trees is that you can explain
+  \emph{why} a specific prediction was made.
+  \begin{examplebox}{Explaining a Prediction to a Manager}
+    ``Our model forecasts \$61,300 in sales for next month because:
+
+    \begin{enumerate}\small
+      \item Last year's same-month sales were above \$38,000 (economy growing)
+      \item Last month's sales were above \$52,000 (current momentum strong)
+      \item When both conditions hold, the average outcome in our training
+            data was \$61,300.''
+    \end{enumerate}
+  \end{examplebox}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Visualizing the tree:}
+      \texttt{sklearn.tree.plot\_tree(tree)} or
+      \texttt{export\_text(tree, feature\_names=[...])}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \muted{\small A decision path tells you which conditions led to
+      the forecast. This is useful for business buy-in ---
+      managers can validate that the tree is using sensible splits.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Limitations and Preview: Ensembles}
+% =============================================================================
+
+\sectionslide{Limitations and Preview: Ensembles}{%
+  A single tree is a weak learner. Combine hundreds to build a strong one.}
+
+% --- Slide: When trees fail ---------------------------------------------------
+\begin{frame}{When a Single Tree Falls Short}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Strengths:}
+      \begin{itemize}[\pos{$\checkmark$}]
+        \item Interpretable (can show the path)
+        \item No feature scaling needed
+        \item Captures nonlinear relationships
+        \item Handles missing values well
+        \item Fast to train
+      \end{itemize}
+      \vspace{0.2cm}
+      \textbf{Weaknesses:}
+      \begin{itemize}[\negc{$\times$}]
+        \item High variance --- small data changes $\Rightarrow$ very different tree
+        \item Flat predictions within each leaf
+        \item Cannot extrapolate beyond training range
+        \item Sensitive to outliers (a single outlier can dominate a leaf)
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        \textbf{The ensemble solution:}
+        Instead of trusting one tree, average many trees trained on
+        different bootstrap samples of the data.
+
+        This reduces variance dramatically while keeping the
+        interpretability benefits of individual trees at the feature
+        importance level.
+      \end{keybox}
+      \vspace{0.1cm}
+      \muted{\small On standard benchmarks, Random Forests
+      improve over single trees by 20--40\% in RMSE.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Key takeaways ---------------------------------------------------
+\begin{frame}{Lecture 4: Key Takeaways}
+  \begin{keybox}
+    {\small
+    \begin{enumerate}
+      \item Linear models cannot capture \textbf{interactions} or
+            \textbf{threshold effects}. Decision trees can, without
+            needing to specify these relationships in advance.
+
+      \item The \textbf{bias--variance tradeoff} means that a
+            too-simple tree underfits (high bias) and a too-deep tree
+            overfits (high variance). Tune with \texttt{max\_depth}
+            and \texttt{min\_samples\_leaf}.
+
+      \item \textbf{CART} greedily minimizes within-region variance at
+            each split. Prediction = mean of observations in the leaf.
+
+      \item Decision trees are \textbf{interpretable}: you can trace
+            the exact decision path that led to any prediction.
+
+      \item Single trees have \textbf{high variance} --- they change
+            dramatically when the data changes slightly.
+            Ensembles (Random Forests, XGBoost) solve this.
+    \end{enumerate}
+    }
+  \end{keybox}
+  \muted{\itshape Next: Random Forests --- variance reduction through
+  bootstrap aggregation and random feature selection.}
+\end{frame}
+
+% --- References ---------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+% =============================================================================
+\end{document}
+% =============================================================================
