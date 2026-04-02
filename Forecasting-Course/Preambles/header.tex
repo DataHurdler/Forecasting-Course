@@ -1,0 +1,252 @@
+% =============================================================================
+% header.tex — BSAD 8310: Business Forecasting
+% University of Nebraska at Omaha
+% Beamer theme: UNO-branded, clean, professional
+% =============================================================================
+
+% ----------------------------- BEAMER THEME ----------------------------------
+\usetheme{default}
+\useinnertheme{rectangles}
+
+% ----------------------------- UNO COLOR PALETTE -----------------------------
+\definecolor{unoblue}{HTML}{005CA9}
+\definecolor{unored}{HTML}{E41C38}
+\definecolor{unogray}{HTML}{525252}
+\definecolor{unogreen}{HTML}{15803d}
+\definecolor{unolightblue}{HTML}{E8F0FA}
+\definecolor{unolightred}{HTML}{FDECEA}
+\definecolor{unolightgreen}{HTML}{F0FAF4}
+\definecolor{unowhite}{HTML}{FFFFFF}
+
+% Apply UNO colors to Beamer structure
+\setbeamercolor{structure}{fg=unoblue}
+\setbeamercolor{palette primary}{bg=unoblue, fg=white}
+\setbeamercolor{palette secondary}{bg=unoblue!80!black, fg=white}
+\setbeamercolor{palette tertiary}{bg=unoblue!60!black, fg=white}
+\setbeamercolor{frametitle}{bg=unoblue, fg=white}
+\setbeamercolor{frametitle right}{bg=unoblue!80!black}
+\setbeamercolor{title}{fg=unoblue}
+\setbeamercolor{subtitle}{fg=unogray}
+\setbeamercolor{author in head/foot}{bg=unoblue, fg=white}
+\setbeamercolor{title in head/foot}{bg=unoblue!80, fg=white}
+\setbeamercolor{date in head/foot}{bg=unoblue!60, fg=white}
+\setbeamercolor{page number in head/foot}{bg=unoblue!60, fg=white}
+\setbeamercolor{block title}{bg=unoblue, fg=white}
+\setbeamercolor{block body}{bg=unolightblue}
+\setbeamercolor{block title alerted}{bg=unored, fg=white}
+\setbeamercolor{block body alerted}{bg=unolightred}
+\setbeamercolor{block title example}{bg=unogreen, fg=white}
+\setbeamercolor{block body example}{bg=unolightgreen}
+\setbeamercolor{itemize item}{fg=unoblue}
+\setbeamercolor{itemize subitem}{fg=unored}
+\setbeamercolor{enumerate item}{fg=unoblue}
+\setbeamercolor{enumerate subitem}{fg=unored}
+\setbeamercolor{alerted text}{fg=unored}
+
+% ----------------------------- FONTS -----------------------------------------
+\usefonttheme{professionalfonts}
+\usefonttheme[onlymath]{serif}       % serif math; sans-serif text
+\setbeamerfont{frametitle}{size=\large, series=\bfseries}
+\setbeamerfont{title}{size=\LARGE, series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamerfont{footline}{size=\tiny}
+
+% ----------------------------- LAYOUT ----------------------------------------
+\setbeamersize{text margin left=0.5cm, text margin right=0.5cm}
+\setbeamertemplate{navigation symbols}{}   % remove navigation buttons
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{enumerate items}[default]
+
+% Custom footline: [Course] [Title] [Page/Total]
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.33\paperwidth, ht=2.5ex, dp=1ex, left, leftskip=4pt]
+      {author in head/foot}%
+      \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.34\paperwidth, ht=2.5ex, dp=1ex, center]
+      {title in head/foot}%
+      \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.33\paperwidth, ht=2.5ex, dp=1ex, right, rightskip=4pt]
+      {date in head/foot}%
+      \usebeamerfont{date in head/foot}%
+      \insertframenumber{} / \inserttotalframenumber
+    \end{beamercolorbox}%
+  }%
+  \vskip0pt%
+}
+
+% Frametitle with thin accent line
+\setbeamertemplate{frametitle}{%
+  \vskip0.1cm
+  \insertframetitle
+  \vskip0.05cm
+  \color{unored}\rule{\textwidth}{0.5pt}
+}
+
+% Title page
+\setbeamertemplate{title page}{%
+  \vfill
+  \begin{center}
+    {\color{unoblue}\rule{\textwidth}{2pt}}\\[0.3cm]
+    {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle}\\[0.2cm]
+    {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle}\\[0.3cm]
+    {\color{unored}\rule{\textwidth}{0.5pt}}\\[0.4cm]
+    {\small\insertauthor}\\[0.1cm]
+    {\small\insertinstitute}\\[0.1cm]
+    {\small\insertdate}
+  \end{center}
+  \vfill
+}
+
+% ----------------------------- PACKAGES --------------------------------------
+
+% Math
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{bm}                    % bold math symbols
+
+% Graphics & color
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes, fit, backgrounds, calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+% Typography
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=unoblue, urlcolor=unoblue, citecolor=unogray}
+
+% Code listings (no shell-escape required)
+\usepackage{listings}
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{unoblue}\bfseries,
+  stringstyle=\color{unogreen},
+  commentstyle=\color{unogray}\itshape,
+  numberstyle=\tiny\color{unogray},
+  breaklines=true,
+  showstringspaces=false,
+  frame=single,
+  rulecolor=\color{unogray!40},
+  backgroundcolor=\color{unogray!5},
+  xleftmargin=0.5em,
+  xrightmargin=0.5em,
+}
+
+% Bibliography
+\usepackage[backend=bibtex, style=authoryear, maxcitenames=2]{biblatex}
+\addbibresource{../Bibliography_base.bib}
+
+% Colored text helpers
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable, listingsutf8}
+
+% ----------------------------- CUSTOM ENVIRONMENTS ---------------------------
+
+% keybox: UNO-blue background — for key results, formulas, takeaways
+\newtcolorbox{keybox}{
+  enhanced,
+  colback=unoblue,
+  colframe=unoblue!80!black,
+  coltitle=white,
+  coltext=white,
+  fonttitle=\bfseries,
+  boxrule=0pt,
+  arc=3pt,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+}
+
+% definitionbox: blue left-rule with title — for formal definitions
+\newtcolorbox{definitionbox}[1]{
+  enhanced,
+  title={#1},
+  colback=unolightblue,
+  colframe=unoblue,
+  coltitle=unoblue,
+  fonttitle=\bfseries,
+  boxrule=0pt,
+  leftrule=3pt,
+  arc=0pt,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+}
+
+% warningbox: red-accent — for pitfalls, assumption violations, common errors
+\newtcolorbox{warningbox}{
+  enhanced,
+  colback=unolightred,
+  colframe=unored,
+  coltitle=white,
+  fonttitle=\bfseries,
+  boxrule=0pt,
+  leftrule=3pt,
+  arc=0pt,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+}
+
+% examplebox: green-accent with title — for worked examples, business applications
+\newtcolorbox{examplebox}[1]{
+  enhanced,
+  title={#1},
+  colback=unolightgreen,
+  colframe=unogreen,
+  coltitle=unogreen,
+  fonttitle=\bfseries,
+  boxrule=0pt,
+  leftrule=3pt,
+  arc=0pt,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+}
+
+% ----------------------------- MATH SHORTCUTS --------------------------------
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\MSE}{\operatorname{MSE}}
+\newcommand{\RMSE}{\operatorname{RMSE}}
+\newcommand{\MAE}{\operatorname{MAE}}
+\newcommand{\MASE}{\operatorname{MASE}}
+\newcommand{\yhat}{\hat{y}}
+\newcommand{\bhat}{\hat{\beta}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,|\,}
+
+% ----------------------------- SLIDE HELPERS ---------------------------------
+% Section title slide (call at start of each section)
+\newcommand{\sectionslide}[2]{%
+  \begin{frame}
+    \vfill
+    \begin{center}
+      {\color{unoblue}\rule{0.6\textwidth}{2pt}}\\[0.4cm]
+      {\Large\bfseries\color{unoblue} #1}\\[0.2cm]
+      {\normalsize\color{unogray} #2}\\[0.4cm]
+      {\color{unored}\rule{0.6\textwidth}{1pt}}
+    \end{center}
+    \vfill
+  \end{frame}
+}
+
+% Muted text
+\newcommand{\muted}[1]{{\color{unogray}#1}}
+
+% Key term
+\newcommand{\key}[1]{{\color{unoblue}\textbf{#1}}}
+
+% Positive / negative annotations
+\newcommand{\pos}[1]{{\color{unogreen}#1}}
+\newcommand{\negc}[1]{{\color{unored}#1}}

@@ -1,0 +1,665 @@
+---
+title: "Stationarity and ARIMA"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 4"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture 4: Outline
+
+1. Stationarity
+2. Unit Roots and Differencing
+3. ACF and PACF
+4. The ARIMA Model
+5. Seasonal ARIMA
+6. Key Takeaways and Roadmap
+
+---
+
+# Stationarity
+
+All classical forecasting models implicitly assume a stable data-generating process.
+
+---
+
+## Weak (Covariance) Stationarity
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Weak Stationarity
+:::
+A time series $\{y_t\}$ is **weakly stationary** if:
+
+1. $\mathrm{E}[y_t] = \mu$ &ensp; (constant mean)
+2. $\mathrm{Var}(y_t) = \sigma^2 < \infty$ &ensp; (constant, finite variance)
+3. $\mathrm{Cov}(y_t, y_{t-k}) = \gamma_k$ depends only on lag $k$, not on $t$
+:::
+
+**Why it matters for forecasting:**
+
+- If $\mathrm{E}[y_t]$ changes over time, no single mean is forecastable
+- If $\mathrm{Var}(y_t) \to \infty$, prediction intervals become unbounded
+- Stationarity is what makes past patterns informative about the future
+
+[*Socratic: if $y_t = t + \varepsilon_t$ (linear trend plus white noise), which stationarity condition does it violate?*]{.neutral .smaller}
+
+---
+
+## Stationary vs. Non-Stationary: A Visual Comparison
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**AR(1)-like series, $\phi_1 = 0.7$ (simulated):**
+
+```{=html}
+<svg width="100%" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" style="max-height:120px;">
+  <!-- Axes -->
+  <line x1="30" y1="100" x2="310" y2="100" stroke="#525252" stroke-width="1.5"/>
+  <line x1="30" y1="100" x2="30" y2="10"  stroke="#525252" stroke-width="1.5"/>
+  <!-- y-tick label at mu -->
+  <text x="22" y="57" font-size="10" fill="#525252" text-anchor="middle">μ</text>
+  <line x1="28" y1="55" x2="32" y2="55" stroke="#525252" stroke-width="1"/>
+  <!-- Stationary wiggly series -->
+  <polyline
+    points="30,55 41,38 52,62 63,45 74,70 85,42 96,58 107,35 118,65 129,48
+            140,72 151,40 162,55 173,30 184,60 195,50 206,68 217,38 228,58
+            239,44 250,70 261,45 272,60 283,38 294,55 305,50"
+    fill="none" stroke="#005CA9" stroke-width="2"/>
+  <!-- Dashed mean line -->
+  <line x1="30" y1="55" x2="310" y2="55" stroke="#525252" stroke-width="1" stroke-dasharray="5,4"/>
+</svg>
+```
+
+[*Fluctuates around $\mu$; bounded variance.*]{.neutral .smaller}
+:::
+
+::: {.column width="48%"}
+**Random-walk-like series, $\phi_1 = 1$ (simulated):**
+
+```{=html}
+<svg width="100%" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" style="max-height:120px;">
+  <!-- Axes -->
+  <line x1="30" y1="100" x2="310" y2="100" stroke="#525252" stroke-width="1.5"/>
+  <line x1="30" y1="100" x2="30" y2="10"  stroke="#525252" stroke-width="1.5"/>
+  <!-- Drifting random walk series -->
+  <polyline
+    points="30,90 41,85 52,80 63,82 74,75 85,70 96,72 107,65 118,68
+            129,60 140,55 151,58 162,50 173,45 184,48 195,40 206,35
+            228,28 250,22 272,18 294,14 305,12"
+    fill="none" stroke="#E41C38" stroke-width="2"/>
+</svg>
+```
+
+[*Drifts without bound; variance grows with $t$.*]{.neutral .smaller}
+:::
+
+::::
+
+::: {.keybox}
+ETS and AR models require stationarity (or achieve it via trend/seasonal components). ARIMA handles non-stationarity through **differencing**.
+:::
+
+---
+
+# Unit Roots and Differencing
+
+A random walk has a unit root --- shocks accumulate permanently.
+
+---
+
+## The Unit Root
+
+Consider the AR(1) model: $y_t = \phi_1\,y_{t-1} + \varepsilon_t$
+
+| **Condition** | **Behavior** | **Process** |
+|:---|:---|:---|
+| $|\phi_1| < 1$ | Shock decays geometrically | Stationary AR(1) |
+| $\phi_1 = 1$   | Shock persists permanently | Random walk (unit root) |
+| $|\phi_1| > 1$ | Explosion | Explosive (not forecastable) |
+
+**Random walk expanded:** $y_T = y_0 + \displaystyle\sum_{t=1}^{T}\varepsilon_t$
+
+::: {.warningbox}
+With a unit root, the **effect of every past shock is permanent**. The naïve forecast $\hat{y}_{T+h|T} = y_T$ is optimal for a pure random walk --- and the forecast variance grows as $h\sigma^2$.
+:::
+
+---
+
+## Testing for a Unit Root: The ADF Test
+
+Rewrite the AR(1) as a regression:
+$$\Delta y_t \;=\; \delta\, y_{t-1} \;+\; \varepsilon_t, \qquad \delta = \phi_1 - 1$$
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Augmented Dickey-Fuller (ADF) Test
+:::
+$H_0: \delta = 0$ &ensp; (unit root --- non-stationary)
+
+$H_1: \delta < 0$ &ensp; (stationary)
+
+Test statistic: $\tau = \hat{\delta}/\mathrm{SE}(\hat{\delta})$ follows a non-standard distribution; critical values from @DickeyFuller1979.
+:::
+
+**Augmentation:** include $\Delta y_{t-1}, \ldots, \Delta y_{t-p}$ lags to remove residual autocorrelation. Also include a constant and/or linear trend as appropriate.
+
+[*Socratic: the ADF statistic does not follow a standard $t$-distribution even in large samples. What does this mean for using standard regression $p$-values to test for a unit root?*]{.neutral .smaller}
+
+---
+
+## Differencing: Removing Non-Stationarity
+
+**First difference** removes a stochastic trend (unit root):
+$$\Delta y_t \;=\; y_t - y_{t-1} \;=\; (1-B)\,y_t$$
+
+where $B$ is the **backshift operator** ($By_t = y_{t-1}$).
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Seasonal difference** removes seasonal non-stationarity:
+$$\Delta_m y_t = y_t - y_{t-m} = (1-B^m)\,y_t$$
+
+For monthly data: $\Delta_{12} y_t = y_t - y_{t-12}$.
+:::
+
+::: {.column width="46%"}
+::: {.keybox}
+$d=0$: already stationary
+
+$d=1$: one first difference
+
+$d=2$: rarely needed
+
+$D=1$: one seasonal difference
+:::
+:::
+
+::::
+
+::: {.warningbox}
+**Over-differencing** induces negative autocorrelation. Re-apply ADF/KPSS after differencing: if $\Delta y_t$ is stationary, stop at $d=1$. Over-differencing introduces MA unit roots.
+:::
+
+---
+
+## Complementary Test: KPSS
+
+The ADF and KPSS tests address *opposite* null hypotheses.
+
+[*(KPSS: Kwiatkowski--Phillips--Schmidt--Shin)*]{.neutral .smaller}
+
+| **Test** | **$H_0$** | **$H_1$** |
+|:---|:---|:---|
+| ADF [@DickeyFuller1979] | Unit root (non-stationary) | Stationary |
+| KPSS [@Kwiatkowski1992] | Stationary | Unit root |
+
+**Practical workflow:**
+
+1. ADF: fail to reject $\Rightarrow$ evidence of unit root
+2. KPSS: reject $\Rightarrow$ evidence against stationarity
+3. If both agree $\Rightarrow$ high confidence; if conflicting $\Rightarrow$ inspect ACF and apply domain knowledge
+
+[*Automatic order selection (`pmdarima.auto_arima`) runs ADF internally to determine $d$ before fitting ARIMA.*]{.neutral .smaller}
+
+---
+
+# ACF and PACF
+
+The autocorrelation function is the fingerprint of a time series.
+
+---
+
+## The Autocorrelation Function (ACF)
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Autocorrelation Function
+:::
+The **lag-$k$ autocorrelation** of a stationary series:
+$$\rho_k \;=\; \frac{\mathrm{Cov}(y_t,\,y_{t-k})}{\mathrm{Var}(y_t)} \;=\; \frac{\gamma_k}{\gamma_0}, \qquad k = 1, 2, \ldots$$
+
+Estimated by $\hat{\rho}_k$; 95% confidence bounds $\approx \pm 1.96/\sqrt{T}$.
+:::
+
+**Theoretical ACF for AR(1):** $\rho_k = \phi_1^k$ &ensp; (geometric decay):
+
+```{=html}
+<svg width="100%" viewBox="0 0 520 118" xmlns="http://www.w3.org/2000/svg" style="max-height:118px;">
+  <!-- Axes -->
+  <line x1="40" y1="90" x2="510" y2="90" stroke="#525252" stroke-width="1.5"/>
+  <line x1="40" y1="90" x2="40" y2="10"  stroke="#525252" stroke-width="1.5"/>
+  <!-- Y tick labels -->
+  <text x="34" y="93" font-size="9" fill="#525252" text-anchor="end">0</text>
+  <text x="34" y="55" font-size="9" fill="#525252" text-anchor="end">0.5</text>
+  <text x="34" y="17" font-size="9" fill="#525252" text-anchor="end">1</text>
+  <!-- X axis label -->
+  <text x="520" y="93" font-size="9" fill="#525252" font-style="italic">Lag k</text>
+  <!-- Confidence bounds ±1.96/sqrt(100) = 0.196 -->
+  <!-- y scale: 0→90, 1→15; range=75px for 1 unit -->
+  <!-- upper bound at 0.196 → y = 90 - 0.196*75 = 75.3 -->
+  <!-- lower bound at -0.196 → y = 90 + 0.196*75 = 104.7 -->
+  <line x1="40" y1="75" x2="510" y2="75" stroke="#525252" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="40" y1="105" x2="510" y2="105" stroke="#525252" stroke-width="1" stroke-dasharray="4,3"/>
+  <!-- ACF bars for phi=0.7: rho_k = 0.7^k -->
+  <!-- x positions: lag k at x = 40 + k*46; k=1..10 -->
+  <!-- bar height: rho_k * 75 px -->
+  <!-- k=1: 0.700 → h=52.5 → y=90-52.5=37.5 -->
+  <rect x="82"  y="38" width="8" height="52" fill="#005CA9"/>
+  <!-- k=2: 0.490 → h=36.8 → y=53.3 -->
+  <rect x="128" y="53" width="8" height="37" fill="#005CA9"/>
+  <!-- k=3: 0.343 → h=25.7 → y=64.3 -->
+  <rect x="174" y="64" width="8" height="26" fill="#005CA9"/>
+  <!-- k=4: 0.240 → h=18.0 → y=72.0 -->
+  <rect x="220" y="72" width="8" height="18" fill="#005CA9"/>
+  <!-- k=5: 0.168 → h=12.6 → y=77.4 -->
+  <rect x="266" y="77" width="8" height="13" fill="#005CA9"/>
+  <!-- k=6: 0.118 → h=8.8 → y=81.2 -->
+  <rect x="312" y="81" width="8" height="9"  fill="#005CA9"/>
+  <!-- k=7: 0.082 → h=6.2 → y=83.8 -->
+  <rect x="358" y="84" width="8" height="6"  fill="#005CA9"/>
+  <!-- k=8: 0.058 → h=4.3 → y=85.7 -->
+  <rect x="404" y="86" width="8" height="4"  fill="#005CA9"/>
+  <!-- k=9: 0.040 → h=3.0 → y=87.0 -->
+  <rect x="450" y="87" width="8" height="3"  fill="#005CA9"/>
+  <!-- k=10: 0.028 → h=2.1 → y=87.9 -->
+  <rect x="496" y="88" width="8" height="2"  fill="#005CA9"/>
+  <!-- X tick labels (moved down to y=113 to clear lower confidence bound at y=105) -->
+  <text x="86"  y="113" font-size="8" fill="#525252" text-anchor="middle">1</text>
+  <text x="132" y="113" font-size="8" fill="#525252" text-anchor="middle">2</text>
+  <text x="178" y="113" font-size="8" fill="#525252" text-anchor="middle">3</text>
+  <text x="224" y="113" font-size="8" fill="#525252" text-anchor="middle">4</text>
+  <text x="270" y="113" font-size="8" fill="#525252" text-anchor="middle">5</text>
+  <text x="316" y="113" font-size="8" fill="#525252" text-anchor="middle">6</text>
+  <text x="362" y="113" font-size="8" fill="#525252" text-anchor="middle">7</text>
+  <text x="408" y="113" font-size="8" fill="#525252" text-anchor="middle">8</text>
+  <text x="454" y="113" font-size="8" fill="#525252" text-anchor="middle">9</text>
+  <text x="500" y="113" font-size="8" fill="#525252" text-anchor="middle">10</text>
+</svg>
+```
+
+[*Dashed lines: $\pm 1.96/\sqrt{T}$ bounds ($T=100$). Bars outside bounds are statistically significant.*]{.neutral .smaller}
+
+---
+
+## The Partial Autocorrelation Function (PACF)
+
+:::: {.columns}
+
+::: {.column width="52%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+Partial Autocorrelation
+:::
+The **lag-$k$ PACF** $\phi_{kk}$ is the correlation between $y_t$ and $y_{t-k}$ *after removing* the linear effects of $y_{t-1}, \ldots, y_{t-k+1}$.
+:::
+
+**For model identification:**
+
+- AR($p$): $\phi_{kk} = 0$ for $k > p$ $\Rightarrow$ PACF **cuts off** after lag $p$
+- MA($q$): $\phi_{kk} \to 0$ geometrically as $k \to \infty$ $\Rightarrow$ PACF **tails off**
+:::
+
+::: {.column width="46%"}
+**Theoretical PACF for AR(2):**
+
+```{=html}
+<svg width="100%" viewBox="0 0 300 138" xmlns="http://www.w3.org/2000/svg" style="max-height:138px;">
+  <!-- Axes -->
+  <line x1="30" y1="100" x2="290" y2="100" stroke="#525252" stroke-width="1.5"/>
+  <line x1="30" y1="100" x2="30" y2="10"   stroke="#525252" stroke-width="1.5"/>
+  <!-- Y tick labels -->
+  <text x="24" y="103" font-size="8" fill="#525252" text-anchor="end">0</text>
+  <text x="24" y="65"  font-size="8" fill="#525252" text-anchor="end">0.5</text>
+  <!-- X axis label -->
+  <text x="296" y="103" font-size="8" fill="#525252" font-style="italic">k</text>
+  <!-- Confidence bounds at ±0.196; y=100, scale: 0→100, 1→10, range=90px -->
+  <!-- upper bound: 100 - 0.196*90 = 82.4 -->
+  <!-- lower bound: 100 + 0.196*90 = 117.6 -->
+  <line x1="30" y1="82" x2="290" y2="82" stroke="#525252" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="30" y1="118" x2="290" y2="118" stroke="#525252" stroke-width="1" stroke-dasharray="4,3"/>
+  <!-- PACF bars: cuts off after lag 2; x = 30 + k*25 -->
+  <!-- Positive bars: y = 100 - h (bar goes upward from baseline) -->
+  <!-- Negative bars: y = 100, height = h (bar goes downward from baseline) -->
+  <!-- k=1: 0.78 → h=70.2 → y=29.8 -->
+  <rect x="47"  y="30" width="7" height="70" fill="#005CA9"/>
+  <!-- k=2: 0.25 → h=22.5 → y=77.5 -->
+  <rect x="72"  y="78" width="7" height="22" fill="#005CA9"/>
+  <!-- k=3: +0.02 → h=1.8 → y=98.2 (positive, blue, upward) -->
+  <rect x="97"  y="98" width="7" height="2"  fill="#005CA9"/>
+  <!-- k=4: -0.01 → h=0.9 → y=100 (negative, red, downward) -->
+  <rect x="122" y="100" width="7" height="1"  fill="#E41C38"/>
+  <!-- k=5: +0.03 → h=2.7 → y=97.3 (positive, blue, upward) -->
+  <rect x="147" y="97" width="7" height="3"  fill="#005CA9"/>
+  <!-- k=6: -0.02 → h=1.8 → y=100 (negative, red, downward) -->
+  <rect x="172" y="100" width="7" height="2"  fill="#E41C38"/>
+  <!-- k=7: +0.01 → h=0.9 → y=99.1 (positive, blue, upward) -->
+  <rect x="197" y="99" width="7" height="1"  fill="#005CA9"/>
+  <!-- k=8: 0.00 → zero bar -->
+  <rect x="222" y="100" width="7" height="0" fill="#005CA9"/>
+  <!-- k=9: -0.01 → h=0.9 → y=100 (negative, red, downward) -->
+  <rect x="247" y="100" width="7" height="1"  fill="#E41C38"/>
+  <!-- k=10: +0.02 → h=1.8 → y=98.2 (positive, blue, upward) -->
+  <rect x="272" y="98" width="7" height="2"  fill="#005CA9"/>
+  <!-- X tick labels (at y=130, below lower confidence bound at y=118) -->
+  <text x="51"  y="130" font-size="7" fill="#525252" text-anchor="middle">1</text>
+  <text x="76"  y="130" font-size="7" fill="#525252" text-anchor="middle">2</text>
+  <text x="101" y="130" font-size="7" fill="#525252" text-anchor="middle">3</text>
+  <text x="126" y="130" font-size="7" fill="#525252" text-anchor="middle">4</text>
+  <text x="151" y="130" font-size="7" fill="#525252" text-anchor="middle">5</text>
+  <text x="176" y="130" font-size="7" fill="#525252" text-anchor="middle">6</text>
+  <text x="201" y="130" font-size="7" fill="#525252" text-anchor="middle">7</text>
+  <text x="226" y="130" font-size="7" fill="#525252" text-anchor="middle">8</text>
+  <text x="251" y="130" font-size="7" fill="#525252" text-anchor="middle">9</text>
+  <text x="276" y="130" font-size="7" fill="#525252" text-anchor="middle">10</text>
+</svg>
+```
+
+[*Cuts off after lag 2: AR(2) signature.*]{.neutral .smaller}
+:::
+
+::::
+
+::: {.keybox}
+ACF identifies MA order ($q$); PACF identifies AR order ($p$). Together they form the Box-Jenkins identification toolkit.
+:::
+
+---
+
+## ACF/PACF Pattern Recognition
+
+| **Model** | **ACF** | **PACF** | $\boldsymbol{d}$ |
+|:---|:---|:---|:---:|
+| White noise    | No significant spikes | No significant spikes | 0 |
+| AR($p$)        | Tails off (decays) | [**Cuts off after $p$**]{.positive} | 0 |
+| MA($q$)        | [**Cuts off after $q$**]{.positive} | Tails off (decays) | 0 |
+| ARMA($p$,$q$)  | Tails off | Tails off | 0 |
+| Random walk    | Decays very slowly | Large spike at lag 1 | 1 |
+
+::: {.warningbox}
+Always unit-root test and difference *before* reading ACF/PACF. The ACF/PACF of a non-stationary series are not interpretable.
+:::
+
+---
+
+# The ARIMA Model
+
+ARIMA = differencing to achieve stationarity + ARMA on the result.
+
+---
+
+## From AR to ARMA($p$,$q$)
+
+**AR($p$):** $y_t = c + \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + \varepsilon_t$
+
+**MA($q$):** $y_t = c + \varepsilon_t + \theta_1\varepsilon_{t-1} + \cdots + \theta_q\varepsilon_{t-q}$
+
+[*MA terms arise naturally from aggregation and averaging --- notably, ARIMA(0,1,1) is algebraically equivalent to SES.*]{.neutral .smaller}
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+ARMA($p$,$q$) Model
+:::
+$$y_t = c + \sum_{i=1}^{p}\phi_i y_{t-i} + \varepsilon_t + \sum_{j=1}^{q}\theta_j\varepsilon_{t-j}, \qquad \varepsilon_t \overset{iid}{\sim}\mathcal{N}(0,\sigma^2)$$
+MA terms capture autocorrelation in *shocks*; AR terms capture autocorrelation in *levels*.
+:::
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Special cases:**
+
+ARMA($p$,0) $=$ AR($p$)
+
+ARMA(0,$q$) $=$ MA($q$)
+:::
+
+::: {.column width="48%"}
+**Requirements:**
+
+Stationarity: roots of AR polynomial outside unit circle
+
+Invertibility: roots outside unit circle [*(unique MA representation; allows rewriting as AR($\infty$))*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## ARIMA($p$,$d$,$q$): Adding Integration
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+ARIMA($p$,$d$,$q$) Model
+:::
+Apply ARMA($p$,$q$) to the $d$-times differenced series $(1-B)^d y_t$:
+
+$$\underbrace{(1-\phi_1 B - \cdots - \phi_p B^p)}_{\text{AR polynomial}} \underbrace{(1-B)^d}_{\text{differencing}} y_t \;=\; c + \underbrace{(1+\theta_1 B + \cdots + \theta_q B^q)}_{\text{MA polynomial}} \varepsilon_t$$
+:::
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Parameter meaning:**
+
+- $p$: AR order (lags of $y$)
+- $d$: degree of differencing
+- $q$: MA order (lags of $\varepsilon$)
+:::
+
+::: {.column width="48%"}
+**Common special cases:**
+
+- ARIMA(0,1,0): random walk
+- ARIMA(1,1,0): differenced AR(1)
+- ARIMA(0,1,1): equivalent to SES [@Hyndman2021, Ch. 9]
+:::
+
+::::
+
+[*Example (ARIMA(1,1,0), $\hat{\phi}_1=0.5$, $y_{100}=120$, $y_{99}=118$): $\Delta y_{100}=2 \;\Rightarrow\; \hat{y}_{101|100}=120+0.5\times 2=\mathbf{121}$*]{.neutral .smaller}
+
+---
+
+## Box-Jenkins Methodology @BoxJenkins2015
+
+:::: {.columns}
+
+::: {.column width="38%"}
+```{=html}
+<svg width="100%" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg" style="max-height:220px;">
+  <defs>
+    <marker id="bj-arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#005CA9"/>
+    </marker>
+    <marker id="bj-redarr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#E41C38"/>
+    </marker>
+  </defs>
+
+  <!-- Step boxes -->
+  <rect x="20" y="10"  width="160" height="38" rx="6" fill="#E8F0FA" stroke="#005CA9" stroke-width="1.5"/>
+  <text x="100" y="28" font-size="11" font-weight="bold" fill="#005CA9" text-anchor="middle">1. Identify</text>
+  <text x="100" y="42" font-size="10" fill="#005CA9" text-anchor="middle">p, d, q</text>
+
+  <rect x="20" y="63"  width="160" height="34" rx="6" fill="#E8F0FA" stroke="#005CA9" stroke-width="1.5"/>
+  <text x="100" y="78" font-size="11" font-weight="bold" fill="#005CA9" text-anchor="middle">2. Estimate</text>
+  <text x="100" y="91" font-size="10" fill="#005CA9" text-anchor="middle">(MLE)</text>
+
+  <rect x="20" y="112" width="160" height="34" rx="6" fill="#E8F0FA" stroke="#005CA9" stroke-width="1.5"/>
+  <text x="100" y="127" font-size="11" font-weight="bold" fill="#005CA9" text-anchor="middle">3. Diagnose</text>
+  <text x="100" y="140" font-size="10" fill="#005CA9" text-anchor="middle">residuals</text>
+
+  <rect x="20" y="161" width="160" height="34" rx="6" fill="#E8F0FA" stroke="#005CA9" stroke-width="1.5"/>
+  <text x="100" y="180" font-size="11" font-weight="bold" fill="#005CA9" text-anchor="middle">4. Forecast</text>
+
+  <!-- Downward arrows -->
+  <line x1="100" y1="48"  x2="100" y2="63"  stroke="#005CA9" stroke-width="2" marker-end="url(#bj-arr)"/>
+  <line x1="100" y1="97"  x2="100" y2="112" stroke="#005CA9" stroke-width="2" marker-end="url(#bj-arr)"/>
+  <line x1="100" y1="146" x2="100" y2="161" stroke="#005CA9" stroke-width="2" marker-end="url(#bj-arr)"/>
+
+  <!-- Feedback arrow: Diagnose → Identify (right side, within viewBox) -->
+  <path d="M 180 129 Q 215 100 215 29 Q 215 14 180 14" fill="none" stroke="#E41C38" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#bj-redarr)"/>
+  <text x="222" y="77" font-size="7" fill="#E41C38" text-anchor="middle">Inadequate</text>
+</svg>
+```
+:::
+
+::: {.column width="58%"}
+**Step 1 (Identify):** unit root tests $\to d$; ACF/PACF $\to p,q$
+
+**Step 3 (Diagnose):** residual ACF should show no structure; Ljung-Box $H_0$: residuals are white noise
+
+[*Test at lag $L=\min(10,T/5)$; $p$-value $<0.05$ suggests residual autocorrelation --- re-identify.*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## Forecasting with ARIMA
+
+**Multi-step forecasting** uses the recursive substitution principle:
+$$\hat{y}_{T+h|T} = \hat{c} + \sum_{i=1}^{p}\hat{\phi}_i\,\hat{y}_{T+h-i|T} + \sum_{j=1}^{q}\hat{\theta}_j\,\hat{\varepsilon}_{T+h-j|T}$$
+
+where $\hat{y}_{T+k|T} = y_{T+k}$ for $k \leq 0$ and $\hat{\varepsilon}_{T+k|T} = 0$ for $k > 0$.
+
+::: {.keybox}
+ARIMA forecast uncertainty **grows** with horizon $h$: prediction interval half-width scales as $\sigma\sqrt{h}$ for ARIMA(0,1,0). ARIMA(0,1,1) $\equiv$ SES shares this same growing uncertainty.
+:::
+
+[*Socratic: ARIMA(0,1,1) produces the same point forecast as SES with $\hat{\alpha} = 1 - \hat{\theta}_1$. Why might their prediction intervals still differ?*]{.neutral .smaller}
+
+---
+
+# Seasonal ARIMA
+
+Retail and economic data have seasonal autocorrelation at lags $m$, $2m$, $3m$, $\ldots$
+
+---
+
+## SARIMA($p$,$d$,$q$)($P$,$D$,$Q$)[$m$]
+
+Monthly retail data exhibit autocorrelation at lags $m, 2m, 3m, \ldots$ beyond standard ARIMA. SARIMA extends the model with seasonal polynomials $\Phi_P(B^m)$ and $\Theta_Q(B^m)$:
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Seasonal ARIMA (SARIMA)
+:::
+
+::: {.smaller}
+$$\underbrace{\Phi_P(B^m)}_{\text{seasonal AR}} \underbrace{\phi_p(B)}_{\text{AR}} \underbrace{(1-B^m)^D}_{\text{seas. diff.}} \underbrace{(1-B)^d}_{\text{diff.}} y_t \;=\; c + \underbrace{\Theta_Q(B^m)}_{\text{seasonal MA}} \underbrace{\theta_q(B)}_{\text{MA}} \varepsilon_t$$
+:::
+:::
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Parameters:**
+
+- $(p,d,q)$: non-seasonal orders
+- $(P,D,Q)$: seasonal orders at period $m$
+- $m=12$ for monthly; $m=4$ for quarterly
+:::
+
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+RSXFS retail sales
+:::
+SARIMA(1,1,1)(0,1,1)[12] is a common starting point for monthly retail series.
+:::
+:::
+
+::::
+
+---
+
+## Automatic ARIMA Selection
+
+Manual identification via ACF/PACF is time-consuming and subjective. **Auto-ARIMA** automates the process:
+
+1. Apply unit-root tests to select $d$ (and $D$)
+2. Search over a grid of $(p,q,P,Q)$ values
+3. Select the model minimizing AIC (or BIC)
+4. Return selected model + fitted parameters
+
+::: {.keybox}
+**Python:** `pmdarima.auto_arima()` with `seasonal=True`, `m=12` searches SARIMA models automatically. `statsmodels.tsa.statespace.sarimax.SARIMAX` fits any manually specified SARIMA.
+:::
+
+[*AIC-selected models can differ from ACF/PACF-identified models. Both approaches should produce white-noise residuals --- if they disagree strongly, investigate for outliers or structural breaks.*]{.neutral .smaller}
+
+---
+
+# Key Takeaways and Roadmap
+
+Stationarity, unit roots, ACF/PACF, ARIMA, and SARIMA in one framework.
+
+---
+
+## Key Takeaways
+
+::: {.keybox}
+::: {.smaller}
+1. **Stationarity** (constant mean, variance, and autocorrelation) is required by all classical forecasting models.
+
+2. **Unit root tests** (ADF, KPSS) determine the differencing order $d$ before model fitting.
+
+3. **ACF and PACF** fingerprint the autocorrelation structure: AR cuts off in PACF; MA cuts off in ACF.
+
+4. **ARIMA($p$,$d$,$q$)** combines differencing with an ARMA model --- subsumes random walk, AR, MA, and SES as special cases.
+
+5. **SARIMA** adds seasonal polynomials for periodic autocorrelation at multiples of lag $m$.
+:::
+:::
+
+[*ARIMA(0,1,1) $\equiv$ SES and ARIMA(0,2,2) $\equiv$ Holt linear --- the ARIMA family unifies exponential smoothing and classical ARMA models.*]{.neutral .smaller}
+
+---
+
+## What's Next: Multivariate Methods
+
+Four model families are now available in the forecasting toolkit:
+
+- Benchmarks (naïve, seasonal naïve, mean, drift)
+- Regression and AR models (Lecture 2)
+- Exponential smoothing / ETS (Lecture 3)
+- ARIMA / SARIMA (Lecture 4)
+
+**Key question:** what if two series are *related* to each other?
+
+::: {.keybox}
+**Lecture 5:** Multivariate forecasting --- VAR models, ARIMAX, and Granger causality tests.
+:::
+
+::: {.neutral .smaller}
+**Lab 4:** ADF/KPSS tests, ACF/PACF plots, manual ARIMA identification, and auto-ARIMA on RSXFS.
+:::
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::

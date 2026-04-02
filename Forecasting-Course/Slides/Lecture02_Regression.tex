@@ -1,0 +1,672 @@
+% =============================================================================
+% Lecture 02: Regression-Based Forecasting
+% BSAD 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+% ---- Lecture metadata --------------------------------------------------------
+\title{Regression-Based Forecasting}
+\subtitle{BSAD 8310: Business Forecasting --- Lecture 2}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+\date{Spring 2026}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% --- Outline -----------------------------------------------------------------
+\begin{frame}{Lecture 2: Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{From Benchmarks to Regression}
+% =============================================================================
+
+\sectionslide{From Benchmarks to Regression}{%
+  Na\"{i}ve models ignore information. Regression lets us use it.}
+
+% --- Slide: Limits of benchmarks ---------------------------------------------
+\begin{frame}{What Benchmark Models Cannot Do}
+  Recall the four benchmarks from Lecture 1:
+  \begin{center}
+    \begin{tabular}{ll}
+      \toprule
+      \textbf{Benchmark} & \textbf{Information used} \\
+      \midrule
+      Na\"{i}ve & Last observed value only \\
+      Seasonal na\"{i}ve & Same season, last year only \\
+      Historical mean & Unconditional average \\
+      Random walk + drift & Last value + average change \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \vspace{0.2cm}
+  \begin{warningbox}
+    None of these benchmarks can use \textbf{leading indicators} ---
+    variables that move \emph{before} $y_t$ does.
+  \end{warningbox}
+  \muted{\footnotesize\itshape Examples: consumer confidence $\to$ retail sales next quarter; interest rates $\to$ housing starts.}
+\end{frame}
+
+% --- Slide: What regression adds ---------------------------------------------
+\begin{frame}{What Regression-Based Forecasting Adds}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Information we can exploit:}
+      \begin{itemize}
+        \item \key{Leading indicators}: variables observable at $T$
+              that predict $y_{T+h}$
+        \item \key{Structural relationships}: economic theory says
+              $x_t$ affects $y_t$
+        \item \key{Deterministic patterns}: known trend, calendar
+              effects, holidays
+        \item \key{Own-lags}: past $y$ values predict future $y$
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{examplebox}{Business Context}
+        \begin{itemize}
+          \item Retailer: use \emph{ad spend}, \emph{price}, and
+                \emph{calendar flags} to forecast demand
+          \item Macro analyst: use \emph{leading index} to forecast
+                next quarter's GDP
+          \item Bank: use \emph{yield curve} to forecast loan defaults
+                6 months ahead
+        \end{itemize}
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{The Regression Model for Forecasting}
+% =============================================================================
+
+\sectionslide{The Regression Model for Forecasting}{%
+  OLS is not just for causal inference --- it is also a forecasting tool.}
+
+% --- Slide: General setup ----------------------------------------------------
+\begin{frame}{General Setup}
+  \begin{definitionbox}{Regression Model for Forecasting}
+    \[
+      y_t \;=\; \mathbf{x}_t^{\prime}\boldsymbol{\beta} + \varepsilon_t,
+      \qquad t = 1, \ldots, T
+    \]
+    \begin{itemize}
+      \item $y_t$: scalar response (what we want to forecast)
+      \item $\mathbf{x}_t = (1, x_{1t}, \ldots, x_{kt})^{\prime}$:
+            $(k+1)$-vector of predictors (including intercept)
+      \item $\boldsymbol{\beta} = (\beta_0, \beta_1, \ldots, \beta_k)^{\prime}$:
+            unknown coefficients
+      \item $\varepsilon_t \sim WN(0, \sigma^2)$: white-noise errors
+    \end{itemize}
+  \end{definitionbox}
+  \vspace{0.2cm}
+  \muted{\small \textbf{Notation reminder} (from Lecture 1):
+  $\varepsilon_t$ denotes the true model innovation;
+  $e_t = y_t - \hat{y}_{t|t-1}$ denotes the realized forecast error.
+  These are conceptually distinct.}
+\end{frame}
+
+% --- Slide: OLS estimation ---------------------------------------------------
+\begin{frame}{OLS Estimation}
+  Stack observations into matrices: $\mathbf{y} = (y_1, \ldots, y_T)^{\prime}$,
+  $\mathbf{X} = (\mathbf{x}_1, \ldots, \mathbf{x}_T)^{\prime}$ ($T \times (k+1)$).
+
+  \vspace{0.2cm}
+  \begin{definitionbox}{OLS Estimator}
+    \[
+      \hat{\boldsymbol{\beta}}
+      \;=\; \arg\min_{\boldsymbol{\beta}} \sum_{t=1}^{T}(y_t - \mathbf{x}_t^{\prime}\boldsymbol{\beta})^2
+      \;=\; (\mathbf{X}^{\prime}\mathbf{X})^{-1}\mathbf{X}^{\prime}\mathbf{y}
+    \]
+  \end{definitionbox}
+  \vspace{0.15cm}
+  \textbf{Gauss-Markov theorem:} Under classical assumptions, $\hat{\boldsymbol{\beta}}$
+  is the \key{Best Linear Unbiased Estimator} (BLUE) \parencite[][Ch.~8]{Hamilton1994}.
+
+  \vspace{0.15cm}
+  \textbf{Classical assumptions for valid OLS inference:}
+  \begin{enumerate}
+    \item $\E[\varepsilon_t \mid \mathbf{X}] = 0$ \hfill (zero conditional mean)
+    \item $\E[\varepsilon_t^2 \mid \mathbf{X}] = \sigma^2$ \hfill (homoscedasticity)
+    \item $\E[\varepsilon_t \varepsilon_s \mid \mathbf{X}] = 0$ for $t \neq s$ \hfill (no autocorrelation)
+  \end{enumerate}
+\end{frame}
+
+% --- Slide: Predictor types --------------------------------------------------
+\begin{frame}{What Can $\mathbf{x}_{T+h}$ Contain?}
+  \begin{keybox}
+    \textbf{The forecasting constraint:} to use $\mathbf{x}_{T+h}$ in the forecast
+    $\hat{y}_{T+h|T}$, every element of $\mathbf{x}_{T+h}$ must be
+    \emph{known} or \emph{forecastable} at time $T$.
+  \end{keybox}
+  \vspace{0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.32\textwidth}
+      \textbf{\pos{Type 1: Deterministic}}\\[4pt]
+      Always known at $T$:
+      \begin{itemize}
+        \item Time index: $t, t^2$
+        \item Seasonal dummies
+        \item Holiday indicators
+        \item Trend functions
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \textbf{\pos{Type 2: Lagged values}}\\[4pt]
+      Known when $h \leq$ lag:
+      \begin{itemize}
+        \item $y_{t-1}, y_{t-2}$
+        \item $x_{1,t-1}$ (lagged)
+        \item Economic releases
+              with delay
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \textbf{\negc{Type 3: External regressors}}\\[4pt]
+      Must be forecast first:
+      \begin{itemize}
+        \item GDP, CPI forecasts
+        \item Competitor prices
+        \item Weather forecasts
+        \item Budget scenarios
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Forecast formula -------------------------------------------------
+\begin{frame}{The Regression Forecast}
+  Given $\hat{\boldsymbol{\beta}}$ estimated on the training set $\{1, \ldots, T\}$:
+
+  \begin{keybox}
+    \[
+      \hat{y}_{T+h|T} \;=\; \mathbf{x}_{T+h}^{\prime}\hat{\boldsymbol{\beta}}
+    \]
+    Plug the \emph{known or forecasted} predictor vector $\mathbf{x}_{T+h}$
+    into the fitted model.
+  \end{keybox}
+  \vspace{0.2cm}
+  \textbf{Important nuances:}
+  \begin{itemize}
+    \item $\hat{\boldsymbol{\beta}}$ is estimated only on training data
+          --- never on the test set
+    \item If $\mathbf{x}_{T+h}$ contains forecasted values, forecast
+          uncertainty propagates (widens intervals)
+    \item For $h > 1$ with lagged-$y$ predictors, use
+          \emph{recursive substitution} (see Section 5)
+  \end{itemize}
+  \muted{\footnotesize\itshape In Lab 02, $\mathbf{x}_{T+h}$ will contain only deterministic terms (trend index + seasonal dummies), so $\mathbf{x}_{T+h}$ is always known exactly.}
+\end{frame}
+
+% =============================================================================
+\section{Trend and Seasonality as Regressors}
+% =============================================================================
+
+\sectionslide{Trend and Seasonality as Regressors}{%
+  Deterministic components require no forecasting: their values are always known at the forecast origin.}
+
+% --- Slide: Linear trend regression ------------------------------------------
+\begin{frame}{Model 1: Linear Trend}
+  The simplest structural model for a series with an upward or downward drift:
+  \begin{definitionbox}{Linear Trend Regression}
+    \[
+      y_t \;=\; \beta_0 + \beta_1 t + \varepsilon_t,
+      \qquad t = 1, 2, \ldots, T
+    \]
+  \end{definitionbox}
+  \vspace{0.1cm}
+  \textbf{Forecast:} $\hat{y}_{T+h|T} = \hat{\beta}_0 + \hat{\beta}_1(T+h)$ --- always known.
+
+  \vspace{0.15cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{When appropriate:}
+      \begin{itemize}
+        \item Steady linear growth or decline
+        \item No pronounced seasonality
+        \item Relatively stable variance
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{warningbox}
+        \small
+        Linear trend extrapolates indefinitely.
+        Long-horizon forecasts assume growth
+        continues forever --- verify this is
+        substantively reasonable.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+  \muted{\footnotesize\itshape US retail sales grow by roughly 3\% per year. Should you use linear or log-linear trend? What feature of the data would help you decide?}
+\end{frame}
+
+% --- Slide: Seasonal dummies -------------------------------------------------
+\begin{frame}{Model 2: Seasonal Dummy Variables}
+  \begin{definitionbox}{Seasonal Dummy Variables ($m$ seasons)}
+    {\small Define $D_{j,t} = 1$ if observation $t$ is in season $j$, else $0$.
+    \[
+      y_t \;=\; \beta_0 + \sum_{j=2}^{m} \gamma_j D_{j,t} + \varepsilon_t
+    \]
+    Include $m-1$ dummies; drop one season as the \textbf{base category}.}
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \textbf{Interpretation:}
+      {\small\begin{itemize}
+        \item $\beta_0$: mean level in the base season (e.g., January)
+        \item $\gamma_j$: seasonal deviation from the base in season $j$
+        \item $\hat{y}_{T+h|T} = \hat{\beta}_0 + \hat{\gamma}_{s(T+h)}$
+      \end{itemize}}
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \begin{warningbox}
+        \small
+        \textbf{Dummy trap:} Including all $m$ dummies creates
+        exact multicollinearity with the intercept.
+        Always drop one season.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Trend + seasonality ----------------------------------------------
+\begin{frame}{Model 3: Trend + Seasonality}
+  \begin{definitionbox}{Trend + Seasonal Regression}
+    \[
+      y_t \;=\; \underbrace{\beta_0 + \beta_1 t}_{\text{trend}}
+             + \underbrace{\sum_{j=2}^{m} \gamma_j D_{j,t}}_{\text{seasonal}}
+             + \varepsilon_t
+    \]
+  \end{definitionbox}
+  \textbf{Forecast:}
+  $\hat{y}_{T+h|T} = \hat{\beta}_0 + \hat{\beta}_1(T+h) + \hat{\gamma}_{s(T+h)}$ \hfill\muted{(always known)}
+
+  \begin{examplebox}{US Retail Sales (RSXFS)}
+    {\small Monthly retail sales exhibit both components:
+    \begin{itemize}
+      \item Upward trend (growing economy and population)
+      \item Strong December spike, January dip (Lab 02 quantifies both)
+    \end{itemize}}
+  \end{examplebox}
+\end{frame}
+
+% --- Slide: What about non-linear trend? ------------------------------------
+\begin{frame}{Extensions: Non-Linear Trend}
+  \textbf{Polynomial trend:}
+  \[
+    y_t = \beta_0 + \beta_1 t + \beta_2 t^2 + \varepsilon_t
+  \]
+  Still OLS --- just add $t^2$ as another predictor column.
+
+  \vspace{0.2cm}
+  \textbf{Log-linear trend} (when variance grows with level):
+  \[
+    \ln y_t = \beta_0 + \beta_1 t + \varepsilon_t
+    \quad\Leftrightarrow\quad
+    y_t = e^{\beta_0}\, e^{\beta_1 t}\, e^{\varepsilon_t}
+  \]
+  Forecasts: $\hat{y}_{T+h|T} = \exp\!\bigl(\hat{\beta}_0 + \hat{\beta}_1(T+h)
+  + \tfrac{1}{2}\hat{\sigma}^2\bigr)$ \hfill\muted{\small (bias correction)}
+
+  \vspace{0.15cm}
+  \begin{keybox}
+    \small
+    \textbf{Rule of thumb:} If the series grows at a roughly
+    \emph{constant percentage rate} (e.g., 3\% per year), use
+    log-linear trend. If it grows by a \emph{constant dollar amount},
+    use linear trend.
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{Prediction Intervals}
+% =============================================================================
+
+\sectionslide{Prediction Intervals}{%
+  A point forecast without uncertainty bounds is an incomplete forecast.}
+
+% --- Slide: Point vs. interval -----------------------------------------------
+\begin{frame}{From Point Forecast to Prediction Interval}
+  \begin{definitionbox}{95\% Prediction Interval}
+    \[
+      \hat{y}_{T+h|T} \;\pm\; t_{0.025,\,T-k-1}\;\cdot\;
+      \hat{\sigma}_e \sqrt{\underbrace{1}_{\substack{\text{irreducible}\\\text{error}}}
+      + \underbrace{\mathbf{x}_{T+h}^{\prime}
+      (\mathbf{X}^{\prime}\mathbf{X})^{-1}\mathbf{x}_{T+h}}_{\text{estimation uncertainty}}}
+    \]
+    where $\hat{\sigma}_e^2 = \frac{1}{T-k-1}\sum_{t=1}^{T}e_t^2$
+    is the estimated residual variance.
+  \end{definitionbox}
+  \vspace{0.1cm}
+  \textbf{Two sources of uncertainty in the PI:}
+  \begin{itemize}
+    \item \textbf{Irreducible:} future shock $\varepsilon_{T+h}$
+          has variance $\sigma^2$ \hfill (the ``1'' under the square root)
+    \item \textbf{Estimation:} $\hat{\boldsymbol{\beta}} \neq \boldsymbol{\beta}$
+          \hfill (the $(X'X)^{-1}$ term; shrinks as $T \to \infty$)
+  \end{itemize}
+  \muted{\footnotesize\itshape PIs widen for predictions far from the center of the training data — including long-horizon forecasts where $t = T+h$ is far from $\bar{t}$.}
+\end{frame}
+
+% --- Slide: PI assumptions and violations ------------------------------------
+\begin{frame}{When Prediction Intervals Are Valid}
+  The standard PI formula assumes:
+
+  \vspace{0.1cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      {\small\begin{enumerate}
+        \item $\varepsilon_t \stackrel{iid}{\sim} \mathcal{N}(0,\sigma^2)$
+              (normality + homoscedasticity)
+        \item No autocorrelation: $\Cov(\varepsilon_t, \varepsilon_s) = 0$
+        \item No model misspecification
+        \item Predictors $\mathbf{x}_{T+h}$ known exactly
+      \end{enumerate}}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{warningbox}
+        \small
+        Violation of any assumption
+        \textbf{invalidates} the nominal coverage.
+        Always check: residual histogram,
+        ACF of residuals, Breusch-Pagan test
+        for heteroscedasticity.
+        (Lecture 6 covers formal tests.)
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+  \vspace{0.15cm}
+  \begin{keybox}
+    \small
+    \textbf{Empirical rule of thumb:} If ACF of residuals shows spikes
+    at short lags (1–4), the PI is too narrow. Residual autocorrelation
+    is exploitable information --- switch to an AR or ARIMA model.
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{Autoregressive Models}
+% =============================================================================
+
+\sectionslide{Autoregressive Models}{%
+  The past values of a series often predict its future. AR models formalize this idea.}
+
+% --- Slide: AR(1) as regression -----------------------------------------------
+\begin{frame}{The AR(1) Model}
+  An \key{autoregressive model of order 1} is just OLS regression
+  with one lag of $y$ as the predictor:
+
+  \begin{definitionbox}{AR(1) Model}
+    \[
+      y_t \;=\; \phi_0 + \phi_1 y_{t-1} + \varepsilon_t,
+      \qquad \varepsilon_t \overset{iid}{\sim} WN(0,\sigma^2)
+      \;\muted{\small\text{(normality not required for OLS)}}
+    \]
+  \end{definitionbox}
+  \vspace{0.1cm}
+  \textbf{Stationarity condition:} $|\phi_1| < 1$. If $\phi_1 = 1$, the model
+  is a \emph{random walk}; if $|\phi_1| > 1$, it is \emph{explosive} ---
+  both are non-stationary (Lecture 4).
+
+  \vspace{0.1cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{One-step forecast:}
+      \[
+        \hat{y}_{T+1|T} = \hat{\phi}_0 + \hat{\phi}_1 y_T
+      \]
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Two-step forecast (recursive):}
+      \[
+        \hat{y}_{T+2|T} = \hat{\phi}_0 + \hat{\phi}_1 \hat{y}_{T+1|T}
+      \]
+    \end{column}
+  \end{columns}
+  \vspace{0.1cm}
+  \muted{\footnotesize\itshape As $h \to \infty$, multi-step AR(1) forecasts converge to the unconditional mean $\mu = \phi_0/(1-\phi_1)$ when $|\phi_1|<1$.}
+\end{frame}
+
+% --- Slide: AR(p) and lag selection ------------------------------------------
+\begin{frame}{The AR($p$) Model and Lag Selection}
+  \begin{definitionbox}{AR($p$) Model}
+    \[
+      y_t \;=\; \phi_0 + \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + \varepsilon_t
+            \;=\; \phi_0 + \sum_{i=1}^{p} \phi_i y_{t-i} + \varepsilon_t
+    \]
+  \end{definitionbox}
+  \vspace{0.1cm}
+  \textbf{Lag order selection:} choose $p$ to minimize an information criterion.
+
+  \vspace{0.1cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{align*}
+        \text{AIC} &= -2\hat{\ell} + 2(p+2) \\[4pt]
+        \text{BIC} &= -2\hat{\ell} + (p+2)\ln T
+      \end{align*}
+      \muted{\small$\hat{\ell}$: maximized log-likelihood.
+      $p+2$ parameters: $p$ AR coefs + intercept + $\sigma^2$.}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{keybox}
+        \small
+        AIC tends to select more lags
+        (asymptotically inconsistent: does not
+        recover the true order with probability~1).
+        BIC penalizes more and is consistent.
+        \textbf{Use BIC} for forecasting in most
+        business applications \parencite[][Ch.~5]{BoxJenkins2015}.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+  \muted{\footnotesize\itshape BIC selects $p=2$ but the residual ACF shows a significant spike at lag~12. What should you do?}
+\end{frame}
+
+% --- Slide: Recursive multi-step forecasts -----------------------------------
+\begin{frame}{Multi-Step AR Forecasts: The Recursive Method}
+  For an AR($p$) model, $h$-step-ahead forecasts use the
+  \key{recursive substitution} method:
+
+  \vspace{0.1cm}
+  \[
+    \hat{y}_{T+h|T} = \hat{\phi}_0 + \sum_{i=1}^{p} \hat{\phi}_i\, \hat{y}_{T+h-i|T}
+  \]
+  where $\hat{y}_{T+j|T} = y_{T+j}$ for $j \leq 0$ (observed values).
+
+  \vspace{0.15cm}
+  \begin{examplebox}{AR(2), $h=3$ example}
+    {\small
+    \begin{align*}
+      \hat{y}_{T+1|T} &= \hat{\phi}_0 + \hat{\phi}_1 y_T + \hat{\phi}_2 y_{T-1} \\
+      \hat{y}_{T+2|T} &= \hat{\phi}_0 + \hat{\phi}_1 \hat{y}_{T+1|T} + \hat{\phi}_2 y_T \\
+      \hat{y}_{T+3|T} &= \hat{\phi}_0 + \hat{\phi}_1 \hat{y}_{T+2|T} + \hat{\phi}_2 \hat{y}_{T+1|T}
+    \end{align*}}
+  \end{examplebox}
+  \muted{\footnotesize\itshape Forecast uncertainty compounds with horizon: each substitution propagates estimation error from earlier steps.}
+\end{frame}
+
+% --- Slide: AR diagnostics ---------------------------------------------------
+\begin{frame}{Diagnosing an AR Model}
+  \textbf{How do we know if the AR order is adequate?}
+
+  \vspace{0.1cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Residual ACF check:}
+      \begin{itemize}
+        \item Compute residuals $e_t = y_t - \hat{y}_{t|t-1}$
+        \item Plot autocorrelation function (ACF) of residuals
+        \item All spikes should fall inside the
+              95\% bands: $\pm 1.96/\sqrt{T}$
+        \item Significant spike at lag $k$
+              $\Rightarrow$ add lag $k$ to the model
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{warningbox}
+        \small
+        Residual autocorrelation signals
+        information the model has not yet captured.
+        A model with autocorrelated residuals
+        is \textbf{suboptimal} and its prediction
+        intervals are \textbf{invalid}.
+        Full treatment: Lecture 4 (ARIMA).
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+  \vspace{0.15cm}
+  \muted{\footnotesize\itshape Lab 02 plots the residual ACF for the AR($p$) model and checks whether any spikes suggest a higher order is needed.}
+\end{frame}
+
+% =============================================================================
+\section{Pitfalls}
+% =============================================================================
+
+\sectionslide{Pitfalls}{%
+  Regression in time series requires extra care. Three failure modes to avoid.}
+
+% --- Slide: Spurious regression ----------------------------------------------
+\begin{frame}{Pitfall 1: Spurious Regression}
+  \begin{warningbox}
+    \textcite{GrangerNewbold1974} show that regressing two \emph{independent}
+    random-walk series $y_t$ and $x_t$ yields $R^2 \approx 0.7$
+    and apparently significant $t$-statistics ---
+    despite no true relationship between them.
+  \end{warningbox}
+  \vspace{0.1cm}
+  \textbf{Why this happens:}
+  \begin{itemize}
+    \item Both $y_t$ and $x_t$ are $I(1)$ (non-stationary; require one difference
+          to become stationary): their levels share a stochastic trend
+    \item The usual $t$-distribution critical values are \emph{invalid} under non-stationarity
+  \end{itemize}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \textbf{Diagnostic heuristic:} $R^2 > DW$ statistic (where $DW$
+      is the Durbin-Watson autocorrelation statistic, Lecture 6) suggests
+      spurious regression \parencite{GrangerNewbold1974}.
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \begin{keybox}
+        \small
+        \textbf{Fix:} Difference the series
+        ($\Delta y_t$, $\Delta x_t$) before
+        regressing. Or test for
+        cointegration (Lecture 5).
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Overfitting ------------------------------------------------------
+\begin{frame}{Pitfall 2: Overfitting}
+  \textbf{More predictors $\Rightarrow$ better in-sample fit, but often worse out-of-sample forecasting performance.}
+
+  \vspace{0.1cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{What happens:}
+      \begin{itemize}
+        \item OLS fits noise along with signal
+        \item High $R^2$ in-sample; large errors out-of-sample
+        \item Worse with small $T$, large $k$
+        \item Many lags: AR(20) on monthly data
+              likely overfits
+      \end{itemize}
+      \vspace{0.1cm}
+      \muted{\small \textbf{Rule of thumb:} Keep $k \ll T$. A common bound: $k \leq T/10$.}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{examplebox}{Why This Matters}
+        A 12-month history and 11 seasonal
+        dummies + intercept = 12 parameters.
+        You are fitting the data, not the
+        underlying pattern.
+        \smallskip
+
+        \muted{\small Regularization (LASSO, Ridge) addresses
+        this formally in Lecture 8.}
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: The regressor availability problem -------------------------------
+\begin{frame}{Pitfall 3: The Regressor Availability Problem}
+  \begin{warningbox}
+    \textbf{Critical constraint:} To forecast $y_{T+h}$ using a regressor
+    $x_{T+h}$, you must know (or forecast) $x_{T+h}$ at time $T$.
+    Using data that won't be available at the forecast origin is
+    \key{data leakage}.
+  \end{warningbox}
+  \vspace{0.15cm}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{\pos{Valid predictors for $y_{T+1}$:}}
+      \begin{itemize}
+        \item[\pos{$\checkmark$}] $y_T, y_{T-1}, \ldots$ (lagged $y$)
+        \item[\pos{$\checkmark$}] $x_{T-1}$ (lagged leading indicator)
+        \item[\pos{$\checkmark$}] Seasonal dummy at $T+1$
+        \item[\pos{$\checkmark$}] Weather forecast for $T+1$
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{\negc{Invalid predictors for $y_{T+1}$:}}
+      \begin{itemize}
+        \item[\negc{$\times$}] $x_{T+1}$ (contemporaneous, unknown)
+        \item[\negc{$\times$}] $y_{T+1}$ (the target itself)
+        \item[\negc{$\times$}] Future CPI or GDP
+        \item[\negc{$\times$}] Any variable with
+              publication lag $< h$
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section*{Key Takeaways}
+% =============================================================================
+
+\begin{frame}{Lecture 2: Key Takeaways}
+  \begin{keybox}
+    \small
+    \begin{enumerate}
+      \item Regression extends benchmarks by incorporating \textbf{predictors}:
+            deterministic trends, seasonal dummies, lagged values,
+            and leading indicators.
+      \item The OLS forecast is $\hat{y}_{T+h|T} = \mathbf{x}_{T+h}^{\prime}\hat{\boldsymbol{\beta}}$,
+            but $\mathbf{x}_{T+h}$ must be \textbf{known or forecastable} at time $T$.
+      \item Prediction intervals have two components: irreducible error
+            ($\sigma^2$) and estimation uncertainty ($(X'X)^{-1}$ term).
+            Valid only under no autocorrelation and homoscedasticity.
+      \item AR($p$) is OLS with lagged $y$. Use \textbf{BIC} to select $p$.
+            Multi-step forecasts use recursive substitution.
+      \item Three pitfalls: \textbf{spurious regression} (I(1) levels),
+            \textbf{overfitting} (too many predictors), and the
+            \textbf{regressor availability problem} (data leakage).
+    \end{enumerate}
+  \end{keybox}
+  \vspace{0.1cm}
+  \muted{\footnotesize\itshape Next: Exponential Smoothing (Lecture 3) ---
+  adaptive weighting without requiring explicit predictor specification.}
+\end{frame}
+
+% --- References --------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+\end{document}

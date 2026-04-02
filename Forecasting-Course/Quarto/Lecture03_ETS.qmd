@@ -1,0 +1,494 @@
+---
+title: "Exponential Smoothing"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 3"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture 3: Outline
+
+1. Motivation: Adaptive Averaging
+2. Simple Exponential Smoothing
+3. Holt's Linear Method
+4. Holt-Winters Seasonal Method
+5. The ETS Framework
+6. Key Takeaways and Roadmap
+
+---
+
+# Motivation: Adaptive Averaging
+
+Regression treats all observations equally --- but recent observations carry more information.
+
+---
+
+## The Equal-Weight Problem
+
+In OLS regression, *every* observation receives equal implicit weight:
+
+$$\hat{\boldsymbol{\beta}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{y} \qquad \Rightarrow \qquad \hat{y}_{T+h|T} = \mathbf{x}_{T+h}'\hat{\boldsymbol{\beta}}$$
+
+::: {.warningbox}
+When the data-generating process **drifts over time** --- structural breaks, changing growth rates, evolving seasonality --- old observations **contaminate** the forecast.
+:::
+
+::: {.examplebox}
+::: {.examplebox-title}
+Business context
+:::
+A retailer's sales pattern shifts after a store renovation. OLS keeps fitting to pre-renovation data, systematically over- or under-forecasting for months afterward.
+:::
+
+---
+
+## The Exponential Weighting Idea
+
+**Idea:** assign geometrically declining weights to past observations.
+
+| Observation | Age | Weight |
+|:---|:---:|:---:|
+| $y_T$ | 0 | $\alpha$ |
+| $y_{T-1}$ | 1 | $\alpha(1-\alpha)$ |
+| $y_{T-2}$ | 2 | $\alpha(1-\alpha)^2$ |
+| $y_{T-j}$ | $j$ | $\alpha(1-\alpha)^j$ |
+
+Weights sum to 1: $\;\sum_{j=0}^{\infty}\alpha(1-\alpha)^j = 1$ for $0 < \alpha \leq 1$.
+
+::: {.keybox}
+A single parameter $\alpha$ controls how fast old observations are **forgotten**.
+
+$\alpha \approx 1$: almost all weight on the latest value. $\quad$ $\alpha \approx 0$: long memory.
+:::
+
+---
+
+# Simple Exponential Smoothing
+
+One parameter, one component: the level.
+
+---
+
+## Simple Exponential Smoothing (SES)
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Simple Exponential Smoothing
+:::
+Let $\ell_t$ denote the **level** at time $t$. SES updates:
+$$\ell_t \;=\; \alpha\, y_t \;+\; (1-\alpha)\,\ell_{t-1}, \qquad 0 < \alpha \leq 1$$
+with initialization $\ell_0$ estimated from the data.
+:::
+
+**Recursive expansion** reveals the exponential weights:
+$$\ell_t \;=\; \alpha\sum_{j=0}^{t-1}(1-\alpha)^j\,y_{t-j} \;+\; (1-\alpha)^t\,\ell_0$$
+
+[*As $t \to \infty$, the initialization term $(1-\alpha)^t\ell_0 \to 0$ for any $\alpha > 0$ --- the starting value eventually becomes irrelevant.*]{.neutral .smaller}
+
+---
+
+## The Error-Correction Form
+
+SES can be rewritten as an **error-correction equation**:
+$$\ell_t \;=\; \ell_{t-1} \;+\; \alpha\underbrace{(y_t - \ell_{t-1})}_{e_t} \;=\; \ell_{t-1} + \alpha\,e_t$$
+
+where $e_t = y_t - \ell_{t-1}$ is the one-step-ahead forecast error.
+
+[*(SES is equivalent to ARIMA(0,1,1) --- see Lecture 4.)*]{.neutral .smaller}
+
+::: {.keybox}
+At each period the level is **updated in proportion to the latest error**. $\alpha$ controls the speed of adaptation.
+:::
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Large $\alpha$ (e.g. 0.8):**
+
+- Reacts quickly to shocks
+- Noisy, volatile forecasts
+- Good for rapidly changing series
+:::
+
+::: {.column width="48%"}
+**Small $\alpha$ (e.g. 0.1):**
+
+- Slow adaptation
+- Smooth, stable forecasts
+- Good for slowly evolving, near-stationary series
+:::
+
+::::
+
+---
+
+## Estimating $\alpha$ and the SES Forecast
+
+**Parameter estimation:** choose $\alpha$ and $\ell_0$ to minimize the sum of squared one-step-ahead errors [@Hyndman2021, Ch. 8]:
+$$\min_{\alpha,\,\ell_0}\;\sum_{t=1}^{T}(y_t - \ell_{t-1})^2, \qquad 0 < \alpha \leq 1$$
+
+Solved numerically (bounded nonlinear optimization).
+
+**Forecast:** for *any* horizon $h \geq 1$,
+$$\hat{y}_{T+h|T} \;=\; \ell_T$$
+
+::: {.warningbox}
+SES produces a **flat forecast** --- the same value at all horizons. Appropriate only when the series has *no trend and no seasonality*.
+:::
+
+[*Socratic: if $y_T = 110$, $\ell_{T-1} = 104$, and $\hat{\alpha} = 0.6$, what is $\hat{y}_{T+1|T}$?*]{.neutral .smaller}
+
+---
+
+## SES in Context: Boundary Cases
+
+::: {.examplebox}
+::: {.examplebox-title}
+US Retail Sales (RSXFS)
+:::
+Estimated $\hat{\alpha} \approx 0.70$ --- fast adaptation. Forecast for month $T{+}1$ equals the final smoothed level $\ell_T$. Lab 3 compares RMSE against Lecture 1--2 benchmarks.
+:::
+
+**Connection to benchmarks:**
+
+| **Special case** | **Model** |
+|:---|:---|
+| $\alpha = 1$ | Naïve forecast: $\hat{y}_{T+h|T} = y_T$ |
+| $\alpha \to 0$ (large $T$) | Historical mean: $\hat{y}_{T+h|T} = \bar{y}$ |
+
+::: {.keybox}
+SES **nests** both extreme benchmarks from Lecture 1. $\hat{\alpha}$ locates the optimal point between "forget everything" and "forget nothing."
+:::
+
+---
+
+# Holt's Linear Method
+
+Add a second component for trend: level and slope updated separately.
+
+---
+
+## Holt's Linear Method: Level and Trend
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Holt's Linear Exponential Smoothing
+:::
+**Level:** $\;\ell_t = \alpha\, y_t + (1-\alpha)\,(\ell_{t-1} + b_{t-1})$
+
+**Trend:** $\;b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}$
+
+Parameters: $\;0 < \alpha \leq 1$, $\;0 < \beta^* \leq 1$ [@Holt2004]
+:::
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Interpretation:**
+
+- $\ell_t$: where the series is *now*
+- $b_t$: the current growth rate
+- $\beta^*$ controls how fast the slope adapts
+:::
+
+::: {.column width="44%"}
+**$h$-step forecast:**
+$$\hat{y}_{T+h|T} = \ell_T + h\,b_T$$
+Extrapolates the current trend linearly.
+:::
+
+::::
+
+[*SES is nested inside Holt: take $\beta^* \to 0$ and $b_0 = 0$ (so $b_t = 0$ for all $t$).*]{.neutral .smaller}
+
+---
+
+## The Damped Trend
+
+Linear extrapolation can be [unrealistic]{.negative} for long horizons --- trends rarely persist indefinitely.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Damped-trend modification** [@Gardner2006]:
+$$\hat{y}_{T+h|T} = \ell_T + \!\sum_{j=1}^{h}\phi^j b_T, \quad 0 < \phi < 1$$
+
+::: {.keybox}
+$\phi \to 1$: standard Holt (no damping).
+
+$\phi \to 0$: forecast $\to \ell_T$ (flat; trend vanishes).
+
+**Use damped by default for $h > 6$.**
+:::
+:::
+
+::: {.column width="47%"}
+```{=html}
+<svg width="100%" viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg" style="max-height:210px;">
+  <!-- Axes -->
+  <line x1="40" y1="180" x2="300" y2="180" stroke="#525252" stroke-width="1.5"/>
+  <line x1="40" y1="180" x2="40" y2="20" stroke="#525252" stroke-width="1.5"/>
+  <!-- X-axis label -->
+  <text x="295" y="195" font-size="11" fill="#525252" font-style="italic">h</text>
+  <!-- X tick labels -->
+  <text x="40"  y="195" font-size="10" fill="#525252" text-anchor="middle">0</text>
+  <text x="127" y="195" font-size="10" fill="#525252" text-anchor="middle">4</text>
+  <text x="213" y="195" font-size="10" fill="#525252" text-anchor="middle">8</text>
+  <text x="300" y="195" font-size="10" fill="#525252" text-anchor="middle">12</text>
+  <!-- Linear Holt line: 100 + 4h, scaled: h=0→y=180-? -->
+  <!-- y range: 98 to 152; pixels: 180 (bottom) to 20 (top), range=160px for 54 units -->
+  <!-- scale: 160/54 ≈ 2.96 px/unit; h=0→y_val=100→px=180-(100-98)*2.96=174; h=12→y_val=148→px=180-(148-98)*2.96=32 -->
+  <polyline points="40,174 300,32" stroke="#E41C38" stroke-width="2" stroke-dasharray="6,4" fill="none"/>
+  <text x="185" y="65" font-size="10" fill="#E41C38">Holt (φ=1)</text>
+  <!-- Damped line: 100 + 4*0.85*(1-0.85^h)/0.15; scale px_y=180-(y-98)*160/54; px_x=40+h*260/12 -->
+  <!-- h=0..12 integer steps (13 pts): smooth exponential-approach curve -->
+  <!-- asymptote: 100+4*0.85/0.15=122.67 → px_y=180-(122.67-98)*160/54≈107 -->
+  <polyline points="40,174 62,164 83,155 105,148 127,142 148,137 170,133 192,129 213,126 235,123 257,121 278,119 300,118" stroke="#005CA9" stroke-width="2" fill="none"/>
+  <line x1="40" y1="107" x2="300" y2="107" stroke="#005CA9" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="185" y="120" font-size="10" fill="#005CA9">Damped (φ=0.85)</text>
+</svg>
+```
+:::
+
+::::
+
+[*Socratic: with $\ell_T = 100$, $b_T = 4$, $\phi = 0.85$, what is $\hat{y}_{T+3|T}$? (Hint: compute $\phi + \phi^2 + \phi^3$.) Why might large $\beta^*$ cause erratic forecasts when spikes occur?*]{.neutral .smaller}
+
+---
+
+# Holt-Winters Seasonal Method
+
+Add a third component for seasonality: level, trend, and season.
+
+---
+
+## Three-Component Decomposition
+
+The **additive Holt-Winters model** [@Winters1960]:
+$$y_t \;=\; \ell_t \;+\; b_t \;+\; s_t \;+\; \varepsilon_t$$
+
+where $s_t$ is the seasonal component with period $m$.
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Holt-Winters Additive Update Equations
+:::
+$\ell_t = \alpha(y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})$
+
+$b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}$
+
+$s_t = \gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma)\,s_{t-m}$
+
+Parameters: $0 < \alpha \leq 1$, $0 < \beta^* \leq 1$, $0 < \gamma \leq 1{-}\alpha$; seasonal period $m$
+:::
+
+[*The $m$ seasonal indices sum to zero over one full period. For monthly data, $m = 12$.*]{.neutral .smaller}
+
+---
+
+## Additive vs. Multiplicative Seasonality
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Additive forecast:**
+$$\hat{y}_{T+h|T} = \ell_T + h\,b_T + s_{T+h-m}$$
+:::
+
+::: {.column width="48%"}
+**Multiplicative forecast:**
+$$\hat{y}_{T+h|T} = (\ell_T + h\,b_T)\,s_{T+h-m}$$
+:::
+
+::::
+
+| **Variant** | **Seasonal component** | **When to use** |
+|:---|:---|:---|
+| Additive | $\ell_t + s_t$ | Seasonal amplitude *constant* in size |
+| Multiplicative | $\ell_t \times s_t$ | Seasonal amplitude *proportional* to level |
+
+::: {.examplebox}
+::: {.examplebox-title}
+US Retail Sales (RSXFS)
+:::
+The holiday-season spike grows as overall sales grow $\Rightarrow$ **multiplicative seasonality** is usually preferred.
+:::
+
+---
+
+## Estimation and Initialization
+
+**Parameters to estimate:** $\alpha$, $\beta^*$, $\gamma$, plus initial values $\ell_0$, $b_0$, and $m$ seasonal indices $s_{1-m}, \ldots, s_0$.
+
+**Initialization strategies:**
+
+- **Classical:** first-season average for $\ell_0$; first-to-second-season slope for $b_0$; seasonal differences for $s_1, \ldots, s_m$
+- **Optimized:** jointly minimize SSE over all parameters *and* initial values (default in `statsmodels`)
+
+::: {.warningbox}
+Holt-Winters requires at least $\mathbf{2m}$ observations to initialize. With $m = 12$, you need $\geq 24$ months of data.
+:::
+
+[*Socratic: if the December spike triples over ten years, which variant is appropriate and what does that imply for $\hat{\gamma}$?*]{.neutral .smaller}
+
+---
+
+# The ETS Framework
+
+A unified state space taxonomy: Error $\times$ Trend $\times$ Seasonal.
+
+---
+
+## ETS: Error $\times$ Trend $\times$ Seasonal
+
+@Hyndman2021 unify all exponential smoothing variants as **state space models** with a single error source.
+
+| **Component** | **Options** | **Meaning** |
+|:---|:---:|:---|
+| Error ($E$) | A, M | Additive / Multiplicative |
+| Trend ($T$) | N, A, A~d~ | None / Additive / Additive damped |
+| Seasonal ($S$) | N, A, M | None / Additive / Multiplicative |
+
+$2 \times 3 \times 3 = 18$ combinations; some are inadmissible, giving **15 valid ETS models**.
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**ETS(A,N,N)** = SES
+
+**ETS(A,A,N)** = Holt linear
+
+**ETS(A,A~d~,N)** = Holt damped
+:::
+
+::: {.column width="48%"}
+**ETS(A,A,A)** = Holt-Winters additive
+
+**ETS(A,A,M)** = Holt-Winters multiplicative
+
+[*(and 10 more variants)*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## State Space Representation
+
+Every ETS model can be written as a **state space model** (additive-error form shown):
+$$y_t = h(\mathbf{x}_{t-1}) + k(\mathbf{x}_{t-1})\,\varepsilon_t, \qquad \varepsilon_t \overset{\mathrm{iid}}{\sim} \mathcal{N}(0,\sigma^2)$$
+$$\mathbf{x}_t = f(\mathbf{x}_{t-1}) + g(\mathbf{x}_{t-1})\,\varepsilon_t$$
+
+where $\mathbf{x}_t = (\ell_t,\, b_t,\, s_t, \ldots)'$ is the state vector.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Additive error** (`E = A`):
+
+- Gaussian likelihood, closed-form prediction interval (PI)
+- Easier to interpret
+:::
+
+::: {.column width="46%"}
+**Multiplicative error** (`E = M`):
+
+- Often better RMSE
+- [No closed-form PI]{.negative}
+:::
+
+::::
+
+::: {.keybox}
+The state space form enables **maximum likelihood estimation** and principled prediction intervals.
+:::
+
+[*Notation: $\varepsilon_t$ here is the model innovation. For additive-error models, $\varepsilon_t \equiv e_t$ (forecast error); for multiplicative-error models, $\varepsilon_t = e_t / \ell_{t-1}$.*]{.neutral .smaller}
+
+---
+
+## Automatic Model Selection via AIC
+
+Fit all 15 valid ETS models; select by minimum AIC [@Hyndman2021, Ch. 8]:
+$$\mathrm{AIC} = -2\hat{L} + 2p, \qquad \hat{L} = \text{maximized log-likelihood}$$
+
+| **ETS model** | **Key features** | **Typical application** |
+|:---|:---|:---|
+| ETS(A,N,N) | No trend, no seasonal | Stable, level series |
+| ETS(A,A~d~,N) | Damped trend | Long-horizon trending |
+| ETS(A,A,M) | Linear trend, mult. seasonal | Retail, tourism |
+
+::: {.keybox}
+In the M4 Competition, ETS-family methods ranked among the most accurate purely statistical approaches [@Makridakis2020].
+:::
+
+[*Lab 3 uses `statsmodels.tsa.exponential_smoothing.ets.ETSModel` for full AIC-based model selection across all valid ETS variants.*]{.neutral .smaller}
+
+---
+
+# Key Takeaways and Roadmap
+
+ETS unifies exponential smoothing as state space models with AIC selection.
+
+---
+
+## Key Takeaways
+
+::: {.keybox .smaller}
+1. **Exponential weighting** gives more importance to recent observations; $\alpha$ controls the forgetting rate.
+
+2. **SES**: one smoothing parameter ($\alpha$), flat forecast --- nests naïve ($\alpha{=}1$) and mean ($\alpha{\to}0$).
+
+3. **Holt**: adds trend component $b_t$ --- use the *damped* variant for horizons $h > 6$.
+
+4. **Holt-Winters**: adds seasonal component $s_t$ --- choose additive vs. multiplicative based on whether amplitude scales with the level.
+
+5. **ETS framework**: unifies all methods as state space models; AIC selects the best variant automatically.
+:::
+
+[*All ETS models share the error-correction intuition: update each component in proportion to the latest forecast error.*]{.neutral .smaller}
+
+---
+
+## What's Next: Stationarity and ARIMA
+
+Exponential smoothing captures **level, trend, and seasonality** through adaptive updating.
+
+**What ETS cannot easily handle:**
+
+- Rich autocorrelation structure beyond a single AR(1)-like decay
+- Integration and differencing in a principled statistical framework
+- Combining external regressors with adaptive dynamics (ARIMAX)
+
+::: {.keybox}
+**Lecture 4:** Stationarity, differencing, and the ARIMA model family --- a regression-based approach to capturing autocorrelation.
+:::
+
+::: {.neutral .smaller style="text-align: center;"}
+**Lab 3:** Fit SES, Holt, Holt-Winters, and auto-ETS to RSXFS; compare RMSE / MAE with Lecture 1--2 benchmarks.
+:::
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::

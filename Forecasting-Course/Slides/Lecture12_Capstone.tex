@@ -1,0 +1,554 @@
+% =============================================================================
+% Lecture 12: Capstone & Applications
+% BSAD 8310: Business Forecasting | University of Nebraska at Omaha
+% =============================================================================
+\documentclass[aspectratio=169, 10pt]{beamer}
+\input{../Preambles/header}
+
+\title{Lecture 12: Capstone \& Applications}
+\subtitle{Synthesizing the Forecasting Toolkit}
+\author{BSAD 8310: Business Forecasting}
+\institute{University of Nebraska at Omaha}
+\date{Spring 2026}
+
+\begin{document}
+
+% --- Title frame --------------------------------------------------------------
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% --- Outline ------------------------------------------------------------------
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Course Synthesis}
+% =============================================================================
+
+\sectionslide{Course Synthesis}{%
+  Twelve lectures, two frameworks, one decision: which tool fits this problem?}
+
+% --- Slide: L01–L11 Two Parts -------------------------------------------------
+\begin{frame}{L01--L11: A Two-Part Toolkit}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+      \textbf{Part I: Classical Forecasting (L01--L06)}
+      \begin{itemize}\small
+        \item \textbf{L01} Benchmarks and evaluation discipline
+        \item \textbf{L02} Regression-based forecasting
+        \item \textbf{L03} Exponential smoothing (ETS)
+        \item \textbf{L04} ARIMA and Box-Jenkins workflow
+        \item \textbf{L05} Multivariate: VAR, ARIMAX, cointegration
+        \item \textbf{L06} Forecast evaluation, DM test, combination
+      \end{itemize}
+    \column{0.48\textwidth}
+      \textbf{Part II: Machine Learning (L07--L11)}
+      \begin{itemize}\small
+        \item \textbf{L07} Bias-variance, train/val/test, CV
+        \item \textbf{L08} Regularization: LASSO, Ridge, Elastic Net
+        \item \textbf{L09} Tree methods: Random Forests, XGBoost
+        \item \textbf{L10} Neural networks: LSTM, attention
+        \item \textbf{L11} Feature engineering and pipeline design
+      \end{itemize}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    {\small \textbf{Capstone question:} Given a new forecasting problem,
+    which part of the toolkit do you reach for first --- and how do you
+    decide when to switch?}
+  \end{keybox}
+\end{frame}
+
+% --- Slide: Decision Framework ------------------------------------------------
+\begin{frame}{The Forecasting Decision Framework}
+  \begin{definitionbox}{Five Questions Before Fitting Any Model}
+    {\small
+    \begin{enumerate}\setlength{\itemsep}{3pt}
+      \item \textbf{How much data?}
+            $n < 200$: classical methods are more reliable;
+            $n \geq 200$: either framework is viable.
+      \item \textbf{How many predictors?}
+            $k < 10$: ARIMAX or VAR; $k \geq 10$: regularization or trees.
+      \item \textbf{Is the pattern regular?}
+            Strong, stable seasonality $\Rightarrow$ SARIMA/ETS are competitive.
+      \item \textbf{Interpretability required?}
+            Yes $\Rightarrow$ LASSO or SARIMA; No $\Rightarrow$ XGBoost or LSTM.
+      \item \textbf{Refit cadence?}
+            Weekly refit $\Rightarrow$ prefer simpler models; Monthly refit $\Rightarrow$ ML feasible.
+    \end{enumerate}
+    }
+  \end{definitionbox}
+  \vspace{0.1cm}
+  \muted{\footnotesize\itshape
+    No single model wins every case. The framework replaces intuition with
+    discipline. Apply it \emph{before} fitting.}\\[3pt]
+  \muted{\footnotesize\itshape Q5 asks about refit cadence.
+    If an economic shock makes weekly refit feasible for the first time,
+    does that change which model you choose --- or only how you maintain it?}
+\end{frame}
+
+% --- Slide: Five Common Failure Modes -----------------------------------------
+\begin{frame}{Five Common Failure Modes}
+  \begin{warningbox}
+    {\small
+    \begin{enumerate}\setlength{\itemsep}{4pt}
+      \item \textbf{Data leakage} --- features using future information
+            inflate in-sample accuracy and collapse out-of-sample.
+            (Fix: \texttt{.shift(1)} before every rolling window.)
+      \item \textbf{In-sample evaluation only} --- training RMSE is not
+            forecast accuracy. Always evaluate on a held-out test set.
+      \item \textbf{Wrong metric for the cost structure} --- MAPE fails
+            near zero; RMSE penalizes outliers heavily. Match metric
+            to business consequences. (L01, L06)
+      \item \textbf{No statistical test for differences} --- a lower RMSE
+            may be noise. Report Diebold--Mariano $p$-values. (L06)
+      \item \textbf{Point forecast without uncertainty} --- A forecast
+            without a prediction interval is not actionable for most
+            business decisions. Report intervals.
+    \end{enumerate}
+    }
+  \end{warningbox}
+\end{frame}
+
+% =============================================================================
+\section{Combining and Testing Forecasts}
+% =============================================================================
+
+\sectionslide{Combining and Testing Forecasts}{%
+  Equal-weight combination is the benchmark that beats most individual models.}
+
+% --- Slide: Forecast Combination ----------------------------------------------
+\begin{frame}{Forecast Combination: The Robust Baseline}
+  \muted{\footnotesize\parencite{BatesGranger1969,Timmermann2006,StockWatson2004}}
+  \vspace{0.1cm}
+
+  \textbf{Why combination works:} individual models capture different
+  features of the DGP. Combining reduces variance without increasing bias.\\[4pt]
+
+  \begin{columns}[T]
+    \column{0.54\textwidth}
+      \begin{keybox}
+        {\small \textbf{RSXFS result:}\\[3pt]
+        LSTM alone: RMSE $= 1{,}920$\\
+        XGBoost alone: RMSE $= 2{,}050$\\
+        SARIMA alone: RMSE $= 2{,}840$\\[4pt]
+        \textbf{Equal-weight (SARIMA $+$ XGBoost $+$ LSTM):}\\
+        RMSE $= 2{,}080$ --- within 9\% of LSTM,
+        lower variance, simpler to maintain.}
+      \end{keybox}
+    \column{0.42\textwidth}
+      \begin{examplebox}{M4 Competition}
+        {\small The top-ranked hybrid (ES-RNN) used
+        combination of exponential smoothing with
+        an RNN internally.\\[3pt]
+        Pure ML without combination ranked
+        \emph{lower} than Theta (classical) on
+        short series. \muted{\footnotesize\parencite{Makridakis2020}}}
+      \end{examplebox}
+  \end{columns}
+\end{frame}
+
+% --- Slide: DM Test -----------------------------------------------------------
+\begin{frame}{DM Test Across the Leaderboard}
+  \muted{\footnotesize\parencite{Diebold1995,Harvey1997}}
+  \vspace{0.05cm}
+
+  \muted{\footnotesize\itshape (Recall from L06:
+    $DM = \bar{d}/\widehat{\operatorname{se}}(\bar{d}) \sim \mathcal{N}(0,1)$;
+    $d_t = e_{1t}^2 - e_{2t}^2$. Harvey--Leybourne--Newbold correction applied;
+    $n = 48$ months.)}
+  \vspace{0.05cm}
+
+  {\small Pairwise Diebold--Mariano test results on RSXFS (walk-forward errors,
+  HAC standard errors). $\star p < 0.05$;\; $\star\star p < 0.01$;\;
+  $\star\star\star p < 0.001$;\; n.s.\ not significant.}
+  \vspace{0.1cm}
+
+  \begin{center}
+  {\footnotesize
+  \begin{tabular}{lp{1.7cm}p{1.7cm}p{1.7cm}p{1.7cm}}
+    \toprule
+    & \textbf{vs.\ SARIMA} & \textbf{vs.\ Elastic Net} & \textbf{vs.\ RF} & \textbf{vs.\ XGBoost} \\
+    \midrule
+    Elastic Net  & $\star\star\star$ & ---              &                   & \\
+    Random Forest & $\star\star\star$ & $\star\star$     & ---               & \\
+    XGBoost      & $\star\star\star$ & $\star\star\star$ & $\star$           & --- \\
+    LSTM         & $\star\star\star$ & $\star\star\star$ & $\star\star$      & n.s. \\
+    Combination  & $\star\star\star$ & $\star\star\star$ & $\star$           & n.s. \\
+    \bottomrule
+  \end{tabular}
+  }
+  \end{center}
+
+  \vspace{0.1cm}
+  \begin{keybox}
+    {\small LSTM vs.\ XGBoost: \textbf{not significant} (n.s.).
+    The RMSE gap ($1{,}920$ vs.\ $2{,}050$) does not clear the DM
+    threshold. Report $p$-values, not just RMSE gaps.}
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{RSXFS Final Leaderboard}
+% =============================================================================
+
+\sectionslide{RSXFS Final Leaderboard}{%
+  Eleven methods, one dataset, a clear pattern.}
+
+% --- Slide: Full Leaderboard --------------------------------------------------
+\begin{frame}{All 11 Methods on RSXFS}
+  {\footnotesize Test-set results (2020--2023), walk-forward evaluation.
+  ML models use 36-feature set ($\dagger$) from L11.}
+  \vspace{0.1cm}
+  \begin{center}
+  {\footnotesize
+  \begin{tabular}{llrr}
+    \toprule
+    \textbf{Lecture} & \textbf{Model} & \textbf{RMSE} & \textbf{MAE} \\
+    \midrule
+    L01 & Seasonal Na\"{i}ve (benchmark) & 4{,}210 & 3{,}120 \\
+    L03 & ETS (auto-AICc)               & 2{,}890 & 2{,}150 \\
+    L03 & Holt-Winters (add.)           & 2{,}950 & 2{,}190 \\
+    L04 & SARIMA(1,1,1)(1,1,1)$_{12}$   & 2{,}840 & 2{,}100 \\
+    L05 & ARIMAX ($+$ sentiment index)  & 2{,}780 & 2{,}060 \\
+    L08 & Elastic Net$^\dagger$         & 2{,}410 & 1{,}800 \\
+    L08 & Ridge$^\dagger$               & 2{,}460 & 1{,}830 \\
+    L09 & Random Forest$^\dagger$       & 2{,}210 & 1{,}640 \\
+    L09 & XGBoost$^\dagger$             & 2{,}050 & 1{,}510 \\
+    L10 & LSTM (2-layer, $T=24$)$^\dagger$ & 1{,}920 & 1{,}410 \\
+    L06 & Equal-weight combination      & 2{,}080 & 1{,}530 \\
+    \bottomrule
+  \end{tabular}
+  }
+  \end{center}
+  \vspace{0.05cm}
+  \muted{\footnotesize\itshape
+    Equal-weight combination (RMSE $2{,}080$, MAE $1{,}530$) nearly matches
+    XGBoost (RMSE $2{,}050$, MAE $1{,}510$) and LSTM (RMSE $1{,}920$, MAE $1{,}410$)
+    at a fraction of the deployment complexity.}
+  \muted{\footnotesize\itshape Which gaps are statistically confirmed? DM test results on the next slide.}
+\end{frame}
+
+% --- Slide: DM Significance ---------------------------------------------------
+\begin{frame}{What the DM Test Tells Us}
+  \begin{columns}[T]
+    \column{0.54\textwidth}
+      \textbf{Statistically confirmed improvements:}
+      \begin{itemize}\small
+        \item All ML methods $\gg$ SARIMA ($p < 0.001$)
+        \item XGBoost $>$ Elastic Net ($p < 0.001$)
+        \item RF $>$ Elastic Net ($p < 0.01$)
+        \item XGBoost $>$ RF ($p < 0.05$) --- marginal
+      \end{itemize}
+      \vspace{0.2cm}
+      \textbf{Not statistically confirmed:}
+      \begin{itemize}\small
+        \item LSTM vs.\ XGBoost (n.s.)
+        \item Combination vs.\ XGBoost (n.s.)
+        \item Ridge vs.\ Elastic Net (n.s.)
+      \end{itemize}
+    \column{0.42\textwidth}
+      \begin{keybox}
+        {\small \textbf{Practical decision rule:}\\[3pt]
+        If two models are DM-indistinguishable,
+        choose the \emph{simpler} one.\\[4pt]
+        LSTM $\approx$ XGBoost (DM n.s.) $\Rightarrow$
+        prefer XGBoost: fewer hyperparameters,
+        faster refit, more interpretable
+        feature importance.}
+      \end{keybox}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Recommended Pipeline ----------------------------------------------
+\begin{frame}{Recommended Deployment Pipeline for RSXFS}
+  {\small For production, the three-model combination (SARIMA $+$ XGBoost $+$ LSTM)
+  is simplified to two models, dropping LSTM to eliminate GPU dependency.
+  The RMSE difference is modest.}
+  \vspace{0.1cm}
+  \begin{keybox}
+    {\small \textbf{Five-step production pipeline:}
+    \begin{enumerate}\setlength{\itemsep}{3pt}
+      \item \textbf{Fit SARIMA} as monitoring anchor and classical baseline.
+            Refit monthly on expanding window.
+      \item \textbf{Fit XGBoost} with 36-feature set.
+            Retrain monthly; monitor feature drift.
+      \item \textbf{Form equal-weight combination}:
+            $\yhat_t = \tfrac{1}{2}(\yhat_t^{\text{SARIMA}}
+            + \yhat_t^{\text{XGB}})$.
+      \item \textbf{Monitor quarterly}: run DM test on trailing 12 months.
+            If ML no longer improves on SARIMA ($p > 0.10$), revert to
+            SARIMA until data accumulates.
+      \item \textbf{Report intervals}: 80\% and 95\% prediction intervals
+            from bootstrap over walk-forward residuals.
+    \end{enumerate}
+    }
+  \end{keybox}
+  \muted{\footnotesize\itshape
+    LSTM alone (RMSE $1{,}920$) beats the combination by 160 units
+    but adds GPU infrastructure and refit complexity not justified for most business settings.}
+\end{frame}
+
+% =============================================================================
+\section{Case Study: Utility Demand Forecasting}
+% =============================================================================
+
+\sectionslide{Case Study: Utility Demand Forecasting}{%
+  A different domain to stress-test the decision framework.}
+
+% --- Slide: Business Problem --------------------------------------------------
+\begin{frame}{The Business Problem: Residential Natural Gas Demand}
+  \begin{columns}[T]
+    \column{0.54\textwidth}
+      \textbf{Dataset:} Monthly U.S.\ residential natural gas consumption
+      (RESGAS, EIA/FRED series \texttt{NGRESCON}).\\[4pt]
+      \begin{itemize}\small
+        \item \textbf{Period:} Jan 2005 -- Dec 2023 ($n = 228$)
+        \item \textbf{Train:} 2005--2019; \textbf{Test:} 2020--2023
+        \item \textbf{Seasonality:} extreme (6$\times$ winter/summer ratio),
+              virtually no AR structure beyond lag 12 (the seasonal period, $m = 12$)
+        \item \textbf{Trend:} slow decline (efficiency gains)
+      \end{itemize}
+      \vspace{0.1cm}
+      \textbf{Business stake:}
+      {\small Natural gas procurement, pipeline capacity planning,
+      and hedging contracts require 12-month-ahead forecasts.
+      Errors translate directly to over-purchase costs or supply shortfalls.}
+    \column{0.42\textwidth}
+      \begin{warningbox}
+        {\small \textbf{Test period challenge:}
+        COVID-19 (2020) shifted residential
+        usage patterns. The test period
+        is demanding --- an honest
+        stress test for all methods.}
+      \end{warningbox}
+      \vspace{0.2cm}
+      \muted{\footnotesize\itshape
+        Contrast with RSXFS: retail sales are
+        driven by consumer demand shocks;
+        natural gas demand is driven by weather
+        and long-term efficiency trends.}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Applying the Framework --------------------------------------------
+\begin{frame}{Applying the Decision Framework to RESGAS}
+  {\small Walk through the five questions \emph{before} fitting any model.}
+  \vspace{0.1cm}
+  \begin{center}
+  {\small
+  \begin{tabular}{clp{5.2cm}l}
+    \toprule
+    \textbf{Q} & \textbf{Question} & \textbf{Answer for RESGAS} & \textbf{Implication} \\
+    \midrule
+    1 & Series length? & 228 months & Either framework \\
+    2 & Predictor count? & $\leq 5$ core features & Classical competitive \\
+    3 & Seasonality regular? & \textbf{Yes} --- almost purely sinusoidal & SARIMA/ETS strong \\
+    4 & Interpretability? & Regulatory context & Prefer classical \\
+    5 & Refit cadence? & Monthly feasible & ML possible \\
+    \bottomrule
+  \end{tabular}
+  }
+  \end{center}
+  \vspace{0.15cm}
+  \begin{keybox}
+    {\small \textbf{Framework prediction} (before fitting):
+    SARIMA and ETS will be competitive with ML.
+    Feature engineering will add less value than on RSXFS.
+    Prefer SARIMA for interpretability and audit compliance.}
+  \end{keybox}
+\end{frame}
+
+% --- Slide: RESGAS Leaderboard ------------------------------------------------
+\begin{frame}{RESGAS Leaderboard: Framework Prediction vs.\ Results}
+  \begin{columns}[T]
+    \column{0.46\textwidth}
+      {\footnotesize Test-set RMSE (2020--2023,
+      walk-forward, units: billion cubic feet/month):}
+      \vspace{0.1cm}
+      \begin{center}
+      {\footnotesize
+      \begin{tabular}{lr}
+        \toprule
+        \textbf{Model} & \textbf{RMSE} \\
+        \midrule
+        Seasonal Na\"{i}ve  & 12{,}400 \\
+        ETS                  & 4{,}650 \\
+        \textbf{SARIMA}      & \textbf{4{,}200} \\
+        Elastic Net          & 5{,}800 \\
+        Random Forest        & 5{,}100 \\
+        XGBoost              & 4{,}900 \\
+        LSTM                 & 4{,}750 \\
+        \bottomrule
+      \end{tabular}
+      }
+      \end{center}
+    \column{0.50\textwidth}
+      \begin{examplebox}{Finding}
+        {\small \textbf{SARIMA wins} (RMSE = 4,200) --- the decision
+        framework correctly predicted the outcome before a single
+        model was fitted.\\[4pt]
+        ML methods (LSTM best at 4,750) do not overcome the
+        regular seasonality that SARIMA captures exactly.\\[4pt]
+        \textbf{Contrast with RSXFS:}
+        LSTM = 1,920 vs.\ SARIMA = 2,840.
+        The feature gap from L11 exists only
+        when the series has exploitable nonlinear structure.}
+      \end{examplebox}
+  \end{columns}
+  \smallskip
+  \muted{\footnotesize\itshape SARIMA wins partly because COVID shifted residential
+    usage patterns that ML could not anticipate.
+    Is that an advantage of SARIMA --- or a limitation of the test period?}
+\end{frame}
+
+% --- Slide: What Transferred --------------------------------------------------
+\begin{frame}{What Transferred, What Did Not}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+      \textbf{Transferred from RSXFS workflow:}
+      \begin{itemize}\small
+        \item Walk-forward CV discipline (no shuffling)
+        \item Out-of-sample test set (held out throughout)
+        \item DM test for statistical significance
+        \item Forecast combination as a fallback
+        \item Prediction interval reporting
+      \end{itemize}
+    \column{0.48\textwidth}
+      \textbf{Did not transfer:}
+      \begin{itemize}\small
+        \item ML's large RMSE advantage over SARIMA\\
+              {\footnotesize (regular seasonality negates the feature advantage)}
+        \item 36-feature set value\\
+              {\footnotesize (gas demand has 5 core drivers, not 36)}
+        \item LSTM's edge over XGBoost\\
+              {\footnotesize (sequential patterns already captured by lags)}
+      \end{itemize}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    {\small \textbf{The decision framework worked.} Applying five questions
+    before fitting directed resources toward SARIMA, which won.
+    The framework is the product --- not any specific model.}
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{Communication and Deployment}
+% =============================================================================
+
+\sectionslide{Communication and Deployment}{%
+  A forecast without uncertainty is just a guess in formal notation.}
+
+% --- Slide: Presenting to Stakeholders ----------------------------------------
+\begin{frame}{Presenting Forecasts to Stakeholders}
+  \begin{columns}[T]
+    \column{0.50\textwidth}
+      \textbf{What to include:}
+      \begin{itemize}\small
+        \item Point forecast with 80\% and 95\%
+              prediction intervals
+        \item Model used, training window, last
+              refit date
+        \item RMSE on most recent test period
+        \item Known limitations and assumption violations
+        \item Update cadence and trigger for review
+      \end{itemize}
+      \vspace{0.1cm}
+      \textbf{What to exclude:}
+      \begin{itemize}\small
+        \item In-sample $R^2$ or training RMSE
+        \item $p$-values without business interpretation
+        \item Decimal precision beyond measurement error
+      \end{itemize}
+    \column{0.46\textwidth}
+      \begin{examplebox}{Stakeholder summary}
+        {\small \textbf{RSXFS 12-month forecast}\\
+        Point estimate: \$452{,}000M\\
+        80\% PI: \$444{,}000M -- \$460{,}000M\\
+        95\% PI: \$438{,}000M -- \$466{,}000M\\[3pt]
+        Model: XGBoost $+$ SARIMA combination,
+        retrained monthly (36 features).\\
+        Test RMSE (2020--2023): \$2{,}080M.\\[3pt]
+        \textbf{Next update:} April 2026 after
+        March data release.}
+      \end{examplebox}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Monitoring --------------------------------------------------------
+\begin{frame}{Monitoring and Maintenance}
+  \begin{columns}[T]
+    \column{0.54\textwidth}
+      \textbf{Four monitoring checks:}
+      \begin{enumerate}\small\setlength{\itemsep}{4pt}
+        \item \textbf{Rolling RMSE:} compute walk-forward
+              RMSE each period. Flag if $> 2\times$ historical
+              average over three consecutive months.
+        \item \textbf{Quarterly DM test:} confirm ML still
+              outperforms SARIMA baseline. Revert if $p > 0.10$.
+        \item \textbf{Feature drift:} monitor input feature
+              distributions. Alert if mean shifts $> 2\sigma$
+              from training distribution.
+        \item \textbf{Model refresh:} retrain on expanding
+              window monthly. Benchmark against prior version
+              before deploying.
+      \end{enumerate}
+    \column{0.42\textwidth}
+      \begin{warningbox}
+        {\small \textbf{Models degrade silently.}\\[3pt]
+        A model that was accurate in 2022 may
+        be systematically wrong in 2025 due to
+        structural shifts in the economy.\\[3pt]
+        A monitoring dashboard is not optional
+        --- it is the difference between a
+        deployed model and a science project.}
+      \end{warningbox}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Takeaways and References}
+% =============================================================================
+
+\sectionslide{Takeaways and References}{What we learned and where to go next.}
+
+% --- Slide: Key Takeaways -----------------------------------------------------
+\begin{frame}{BSAD 8310 Key Takeaways}
+  \begin{keybox}
+    \footnotesize
+    \begin{enumerate}\setlength{\itemsep}{2pt}
+      \item \textbf{Classical methods} (ETS, ARIMA) are competitive for
+            regular, short series with few predictors.
+            Match the method to the series structure.
+      \item \textbf{ML methods} (regularization, trees, LSTM) add value
+            when features are rich, series are long, and patterns are
+            nonlinear or structural.
+      \item \textbf{Forecast combination} (equal-weight) consistently
+            matches or beats the best individual model at lower
+            deployment variance \parencite{BatesGranger1969,Timmermann2006}.
+      \item \textbf{Evaluation discipline} --- walk-forward CV, DM
+            significance test, out-of-sample only --- is
+            non-negotiable \parencite{Diebold1995}.
+      \item \textbf{Feature engineering} often yields larger RMSE gains
+            than switching model class. The feature gap dominates the
+            model gap \parencite{Makridakis2020}.
+      \item \textbf{Communication} determines whether a technically
+            correct forecast is actionable.
+            Report intervals, not just point estimates.
+    \end{enumerate}
+  \end{keybox}
+  \smallskip
+  \muted{\footnotesize\itshape
+    This concludes BSAD 8310: Business Forecasting.
+    The toolkit, the discipline, and the decision framework are yours.}
+\end{frame}
+
+% --- References ---------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+\end{document}

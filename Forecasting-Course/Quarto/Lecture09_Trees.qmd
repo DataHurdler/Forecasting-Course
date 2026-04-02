@@ -1,0 +1,699 @@
+---
+title: "Tree-Based Methods"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 9"
+author: "BSAD 8310: Business Forecasting"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture 9: Outline
+
+1. Decision Trees: CART
+2. Bagging and Random Forests
+3. Gradient Boosting and XGBoost
+4. Feature Importance
+5. Hyperparameter Tuning
+6. Application to Forecasting
+
+---
+
+## Motivation: Beyond Linear Models
+
+::: {.keybox}
+**Lecture 08 best result:** Elastic Net, RMSE $\approx$ 2,540 on RSXFS.
+
+Elastic Net is a linear model: $\hat{y} = \mathbf{x}^\top \hat{\boldsymbol{\beta}}$. It cannot capture *interactions* or *threshold effects* (e.g., the holiday effect amplifies when the economy is strong).
+:::
+
+**What tree-based methods add:**
+
+- **Nonlinearity:** predictions are piecewise constant over feature regions
+- **Interactions:** splits on $x_1$ in a region defined by $x_2$ capture $x_1 \times x_2$ interactions automatically
+- **No standardization required:** scale-invariant splits
+
+**Today's goal:** build from a single decision tree to Random Forests and XGBoost, then compare against the Lecture 08 leaderboard.
+
+---
+
+# Decision Trees: CART
+
+Building blocks of ensemble methods through recursive binary splits of the feature space
+
+---
+
+## Recursive Binary Splitting
+
+**CART (Classification and Regression Trees) for regression:** at each node, find the split $(j, t)$ minimizing the weighted within-region variance:
+
+$$\min_{j,\, t} \left[ \sum_{i:\, x_{ij} \leq t} (y_i - \bar{y}_{L})^2 + \sum_{i:\, x_{ij} > t} (y_i - \bar{y}_{R})^2 \right]$$
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Algorithm:**
+
+1. Start with all data at the root
+2. For every feature $j$ and every threshold $t$: compute the split criterion
+3. Split on the $(j^*, t^*)$ giving the largest reduction
+4. Recurse on left and right children
+5. Stop when nodes are too small or depth limit reached
+6. Predict: $\hat{y} = \bar{y}_{\text{leaf}}$
+:::
+
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Why Recursive?
+:::
+Each split depends on which points fall into a region. Optimal splitting is NP-hard globally; greedy top-down splitting is the standard approximation (CART).
+:::
+:::
+
+::::
+
+---
+
+## A Simple Regression Tree
+
+:::: {.columns}
+
+::: {.column width="44%"}
+**Example: 3-leaf tree for RSXFS**
+
+```{=html}
+<svg viewBox="0 0 300 210" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-height:190px; display:block; margin:0 auto; font-family:inherit;">
+  <defs>
+    <marker id="arr9" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#aaa"/>
+    </marker>
+  </defs>
+
+  <!-- Root node -->
+  <rect x="70" y="4" width="160" height="38" rx="5" ry="5" fill="#E8F0FA" stroke="#005CA9" stroke-width="1.5"/>
+  <text x="150" y="20" font-size="11" fill="#1a1a1a" text-anchor="middle" font-weight="600">y(t-12) &lt;= 38,000?</text>
+  <text x="150" y="35" font-size="9" fill="#525252" text-anchor="middle">(12-month lag)</text>
+
+  <!-- Left leaf: pre-2010 -->
+  <rect x="4" y="96" width="108" height="40" rx="5" ry="5" fill="#F0FAF4" stroke="#15803d" stroke-width="1.5"/>
+  <text x="58" y="113" font-size="11" fill="#1a1a1a" text-anchor="middle" font-weight="600">y-hat = 28,400</text>
+  <text x="58" y="128" font-size="9" fill="#525252" text-anchor="middle">(pre-2010)</text>
+
+  <!-- Right internal node -->
+  <rect x="158" y="88" width="136" height="38" rx="5" ry="5" fill="#E8F0FA" stroke="#005CA9" stroke-width="1.5"/>
+  <text x="226" y="104" font-size="11" fill="#1a1a1a" text-anchor="middle" font-weight="600">y(t-1) &lt;= 52,000?</text>
+  <text x="226" y="119" font-size="9" fill="#525252" text-anchor="middle">(1-month lag)</text>
+
+  <!-- Left-right leaf: mid -->
+  <rect x="128" y="166" width="106" height="38" rx="5" ry="5" fill="#F0FAF4" stroke="#15803d" stroke-width="1.5"/>
+  <text x="181" y="183" font-size="11" fill="#1a1a1a" text-anchor="middle" font-weight="600">y-hat = 44,100</text>
+  <text x="181" y="197" font-size="9" fill="#525252" text-anchor="middle">(mid period)</text>
+
+  <!-- Right-right leaf: recent -->
+  <rect x="246" y="166" width="50" height="38" rx="5" ry="5" fill="#F0FAF4" stroke="#15803d" stroke-width="1.5"/>
+  <text x="271" y="183" font-size="10" fill="#1a1a1a" text-anchor="middle" font-weight="600">61,300</text>
+  <text x="271" y="197" font-size="9" fill="#525252" text-anchor="middle">(recent)</text>
+
+  <!-- Edges -->
+  <line x1="120" y1="42" x2="58" y2="96" stroke="#aaa" stroke-width="1.2" marker-end="url(#arr9)"/>
+  <line x1="180" y1="42" x2="226" y2="88" stroke="#aaa" stroke-width="1.2" marker-end="url(#arr9)"/>
+  <line x1="200" y1="126" x2="181" y2="166" stroke="#aaa" stroke-width="1.2" marker-end="url(#arr9)"/>
+  <line x1="252" y1="126" x2="271" y2="166" stroke="#aaa" stroke-width="1.2" marker-end="url(#arr9)"/>
+
+  <!-- Edge labels -->
+  <text x="80" y="74" font-size="9" fill="#525252" text-anchor="middle">Yes</text>
+  <text x="210" y="68" font-size="9" fill="#525252" text-anchor="middle">No</text>
+  <text x="186" y="150" font-size="9" fill="#525252" text-anchor="middle">Yes</text>
+  <text x="260" y="150" font-size="9" fill="#525252" text-anchor="middle">No</text>
+</svg>
+```
+:::
+
+::: {.column width="52%"}
+**Key properties:**
+
+- **Non-parametric** --- no functional form assumed
+- **Nonlinear** --- can capture threshold and interaction effects
+- **Interpretable** --- decision path is readable
+- **Handles mixed features** --- lags, rolling stats, dummies all treated equally
+- **Scale-invariant** --- no need to standardize predictors
+
+::: {.warningbox}
+A single deep tree **overfits severely**. The solution is not pruning alone --- it is *ensembling*.
+:::
+:::
+
+::::
+
+---
+
+## Overfitting and the Bias--Variance Tradeoff in Trees
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Tree depth controls complexity:**
+
+- **Depth 1** (stump): high bias, low variance
+- **Depth 5--10**: balanced region
+- **Full tree** (each leaf = 1 obs): zero bias, infinite variance
+
+**Why trees have high variance:**
+A single split can change the entire subtree beneath it. Small perturbations in data (e.g., one outlier) produce very different trees --- trees are *unstable*.
+
+::: {.keybox}
+**Key insight:** averaging many high-variance, low-bias trees (each fit to a bootstrap sample) substantially reduces variance while preserving low bias. This is bagging.
+:::
+:::
+
+::: {.column width="44%"}
+
+```{=html}
+<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-height:200px; display:block; margin:0 auto; font-family:inherit;">
+  <!-- Axes -->
+  <line x1="30" y1="175" x2="225" y2="175" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="223,171 231,175 223,179" fill="#1a1a1a"/>
+  <text x="234" y="179" font-size="11" fill="#1a1a1a">depth</text>
+  <line x1="30" y1="180" x2="30" y2="10" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="26,12 30,4 34,12" fill="#1a1a1a"/>
+  <text x="5" y="8" font-size="11" fill="#1a1a1a">error</text>
+
+  <!-- Bias² curve: monotone decreasing (red) -->
+  <path d="M35,20 C65,45 110,105 210,168" fill="none" stroke="#E41C38" stroke-width="2.5"/>
+  <text x="46" y="38" font-size="10" fill="#E41C38">Bias²</text>
+
+  <!-- Variance curve: monotone increasing (blue) -->
+  <path d="M35,168 C80,158 130,118 210,28" fill="none" stroke="#005CA9" stroke-width="2.5"/>
+  <text x="182" y="55" font-size="10" fill="#005CA9">Var</text>
+
+  <!-- Total curve: U-shape (gray dashed) -->
+  <path d="M35,26 C60,38 95,72 118,78 C140,82 165,102 210,160" fill="none" stroke="#525252" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="168" y="120" font-size="10" fill="#525252">Total</text>
+
+  <!-- Optimal depth marker -->
+  <line x1="118" y1="175" x2="118" y2="78" stroke="#525252" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="100" y="192" font-size="10" fill="#525252">opt. depth</text>
+</svg>
+```
+
+:::
+
+::::
+
+---
+
+# Bagging and Random Forests
+
+Variance reduction through bootstrap aggregation and random feature decorrelation
+
+---
+
+## Bagging: Bootstrap Aggregating
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Bagging
+:::
+Draw $B$ bootstrap samples; fit one deep tree on each; average:
+
+$$\hat{y}_{\mathrm{bag}} = \tfrac{1}{B}\sum_{b=1}^{B} \hat{f}^{(b)}(\mathbf{x})$$
+
+[@Breiman1996]
+:::
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Variance of the ensemble:**
+
+$$\mathrm{Var}(\bar{f}) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2$$
+
+$\rho$ = pairwise prediction correlation; $\sigma^2$ = single-tree variance.
+
+As $B \to \infty$, variance $\to \rho\sigma^2$ (not zero). Reducing $\rho$ matters as much as increasing $B$ --- this motivates Random Forests.
+:::
+
+::: {.column width="44%"}
+::: {.keybox}
+**Bagging key numbers:**
+
+- Bootstrap sample $\approx 63\%$ unique obs.
+- Remaining $\approx 37\%$ = out-of-bag (OOB)
+- OOB obs. give a free cross-validation estimate
+- $B \geq 500$ trees recommended (stable)
+:::
+:::
+
+::::
+
+---
+
+## Random Forests: Decorrelating the Trees
+
+**Problem with bagging:** if one feature dominates, all trees use it at the root $\Rightarrow$ trees are highly correlated ($\rho$ stays large).
+
+**Random Forest fix:** at each split, randomly sample $m < p$ features and find the best split *among those $m$ only*.
+
+:::: {.columns}
+
+::: {.column width="52%"}
+- Default: $m = \lfloor\sqrt{p}\rfloor$ (sklearn $\geq$ 1.1); $\lfloor p/3 \rfloor$ recommended for regression [@Hastie2009, §15.3]
+- Reduces $\rho$ $\Rightarrow$ lower ensemble variance
+- Each tree is weaker but the ensemble is stronger
+
+::: {.keybox}
+RF = Bagging + random feature selection at each split. Both ingredients are necessary.
+:::
+:::
+
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Out-of-Bag Error
+:::
+Each obs. is OOB for $\approx 37\%$ of trees. Predict using only those trees; compute RMSE.
+
+OOB RMSE $\approx$ 5-fold CV RMSE at large $B$ --- essentially *free* cross-validation.
+:::
+:::
+
+::::
+
+---
+
+## Random Forests: Key Hyperparameters
+
+::: {.smaller}
+
+| **Parameter** | **sklearn name** | **Default** | **Effect** |
+|:---|:---|:---|:---|
+| Num. trees | `n_estimators` | 100 | More = lower variance; plateau after ~500 |
+| Max features/split | `max_features` | `'sqrt'` | Lower = more decorrelated; tune via OOB |
+| Max depth | `max_depth` | None | None = full tree; limit to reduce memory |
+| Min samples/leaf | `min_samples_leaf` | 1 | Higher = smoother predictions; reduces overfit |
+| Bootstrap | `bootstrap` | True | False = subsampling (not bootstrap) |
+
+:::
+
+[*Socratic: why does increasing `n_estimators` always reduce out-of-bag error, but increasing tree depth does not? (Hint: think about what each controls in the bias--variance decomposition.)*]{.neutral .smaller}
+
+---
+
+# Gradient Boosting and XGBoost
+
+Sequential residual fitting with second-order optimization and explicit regularization
+
+---
+
+## Gradient Boosting: Sequential Residual Fitting
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Gradient Boosting Algorithm
+:::
+Initialize $F_0(\mathbf{x}) = \bar{y}$. For $b = 1, \ldots, B$:
+
+- Residuals: $r_i^{(b)} = y_i - F_{b-1}(\mathbf{x}_i)$ *(negative gradient for squared-error loss)*
+- Fit shallow tree $T_b$ to $\{(\mathbf{x}_i,\, r_i^{(b)})\}$
+- Update: $F_b = F_{b-1} + \eta\, T_b$
+
+Predict: $\hat{y} = F_B(\mathbf{x})$
+:::
+
+:::: {.columns}
+
+::: {.column width="54%"}
+**RF vs. Boosting:**
+
+- RF: **parallel** trees, deep, bias not reduced by adding more trees
+- Boosting: **sequential**, shallow trees (depth 3--6)
+- Boosting bias **decreases** with stages
+- Both benefit from large $B$ (number of trees)
+:::
+
+::: {.column width="42%"}
+::: {.warningbox}
+Small $\eta$ + large $B$ + early stopping outperforms large $\eta$ + small $B$.
+
+**Always use early stopping on a validation set.**
+:::
+:::
+
+::::
+
+---
+
+## XGBoost: Three Advances Over GBM
+
+XGBoost [@Chen2016] extends gradient boosting with three additions:
+
+:::: {.columns}
+
+::: {.column width="56%"}
+- **1. Newton step (2nd-order):** Uses gradient *and* curvature of the loss to compute a more precise tree-fitting direction than first-order GBM.
+- **2. Explicit regularization:** Penalizes leaf count and leaf weights directly in the objective --- shrinks trees without relying on early stopping alone.
+- **3. Column subsampling:** Like RF, randomly samples features per tree *and* per split --- reduces correlation and overfitting.
+:::
+
+::: {.column width="40%"}
+::: {.keybox}
+Newton step $\Rightarrow$ more precise gradient direction.
+
+Regularization $\Rightarrow$ guards against overfitting.
+
+Together: XGBoost outperforms vanilla GBM on most benchmarks [@Chen2016].
+:::
+
+[*Mathematical formulation: next slide.*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## XGBoost: Optimization Objective
+
+*Here $f_b(\mathbf{x})$ is the output of tree $T_b$ in boosting step $b$ --- same tree, XGBoost notation.*
+
+:::: {.columns}
+
+::: {.column width="56%"}
+**1. Newton-step objective (stage $b$):**
+
+$$\mathcal{L}^{(b)} = \sum_{i} \bigl[g_i f_b(\mathbf{x}_i) + \tfrac{1}{2} h_i f_b^2(\mathbf{x}_i)\bigr] + \Omega(f_b)$$
+
+$g_i$ = gradient, $h_i$ = Hessian of loss w.r.t. $F_{b-1}(\mathbf{x}_i)$.
+
+**2. Regularization term:**
+
+$$\Omega(f_b) = \gamma T + \tfrac{1}{2}\lambda \|\mathbf{w}\|_2^2$$
+
+$T$ = leaf count, $\mathbf{w}$ = leaf weights, $\gamma$ = per-leaf complexity penalty.
+:::
+
+::: {.column width="40%"}
+**Notation note:**
+
+$\lambda$ here is XGBoost's L2 leaf-weight penalty. It is distinct from the regularization $\lambda$ (penalty strength) in Lecture 08.
+
+**Practical effect:** Setting $\lambda > 0$ and $\gamma > 0$ produces sparser, more interpretable trees even without aggressive early stopping.
+:::
+
+::::
+
+---
+
+## XGBoost: Key Hyperparameters
+
+::: {.smaller}
+
+| **Parameter** | **XGB name** | **Typical** | **Effect** |
+|:---|:---|:---|:---|
+| Num. trees | `n_estimators`* | 500--2000 | More + small $\eta$ = better (use early stopping) |
+| Learning rate | `learning_rate` | 0.01--0.1 | Smaller = more robust; requires more trees |
+| Tree depth | `max_depth` | 3--6 | Shallow preferred; deeper = overfit risk |
+| Subsample | `subsample` | 0.7--0.9 | Row fraction per tree; adds stochasticity |
+| Col. sample | `colsample_bytree` | 0.7--0.9 | Feature fraction per tree (like RF) |
+| L2 penalty | `reg_lambda` | 1 | Ridge on leaf weights; stabilizes |
+
+:::
+
+[*sklearn API name; native API uses `num_boost_round`.*]{.neutral .smaller}
+
+::: {.keybox}
+**Practical starting point:** `learning_rate=0.05`, `max_depth=4`, `n_estimators=1000` with early stopping on val RMSE. Tune `max_depth` and `subsample` via TimeSeriesSplit CV.
+:::
+
+[*Socratic: if `learning_rate` is halved, roughly how many additional trees are needed to maintain the same training loss? What does this imply for early stopping budget?*]{.neutral .smaller}
+
+---
+
+# Feature Importance
+
+Impurity, permutation, and XGBoost gain measures for model interpretation
+
+---
+
+## Feature Importance: Impurity and Permutation
+
+:::: {.columns}
+
+::: {.column width="52%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+1. Impurity-Based (RF Default)
+:::
+
+$$\operatorname{Imp}(j) = \sum_{\text{nodes using } j} \Delta\operatorname{RSS} \cdot \frac{n_{\text{node}}}{n}$$
+
+Sum of RSS reduction at all splits on feature $j$, weighted by fraction of samples reaching that node.
+:::
+
+[*Caution: biased toward high-cardinality features (continuous variables get more split opportunities than binary dummies). Do not use for final reporting.*]{.neutral .smaller}
+:::
+
+::: {.column width="44%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+2. Permutation Importance
+:::
+For each feature $j$:
+
+1. Shuffle column $j$ in the OOB set
+2. Record increase in RMSE
+
+Larger increase $\Rightarrow$ more important.
+
+**Unbiased** (no cardinality bias). **Model-agnostic.** Use for reporting.
+:::
+:::
+
+::::
+
+---
+
+## Feature Importance: XGBoost Gain and Rankings
+
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+3. XGBoost Gain Importance
+:::
+Average *gain* (improvement in objective function) per split using feature $j$, across all trees.
+
+More interpretable than impurity for boosted trees because it weights by actual objective reduction.
+:::
+
+**Practical rule:**
+
+- Use **permutation** importance for model reports and presentations
+- Use **impurity** for quick diagnostics during training
+- Use **XGBoost gain** when comparing feature contributions inside a boosted model
+:::
+
+::: {.column width="46%"}
+::: {.examplebox}
+::: {.examplebox-title}
+RSXFS Typical Rankings
+:::
+
+1. **lag_12** --- dominant seasonal signal
+2. **lag_1** --- short-run momentum
+3. **roll_mean_12** --- trend level
+4. **lag_3** --- quarterly effect
+5. **month_12** --- December holiday
+
+Results are consistent across all three importance measures; lag_12 should be the primary feature in any RSXFS model.
+:::
+:::
+
+::::
+
+---
+
+# Hyperparameter Tuning
+
+Time-series-aware cross-validation with TimeSeriesSplit
+
+---
+
+## Tuning Random Forests and XGBoost
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Random Forest (RandomizedSearchCV):**
+
+```python
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import (
+    TimeSeriesSplit, RandomizedSearchCV)
+
+tscv = TimeSeriesSplit(n_splits=5, gap=1)
+rf_grid = {
+  'n_estimators':     [200, 500],
+  'max_features':     ['sqrt', 0.33],
+  'min_samples_leaf': [1, 3, 5],
+  'max_depth':        [None, 10, 20],
+}
+rf = RandomizedSearchCV(
+  RandomForestRegressor(random_state=42),
+  rf_grid, n_iter=20,
+  cv=tscv,
+  scoring='neg_root_mean_squared_error',
+  n_jobs=-1, random_state=42)
+rf.fit(X_trainval, y_trainval)
+```
+:::
+
+::: {.column width="48%"}
+**XGBoost (early stopping on val):**
+
+```python
+import xgboost as xgb
+
+dtrain = xgb.DMatrix(X_train, label=y_train)
+dval   = xgb.DMatrix(X_val,   label=y_val)
+dtest  = xgb.DMatrix(X_test,  label=y_test)
+
+params = {
+  'learning_rate': 0.05,
+  'max_depth':     4,
+  'subsample':     0.8,
+  'colsample_bytree': 0.8,
+  'reg_lambda':    1.0,
+  'objective':     'reg:squarederror',
+}
+model = xgb.train(
+  params, dtrain,
+  num_boost_round=2000,
+  evals=[(dval, 'val')],
+  early_stopping_rounds=50)
+```
+:::
+
+::::
+
+---
+
+# Application to Forecasting
+
+Comparing Random Forest and XGBoost against SARIMA and Elastic Net on RSXFS
+
+---
+
+## Tree-Based Forecasting: Design Choices
+
+**Same feature matrix as Lecture 08:** 12 lags + 3 rolling windows + 11 month dummies = 26 features (one dummy omitted vs. L08 for comparability; trees do not require it).
+
+**Key differences vs. regularized regression:**
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Advantages of trees:**
+
+- Capture nonlinearities and interactions (e.g., "holiday effect only when economy is strong")
+- No standardization needed
+- Handle irrelevant features gracefully (unused features do not appear in splits)
+- Built-in feature importance
+:::
+
+::: {.column width="46%"}
+**Cautions for time series:**
+
+- **No extrapolation:** trees predict $\bar{y}_{\text{leaf}}$, so they cannot predict beyond the training range
+- **Trending series:** a naive tree trained on non-stationary data may perform poorly out of sample
+- **Fix:** use first-differences or add rolling statistics as features to encode trend
+:::
+
+::::
+
+::: {.warningbox}
+**Stationarity matters for trees too.** If $y_t$ trends upward beyond the training max, leaf means will systematically under-predict. Difference or detrend before applying tree-based forecasting.
+:::
+
+---
+
+## Forecast Comparison: Adding Trees to the Leaderboard
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Test-set results on RSXFS (24-month horizon):**
+
+::: {.smaller}
+
+| **Model** | **RMSE** | **MAE** |
+|:---|---:|---:|
+| Seasonal Naïve | 4,210 | 3,120 |
+| SARIMA(1,1,1)(1,1,1)$_{12}$ | 2,840 | 2,100 |
+| Elastic Net ($\lambda^*$) | 2,540 | 1,890 |
+| Random Forest | 2,380 | 1,760 |
+| XGBoost (early stop) | 2,250 | 1,650 |
+
+:::
+
+[*Values are illustrative. Strategy: direct multi-step --- one model trained per horizon $h = 1, \ldots, 24$.*]{.neutral .smaller}
+:::
+
+::: {.column width="44%"}
+**Why do trees win here?**
+
+- Nonlinear interaction between lag_12 and calendar dummies (holiday amplification)
+- XGBoost sequential residual fitting corrects patterns that Elastic Net misses
+- RF OOB error $\approx$ CV error at $B=500$
+
+**Caveat:** gains depend heavily on feature quality. With a good feature set, Elastic Net and XGBoost are often competitive. Adding *more* features benefits trees more.
+
+[*Socratic: XGBoost outperforms Elastic Net here. Does this guarantee trees will always win with more data? (Hint: consider the no-extrapolation warning.)*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+# Takeaways and References
+
+What we learned and where to go next
+
+---
+
+## Lecture 09 Key Takeaways
+
+::: {.keybox}
+1. **Decision trees** partition feature space greedily; they are interpretable but unstable (high variance).
+2. **Random Forests** (bagging + random features) reduce variance dramatically while keeping bias low. OOB error is a free CV estimate.
+3. **Gradient boosting** reduces bias sequentially by fitting residuals. XGBoost adds L2 regularization and Newton optimization.
+4. **Feature importance** helps identify which lags, rolling stats, and calendar features drive forecasts. Use permutation importance for unbiased estimates.
+5. **Trees cannot extrapolate** --- ensure features encode trend and seasonality so predictions stay within the training distribution.
+6. **RF vs. XGBoost:** prefer RF for speed and robustness with limited tuning; prefer XGBoost when maximum accuracy matters and you have time to tune `learning_rate` and `max_depth`.
+:::
+
+**Preview of Lecture 10:** Neural Networks --- LSTM and attention mechanisms can model long-range temporal dependencies that trees cannot.
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::

@@ -1,0 +1,952 @@
+---
+title: "Machine Learning Introduction"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 7"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture 7: Outline
+
+1. Why ML for Forecasting?
+2. The Bias-Variance Tradeoff
+3. Train / Validation / Test Discipline
+4. Cross-Validation for Time Series
+5. Regularization Preview
+6. Feature Engineering Preview
+7. The ML Forecasting Pipeline
+
+---
+
+# Why ML for Forecasting?
+
+Classical methods are powerful --- but structured. What happens when the structure breaks?
+
+---
+
+## The Limits of Classical Forecasting
+
+Six lectures have built a powerful toolkit. This lecture examines where its assumptions break down.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**What we have (L01--L06):**
+
+- Benchmarks and regression (L01--L02)
+- ETS for trend + seasonality (L03)
+- ARIMA/SARIMA for autocorrelation (L04)
+- VAR, ARIMAX, ECM for multivariate dynamics (L05)
+- Rigorous walk-forward evaluation (L06)
+:::
+
+::: {.column width="46%"}
+::: {.warningbox}
+::: {.smaller}
+Classical models assume: linearity, fixed lag structure, Gaussian errors, known seasonality. When these fail, **model misspecification** inflates forecast error beyond what better data could fix.
+:::
+:::
+:::
+
+::::
+
+[*Socratic: which assumption fails first when forecasting social-media-driven demand spikes for a new product?*]{.neutral .smaller}
+
+---
+
+## Four Gaps ML Fills
+
+:::: {.columns}
+
+::: {.column width="54%"}
+::: {.smaller}
+
+| **Gap** | **Classical limit** | **ML remedy** |
+|:---|:---|:---|
+| Non-linearity | Linear $f(x)$ assumed | Trees, nets |
+| Many predictors | OLS collapses ($k \gg T$) | Regularization |
+| Interactions | Hand-specified only | Learned |
+| Non-Gaussian | Normality assumed | Distribution-free |
+
+:::
+:::
+
+::: {.column width="42%"}
+::: {.keybox}
+::: {.smaller}
+ML does **not** replace ARIMA. It extends the toolkit for problems where: (1) predictors number in the hundreds, (2) relationships are non-linear, or (3) structure is unknown *a priori*.
+:::
+:::
+:::
+
+::::
+
+[*[@Hastie2009]: the statistical learning perspective on non-linearity and interactions.*]{.neutral .smaller}
+
+---
+
+## Evidence: The M4 Competition
+
+**100,000 time series, 61 methods** [@Makridakis2020]: nine of the top twelve methods were *hybrid* (classical + ML).
+
+:::: {.columns}
+
+::: {.column width="52%"}
+::: {.smaller}
+
+| **Method** | **Rank** | **sMAPE** |
+|:---|---:|---:|
+| Hybrid ES-RNN (ML + ETS) | 1 | 11.374 |
+| Theta (classical) | 2 | 11.551 |
+| FFORMA (ML ensemble) | 3 | 11.720 |
+| Naive 2 (seasonal) | 12 | 13.56 |
+| Auto ARIMA | 14 | 13.58 |
+
+:::
+:::
+
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Business context
+:::
+::: {.smaller}
+Retail, electricity, and supply-chain forecasting now routinely use gradient-boosted trees and ensemble combinations of ARIMA + ML.
+
+But: pure ML often *underperforms* naive on short series ($n < 100$). Context matters.
+:::
+:::
+:::
+
+::::
+
+---
+
+# The Bias-Variance Tradeoff
+
+Every modeling decision shifts error between bias and variance. This is the central tension in all of statistical learning.
+
+---
+
+## MSE Decomposition
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Bias-Variance Decomposition
+:::
+::: {.smaller}
+Let $\hat{f}$ be an estimated model, $f$ the true function, and $x_0$ a new observation.
+
+$$\text{MSE}(\hat{f}(x_0)) = \bigl(\text{Bias}[\hat{f}(x_0)]\bigr)^2 + \text{Var}[\hat{f}(x_0)] + \sigma^2$$
+
+[[@Hastie2009]]{.neutral}
+:::
+:::
+
+Three distinct sources of error --- each unpacked on the next slide.
+
+::: {.smaller}
+Two of the three are **controllable** by the modeler. One is fixed by the data-generating process.
+:::
+
+[*(Each term unpacked on the next slide.)*]{.neutral .smaller}
+
+---
+
+## MSE Decomposition: Each Term
+
+:::: {.columns}
+
+::: {.column width="54%"}
+- **Bias$^2$** (underfitting): systematic error from wrong model class.
+  - *Example: $\text{Bias}^2 \approx 0.42$. Reduce by increasing model complexity.*
+- **Variance** (overfitting): sensitivity to the particular training sample.
+  - *Example: $\text{Var} \approx 0.31$. Reduce by regularization or more data.*
+- **$\sigma^2$** (irreducible): determined solely by the DGP; neither better models nor additional observations can eliminate it.
+  - *Example: $\sigma^2 = 0.07$ --- fixed.*
+:::
+
+::: {.column width="42%"}
+::: {.keybox}
+::: {.smaller}
+**Two levers you control:**
+
+Complexity $\uparrow$:
+&nbsp;&nbsp;$\text{Bias}^2 \downarrow$, $\text{Var} \uparrow$
+
+Regularization $\uparrow$:
+&nbsp;&nbsp;$\text{Bias}^2 \uparrow$, $\text{Var} \downarrow$
+
+$\sigma^2$ is fixed by the DGP.
+:::
+:::
+:::
+
+::::
+
+---
+
+## Bias and Variance in Plain Language
+
+**Both extremes hurt.**
+
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {.examplebox}
+::: {.examplebox-title}
+High bias --- underfitting
+:::
+::: {.smaller}
+AR(1) fit to a threshold non-linear series: the model systematically underestimates peaks and overestimates troughs every cycle.
+
+Low variance: refit on any subsample and the errors look the same.
+:::
+:::
+:::
+
+::: {.column width="46%"}
+::: {.warningbox}
+::: {.smaller}
+High variance --- overfitting:
+
+Degree-15 polynomial fits every wiggle in the training set. Train RMSE $\approx 0.02$. Test RMSE $\approx 8\times$ train RMSE.
+
+Small change in training data $\Rightarrow$ large change in $\hat{f}$.
+:::
+:::
+:::
+
+::::
+
+Reducing bias *typically* increases variance. We control the tradeoff via **model complexity** and **regularization**.
+
+---
+
+## The Complexity Curve
+
+Train error always falls with complexity. Test error has a U-shape.
+
+```{=html}
+<svg width="100%" viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" style="max-height:280px; display:block; margin: 0 auto;">
+  <!-- Axes -->
+  <line x1="60" y1="260" x2="660" y2="260" stroke="#525252" stroke-width="2"/>
+  <line x1="60" y1="260" x2="60"  y2="20"  stroke="#525252" stroke-width="2"/>
+  <!-- Y label -->
+  <text x="20" y="145" font-size="13" fill="#525252" text-anchor="middle" transform="rotate(-90,20,145)">Expected error</text>
+  <!-- X label -->
+  <text x="360" y="295" font-size="13" fill="#525252" text-anchor="middle">Model complexity →</text>
+
+  <!-- X tick labels: AR(1) at x=1.5→150px, Ridge at x=4→300px, RF at x=7→480px, Deep NN at x=9→600px -->
+  <!-- px = 60 + tick/10*600 -->
+  <text x="150" y="278" font-size="11" fill="#525252" text-anchor="middle">AR(1)</text>
+  <text x="300" y="278" font-size="11" fill="#525252" text-anchor="middle">Ridge</text>
+  <text x="480" y="278" font-size="11" fill="#525252" text-anchor="middle">RF</text>
+  <text x="600" y="278" font-size="11" fill="#525252" text-anchor="middle">Deep NN</text>
+
+  <!-- Train error: monotone decreasing from left to right -->
+  <!-- y = 0.75*exp(-0.45*x/60) + 0.07, x in [0,10] → mapped to [60,660] px, y in [0,1.8] → [260,20] -->
+  <!-- scale: yPx = 260 - val*(260-20)/1.8 = 260 - val*133.3 -->
+  <!-- x=0: 0.75+0.07=0.82 → yPx=260-109=151; x=10: 0.75*e^-4.5+0.07≈0.075+0.07=0.145 → yPx=260-19=241 -->
+  <polyline
+    points="60,151 120,175 180,196 240,210 300,221 360,228 420,234 480,238 540,241 600,242 660,243"
+    fill="none" stroke="#525252" stroke-width="2.5" stroke-dasharray="8,5"/>
+
+  <!-- Test error: U-shape, min at x≈3.5 (mapped to x≈270px from left edge at 60px) -->
+  <!-- x domain [60,660], 600px wide. x=3.5 → 60 + 3.5/10*600 = 270px -->
+  <!-- min at 270px, y≈200; rises on both sides -->
+  <polyline
+    points="60,130 120,150 180,172 240,193 270,200 300,203 360,197 420,188 480,178 540,165 600,150 640,140"
+    fill="none" stroke="#005CA9" stroke-width="2.5"/>
+
+  <!-- Irreducible sigma^2 floor: y=0.07 → yPx=260-9=251 -->
+  <line x1="60" y1="251" x2="660" y2="251" stroke="#E41C38" stroke-width="2" stroke-dasharray="4,4"/>
+
+  <!-- Optimal marker at x≈270 -->
+  <line x1="270" y1="260" x2="270" y2="204" stroke="#005CA9" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.7"/>
+  <text x="270" y="200" font-size="11" fill="#005CA9" text-anchor="middle">Optimal</text>
+
+  <!-- Zone labels -->
+  <text x="130" y="80" font-size="12" fill="#525252" font-weight="bold" text-anchor="middle">High bias</text>
+  <text x="560" y="80" font-size="12" fill="#525252" font-weight="bold" text-anchor="middle">High variance</text>
+
+  <!-- Legend -->
+  <line x1="480" y1="40" x2="520" y2="40" stroke="#525252" stroke-width="2.5" stroke-dasharray="8,5"/>
+  <text x="525" y="44" font-size="11" fill="#525252">Train error</text>
+  <line x1="480" y1="60" x2="520" y2="60" stroke="#005CA9" stroke-width="2.5"/>
+  <text x="525" y="64" font-size="11" fill="#005CA9">Test error</text>
+  <line x1="480" y1="80" x2="520" y2="80" stroke="#E41C38" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="525" y="84" font-size="11" fill="#E41C38">Irreducible σ²</text>
+</svg>
+```
+
+[*Cross-validation finds the optimal complexity point without ever touching the test set.*]{.neutral .smaller}
+
+---
+
+## Bias-Variance in the Forecasting Setting
+
+:::: {.columns}
+
+::: {.column width="56%"}
+::: {.smaller}
+
+| **Model** | **Bias** | **Var.** | **Good when** |
+|:---|:---|:---|:---|
+| AR(1) | High | Low | Long, stable series |
+| ARIMA (auto) | Medium | Low--Med | General TS |
+| Ridge (many X) | Med | Low | Many predictors |
+| OLS (unregul.) | Low | High | $n \gg p$ only |
+| Deep LSTM | Low | High | Very long series |
+
+:::
+:::
+
+::: {.column width="40%"}
+::: {.keybox}
+::: {.smaller}
+For short series ($n < 200$):
+
+**Bias is cheaper than variance.**
+
+Prefer parsimonious models. Add complexity only when cross-validation confirms out-of-sample improvement.
+:::
+:::
+:::
+
+::::
+
+[*This directly motivates LASSO (L08): deliberately increasing bias via shrinkage to reduce variance on short, noisy series.*]{.neutral .smaller}
+
+---
+
+# Train / Validation / Test Discipline
+
+One split is not enough. Three sets, three roles --- and the rules are strict.
+
+---
+
+## The Three-Way Split
+
+```{=html}
+<svg width="100%" viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="max-height:150px; display:block; margin:0 auto;">
+  <!-- Train band -->
+  <rect x="10" y="50" width="380" height="55" fill="#B8D4EF" stroke="#005CA9" stroke-width="1.5" rx="3"/>
+  <text x="200" y="82" font-size="14" fill="#005CA9" font-weight="bold" text-anchor="middle">Train (≈65%)</text>
+  <!-- Validation band -->
+  <rect x="390" y="50" width="140" height="55" fill="#D4EDDA" stroke="#15803d" stroke-width="1.5" rx="3"/>
+  <text x="460" y="82" font-size="13" fill="#15803d" font-weight="bold" text-anchor="middle">Validation (≈15%)</text>
+  <!-- Test band -->
+  <rect x="530" y="50" width="150" height="55" fill="#FDECEA" stroke="#E41C38" stroke-width="1.5" rx="3"/>
+  <text x="605" y="82" font-size="13" fill="#E41C38" font-weight="bold" text-anchor="middle">Test (≈20%)</text>
+  <!-- Purpose labels above -->
+  <text x="200" y="40" font-size="11" fill="#525252" text-anchor="middle">Fit model parameters</text>
+  <text x="460" y="33" font-size="11" fill="#525252" text-anchor="middle">Tune hyper-</text>
+  <text x="460" y="46" font-size="11" fill="#525252" text-anchor="middle">parameters</text>
+  <text x="605" y="33" font-size="11" fill="#525252" text-anchor="middle">Final honest</text>
+  <text x="605" y="46" font-size="11" fill="#525252" text-anchor="middle">evaluation</text>
+  <!-- Time arrow -->
+  <line x1="10" y1="125" x2="680" y2="125" stroke="#525252" stroke-width="1.5"/>
+  <polygon points="678,121 688,125 678,129" fill="#525252"/>
+  <text x="693" y="129" font-size="12" fill="#525252" font-style="italic">Time t</text>
+  <text x="10" y="143" font-size="10" fill="#525252" text-anchor="middle">1</text>
+  <text x="680" y="143" font-size="10" fill="#525252" text-anchor="middle">T</text>
+</svg>
+```
+
+:::: {.columns}
+
+::: {.column width="54%"}
+**Why three sets, not two?**
+
+::: {.smaller}
+If you tune on the test set --- even once --- it becomes a second validation set, and you no longer have an honest generalization estimate.
+:::
+:::
+
+::: {.column width="42%"}
+::: {.warningbox}
+::: {.smaller}
+The test set is a **time capsule**. Open it exactly once, at the very end, to report the final number.
+:::
+:::
+:::
+
+::::
+
+---
+
+## Data Leakage: Definition and Examples
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Data Leakage
+:::
+::: {.smaller}
+Leakage occurs when information from outside the training window contaminates the model, producing optimistic in-sample performance that does not generalize out-of-sample.
+:::
+:::
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Feature leakage:**
+
+- Using next-month CPI to forecast this-month sales (future predictor)
+- Target-encoding computed on the full dataset before splitting (statistical leakage)
+
+**Temporal leakage:**
+
+- Random train/test shuffle on a time series
+- Fitting `StandardScaler` on the full series before splitting
+:::
+
+::: {.column width="44%"}
+::: {.warningbox}
+::: {.smaller}
+Random train/test split is *correct* for i.i.d. data. It is **wrong** for time series. Always split in **chronological order**.
+
+In production: leakage makes reported RMSE optimistic by $2\times$--$5\times$.
+:::
+:::
+
+[*Socratic: a practitioner fits `StandardScaler` on the full series before splitting. What is the first production sign that something went wrong?*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## Time-Series Rules for Train/Val/Test
+
+:::: {.columns}
+
+::: {.column width="54%"}
+1. **No random shuffling** --- always chronological order
+2. **Validation after train, test after validation** --- strict temporal ordering; no overlaps
+3. **No future-dependent features** --- any feature using time $t+k$ data cannot be known at time $t$
+4. **Scale within each fold** --- fit `StandardScaler` on train-fold only; transform val/test with train parameters
+5. **Optional gap** --- buffer between train end and val start prevents autocorrelation bleed-through
+:::
+
+::: {.column width="42%"}
+::: {.keybox}
+::: {.smaller}
+These rules are the time-series extensions of the bias-variance discipline.
+
+Break them and every accuracy number you report is invalid.
+
+`train_test_split(shuffle=False)` respects ordering. Use `TimeSeriesSplit` for CV.
+:::
+:::
+:::
+
+::::
+
+---
+
+# Cross-Validation for Time Series
+
+Standard $k$-fold CV violates time ordering. Walk-forward CV is the fix.
+
+---
+
+## Why $k$-fold CV is Wrong for Time Series
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Standard 5-fold (shuffled):**
+
+```{=html}
+<svg width="100%" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" style="max-height:170px;">
+  <!-- Fold 1: test = 30-50 -->
+  <rect x="10" y="10"  width="280" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.6"/>
+  <rect x="94" y="10"  width="56"  height="22" fill="#FDECEA" stroke="#E41C38" stroke-width="0.6"/>
+  <text x="4" y="25" font-size="9" fill="#005CA9" text-anchor="end">F1</text>
+  <!-- Fold 2: test = 10-30 -->
+  <rect x="10" y="40"  width="280" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.6"/>
+  <rect x="38" y="40"  width="56"  height="22" fill="#FDECEA" stroke="#E41C38" stroke-width="0.6"/>
+  <text x="4" y="55" font-size="9" fill="#005CA9" text-anchor="end">F2</text>
+  <!-- Fold 3: test = 60-80 -->
+  <rect x="10" y="70"  width="280" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.6"/>
+  <rect x="178" y="70"  width="56"  height="22" fill="#FDECEA" stroke="#E41C38" stroke-width="0.6"/>
+  <text x="4" y="85" font-size="9" fill="#005CA9" text-anchor="end">F3</text>
+  <!-- Fold 4: test = 80-100 -->
+  <rect x="10" y="100" width="280" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.6"/>
+  <rect x="234" y="100" width="56"  height="22" fill="#FDECEA" stroke="#E41C38" stroke-width="0.6"/>
+  <text x="4" y="115" font-size="9" fill="#005CA9" text-anchor="end">F4</text>
+  <!-- Fold 5: test = 40-60 -->
+  <rect x="10" y="130" width="280" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.6"/>
+  <rect x="122" y="130" width="56"  height="22" fill="#FDECEA" stroke="#E41C38" stroke-width="0.6"/>
+  <text x="4" y="145" font-size="9" fill="#005CA9" text-anchor="end">F5</text>
+  <!-- Time axis -->
+  <line x1="10" y1="165" x2="292" y2="165" stroke="#525252" stroke-width="1.2"/>
+  <polygon points="290,161 300,165 290,169" fill="#525252"/>
+  <text x="302" y="169" font-size="9" fill="#525252" font-style="italic">Time</text>
+</svg>
+```
+
+::: {.smaller}
+[Wrong for time series:]{.negative} validation block may precede some training data $\Rightarrow$ temporal leakage.
+:::
+:::
+
+::: {.column width="46%"}
+**Failure modes:**
+
+- Uses future data to predict the past
+- Train and validation observations are not exchangeable under autocorrelation
+- Validation RMSE is optimistically biased
+
+::: {.warningbox}
+::: {.smaller}
+@Bergmeir2018: random $k$-fold gives biased CV estimates for autoregressive series. The bias grows with autocorrelation strength.
+:::
+:::
+:::
+
+::::
+
+---
+
+## Walk-Forward CV and `TimeSeriesSplit`
+
+**The correct analog:** expanding-window validation introduced in L06, now applied to hyperparameter tuning.
+
+```{=html}
+<svg width="80%" viewBox="0 0 450 200" xmlns="http://www.w3.org/2000/svg" style="max-height:190px; display:block; margin:0 auto;">
+  <!-- Fold 1 -->
+  <text x="18" y="28" font-size="10" fill="#005CA9" text-anchor="end">F1</text>
+  <rect x="20" y="14" width="140" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.7"/>
+  <rect x="160" y="14" width="60"  height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.7"/>
+  <!-- Fold 2 -->
+  <text x="18" y="60" font-size="10" fill="#005CA9" text-anchor="end">F2</text>
+  <rect x="20" y="46" width="180" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.7"/>
+  <rect x="200" y="46" width="60"  height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.7"/>
+  <!-- Fold 3 -->
+  <text x="18" y="92" font-size="10" fill="#005CA9" text-anchor="end">F3</text>
+  <rect x="20" y="78" width="220" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.7"/>
+  <rect x="240" y="78" width="60"  height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.7"/>
+  <!-- Fold 4 -->
+  <text x="18" y="124" font-size="10" fill="#005CA9" text-anchor="end">F4</text>
+  <rect x="20" y="110" width="260" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.7"/>
+  <rect x="280" y="110" width="60"  height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.7"/>
+  <!-- Fold 5 -->
+  <text x="18" y="156" font-size="10" fill="#005CA9" text-anchor="end">F5</text>
+  <rect x="20" y="142" width="300" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.7"/>
+  <rect x="320" y="142" width="60"  height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.7"/>
+  <!-- Time axis -->
+  <line x1="20" y1="176" x2="400" y2="176" stroke="#525252" stroke-width="1.5"/>
+  <polygon points="398,172 408,176 398,180" fill="#525252"/>
+  <text x="412" y="180" font-size="10" fill="#525252" font-style="italic">Time t</text>
+  <text x="20"  y="191" font-size="9" fill="#525252" text-anchor="middle">1</text>
+  <text x="380" y="191" font-size="9" fill="#525252" text-anchor="middle">T</text>
+  <!-- Legend -->
+  <rect x="240" y="10" width="12" height="10" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.7"/>
+  <text x="255" y="20" font-size="10" fill="#005CA9">Train</text>
+  <rect x="300" y="10" width="12" height="10" fill="#D4EDDA" stroke="#15803d" stroke-width="0.7"/>
+  <text x="315" y="20" font-size="10" fill="#15803d">Val</text>
+</svg>
+```
+
+:::: {.columns}
+
+::: {.column width="52%"}
+```python
+from sklearn.model_selection import TimeSeriesSplit
+tscv = TimeSeriesSplit(n_splits=5, gap=0)
+for train_idx, val_idx in tscv.split(X):
+    X_train, X_val = X[train_idx], X[val_idx]
+```
+:::
+
+::: {.column width="44%"}
+::: {.keybox}
+::: {.smaller}
+`gap`: skip observations between train end and val start. Set `gap=`$H$ when forecasting $H$ steps ahead to prevent overlap.
+:::
+:::
+:::
+
+::::
+
+[General CV theory: [@Arlot2010].]{.neutral .smaller}
+
+---
+
+## CV in Practice: Hyperparameter Tuning
+
+::: {.smaller}
+A **hyperparameter** (e.g., $\lambda$) controls model complexity but is *not* estimated from data --- it is chosen before fitting. CV selects the best value.
+:::
+
+:::: {.columns}
+
+::: {.column width="52%"}
+1. Choose candidate values: $\lambda \in \{0.01, 0.1, 1, 10, 100\}$
+2. For each $\lambda$: run `TimeSeriesSplit` CV, compute mean validation RMSE
+3. Select $\lambda^*$ minimizing mean CV RMSE
+4. **Refit on full train + val** with $\lambda^*$
+5. Evaluate exactly once on held-out test set
+
+**Step 4 is critical:** refit on all non-test data. Using the CV train-fold only wastes data.
+:::
+
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+LASSO on RSXFS
+:::
+::: {.smaller}
+5-fold `TimeSeriesSplit`:
+
+$\lambda=0.1 \Rightarrow$ CV RMSE $= 1{,}780$ (optimal)
+
+$\lambda=0.001$ (overfit): $1{,}890$
+
+$\lambda=100$ (underfit): $2{,}140$
+
+Test RMSE with $\lambda^* = 0.1$: $1{,}810$ (close to CV RMSE, as expected).
+:::
+:::
+:::
+
+::::
+
+---
+
+# Regularization Preview
+
+When there are many predictors, unconstrained OLS overfits. Shrinkage is the solution. Full treatment: Lecture 8.
+
+---
+
+## Ridge, LASSO, and Elastic Net
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Penalized Regression
+:::
+::: {.smaller}
+$$\hat{\beta} = \arg\min_\beta \underbrace{\sum_{t=1}^T (y_t - \beta^\top x_t)^2}_{\text{OLS loss}} \;+\; \lambda \cdot P(\beta)$$
+
+**Ridge:** $P(\beta) = \lVert\beta\rVert_2^2$ &nbsp;&nbsp; **LASSO** [@Tibshirani1996]: $P(\beta) = \lVert\beta\rVert_1$ &nbsp;&nbsp; **EN** [@ZouHastie2005]: $\alpha\lVert\beta\rVert_1 + (1{-}\alpha)\lVert\beta\rVert_2^2$
+
+[[@Hastie2009]]{.neutral}
+:::
+:::
+
+:::: {.columns}
+
+::: {.column width="54%"}
+- **Ridge**: shrinks all coefficients smoothly; none reach exactly zero
+- **LASSO**: sets some coefficients to exactly zero $\Rightarrow$ automatic variable selection
+- **Elastic Net**: handles collinear predictors; ridge + LASSO combined
+:::
+
+::: {.column width="42%"}
+::: {.neutral .smaller}
+All three trade bias for variance via $\lambda$.
+
+$\lambda = 0$: OLS (maximum variance).
+
+$\lambda \to \infty$: intercept only (maximum bias).
+
+Note: EN $\alpha$ is the LASSO/Ridge mixing ratio (not ETS smoothing $\alpha$ from L03).
+
+Full derivation in L08.
+:::
+:::
+
+::::
+
+---
+
+## Shrinkage as Complexity Control
+
+:::: {.columns}
+
+::: {.column width="52%"}
+
+```{=html}
+<svg width="100%" viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" style="max-height:220px;">
+  <!-- Axes -->
+  <line x1="50" y1="195" x2="320" y2="195" stroke="#525252" stroke-width="1.5"/>
+  <line x1="50" y1="195" x2="50"  y2="10"  stroke="#525252" stroke-width="1.5"/>
+  <!-- Y label -->
+  <text x="14" y="108" font-size="11" fill="#525252" text-anchor="middle" transform="rotate(-90,14,108)">Coefficient β̂ⱼ</text>
+  <!-- X label -->
+  <text x="185" y="215" font-size="11" fill="#525252" text-anchor="middle">log₁₀(λ) — penalty strength</text>
+  <!-- X ticks: -2,0,2,4 → mapped to x domain [-3,4], 7 units over 270px → 38.6px/unit -->
+  <!-- x(-3)=50, x(-2)=88.6, x(0)=165.7, x(2)=242.9, x(4)=320 -->
+  <text x="89"  y="208" font-size="9" fill="#525252" text-anchor="middle">10⁻²</text>
+  <text x="166" y="208" font-size="9" fill="#525252" text-anchor="middle">1</text>
+  <text x="243" y="208" font-size="9" fill="#525252" text-anchor="middle">10²</text>
+  <text x="320" y="208" font-size="9" fill="#525252" text-anchor="middle">10⁴</text>
+  <!-- Y=0 line -->
+  <line x1="50" y1="108" x2="320" y2="108" stroke="#525252" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+  <!-- Y ticks: -1→y=163, 0→108, 1→53 (range -1.2 to 1.5, scale=185/2.7=68.5px per unit; y(0)=108) -->
+  <text x="44" y="167" font-size="9" fill="#525252" text-anchor="end">-1</text>
+  <text x="44" y="112" font-size="9" fill="#525252" text-anchor="end">0</text>
+  <text x="44" y="57"  font-size="9" fill="#525252" text-anchor="end">1</text>
+
+  <!-- Ridge paths (blue, solid) — smooth decay to 0 -->
+  <!-- β=1.2/(1+0.35*exp(x)), x from -3 to 4, px_x = 50 + (x+3)*38.6 -->
+  <!-- y_px = 108 - β*68.5 -->
+  <!-- Path 1: β starts at 1.2/(1+0.35*exp(-3))≈1.15 → y=108-79=29; x=4: 1.2/(1+0.35*54.6)≈0.063 → y=108-4=104 -->
+  <polyline points="50,29 89,38 127,58 166,82 205,99 243,104 282,106 320,107"
+    fill="none" stroke="#005CA9" stroke-width="2"/>
+  <!-- Path 2: β=0.8/(1+0.5*exp(x)) -->
+  <polyline points="50,52 89,62 127,79 166,97 205,106 243,108 282,108 320,108"
+    fill="none" stroke="#005CA9" stroke-width="2"/>
+  <!-- Path 3: β=-0.9/(1+0.4*exp(x)) (negative → above 0 line) -->
+  <polyline points="50,164 89,155 127,137 166,120 205,112 243,109 282,108 320,108"
+    fill="none" stroke="#005CA9" stroke-width="2"/>
+  <!-- Path 4: β=0.5/(1+0.6*exp(x)) -->
+  <polyline points="50,74 89,81 127,92 166,102 205,107 243,108 282,108 320,108"
+    fill="none" stroke="#005CA9" stroke-width="2"/>
+
+  <!-- LASSO paths (red, dashed) — reach 0 at finite lambda -->
+  <!-- Path 1: β=1.0 - (x+3)/4.2 for x in [-3, 1.2]; clamped at 0 -->
+  <!-- x=-3→β=1→y=40; x=0→β=0.29→y=88; x=1.2→β=0→y=108 -->
+  <polyline points="50,40 89,61 127,82 166,99 204,107 214,108"
+    fill="none" stroke="#E41C38" stroke-width="2" stroke-dasharray="6,3"/>
+  <!-- Path 2: negative coefficient reaching 0 -->
+  <!-- β=-0.7 at x=-3, reaches 0 at x≈0 -->
+  <!-- x=-3→β=-0.7→y=156; x=0→β=0→y=108 -->
+  <polyline points="50,156 89,139 127,122 166,108"
+    fill="none" stroke="#E41C38" stroke-width="2" stroke-dasharray="6,3"/>
+
+  <!-- Labels -->
+  <text x="68"  y="24" font-size="11" fill="#005CA9">Ridge</text>
+  <text x="120" y="66" font-size="11" fill="#E41C38">LASSO</text>
+</svg>
+```
+
+:::
+
+::: {.column width="44%"}
+::: {.keybox}
+::: {.smaller}
+As $\lambda \to \infty$: $\hat{\beta}_j \to 0$ (all predictors removed).
+
+As $\lambda \to 0$: OLS solution.
+
+LASSO paths hit zero at a finite $\lambda$ --- Ridge paths only approach zero asymptotically.
+
+CV selects $\lambda^*$ at the bias-variance minimum.
+:::
+:::
+:::
+
+::::
+
+[*Illustrative paths. L08 derives the exact form from the subgradient conditions.*]{.neutral .smaller}
+
+---
+
+# Feature Engineering Preview
+
+ML models do not handle time series natively. We must create temporal structure explicitly. Full treatment: Lecture 11.
+
+---
+
+## From Time Series to Feature Matrix
+
+A raw series $y_1, \ldots, y_T$ is not a feature matrix. We extract temporal patterns as columns.
+
+::: {.smaller}
+[Unlike ARIMA, ML algorithms assume i.i.d. rows: they cannot exploit autocorrelation internally. We must encode temporal structure as explicit columns.]{.neutral}
+:::
+
+::: {.smaller}
+
+| **Feature type** | **Formula** | **Business meaning** |
+|:---|:---|:---|
+| Lag | $x_t^{(k)} = y_{t-k}$ | Sales $k$ periods ago |
+| Rolling mean | $\bar{y}_{t,w} = \tfrac{1}{w}\sum_{k=1}^{w} y_{t-k}$ | Recent trend level |
+| Rolling std | $s_{t,w} = \text{std}(y_{t-w:t-1})$ | Recent volatility |
+| Month-of-year | $\mathbf{1}[\text{month}(t) = m]$ | Seasonal dummy |
+| Trend counter | $t = 1, 2, \ldots, T$ | Linear time trend |
+
+:::
+
+::: {.warningbox}
+::: {.smaller}
+All features **must** use only $y_1, \ldots, y_{t-1}$ when predicting $y_t$. Any feature using $y_t$ or later creates leakage. Apply `.shift(1)` before any rolling window.
+:::
+:::
+
+[*Full treatment in L11: calendar features, Fourier terms, interaction features, and pipeline automation.*]{.neutral .smaller}
+
+---
+
+## Features + Leakage Prevention in Python
+
+:::: {.columns}
+
+::: {.column width="52%"}
+```python
+# Lag features: shift(1) avoids leakage
+X['lag_1']  = y.shift(1)
+X['lag_12'] = y.shift(12)
+
+# Rolling mean of y_{t-1}...y_{t-3}
+X['roll_3'] = y.shift(1).rolling(3).mean()
+
+# Calendar feature (always known)
+X['month'] = y.index.month
+
+# Drop rows with NaN from lags
+X = X.dropna()
+```
+:::
+
+::: {.column width="44%"}
+- `.shift(1)`: shifts series forward one period --- ensures $x_t$ uses $y_{t-1}$, not $y_t$
+- `.rolling(3).mean()` after `.shift(1)`: mean of $y_{t-1}, y_{t-2}, y_{t-3}$
+- `.index.month`: calendar feature; no leakage (calendar is always known in advance)
+
+::: {.keybox}
+::: {.smaller}
+L11 wraps this logic in a `sklearn.Pipeline` that prevents leakage automatically at every CV fold.
+:::
+:::
+:::
+
+::::
+
+---
+
+# The ML Forecasting Pipeline
+
+End-to-end: features $\to$ split $\to$ fit $\to$ evaluate $\to$ deploy.
+
+---
+
+## The End-to-End ML Forecasting Pipeline
+
+```{=html}
+<svg width="100%" viewBox="0 0 760 130" xmlns="http://www.w3.org/2000/svg" style="max-height:120px; display:block; margin:0 auto;">
+  <!-- Boxes -->
+  <rect x="10"  y="20" width="100" height="50" fill="#005CA9" rx="5"/>
+  <text x="60"  y="43" font-size="11" fill="white" font-weight="bold" text-anchor="middle">Raw</text>
+  <text x="60"  y="58" font-size="11" fill="white" font-weight="bold" text-anchor="middle">series</text>
+
+  <rect x="140" y="20" width="100" height="50" fill="#005CA9" rx="5"/>
+  <text x="190" y="43" font-size="11" fill="white" font-weight="bold" text-anchor="middle">Feature</text>
+  <text x="190" y="58" font-size="11" fill="white" font-weight="bold" text-anchor="middle">matrix</text>
+
+  <rect x="270" y="20" width="100" height="50" fill="#005CA9" rx="5"/>
+  <text x="320" y="43" font-size="11" fill="white" font-weight="bold" text-anchor="middle">Split</text>
+  <text x="320" y="58" font-size="11" fill="white" font-weight="bold" text-anchor="middle">Tr/Va/Te</text>
+
+  <rect x="400" y="20" width="100" height="50" fill="#005CA9" rx="5"/>
+  <text x="450" y="43" font-size="11" fill="white" font-weight="bold" text-anchor="middle">CV +</text>
+  <text x="450" y="58" font-size="11" fill="white" font-weight="bold" text-anchor="middle">model fit</text>
+
+  <rect x="530" y="20" width="100" height="50" fill="#005CA9" rx="5"/>
+  <text x="580" y="43" font-size="11" fill="white" font-weight="bold" text-anchor="middle">Evaluate</text>
+  <text x="580" y="58" font-size="11" fill="white" font-weight="bold" text-anchor="middle">on test</text>
+
+  <rect x="660" y="20" width="100" height="50" fill="#005CA9" rx="5"/>
+  <text x="710" y="43" font-size="11" fill="white" font-weight="bold" text-anchor="middle">Deploy +</text>
+  <text x="710" y="58" font-size="11" fill="white" font-weight="bold" text-anchor="middle">monitor</text>
+
+  <!-- Arrows -->
+  <line x1="110" y1="45" x2="138" y2="45" stroke="#525252" stroke-width="1.5"/>
+  <polygon points="136,41 142,45 136,49" fill="#525252"/>
+  <line x1="240" y1="45" x2="268" y2="45" stroke="#525252" stroke-width="1.5"/>
+  <polygon points="266,41 272,45 266,49" fill="#525252"/>
+  <line x1="370" y1="45" x2="398" y2="45" stroke="#525252" stroke-width="1.5"/>
+  <polygon points="396,41 402,45 396,49" fill="#525252"/>
+  <line x1="500" y1="45" x2="528" y2="45" stroke="#525252" stroke-width="1.5"/>
+  <polygon points="526,41 532,45 526,49" fill="#525252"/>
+  <line x1="630" y1="45" x2="658" y2="45" stroke="#525252" stroke-width="1.5"/>
+  <polygon points="656,41 662,45 656,49" fill="#525252"/>
+
+  <!-- Notes below -->
+  <text x="60"  y="85" font-size="9" fill="#525252" text-anchor="middle">RSXFS,</text>
+  <text x="60"  y="97" font-size="9" fill="#525252" text-anchor="middle">FRED</text>
+  <text x="190" y="85" font-size="9" fill="#525252" text-anchor="middle">lags, rolling</text>
+  <text x="190" y="97" font-size="9" fill="#525252" text-anchor="middle">stats, calendar</text>
+  <text x="320" y="85" font-size="9" fill="#525252" text-anchor="middle">chronological;</text>
+  <text x="320" y="97" font-size="9" fill="#525252" text-anchor="middle">gap = H</text>
+  <text x="450" y="85" font-size="9" fill="#525252" text-anchor="middle">TimeSeriesSplit</text>
+  <text x="450" y="97" font-size="9" fill="#525252" text-anchor="middle">Ridge/LASSO/RF</text>
+  <text x="580" y="85" font-size="9" fill="#525252" text-anchor="middle">RMSE by h;</text>
+  <text x="580" y="97" font-size="9" fill="#525252" text-anchor="middle">DM test</text>
+  <text x="710" y="85" font-size="9" fill="#525252" text-anchor="middle">retrain monthly;</text>
+  <text x="710" y="97" font-size="9" fill="#525252" text-anchor="middle">monitor drift</text>
+</svg>
+```
+
+::: {.keybox}
+::: {.smaller}
+The `sklearn.Pipeline` object chains preprocessing (`StandardScaler`) + model into a single estimator. This ensures the scaler is fitted on train-fold only during CV --- eliminating a common source of leakage [@James2021].
+:::
+:::
+
+---
+
+## Key Takeaways and the Road Ahead
+
+:::: {.columns}
+
+::: {.column width="56%"}
+::: {.keybox}
+::: {.smaller}
+1. ML **extends** classical forecasting for non-linearity, many predictors, and unknown structure.
+2. $\text{MSE} = \text{Bias}^2 + \text{Var} + \sigma^2$ governs every modeling decision.
+3. Three-way train/val/test split with chronological ordering is non-negotiable.
+4. Walk-forward CV (`TimeSeriesSplit`) replaces $k$-fold for time series.
+5. Regularization (L08) and feature engineering (L11) are the main levers for controlling bias-variance.
+:::
+:::
+:::
+
+::: {.column width="40%"}
+**Lecture roadmap:**
+
+::: {.smaller}
+
+| **Lecture** | **Topic** |
+|:---|:---|
+| L08 | LASSO, Ridge, EN |
+| L09 | RF, XGBoost |
+| L10 | LSTM, attention |
+| L11 | Feature pipeline |
+| L12 | Capstone cases |
+
+:::
+
+[*Lab 7: full pipeline from raw RSXFS to LASSO and Ridge with walk-forward CV.*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::

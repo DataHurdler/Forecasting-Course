@@ -1,0 +1,773 @@
+---
+title: "Introduction to Forecasting"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 1"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Why Forecasting Matters
+2. The Forecasting Framework
+3. Time Series Patterns
+4. Benchmark Models
+5. Forecast Evaluation
+6. Course Roadmap
+
+---
+
+# Why Forecasting Matters
+
+Every business decision made today depends on expectations about tomorrow.
+
+---
+
+## Forecasting Is Everywhere in Business
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Operations & Supply Chain**
+
+- How much inventory should Walmart order for Black Friday?
+- How many nurses does a hospital need next Tuesday night?
+- When will this machine component fail?
+
+**Finance & Risk**
+
+- Will credit card defaults rise next quarter?
+- What will the Fed Funds rate be in 6 months?
+- How volatile will equity returns be tomorrow?
+:::
+
+::: {.column width="48%"}
+**Marketing & Strategy**
+
+- How many units will this new product sell in year one?
+- What is the customer lifetime value of this cohort?
+
+**Macro & Public Policy**
+
+- Will GDP grow by 2% or 3% next year?
+- What will unemployment be in Q4?
+
+::: {.keybox}
+A decision is only as good as the forecast it rests on.
+:::
+:::
+
+::::
+
+---
+
+## The Cost of Getting It Wrong
+
+::: {.examplebox}
+::: {.examplebox-title}
+Real-World Forecast Failures
+:::
+
+- **UK NHS (2020):** Initial COVID hospitalization forecasts were off by 4$\times$ --- led to procurement of excess ventilators and delayed other treatments.
+- **Toys R Us (2017):** systematically over-ordered inventory based on outdated demand forecasts, contributing to bankruptcy.
+- **Target Canada (2015):** Inventory system forecasting errors caused shelves to be overstocked on some items and empty on others --- a \$2B writedown.
+:::
+
+::: {.warningbox}
+**Overfitting is not the only failure mode.**
+Ignoring uncertainty (using a point forecast as if it were certain)
+is equally dangerous.
+:::
+
+---
+
+## What Makes Forecasting Hard?
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Fundamental challenges:**
+
+- [**Uncertainty:**]{.hi} The future is inherently random. The best we can do is characterize the distribution of outcomes.
+- [**Nonlinearity:**]{.hi} Many economic relationships change over time or at a threshold.
+- [**Regime shifts:**]{.hi} Structural breaks (recessions, pandemics, policy changes) alter the data-generating process.
+- [**High dimensionality:**]{.hi} More potential predictors than observations (especially in the ML half of the course).
+:::
+
+::: {.column width="48%"}
+**Statistical challenges:**
+
+- Serial correlation: $y_t$ and $y_{t-1}$ are not independent.
+- Non-stationarity: the mean and variance may change over time.
+- Sparse data: rare events (defaults, crises) have few observations.
+- Evaluation: you can only evaluate out-of-sample.
+
+::: {.keybox}
+This course: learn *when* and *why* each method works --- not just how to run it.
+:::
+:::
+
+::::
+
+---
+
+# The Forecasting Framework
+
+A precise language for talking about prediction under uncertainty.
+
+---
+
+## The Formal Setup
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Time Series
+:::
+A [**time series**]{.hi} is an ordered sequence of observations $\{y_1, y_2, \ldots, y_T\}$ where $t$ indexes time.
+:::
+
+:::: {.columns}
+
+::: {.column width="55%"}
+**Notation:**
+
+- $y_t$ --- observed value at time $t$
+- $h$ --- [**forecast horizon**]{.hi} (periods ahead)
+- $\mathcal{F}_t$ --- [**information set**]{.hi} at time $t$ (all data available up to and including time $t$; may include past values of predictors and economic indicators, not only the history of $y_t$)
+- $\hat{y}_{t+h|t}$ --- forecast of $y_{t+h}$ made at time $t$
+:::
+
+::: {.column width="42%"}
+**Examples:**
+
+- $h=1$: next month's sales
+- $h=12$: sales 12 months from now
+- $h=1$ vs. $h=12$: harder problem as $h$ increases
+
+[*The subscript notation $\hat{y}_{t+h|t}$ is read "$y$-hat at $t+h$ given $t$."*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## What Should We Actually Forecast?
+
+We want a single number $\hat{y}_{t+h|t}$ to represent our best guess of $y_{t+h}$.
+
+::: {.examplebox}
+::: {.examplebox-title}
+Think Before the Next Slide
+:::
+Suppose you must predict next month's retail sales.
+You can observe all history $\{y_1, \ldots, y_t\}$.
+
+**What single number would you report to minimize your average squared miss?**
+
+*Hint: think about what the mean of a distribution minimizes.*
+:::
+
+---
+
+## The Optimal Point Forecast
+
+::: {.keybox}
+Under **squared error loss**, the optimal $h$-step-ahead forecast is:
+$$\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]$$
+the *conditional expectation* of $y_{t+h}$ given all information at time $t$.
+:::
+
+**Why the conditional expectation?**
+
+- The MSE-minimizing predictor of any random variable $Z$ is $\mathbb{E}[Z]$ --- the mean.
+- Conditioned on $\mathcal{F}_t$, that becomes $\mathbb{E}[Z \mid \mathcal{F}_t]$.
+- [*Proof sketch: $\mathbb{E}[(Z-c)^2]$ is minimized at $c = \mathbb{E}[Z]$; condition on $\mathcal{F}_t$.*]{.neutral .smaller}
+
+::: {.warningbox}
+**Different loss functions yield different optimal forecasts.**
+MAE loss $\Rightarrow$ conditional median.
+We will use MSE throughout unless stated otherwise.
+:::
+
+[*When is MAE preferable? Hint: asymmetric costs (e.g., stockout vs. over-stocking).*]{.neutral .smaller}
+
+---
+
+## Forecast Error
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Forecast Error
+:::
+The [**forecast error**]{.hi} for a one-step-ahead forecast is:
+$$e_t \;=\; y_t - \hat{y}_{t|t-1}$$
+For $h$-step-ahead: $\;e_{t+h} = y_{t+h} - \hat{y}_{t+h|t}$
+:::
+
+**Properties of errors from the optimal forecast:**
+
+- $\mathbb{E}[e_t] = 0$ --- unbiased (no systematic over- or under-prediction)
+- $\text{Cov}(e_t, e_{t-k}) = 0$ for $k \geq 1$ --- errors are uncorrelated (if forecast is truly optimal)
+- Errors that are autocorrelated reveal *unexploited information*
+
+::: {.warningbox}
+**Reserve $\varepsilon_t$ for the true innovation (white noise) of a model.**
+Use $e_t$ for the realized forecast error.
+These are different: $e_t$ includes parameter estimation error; $\varepsilon_t$ does not.
+:::
+
+---
+
+## Types of Forecasts
+
+:::: {.columns}
+
+::: {.column width="32%"}
+**Point forecast**
+$$\hat{y}_{t+1|t} = 42.7$$
+
+- Single number
+- Most common in practice
+- Hides uncertainty
+:::
+
+::: {.column width="32%"}
+**Interval forecast**
+$$[38.2,\ 47.2]$$
+
+- Lower + upper bound
+- 95% coverage means: 95% of such intervals contain $y_{t+1}$
+- Calibration matters
+:::
+
+::: {.column width="32%"}
+**Density forecast**
+$$p(y_{t+1} \mid \mathcal{F}_t)$$
+
+- Full distribution
+- Most informative
+- Harder to produce and evaluate
+:::
+
+::::
+
+::: {.keybox}
+This course focuses on **point** and **interval** forecasts. Density forecasting is beyond the scope of this course.
+:::
+
+---
+
+# Time Series Patterns
+
+Before fitting any model, understand the structure of the data.
+
+---
+
+## Components of a Time Series
+
+Any time series can be decomposed into (additive form):
+$$y_t = T_t + S_t + C_t + I_t$$
+
+[*Multiplicative form: $y_t = T_t \times S_t \times C_t \times I_t$ (use when seasonal amplitude grows with level).*]{.neutral .smaller}
+
+:::: {.columns}
+
+::: {.column width="48%"}
+- [**$T_t$: Trend**]{.hi} --- long-run movement (linear, quadratic, or stochastic)
+- [**$S_t$: Seasonality**]{.hi} --- regular, calendar-driven pattern
+- [**$C_t$: Cycle**]{.hi} --- medium-run fluctuations (business cycles)
+- [**$I_t$: Irregular**]{.hi} --- random shocks and one-offs
+:::
+
+::: {.column width="48%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Which Components Matter?
+:::
+- **Retail sales:** strong trend + strong seasonality
+- **Quarterly GDP:** trend + cycle (weak seasonality)
+- **Daily stock returns:** nearly all irregular
+- **Energy demand:** trend + seasonality + cycle
+:::
+:::
+
+::::
+
+---
+
+## Seasonality: A Closer Look
+
+**Seasonal period $m$:** the number of observations per year (or per recurring cycle).
+
+:::: {.columns}
+
+::: {.column width="48%"}
+
+| Data frequency | Seasonal period $m$ |
+|:--------------|:--------------------|
+| Annual        | 1 (no seasonality)  |
+| Quarterly     | 4                   |
+| Monthly       | 12                  |
+| Weekly        | 52                  |
+| Daily         | 7 or 365            |
+
+:::
+
+::: {.column width="48%"}
+::: {.warningbox}
+**Ignoring seasonality is a common source of large forecast errors.**
+A non-seasonal model applied to monthly retail data will systematically
+under-forecast in December and over-forecast in January.
+:::
+:::
+
+::::
+
+[Lab 01 will visualize seasonality in US retail sales data. We will decompose the series using STL (Seasonal-Trend decomposition via LOESS).]{.neutral .smaller}
+
+---
+
+## Stationarity: A First Look
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Weak Stationarity (Preview)
+:::
+::: {.smaller}
+A time series $\{y_t\}$ is [**weakly stationary**]{.hi} if:
+
+1. $\mathbb{E}[y_t] = \mu$ (constant mean)
+2. $\text{Var}(y_t) = \sigma^2 < \infty$ (constant variance)
+3. $\text{Cov}(y_t, y_{t-k}) = \gamma_k$ depends only on lag $k$, not on $t$
+:::
+:::
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Why it matters:**
+
+::: {.smaller}
+- Most classical forecasting methods assume stationarity
+- Non-stationary series produce *spurious* regressions
+:::
+:::
+
+::: {.column width="48%"}
+::: {.keybox}
+::: {.smaller}
+**Rule of thumb:** Visible trend or growing variance (heteroscedasticity)
+$\Rightarrow$ likely non-stationary.
+
+Full treatment: **Lecture 4** (ARIMA Models).
+:::
+:::
+:::
+
+::::
+
+[*Is US retail sales stationary? What about daily S&P 500 returns vs. price levels?*]{.neutral .smaller}
+
+---
+
+# Benchmark Models
+
+Always beat a simple baseline before claiming success.
+
+---
+
+## The Benchmark Principle
+
+::: {.keybox}
+Before presenting any forecast model, establish what a **naive benchmark**
+achieves. A model that does not beat the benchmark has zero value.
+:::
+
+**Why benchmarks matter:**
+
+- Many series are hard to forecast --- even "simple" models may be hard to beat.
+- The M4 Competition [@Makridakis2020]: out of 61 methods, many sophisticated ML models failed to beat exponential smoothing.
+- A benchmark defines the floor. Your goal is to clear it by a meaningful margin.
+
+::: {.examplebox}
+::: {.examplebox-title}
+Standard Benchmarks in This Course
+:::
+Naïve, Seasonal Naïve, Historical Mean, Random Walk with Drift.
+We will always compute these before evaluating any model.
+:::
+
+---
+
+## Benchmark 1: The Naïve Forecast
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Naïve Forecast
+:::
+$$\hat{y}_{t+h|t} = y_t \quad \text{for all } h \geq 1$$
+Use the *most recent observation* as the forecast for all future periods.
+:::
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Properties:**
+
+- Equivalent to a [**random walk**]{.hi} model: $y_t = y_{t-1} + \varepsilon_t$
+- Optimal under the random walk hypothesis
+- Standard benchmark for financial prices
+- Forecast does not change with $h$ (flat forecast function)
+:::
+
+::: {.column width="48%"}
+**When to use:**
+
+- [✓]{.positive} Asset prices, exchange rates
+- [✓]{.positive} When you have very little history
+- [✗]{.negative} Series with strong trend or seasonality
+
+[Python: `y_hat = y_train.iloc[-1]`]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## Benchmark 2: The Seasonal Naïve Forecast
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Seasonal Naïve Forecast (monthly data, $m = 12$)
+:::
+$$\hat{y}_{t+h|t} = y_{t+h-12}$$
+Use the *value from the same month one year ago*.
+
+[*General form for arbitrary $h$ and period $m$: $\hat{y}_{t+h|t} = y_{t+h-m \cdot \lceil h/m \rceil}$*]{.neutral .smaller}
+:::
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Properties:**
+
+- Captures seasonality without modeling it explicitly
+- Standard benchmark for monthly business data
+- Automatically handles any seasonal period $m$
+:::
+
+::: {.column width="48%"}
+**When to use:**
+
+- [✓]{.positive} Retail sales, electricity demand
+- [✓]{.positive} Any series with clear seasonal pattern
+- [✗]{.negative} Non-seasonal series (use naïve instead)
+
+[Python: shift by seasonal period using `pd.Series.shift(m)`]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## Benchmark 3: The Historical Mean Forecast
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Historical Mean (Average) Forecast
+:::
+$$\hat{y}_{t+h|t} = \bar{y}_t = \frac{1}{t}\sum_{s=1}^{t} y_s \quad \text{for all } h \geq 1$$
+Forecast with the *average of all past observations*.
+:::
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Properties:**
+
+- Optimal under the assumption that $y_t$ is i.i.d.
+- Produces a constant, flat forecast
+- Variance of forecast error decreases as $t$ grows (more data $\Rightarrow$ better estimate of $\mu$)
+:::
+
+::: {.column width="48%"}
+**When to use:**
+
+- [✓]{.positive} Stationary series with no pattern
+- [✓]{.positive} Very long history, very stable series
+- [✗]{.negative} Any series with trend or seasonality
+
+[Python: `y_hat = y_train.mean()`]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## Benchmark 4: Random Walk with Drift
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Random Walk with Drift
+:::
+$$y_t = c + y_{t-1} + \varepsilon_t \quad \Longrightarrow \quad \hat{y}_{t+h|t} = y_t + h\hat{c}$$
+where $\hat{c} = (y_T - y_1)/(T-1)$ is the estimated average period-to-period change.
+:::
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Properties:**
+
+- Combines naïve with a linear trend component
+- Forecast function: linear extrapolation from last observation
+- Limiting case: as $\alpha \to 1$ and $\beta \to 1$, Holt's method approaches the random walk with drift (Lecture 3)
+:::
+
+::: {.column width="46%"}
+::: {.keybox}
+**Which benchmark to use?**
+
+::: {.smaller}
+No trend, no season $\rightarrow$ Mean
+
+Trend, no season $\rightarrow$ RW + Drift
+
+Season, no trend $\rightarrow$ Seasonal Naïve
+
+Trend + Season $\rightarrow$ Seasonal Naïve
+
+Asset prices $\rightarrow$ Naïve
+:::
+:::
+:::
+
+::::
+
+---
+
+# Forecast Evaluation
+
+Forecasting without evaluation is not science --- it is storytelling.
+
+---
+
+## Point Forecast Accuracy Metrics
+
+Given $T$ out-of-sample observations $\{y_{T+1}, \ldots, y_{T+H}\}$ and forecasts $\{\hat{y}_{T+1|T}, \ldots, \hat{y}_{T+H|T}\}$:
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Scale-dependent metrics:**
+$$\begin{aligned}
+\operatorname{MSE}  &= \frac{1}{H}\sum_{h=1}^{H} e_{T+h}^2 \\[4pt]
+\operatorname{RMSE} &= \sqrt{\operatorname{MSE}} \\[4pt]
+\operatorname{MAE}  &= \frac{1}{H}\sum_{h=1}^{H} |e_{T+h}|
+\end{aligned}$$
+
+[RMSE and MAE are in the same units as $y_t$. Use to compare models on the *same* series.]{.neutral .smaller}
+:::
+
+::: {.column width="48%"}
+**Scale-free metric:**
+$$\text{MAPE} = \frac{1}{H}\sum_{h=1}^{H}\left|\frac{e_{T+h}}{y_{T+h}}\right| \times 100\%$$
+
+[MAPE: cross-series comparison; undefined at $y_{T+h}=0$; asymmetric.]{.neutral .smaller}
+
+::: {.warningbox}
+**RMSE vs. MAE:** RMSE penalizes large errors more heavily.
+If large errors are very costly, prefer RMSE.
+:::
+:::
+
+::::
+
+---
+
+## The Evaluation Principle: Always Out-of-Sample
+
+::: {.keybox}
+**Never evaluate a forecast model on the data used to fit it.**
+In-sample fit measures how well the model reproduces past observations,
+not how well it can predict the future.
+:::
+
+**Correct time series train/test split:**
+
+- Use observations $1, \ldots, T$ to estimate the model
+- Evaluate on $T+1, \ldots, T+H$ (held-out future observations)
+- *Never* randomly shuffle observations --- time order must be preserved
+
+::: {.warningbox}
+**Common mistake:** Using `sklearn`'s `KFold` on time series data.
+This randomly assigns observations to folds, allowing future data to "train" the model.
+Always use `TimeSeriesSplit`.
+Full treatment in **Lecture 7**.
+:::
+
+---
+
+## Visualizing the Train/Test Split
+
+```{=html}
+<div style="display:flex; flex-direction:column; align-items:center; margin: 1.5em 0;">
+  <div style="position:relative; width:80%; height:80px;">
+    <!-- Timeline arrow -->
+    <div style="position:absolute; top:35px; left:0; right:0; height:3px; background:#005CA9;"></div>
+    <div style="position:absolute; top:27px; right:-2px; width:0; height:0; border-left:12px solid #005CA9; border-top:8px solid transparent; border-bottom:8px solid transparent;"></div>
+    <div style="position:absolute; top:48px; right:-4px; font-style:italic; color:#005CA9; font-size:0.8em;">t</div>
+    <!-- Training region -->
+    <div style="position:absolute; top:20px; left:1%; width:62%; height:30px; background:rgba(0,92,169,0.15); border:2px solid #005CA9; display:flex; align-items:center; justify-content:center; font-weight:700; color:#005CA9; font-size:0.85em;">Training set</div>
+    <!-- Test region -->
+    <div style="position:absolute; top:20px; left:63%; width:25%; height:30px; background:rgba(228,28,56,0.12); border:2px solid #E41C38; display:flex; align-items:center; justify-content:center; font-weight:700; color:#E41C38; font-size:0.85em;">Test set</div>
+    <!-- Labels -->
+    <div style="position:absolute; top:55px; left:0; font-size:0.7em; color:#525252;">t = 1</div>
+    <div style="position:absolute; top:55px; left:60%; font-size:0.7em; color:#525252;">t = T</div>
+    <div style="position:absolute; top:55px; left:85%; font-size:0.7em; color:#525252;">t = T+H</div>
+    <!-- Forecast origin dashed line -->
+    <div style="position:absolute; top:10px; left:63%; width:2px; height:55px; background:#E41C38; border-left:2px dashed #E41C38;"></div>
+    <div style="position:absolute; top:4px; left:55%; font-size:0.7em; color:#E41C38; white-space:nowrap;">Forecast origin</div>
+  </div>
+</div>
+```
+
+- Model estimated on $\{y_1, \ldots, y_T\}$
+- Forecasts $\{\hat{y}_{T+1|T}, \ldots, \hat{y}_{T+H|T}\}$ evaluated against realized values
+- Typical test set size: **10--20%** of the series, or a fixed future window
+
+[Walk-forward (rolling-origin) evaluation: Lecture 6.]{.neutral .smaller}
+
+---
+
+## A Better Scale-Free Metric: MASE
+
+@Hyndman2006 propose the [**Mean Absolute Scaled Error**]{.hi}:
+$$\text{MASE} = \frac{\operatorname{MAE}}{\displaystyle\frac{1}{T-m}\sum_{t=m+1}^{T}|y_t - y_{t-m}|}$$
+
+- Denominator: in-sample MAE of the seasonal naïve forecast
+- $\text{MASE} < 1$: model beats seasonal naïve
+- $\text{MASE} > 1$: model is *worse* than the seasonal naïve benchmark
+- Works when $y_t = 0$ (unlike MAPE)
+- Symmetric --- positive and negative errors treated equally
+
+::: {.keybox}
+MASE is the standard metric in the M-competitions [@Makridakis2020].
+We will use it in Lecture 6 for model comparison.
+:::
+
+---
+
+# Course Roadmap
+
+What we will cover, and how it fits together.
+
+---
+
+## BSAD 8310 in Two Parts
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Part I: Classical Econometric Forecasting**
+
+1. **Introduction** [$\leftarrow$ today]{.neutral}
+2. Regression-Based Forecasting
+3. Exponential Smoothing (ETS)
+4. ARIMA Models
+5. Multivariate Methods (VAR, ARIMAX)
+6. Forecast Evaluation & Combination
+
+[Focus: theory + properties + principled model selection.]{.neutral .smaller}
+:::
+
+::: {.column width="48%"}
+**Part II: Predictive Analytics & Machine Learning**
+
+7. ML Introduction & Cross-Validation
+8. Regularization (LASSO, Ridge, Elastic Net)
+9. Tree-Based Methods (RF, XGBoost)
+10. Neural Networks & LSTM
+11. Feature Engineering
+12. Capstone & Applications
+
+[Focus: scalability, data-driven model selection, real-world pipelines.]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## Tools and Expectations
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Python throughout:**
+
+- `statsmodels` --- ARIMA, ETS, VAR, statistical tests
+- `scikit-learn` --- ML models, cross-validation, pipelines
+- `pandas` --- data manipulation
+- `matplotlib` --- visualization
+- `numpy` --- numerical computing
+
+**Lab format:** Jupyter notebooks.
+Each lab implements the methods from the preceding lecture.
+:::
+
+::: {.column width="48%"}
+**What you will be able to do:**
+
+- [✓]{.positive} Select and justify a forecasting method for a business problem
+- [✓]{.positive} Implement ARIMA, ETS, LASSO, and RF models in Python
+- [✓]{.positive} Evaluate and compare models rigorously
+- [✓]{.positive} Communicate forecast uncertainty to stakeholders
+- [✓]{.positive} Avoid the most common forecasting mistakes
+:::
+
+::::
+
+---
+
+## Lecture 1: Key Takeaways
+
+::: {.keybox}
+::: {.smaller}
+1. Forecasting underpins every forward-looking business decision. Bad forecasts have measurable, costly consequences.
+
+2. The optimal point forecast (under squared loss) is the **conditional expectation**: $\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]$.
+
+3. Always establish **benchmark performance** first. A model that does not beat naïve is not useful.
+
+4. **Evaluate out-of-sample only.** Never shuffle time series; always use `TimeSeriesSplit`.
+
+5. Metric choice matters: RMSE penalizes large errors; MAPE allows cross-series comparison; MASE benchmarks against naïve.
+:::
+:::
+
+[*Next: Regression-Based Forecasting --- when and how do predictor variables improve on these benchmarks?*]{.neutral}
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::

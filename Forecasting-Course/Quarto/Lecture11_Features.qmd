@@ -1,0 +1,983 @@
+---
+title: "Feature Engineering"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 11"
+author: "BSAD 8310: Business Forecasting"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture 11: Outline
+
+1. Lag Features
+2. Rolling Statistics
+3. Calendar & Structural Features
+4. Interaction & Ratio Features
+5. Feature Selection
+6. Pipeline Design
+7. Application to Forecasting
+
+---
+
+## Motivation: The Feature Gap
+
+::: {.keybox}
+**Lecture 10 best result:** LSTM with 36 features achieved RMSE $\approx$ 1,920 --- down from XGBoost's 2,250 (26 features). The improvement came mostly from *better inputs*, not a fancier model.
+:::
+
+**What feature engineering adds:**
+
+- **Lag features:** give the model explicit access to past values, guided by ACF and PACF
+- **Rolling statistics:** capture local trends, volatility, and momentum across multiple time scales
+- **Calendar effects:** encode seasonality without requiring seasonal differencing
+- **Interaction / ratio features:** year-over-year and month-over-month change rates that tree models cannot discover on their own
+- **Pipeline design:** prevent data leakage by fitting transformations inside each cross-validation fold
+
+**Lecture goal:** Build `make_features_extended()` (36 features), select the best subset, and update the Lectures 01--11 leaderboard.
+
+---
+
+# Lag Features
+
+Converting time-series forecasting into a supervised regression problem
+
+---
+
+## Lag Features: Section Overview
+
+**Lag features** are the most direct way to give a tree-based or linear model access to the past. They convert a time-series forecasting problem into a standard supervised regression problem with $y_{t-k}$ as predictors.
+
+**Design questions:**
+
+- Which lags are worth including? (ACF and PACF guidance)
+- How many lags before diminishing returns?
+- How to avoid look-ahead leakage when computing lags?
+
+**Key rule:** always use `shift(k)` with $k \geq 1$ so that at prediction time for period $t$, only values observed at $t-1, t-2, \ldots$ are used.
+
+---
+
+## Choosing Lags: ACF and PACF Guidance
+
+:::: {.columns}
+
+::: {.column width="52%"}
+
+```{=html}
+<svg viewBox="0 0 260 290" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-height:270px; display:block; margin:0 auto; font-family:inherit;">
+
+  <!-- ===== ACF panel (y=150 to y=270) ===== -->
+  <!-- Axis -->
+  <line x1="30" y1="150" x2="30" y2="270" stroke="#aaa" stroke-width="0.8"/>
+  <line x1="30" y1="270" x2="248" y2="270" stroke="#aaa" stroke-width="0.8"/>
+  <!-- Axis label -->
+  <text x="6" y="215" font-size="8" fill="#525252" transform="rotate(-90,10,215)">ACF</text>
+
+  <!-- Confidence band (dashed) at y=241 (approx 0.29 of 2.0 scale) -->
+  <line x1="30" y1="241" x2="248" y2="241" stroke="#aaa" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+  <!-- ACF bars (lags 1-12): heights scaled from data -->
+  <!-- Lag 1: 1.36 → height=68 → bar from y=270 to y=202 -->
+  <rect x="33"  y="202" width="12" height="68" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 2: 1.15 → height=57.5 -->
+  <rect x="50"  y="213" width="12" height="57" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 3: 0.93 → height=46.5 -->
+  <rect x="67"  y="224" width="12" height="46" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 4: 0.72 → height=36 -->
+  <rect x="84"  y="234" width="12" height="36" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 5: 0.51 → height=25.5 -->
+  <rect x="101" y="244" width="12" height="26" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 6: 0.35 → height=17.5 -->
+  <rect x="118" y="252" width="12" height="18" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 7: 0.24 → height=12 -->
+  <rect x="135" y="258" width="12" height="12" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 8: 0.16 → height=8 -->
+  <rect x="152" y="262" width="12" height="8"  fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 9: 0.13 → height=6.5 -->
+  <rect x="169" y="263" width="12" height="7"  fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 10: 0.11 → height=5.5 -->
+  <rect x="186" y="264" width="12" height="6"  fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 11: 0.10 → height=5 -->
+  <rect x="203" y="265" width="12" height="5"  fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 12: 1.20 → height=60 (seasonal spike) -->
+  <rect x="220" y="210" width="12" height="60" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 12 annotation -->
+  <text x="226" y="206" font-size="7" fill="#005CA9" text-anchor="middle" font-weight="600">seasonal</text>
+
+  <!-- ===== PACF panel (y=10 to y=130) ===== -->
+  <!-- Axis -->
+  <line x1="30" y1="10"  x2="30" y2="130" stroke="#aaa" stroke-width="0.8"/>
+  <line x1="30" y1="130" x2="248" y2="130" stroke="#aaa" stroke-width="0.8"/>
+  <!-- Axis label -->
+  <text x="6" y="75" font-size="8" fill="#525252" transform="rotate(-90,10,75)">PACF</text>
+
+  <!-- Confidence band at y=115.5 (0.29/2.0 * 100 = 14.5 from bottom) -->
+  <line x1="30" y1="115" x2="248" y2="115" stroke="#aaa" stroke-width="0.6" stroke-dasharray="3,2"/>
+
+  <!-- PACF bars scaled: max height=80, baseline y=130 -->
+  <!-- Lag 1: 1.36 → height=68 (unoblue, significant) -->
+  <rect x="33"  y="62"  width="12" height="68" fill="#005CA9" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lag 2: 0.29 → height=14.5 (light, borderline) -->
+  <rect x="50"  y="115" width="12" height="15" fill="#E8F0FA" stroke="#005CA9" stroke-width="0.5"/>
+  <!-- Lags 3-11: small (gray, below band) -->
+  <rect x="67"  y="125" width="12" height="5"  fill="#d0d0d0"/>
+  <rect x="84"  y="125" width="12" height="5"  fill="#d0d0d0"/>
+  <rect x="101" y="126" width="12" height="4"  fill="#d0d0d0"/>
+  <rect x="118" y="126" width="12" height="4"  fill="#d0d0d0"/>
+  <rect x="135" y="126" width="12" height="4"  fill="#d0d0d0"/>
+  <rect x="152" y="127" width="12" height="3"  fill="#d0d0d0"/>
+  <rect x="169" y="127" width="12" height="3"  fill="#d0d0d0"/>
+  <rect x="186" y="127" width="12" height="3"  fill="#d0d0d0"/>
+  <rect x="203" y="127" width="12" height="3"  fill="#d0d0d0"/>
+  <!-- Lag 12: 1.12 → height=56 (unogreen, seasonal) -->
+  <rect x="220" y="74"  width="12" height="56" fill="#F0FAF4" stroke="#15803d" stroke-width="0.8"/>
+
+  <!-- Lag 1 PACF annotation -->
+  <text x="39" y="58" font-size="7" fill="#005CA9" text-anchor="middle" font-weight="600">AR(1)</text>
+  <!-- Lag 12 PACF annotation -->
+  <text x="226" y="70" font-size="7" fill="#15803d" text-anchor="middle" font-weight="600">s12</text>
+
+  <!-- x-axis labels (shared for both panels, below ACF panel) -->
+  <text x="39"  y="284" font-size="7" fill="#525252" text-anchor="middle">1</text>
+  <text x="56"  y="284" font-size="7" fill="#525252" text-anchor="middle">2</text>
+  <text x="73"  y="284" font-size="7" fill="#525252" text-anchor="middle">3</text>
+  <text x="90"  y="284" font-size="7" fill="#525252" text-anchor="middle">4</text>
+  <text x="107" y="284" font-size="7" fill="#525252" text-anchor="middle">5</text>
+  <text x="124" y="284" font-size="7" fill="#525252" text-anchor="middle">6</text>
+  <text x="141" y="284" font-size="7" fill="#525252" text-anchor="middle">7</text>
+  <text x="158" y="284" font-size="7" fill="#525252" text-anchor="middle">8</text>
+  <text x="175" y="284" font-size="7" fill="#525252" text-anchor="middle">9</text>
+  <text x="192" y="284" font-size="7" fill="#525252" text-anchor="middle">10</text>
+  <text x="209" y="284" font-size="7" fill="#525252" text-anchor="middle">11</text>
+  <text x="226" y="284" font-size="7" fill="#15803d" text-anchor="middle" font-weight="600">12</text>
+  <text x="139" y="292" font-size="7" fill="#525252" text-anchor="middle">Lag k</text>
+</svg>
+```
+
+:::
+
+::: {.column width="44%"}
+
+**Reading the charts:**
+
+- **ACF:** slow decay → persistent trend; spike at lag 12 → seasonal pattern
+- **PACF:** significant at lag 1 only → pure AR(1); significant at lag 12 → include `lag_12`
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Lag Selection Rule
+:::
+Include `lag_k` if the PACF at lag $k$ exceeds $\pm 1.96/\sqrt{n}$ (dashed band). For monthly RSXFS: include lags 1, 2, 12. Add lags 3--6 for robustness.
+:::
+
+[*Socratic: ACF at lag 12 is strong, but PACF at lag 12 is also strong. Why include `lag_12` even in an ARIMA model that handles seasonality through differencing?*]{.neutral .smaller}
+
+:::
+
+::::
+
+---
+
+## Lag Leakage: Safe Shift vs. Lookahead Bug
+
+:::: {.columns}
+
+::: {.column width="48%"}
+
+**Safe: always `shift(k)`**
+
+```python
+import pandas as pd
+
+# SAFE: shift(k) looks back k steps
+# At time t we only see y[t-k]
+df['lag_1']  = df['y'].shift(1)
+df['lag_2']  = df['y'].shift(2)
+df['lag_12'] = df['y'].shift(12)
+
+# Rolling mean: shift FIRST
+df['roll_mean_3'] = (
+    df['y'].shift(1)
+    .rolling(3).mean())
+
+# No future information used.
+print("Lag features are safe.")
+```
+
+:::
+
+::: {.column width="48%"}
+
+**Bug: missing `shift(1)`**
+
+```python
+# BUG: rolling without shift(1)
+# includes y[t] = current target!
+df['roll_mean_3'] = (
+    df['y'].rolling(3).mean())
+
+# At t=5, rolling uses:
+#   y[3], y[4], y[5]  <- leakage!
+# y[5] is what we are predicting.
+
+# This inflates in-sample R^2
+# but collapses on test data.
+
+# Rule: always shift before
+# any window operation.
+```
+
+::: {.warningbox}
+Rolling without `shift(1)` is the #1 feature engineering bug. It causes dramatic overfitting that only appears on the test set.
+:::
+
+:::
+
+::::
+
+---
+
+# Rolling Statistics
+
+Local trends, volatility, and momentum over time
+
+---
+
+## Rolling Statistics: Section Overview
+
+**Rolling statistics** capture local trends, volatility, and momentum over multiple time windows. They are especially powerful for tree-based models, which cannot express the concept of a "moving average" from raw lag features alone.
+
+**Feature families:**
+
+- **Rolling mean** ($w = 3, 6, 12$): local trend at multiple scales
+- **Rolling std** ($w = 3, 6, 12$): local volatility --- useful for identifying calm vs. volatile regimes
+- **Rolling min/max** ($w = 3, 6, 12$): range and extremes
+- **Exponentially weighted mean (EWM):** gives more weight to recent observations than a simple average
+
+All rolling operations must be computed on `df['value'].shift(1)` to prevent leakage (see the Lag Leakage slide).
+
+---
+
+## Rolling Statistics and EWM
+
+:::: {.columns}
+
+::: {.column width="52%"}
+
+**Rolling window operations:**
+
+::: {.smaller}
+
+| **Feature** | **Formula** | **Captures** |
+|:---|:---|:---|
+| `roll_mean_w` | $\bar{y}_{t-w:t-1}$ | Local trend |
+| `roll_std_w` | $s_{t-w:t-1}$ | Volatility |
+| `roll_min_w` | $\min(y_{t-w},\ldots,y_{t-1})$ | Trough |
+| `roll_max_w` | $\max(y_{t-w},\ldots,y_{t-1})$ | Peak |
+
+:::
+
+**Exponentially weighted mean:**
+
+$$\mathrm{EWM}_t = \alpha\, y_{t-1} + (1-\alpha)\,\mathrm{EWM}_{t-1}, \quad \alpha \in (0,1)$$
+
+With $\alpha = 0.3$: recent values receive ${\approx}3\times$ the weight of values 4 months back.
+
+[Here $\alpha$ is the EWM decay weight --- distinct from the level-smoothing $\alpha$ in Lecture 03 (ETS) and the L1/L2 mixing $\alpha$ in Lecture 08 (Elastic Net).]{.neutral .smaller}
+
+:::
+
+::: {.column width="44%"}
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Window Choice Heuristics
+:::
+- $w = 3$: captures quarter-long momentum
+- $w = 6$: captures half-year cycles
+- $w = 12$: captures full-year seasonality
+
+Use all three; let the model select via regularization or feature importance.
+:::
+
+::: {.examplebox}
+::: {.examplebox-title}
+EWM vs. Rolling Mean
+:::
+EWM reacts faster to trend reversals. On RSXFS, EWM with $\alpha=0.3$ reduces lag behind turning points by $\sim$2 months compared with a 12-month rolling mean.
+:::
+
+:::
+
+::::
+
+---
+
+## Which Features Matter? A Preview
+
+:::: {.columns}
+
+::: {.column width="54%"}
+
+**Permutation importance (Random Forest, val set):**
+
+```{=html}
+<svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-height:210px; display:block; margin:0 auto; font-family:inherit;">
+  <!-- y-axis -->
+  <line x1="90" y1="10" x2="90" y2="195" stroke="#aaa" stroke-width="0.8"/>
+  <!-- x-axis -->
+  <line x1="90" y1="195" x2="285" y2="195" stroke="#aaa" stroke-width="0.8" marker-end="url(#arr11imp)"/>
+  <defs>
+    <marker id="arr11imp" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 Z" fill="#aaa"/>
+    </marker>
+  </defs>
+  <text x="287" y="199" font-size="7" fill="#525252">importance</text>
+
+  <!-- Bars (top 4 unoblue, bottom 4 gray) -->
+  <!-- lag_1: width=170 (most important) -->
+  <rect x="90" y="15"  width="170" height="18" fill="#005CA9"/>
+  <!-- lag_12: width=144 -->
+  <rect x="90" y="40"  width="144" height="18" fill="#005CA9"/>
+  <!-- lag_2: width=116 -->
+  <rect x="90" y="65"  width="116" height="18" fill="#005CA9"/>
+  <!-- roll_mean_12: width=96 -->
+  <rect x="90" y="90"  width="96"  height="18" fill="#005CA9"/>
+  <!-- roll_std_3: width=44 (gray) -->
+  <rect x="90" y="115" width="44"  height="18" fill="#d0d0d0"/>
+  <!-- month_Dec: width=36 -->
+  <rect x="90" y="140" width="36"  height="18" fill="#d0d0d0"/>
+  <!-- roll_mean_3: width=28 -->
+  <rect x="90" y="155" width="28"  height="17" fill="#d0d0d0"/>
+  <!-- month_Feb: width=20 -->
+  <rect x="90" y="173" width="20"  height="17" fill="#d0d0d0"/>
+
+  <!-- Feature labels -->
+  <text x="86" y="28"  font-size="8" fill="#1a1a1a" text-anchor="end" font-family="monospace">lag_1</text>
+  <text x="86" y="53"  font-size="8" fill="#1a1a1a" text-anchor="end" font-family="monospace">lag_12</text>
+  <text x="86" y="78"  font-size="8" fill="#1a1a1a" text-anchor="end" font-family="monospace">lag_2</text>
+  <text x="86" y="103" font-size="8" fill="#1a1a1a" text-anchor="end" font-family="monospace">roll_mean_12</text>
+  <text x="86" y="128" font-size="8" fill="#525252" text-anchor="end" font-family="monospace">roll_std_3</text>
+  <text x="86" y="153" font-size="8" fill="#525252" text-anchor="end" font-family="monospace">month_Dec</text>
+  <text x="86" y="168" font-size="8" fill="#525252" text-anchor="end" font-family="monospace">roll_mean_3</text>
+  <text x="86" y="186" font-size="8" fill="#525252" text-anchor="end" font-family="monospace">month_Feb</text>
+</svg>
+```
+
+:::
+
+::: {.column width="42%"}
+
+**Key findings:**
+
+- Lags 1 and 12 dominate --- confirming ACF/PACF
+- `roll_mean_12` is the most important rolling feature
+- `month_Dec` matters: December retail spike is real
+- Calendar dummies are less important than rolling features when lags already capture seasonal levels
+
+[This ranking is illustrative. Permutation importance is covered formally in Section 5 (Feature Selection).]{.neutral .smaller}
+
+:::
+
+::::
+
+---
+
+# Calendar & Structural Features
+
+Encoding temporal position for tree-based models
+
+---
+
+## Calendar & Structural Features: Section Overview
+
+**Calendar features** encode the position of a time step in the calendar --- month, quarter, year, holiday proximity. Unlike SARIMA's seasonal differencing, calendar dummies give tree-based models explicit information about which periods are structurally different.
+
+**Key feature types:**
+
+- **Month dummies:** 11 binary columns (`month_2` through `month_12`); January is the reference category
+- **Quarter dummies:** 3 binary columns (Q2--Q4)
+- **Trend term:** $t = 1, 2, \ldots, T$ for linear time trend
+- **Structural break indicator:** 0/1 for pre/post a known break (recession, pandemic, policy change)
+
+---
+
+## Month Dummies: Construction and Interpretation
+
+:::: {.columns}
+
+::: {.column width="52%"}
+
+**Construction in pandas:**
+
+`df.index.month` $\rightarrow$ integers 1--12
+
+`pd.get_dummies(df['month'], prefix='month', drop_first=True)`
+
+**Interpretation (Random Forest):**
+
+::: {.smaller}
+
+| **Month** | **Avg. Effect** | **Business Meaning** |
+|:---|---:|:---|
+| January (ref) | --- | Post-holiday low |
+| `month_11` | $+$1,800 | Nov. ramp-up |
+| `month_12` | $+$3,200 | Holiday peak |
+| `month_7` | $+$900 | Summer surge |
+| `month_2` | $-$400 | Feb. dip |
+
+:::
+
+:::
+
+::: {.column width="44%"}
+
+::: {.examplebox}
+::: {.examplebox-title}
+Calendar vs. Seasonal Lag
+:::
+**Both encode seasonality, but differently:**
+
+- `lag_12` $= y_{t-12}$: level effect --- captures the same magnitude as last year
+- `month_12`: indicator effect --- always adds the same fixed amount for December, regardless of last year's level
+
+Use both when trend is changing.
+:::
+
+[*Socratic: A SARIMA model with $s=12$ handles seasonality through seasonal differencing. Why might month dummies improve a Random Forest but add no value to SARIMA?*]{.neutral .smaller}
+
+:::
+
+::::
+
+---
+
+## When Calendar Features Help and Hurt
+
+:::: {.columns}
+
+::: {.column width="48%"}
+
+**Calendar features help when:**
+
+- The seasonal pattern is *fixed* across years (e.g., holiday retail, fiscal quarters)
+- The model does not already capture seasonality via lag features (e.g., shallow trees, linear models without lag 12)
+- Structural breaks are known and datable (add a 0/1 indicator for pre/post)
+
+:::
+
+::: {.column width="48%"}
+
+**Calendar features can hurt when:**
+
+- Seasonal patterns are *evolving* over time --- the fixed-effect assumption breaks down
+- `lag_12` already accounts for seasonality --- month dummies add multicollinearity
+- The dataset is small ($n < 100$): 11 month dummies consume degrees of freedom faster than they add signal
+
+:::
+
+::::
+
+::: {.warningbox}
+Never use calendar dummies as the sole source of seasonality in a neural network (LSTM). LSTMs learn temporal patterns from the sequence itself; adding 11 overlapping dummies adds noise. Use them as supplementary features only when lag features are already present.
+:::
+
+---
+
+# Interaction & Ratio Features
+
+Encoding change, not level
+
+---
+
+## Interaction & Ratio Features: Section Overview
+
+**Interaction and ratio features** encode *change* rather than *level*. They help tree-based models detect acceleration or deceleration in a series --- a concept that requires computing ratios of two variables, something a single tree split cannot express directly.
+
+**Key features:**
+
+- **Year-over-year (YoY) change:** $\Delta^{(12)} y_t = y_{t-1} / y_{t-13} - 1$
+- **Month-over-month (MoM) change:** $\Delta^{(1)} y_t = y_{t-1} / y_{t-2} - 1$
+- **Lag interaction:** $y_{t-1} \times \mathbf{1}[\text{month} = 12]$ --- lets the model use different slopes for December
+
+---
+
+## Year-Over-Year and Month-Over-Month Formulas
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Year-over-year rate of change:**
+
+$$\text{YoY}_t = \frac{y_{t-1}}{y_{t-13}} - 1$$
+
+Note: both $y_{t-1}$ and $y_{t-13}$ are lagged to prevent leakage at prediction time for target $y_t$.
+
+**Month-over-month rate of change:**
+
+$$\text{MoM}_t = \frac{y_{t-1}}{y_{t-2}} - 1$$
+
+**Why ratios instead of differences?** A 1,000-unit change means something different when the baseline is 10,000 vs. 100,000. Ratios are scale-free.
+
+:::
+
+::: {.column width="46%"}
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Economic Interpretation
+:::
+For RSXFS retail sales:
+
+- $\text{YoY}_t > 0$: economy is stronger than same month last year
+- $\text{YoY}_t < 0$: contraction signal
+- $|\text{MoM}_t|$ large: abnormal month-to-month swing (data revision or shock)
+
+These features help the model distinguish a Christmas peak from an unexpected demand shock.
+:::
+
+[*Socratic: YoY removes the seasonal level but still contains trend. What additional transformation would make $\text{YoY}_t$ a stationary series?*]{.neutral .smaller}
+
+:::
+
+::::
+
+---
+
+## The Extended Feature Function (36 Features)
+
+**Full feature engineering pipeline:**
+
+```python
+def make_features_extended(df,
+                            lags=range(1, 13),
+                            roll_windows=[3, 6, 12]):
+    X = df[['value']].copy()
+    # Lag features (ACF/PACF-guided, lags 1--12)
+    for k in lags:
+        X[f'lag_{k}'] = X['value'].shift(k)
+    # Rolling stats (shift first to avoid leakage)
+    for w in roll_windows:
+        r = X['value'].shift(1).rolling(w)
+        X[f'roll_mean_{w}'] = r.mean()
+        X[f'roll_std_{w}']  = r.std()
+        X[f'roll_min_{w}']  = r.min()
+        X[f'roll_max_{w}']  = r.max()
+    # Exponentially weighted mean
+    X['ewm_alpha03'] = (
+        X['value'].shift(1)
+        .ewm(alpha=0.3, adjust=False).mean())
+    # Calendar dummies (Jan = reference category)
+    months = pd.Series(
+        X.index.month, index=X.index)
+    dums = pd.get_dummies(
+        months, prefix='month',
+        drop_first=True)
+    X = pd.concat([X, dums], axis=1)
+    # Return 36-column feature matrix
+    return X.drop(columns='value').dropna()
+```
+
+---
+
+# Feature Selection
+
+Choosing the best subset of 36 candidate features
+
+---
+
+## Feature Selection: Section Overview
+
+More features are not always better. With 36 features and $n \approx 300$ observations, we risk overfitting --- especially in linear models. **Feature selection** identifies the subset of features that maximizes out-of-sample predictive accuracy.
+
+**Three strategies covered today:**
+
+1. **LASSO** (from Lecture 08): $\ell_1$ penalty shrinks irrelevant feature coefficients to exactly zero. Implicit selection via the regularization path.
+2. **Permutation importance:** measure how much test RMSE rises when a feature's values are randomly shuffled. Model-agnostic.
+3. **RFECV:** Recursive Feature Elimination with cross-validation. Fit model, remove weakest feature, repeat until CV score stops improving.
+
+---
+
+## Feature Selection via LASSO
+
+**LASSO regularization path** (Lecture 08 connection):
+
+$$\hat{\boldsymbol{\beta}}^{\text{LASSO}} = \operatorname{arg\,min}_{\boldsymbol{\beta}}
+\underbrace{\sum_{t} (y_t - \mathbf{x}_t^\top \boldsymbol{\beta})^2}_{\text{prediction error}}
++ \lambda \underbrace{\|\boldsymbol{\beta}\|_1}_{\text{selection penalty}}$$
+
+As $\lambda$ increases along the regularization path:
+
+- **Lag 12 and lag 1** coefficients survive to large $\lambda$ --- high marginal importance
+- **Rolling std features** shrink toward zero early --- lower marginal importance
+- At CV-optimal $\lambda^*$: many coefficients are exactly zero (automatic feature selection) [@Tibshirani1996]
+
+[LASSO requires standardized features --- all inputs should be on comparable scales (use `StandardScaler` inside a `Pipeline` to prevent leakage).]{.neutral .smaller}
+
+---
+
+## Feature Selection via Permutation Importance
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Algorithm: Permutation Importance [@Molnar2022]
+:::
+::: {.smaller}
+1. Fit Random Forest on training set
+2. Record **baseline** validation RMSE: $\text{RMSE}_0$
+3. For each feature $j$: shuffle column $j$, re-predict, record $\text{RMSE}_j$
+4. $\text{Importance}_j = \text{RMSE}_j - \text{RMSE}_0$ (larger = more important)
+:::
+:::
+
+**Advantages over split-count (impurity) importance:**
+
+- Evaluated on *validation* set --- not biased toward high-cardinality features
+- *Model-agnostic*: applies to LSTM, XGBoost, linear models
+- Measures *marginal* contribution with all other features present
+
+[On RSXFS: `lag_1`, `lag_12`, `roll_mean_12`, `ewm_alpha03` are the top four. See the importance preview in Section 2 (Rolling Statistics).]{.neutral .smaller}
+
+---
+
+## RFECV: Recursive Feature Elimination
+
+:::: {.columns}
+
+::: {.column width="49%"}
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+RFECV Algorithm
+:::
+::: {.smaller}
+**Input:** estimator, feature matrix $X$, cross-validator
+
+**Repeat:**
+
+1. Fit estimator on all remaining features
+2. Rank features by importance
+3. Eliminate the lowest-ranked feature
+
+**Select:** the subset size that maximizes mean CV score [@Guyon2003]
+:::
+:::
+
+**Key parameters:**
+
+- `step=1`: eliminate one feature per round
+- `cv=TimeSeriesSplit(gap=1)`: prevents temporal leakage during selection
+- `min_features_to_select=5`: floor to avoid trivial models
+
+:::
+
+::: {.column width="48%"}
+
+```python
+from sklearn.feature_selection import RFECV
+from sklearn.ensemble import (
+    RandomForestRegressor)
+from sklearn.model_selection import (
+    TimeSeriesSplit)
+
+estimator = RandomForestRegressor(
+    n_estimators=200, random_state=42)
+
+tscv = TimeSeriesSplit(n_splits=5, gap=1)
+
+selector = RFECV(
+    estimator=estimator,
+    step=1,
+    cv=tscv,
+    scoring='neg_mean_squared_error',
+    min_features_to_select=5)
+
+selector.fit(X_tr, y_tr)
+
+# Selected feature names
+selected = X_tr.columns[
+    selector.support_].tolist()
+print(f"Selected: {len(selected)} feats")
+```
+
+:::
+
+::::
+
+---
+
+# Pipeline Design
+
+Preventing leakage in cross-validation
+
+---
+
+## Pipeline Design: Section Overview
+
+A **sklearn Pipeline** chains transformations and a model into a single object. Inside cross-validation, the pipeline re-fits every transformation on the training fold only --- preventing the subtle leakage that occurs when scaling with statistics from the full dataset.
+
+**Why pipelines matter for time-series CV:**
+
+- `StandardScaler` fitted on all data leaks test-set mean and variance into training
+- With `Pipeline` + `TimeSeriesSplit`: scaler is fitted fresh on each train fold
+- Same principle applies to `RFECV` and any imputer --- fit only on train, transform both train and test [@Pedregosa2011]
+
+[Rule of thumb: if a transformation looks at the target variable (e.g., LabelEncoder, WoE encoding) or at the distribution of $X$ (e.g., StandardScaler, PCA), it *must* go inside the pipeline.]{.neutral .smaller}
+
+---
+
+## Pipeline Flow: From Features to Predictions
+
+:::: {.columns}
+
+::: {.column width="44%"}
+
+```{=html}
+<svg viewBox="0 0 200 330" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-height:310px; display:block; margin:0 auto; font-family:inherit;">
+  <defs>
+    <marker id="arr11pipe" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 Z" fill="#aaa"/>
+    </marker>
+  </defs>
+
+  <!-- Stage 1: Raw Data -->
+  <rect x="10" y="10"  width="180" height="38" rx="4" fill="#E8F0FA" stroke="#005CA9" stroke-width="1"/>
+  <text x="100" y="27" font-size="9" fill="#1a1a1a" text-anchor="middle" font-weight="600">Raw Data</text>
+  <text x="100" y="40" font-size="8" fill="#525252" text-anchor="middle">(RSXFS)</text>
+  <!-- Arrow 1→2 -->
+  <line x1="100" y1="48" x2="100" y2="60" stroke="#aaa" stroke-width="1" marker-end="url(#arr11pipe)"/>
+
+  <!-- Stage 2: Feature Engineering -->
+  <rect x="10" y="60"  width="180" height="38" rx="4" fill="#F0FAF4" stroke="#15803d" stroke-width="1"/>
+  <text x="100" y="77" font-size="9" fill="#1a1a1a" text-anchor="middle" font-weight="600">Feature Engineering</text>
+  <text x="100" y="90" font-size="8" fill="#525252" text-anchor="middle">(36 features)</text>
+  <!-- Arrow 2→3 -->
+  <line x1="100" y1="98" x2="100" y2="110" stroke="#aaa" stroke-width="1" marker-end="url(#arr11pipe)"/>
+
+  <!-- Stage 3: TimeSeriesSplit -->
+  <rect x="10" y="110" width="180" height="38" rx="4" fill="#F0FAF4" stroke="#15803d" stroke-width="1"/>
+  <text x="100" y="127" font-size="9" fill="#1a1a1a" text-anchor="middle" font-weight="600">TimeSeriesSplit</text>
+  <text x="100" y="140" font-size="8" fill="#525252" text-anchor="middle">(gap=1)</text>
+  <!-- Arrow 3→4 -->
+  <line x1="100" y1="148" x2="100" y2="160" stroke="#aaa" stroke-width="1" marker-end="url(#arr11pipe)"/>
+
+  <!-- Stage 4: StandardScaler -->
+  <rect x="10" y="160" width="180" height="38" rx="4" fill="#F0FAF4" stroke="#15803d" stroke-width="1"/>
+  <text x="100" y="177" font-size="9" fill="#1a1a1a" text-anchor="middle" font-weight="600">StandardScaler</text>
+  <text x="100" y="190" font-size="8" fill="#525252" text-anchor="middle">(fit on train fold)</text>
+  <!-- Arrow 4→5 -->
+  <line x1="100" y1="198" x2="100" y2="210" stroke="#aaa" stroke-width="1" marker-end="url(#arr11pipe)"/>
+
+  <!-- Stage 5: Model -->
+  <rect x="10" y="210" width="180" height="38" rx="4" fill="#FDECEA" stroke="#E41C38" stroke-width="1"/>
+  <text x="100" y="227" font-size="9" fill="#1a1a1a" text-anchor="middle" font-weight="600">Model</text>
+  <text x="100" y="240" font-size="8" fill="#525252" text-anchor="middle">(RF / XGBoost / LSTM)</text>
+  <!-- Arrow 5→6 -->
+  <line x1="100" y1="248" x2="100" y2="260" stroke="#aaa" stroke-width="1" marker-end="url(#arr11pipe)"/>
+
+  <!-- Stage 6: Predictions -->
+  <rect x="10" y="260" width="180" height="38" rx="4" fill="#E8F0FA" stroke="#005CA9" stroke-width="1"/>
+  <text x="100" y="277" font-size="9" fill="#1a1a1a" text-anchor="middle" font-weight="600">Predictions</text>
+  <text x="100" y="290" font-size="8" fill="#525252" text-anchor="middle">ŷ_{T+h}</text>
+</svg>
+```
+
+:::
+
+::: {.column width="52%"}
+
+**What happens inside each CV fold:**
+
+::: {.smaller}
+1. **Split:** `TimeSeriesSplit(gap=1)` --- 1-step gap prevents leakage
+2. **Fit scaler:** `StandardScaler` on train fold *only*
+3. **Transform:** same params applied to train and val
+4. **Fit model:** on scaled train fold
+5. **Score:** RMSE on scaled val fold
+6. **Report:** average across all folds
+:::
+
+::: {.examplebox}
+::: {.examplebox-title}
+The Leakage Trap
+:::
+Fitting `StandardScaler` before CV on all data: validation mean/std seep into training. Typical RMSE improvement from fixing this: 50--200 units on RSXFS.
+:::
+
+:::
+
+::::
+
+---
+
+## Building a Leakage-Free Pipeline
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Step 1: Construct the pipeline**
+
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import (
+    StandardScaler)
+from sklearn.ensemble import (
+    RandomForestRegressor)
+from sklearn.model_selection import (
+    TimeSeriesSplit, cross_val_score)
+import numpy as np
+
+# Build pipeline (order matters!)
+pipe = Pipeline([
+    ('scaler', StandardScaler()),
+    ('model', RandomForestRegressor(
+        n_estimators=300,
+        random_state=42))])
+
+tscv = TimeSeriesSplit(
+    n_splits=5, gap=1)
+```
+
+:::
+
+::: {.column width="47%"}
+
+**Step 2: Cross-validate and predict**
+
+```python
+# CV: scaler fit on each train fold
+scores = cross_val_score(
+    pipe,
+    X.values,
+    y.values,
+    cv=tscv,
+    scoring=(
+        'neg_mean_squared_error'))
+rmse_cv = np.sqrt(-scores.mean())
+print(f"CV RMSE: {rmse_cv:,.0f}")
+
+# Refit on full training data
+pipe.fit(X_tr.values, y_tr.values)
+
+# Predict on held-out test set
+y_pred = pipe.predict(
+    X_te.values)
+rmse_te = np.sqrt(
+    np.mean((y_te - y_pred)**2))
+print(f"Test RMSE: {rmse_te:,.0f}")
+```
+
+:::
+
+::::
+
+---
+
+# Application to Forecasting
+
+Baseline vs. extended features on RSXFS retail sales
+
+---
+
+## Application to Forecasting: Section Overview
+
+Apply `make_features_extended()` (36 features) to RSXFS retail sales and compare against the baseline 26-feature set from Lectures 07--10. Measure the marginal contribution of better features holding the model class fixed.
+
+**Evaluation design:**
+
+- **Baseline** (26 features): 12 lags, 6 rolling means, 6 rolling stds, 2 ratios --- as in Lectures 07--10
+- **Extended** (36 features): adds rolling min/max, EWM, and 11 month dummies
+- **Models:** Elastic Net, Random Forest, XGBoost, LSTM (median over 5 seeds)
+- **Holdout:** same chronological 15% test set used throughout the course
+
+---
+
+## Leaderboard: Baseline vs. Extended Features
+
+:::: {.columns}
+
+::: {.column width="56%"}
+
+**Test-set RMSE on RSXFS:**
+
+::: {.smaller}
+
+| **Model** | **26f** | **36f** | $\Delta$RMSE |
+|:---|---:|---:|---:|
+| Seasonal Naive | 4,210 | --- | --- |
+| SARIMA(1,1,1)(1,1,1)$_{12}$ | 2,840 | --- | --- |
+| Elastic Net | 2,540 | 2,410 | $-$130 |
+| Random Forest | 2,380 | 2,210 | $-$170 |
+| XGBoost | 2,250 | 2,050 | $-$200 |
+| LSTM (2-layer, $T\!=\!24$) | 2,180 | 1,920 | $-$260 |
+
+:::
+
+[Values are illustrative. LSTM = median over 5 random seeds.]{.neutral .smaller}
+
+:::
+
+::: {.column width="40%"}
+
+**Interpretation:**
+
+- All four ML models improve with richer features; LSTM gains most
+- The improvement is larger for more flexible models --- extra features give trees more split choices
+- Elastic Net gains least: its penalty already prevents overfitting to noisy features
+
+::: {.keybox}
+Feature engineering delivers larger improvements than switching model class. **RMSE: LSTM 36f $<$ XGBoost 36f $<$ LSTM 26f**: the feature gap dominates the model gap.
+:::
+
+:::
+
+::::
+
+---
+
+# Takeaways and References
+
+What we learned and where to go next
+
+---
+
+## Lecture 11 Key Takeaways
+
+::: {.keybox}
+::: {.smaller}
+1. **Lag features** convert time series to supervised regression; use ACF and PACF to select which lags to include [@BoxJenkins2015].
+2. **Rolling statistics** (mean, std, min, max, EWM) capture local trend and volatility at multiple scales. Always `shift(1)` before rolling to prevent leakage.
+3. **Calendar dummies** help tree models detect recurring peaks and troughs; they add less value when `lag_12` is already present.
+4. **Feature selection** (LASSO, permutation importance, RFECV) reduces overfitting and identifies the most informative signals [@Guyon2003; @Molnar2022].
+5. **Pipelines** are essential for leakage-free cross-validation. Fit all transformations inside the CV loop, not on the full dataset [@Pedregosa2011].
+6. **Feature engineering beats model selection:** on RSXFS, moving from 26 to 36 features reduced RMSE by 130--260 units across all model classes.
+:::
+:::
+
+**Preview of Lecture 12:** Capstone and Applications --- combining the full Lectures 01--11 toolkit on a business case study with model selection, uncertainty quantification, and presentation-ready visualizations.
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::

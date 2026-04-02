@@ -1,0 +1,542 @@
+---
+title: "Multivariate Methods"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 5"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture 5: Outline
+
+1. Beyond Univariate Forecasting
+2. Vector Autoregression (VAR)
+3. ARIMAX Models
+4. Cointegration and Error Correction
+5. Key Takeaways and Roadmap
+
+---
+
+# Beyond Univariate Forecasting
+
+Sometimes other series carry information about $y$'s future that $y$'s own past cannot provide.
+
+---
+
+## The Univariate Limitation
+
+All models in Lectures 1--4 use only $y_t$'s own history:
+$$\hat{y}_{T+h|T} = f(y_T, y_{T-1}, \ldots)$$
+
+**But many series are linked:**
+
+- Consumer sentiment today $\to$ retail spending next month
+- Interest rates today $\to$ housing starts in 3--6 months
+- Unemployment $\to$ consumer credit defaults with a lag
+
+::: {.keybox}
+If series $x_t$ contains information about $y_{t+h}$ not already in $y_t, y_{t-1}, \ldots$, then using $x_t$ can reduce forecast error. **Granger causality** formalizes this idea.
+:::
+
+[*Socratic: can using $x_t$ ever hurt forecast accuracy? When?*]{.neutral .smaller}
+
+---
+
+## The Multivariate Toolkit
+
+::: {.smaller}
+
+| **Model** | **Role of $x_t$** | **Use case** |
+|:---|:---|:---|
+| **VAR**($p$) | Symmetric: $y$ and $x$ forecast each other | Macro, finance; unknown direction |
+| **ARIMAX** | Exogenous: $x_t$ drives $y_t$, not vice versa | Clear causal direction |
+| **ECM** | Error-correction: long-run equilibrium | Cointegrated I(1) pairs |
+
+:::
+
+**Supporting tools:**
+
+- **Granger causality test:** does $x_t$ help predict $y_t$?
+- **Cross-correlation function (CCF):** at which lag does $x_t$ predict $y_{t+k}$?
+- **Cointegration test:** do two I(1) series share a long-run trend?
+
+---
+
+# Vector Autoregression (VAR)
+
+A VAR treats all variables symmetrically: every variable can predict every other.
+
+---
+
+## The VAR(1) Model
+
+For two stationary series $y_{1t}$ and $y_{2t}$, the VAR(1) is:
+$$\begin{cases}
+  y_{1t} = c_1 + a_{11}\,y_{1,t-1} + a_{12}\,y_{2,t-1} + \varepsilon_{1t}\\[4pt]
+  y_{2t} = c_2 + a_{21}\,y_{1,t-1} + a_{22}\,y_{2,t-1} + \varepsilon_{2t}
+\end{cases}$$
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+VAR($p$) Model
+:::
+::: {.smaller}
+$$\mathbf{y}_t = \mathbf{c} + \mathbf{A}_1\mathbf{y}_{t-1} + \cdots + \mathbf{A}_p\mathbf{y}_{t-p} + \boldsymbol{\varepsilon}_t, \qquad \boldsymbol{\varepsilon}_t \overset{\mathrm{iid}}{\sim} \mathcal{N}(\mathbf{0},\,\boldsymbol{\Sigma})$$
+
+$\mathbf{y}_t$ is $k\!\times\!1$; each $\mathbf{A}_i$ is $k\!\times\!k$; $\boldsymbol{\Sigma}$ is the $k\!\times\!k$ error covariance matrix. [@Sims1980]
+:::
+:::
+
+**Key feature:** $a_{12}$ captures the effect of $y_{2,t-1}$ on $y_{1t}$ --- the cross-variable coefficient that univariate AR misses.
+
+---
+
+## Estimation and Order Selection
+
+**Estimation:** each equation is estimated separately by OLS (equivalent to GLS since all equations share the same regressors).
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Order selection:**
+
+- Fit VAR($p$) for $p = 0, 1, \ldots, p_{\max}$
+- Select $p$ minimizing AIC or BIC:
+$$\mathrm{BIC} = -2\hat{\ell} + \kappa\ln T, \quad \kappa = k^2p+k \text{ parameters}$$
+- BIC preferred (penalizes overparameterization)
+- Use *same* $p$ for all equations
+:::
+
+::: {.column width="46%"}
+::: {.warningbox}
+::: {.smaller}
+**Parameter explosion:** VAR($p$) with $k$ variables has $k^2 p + k$ parameters total.
+
+$k=5$, $p=4$: $5^2\times4+5=\mathbf{105}$ parameters!
+
+Keep $k$ small ($\leq 4$) or use LASSO-VAR for large systems.
+:::
+:::
+:::
+
+::::
+
+---
+
+## Granger Causality
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Granger Causality
+:::
+::: {.smaller}
+$x_t$ **Granger-causes** $y_t$ if past values of $x_t$ help predict $y_t$ beyond what $y_t$'s own past can explain. [@Granger1969]
+:::
+:::
+
+**Test procedure (in a VAR):**
+
+1. Fit full VAR (with $x$-lags) and restricted VAR (without $x$-lags)
+2. F-test: $H_0$: all $a_{12,\ell} = 0$ ($\ell = 1,\ldots,p$; no Granger causality)
+
+:::: {.columns}
+
+::: {.column width="60%"}
+*Lab 5 example:* Does consumer sentiment (UMCSENT) Granger-cause retail sales (RSXFS)? $H_0$: all sentiment lags $= 0$ in the retail equation.
+:::
+
+::: {.column width="36%"}
+::: {.warningbox}
+::: {.smaller}
+Granger causality $\neq$ structural causality: tests *predictive content*, not mechanism.
+:::
+:::
+:::
+
+::::
+
+---
+
+## Impulse Response Functions (IRF)
+
+**Question:** what is the dynamic effect of a one-unit shock to $y_{it}$ on $y_{jt}$ over future horizons $h = 0,1,\ldots$?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+IRF
+:::
+::: {.smaller}
+The **impulse response** at horizon $h$:
+$$\mathrm{IRF}_{ji}(h) = \frac{\partial y_{j,T+h}}{\partial \varepsilon_{i,T}}$$
+Trace the propagation of a shock through the VAR system.
+:::
+:::
+
+**Orthogonalization:** Cholesky decomposition of $\boldsymbol{\Sigma}$ to identify structural shocks; *ordering matters* --- place the most exogenous variable first.
+:::
+
+::: {.column width="47%"}
+**IRF: sentiment $\to$ retail (simulated):**
+
+```{=html}
+<svg width="100%" viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg" style="max-height:170px;">
+  <!-- Dashed zero reference line (drawn first so axes render on top) -->
+  <line x1="35" y1="140" x2="285" y2="140" stroke="#525252" stroke-width="1" stroke-dasharray="5,4"/>
+  <!-- Axes -->
+  <line x1="35" y1="140" x2="285" y2="140" stroke="#525252" stroke-width="1.5"/>
+  <line x1="35" y1="140" x2="35"  y2="10"  stroke="#525252" stroke-width="1.5"/>
+  <!-- Y tick labels -->
+  <text x="29" y="143" font-size="9" fill="#525252" text-anchor="end">0</text>
+  <text x="29" y="83"  font-size="9" fill="#525252" text-anchor="end">0.5</text>
+  <text x="29" y="25"  font-size="9" fill="#525252" text-anchor="end">1</text>
+  <!-- X axis label -->
+  <text x="290" y="157" font-size="9" fill="#525252" font-style="italic">h</text>
+  <!-- IRF bars: rho^h for rho=0.85; h=0..10; x spacing = 22px; y scale: 0->140, 1->20; range=120px -->
+  <!-- h=0: 1.000 -> height=120 -> y=20 -->
+  <line x1="58"  y1="20"  x2="58"  y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="58"  cy="20"  r="4" fill="#005CA9"/>
+  <!-- h=1: 0.850 -> height=102 -> y=38 -->
+  <line x1="80"  y1="38"  x2="80"  y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="80"  cy="38"  r="4" fill="#005CA9"/>
+  <!-- h=2: 0.723 -> height=87 -> y=53 -->
+  <line x1="102" y1="53"  x2="102" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="102" cy="53"  r="4" fill="#005CA9"/>
+  <!-- h=3: 0.614 -> height=74 -> y=66 -->
+  <line x1="124" y1="66"  x2="124" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="124" cy="66"  r="4" fill="#005CA9"/>
+  <!-- h=4: 0.522 -> height=63 -> y=77 -->
+  <line x1="146" y1="77"  x2="146" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="146" cy="77"  r="4" fill="#005CA9"/>
+  <!-- h=5: 0.444 -> height=53 -> y=87 -->
+  <line x1="168" y1="87"  x2="168" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="168" cy="87"  r="4" fill="#005CA9"/>
+  <!-- h=6: 0.377 -> height=45 -> y=95 -->
+  <line x1="190" y1="95"  x2="190" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="190" cy="95"  r="4" fill="#005CA9"/>
+  <!-- h=7: 0.321 -> height=39 -> y=101 -->
+  <line x1="212" y1="101" x2="212" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="212" cy="101" r="4" fill="#005CA9"/>
+  <!-- h=8: 0.272 -> height=33 -> y=107 -->
+  <line x1="234" y1="107" x2="234" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="234" cy="107" r="4" fill="#005CA9"/>
+  <!-- h=9: 0.232 -> height=28 -> y=112 -->
+  <line x1="256" y1="112" x2="256" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="256" cy="112" r="4" fill="#005CA9"/>
+  <!-- h=10: 0.197 -> height=24 -> y=116 -->
+  <line x1="278" y1="116" x2="278" y2="140" stroke="#005CA9" stroke-width="6"/>
+  <circle cx="278" cy="116" r="4" fill="#005CA9"/>
+  <!-- X tick labels -->
+  <text x="58"  y="154" font-size="8" fill="#525252" text-anchor="middle">0</text>
+  <text x="80"  y="154" font-size="8" fill="#525252" text-anchor="middle">1</text>
+  <text x="102" y="154" font-size="8" fill="#525252" text-anchor="middle">2</text>
+  <text x="124" y="154" font-size="8" fill="#525252" text-anchor="middle">3</text>
+  <text x="146" y="154" font-size="8" fill="#525252" text-anchor="middle">4</text>
+  <text x="168" y="154" font-size="8" fill="#525252" text-anchor="middle">5</text>
+  <text x="190" y="154" font-size="8" fill="#525252" text-anchor="middle">6</text>
+  <text x="212" y="154" font-size="8" fill="#525252" text-anchor="middle">7</text>
+  <text x="234" y="154" font-size="8" fill="#525252" text-anchor="middle">8</text>
+  <text x="256" y="154" font-size="8" fill="#525252" text-anchor="middle">9</text>
+  <text x="278" y="154" font-size="8" fill="#525252" text-anchor="middle">10</text>
+</svg>
+```
+
+[*Effect decays geometrically ($\rho^h$, here $\rho=0.85$); fades after $\approx 6$ periods.*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## Forecasting with VAR
+
+**1-step ahead:**
+$$\hat{\mathbf{y}}_{T+1|T} = \hat{\mathbf{c}} + \hat{\mathbf{A}}_1\mathbf{y}_T + \cdots + \hat{\mathbf{A}}_p\mathbf{y}_{T-p+1}$$
+
+**Multi-step (recursive substitution):**
+$$\hat{\mathbf{y}}_{T+h|T} = \hat{\mathbf{c}} + \hat{\mathbf{A}}_1\hat{\mathbf{y}}_{T+h-1|T} + \cdots + \hat{\mathbf{A}}_p\hat{\mathbf{y}}_{T+h-p|T}$$
+
+using $\hat{\mathbf{y}}_{T+k|T} = \mathbf{y}_{T+k}$ for $k \leq 0$.
+
+::: {.keybox}
+VAR forecasts are particularly useful at short horizons and when cross-variable dynamics are strong. At long horizons the VAR reverts toward its unconditional mean, matching the theoretical property of stationary systems.
+:::
+
+[*Socratic: if $a_{12} = a_{21} = 0$ in a VAR(1), what model does each equation reduce to?*]{.neutral .smaller}
+
+---
+
+# ARIMAX Models
+
+When the causal direction is clear, augment ARIMA with an exogenous predictor.
+
+---
+
+## Regression with ARIMA Errors
+
+Standard OLS forecasting (Lecture 2) assumes independent errors. In practice, residuals are often autocorrelated.
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+ARIMAX / Regression with ARIMA Errors
+:::
+::: {.smaller}
+$$y_t = \underbrace{\mathbf{x}_t'\boldsymbol{\beta}}_{\text{regression}} + \underbrace{\eta_t}_{\text{ARIMA error}}, \qquad \eta_t \sim \mathrm{ARIMA}(p,d,q)$$
+
+The error $\eta_t$ captures the autocorrelation *not* explained by the regressors $\mathbf{x}_t$.
+:::
+:::
+
+**Why not use OLS?**
+
+- OLS is unbiased but *inefficient* (ignores error covariance)
+- Standard errors are wrong $\Rightarrow$ invalid $t$-tests and prediction intervals (PIs)
+- ARIMAX/SARIMAX jointly estimates $\boldsymbol{\beta}$ and the ARIMA parameters $(\phi,\theta)$ by MLE $\Rightarrow$ correct inference
+
+---
+
+## Distributed Lag Effects
+
+A **contemporaneous** regressor captures only the same-period effect:
+$$y_t = \beta_0 + \beta_1 x_t + \eta_t$$
+
+A **distributed lag** (DL) model captures delayed effects:
+$$y_t = \beta_0 + \beta_1 x_t + \beta_2 x_{t-1} + \cdots + \beta_{L+1} x_{t-L} + \eta_t$$
+
+:::: {.columns}
+
+::: {.column width="56%"}
+**Example:** advertising spend $x_t$ affects sales $y_t$ with a lagged carryover effect:
+
+- $\beta_1$: immediate effect (same month)
+- $\beta_2$: carryover from last month's ads
+- Diminishing returns: $|\beta_1| > |\beta_2| > |\beta_3|$
+:::
+
+::: {.column width="40%"}
+::: {.keybox}
+::: {.smaller}
+**Cross-correlation function (CCF):** $r_k = \mathrm{Corr}(x_t,\, y_{t+k})$. Bars outside ${\pm}1.96/\!\sqrt{T}$ indicate significant lag $k$. Select $L$ at the largest significant $k$; refine by AIC/BIC.
+:::
+:::
+:::
+
+::::
+
+---
+
+## ARIMAX: Practical Implementation
+
+**Differencing rule:** if both $y_t \sim I(1)$ and $x_t \sim I(1)$, difference *both* before fitting (unless cointegrated --- see below).
+
+::: {.keybox}
+**Python:** `statsmodels.tsa.statespace.sarimax.SARIMAX` accepts an `exog` argument for exogenous regressors.
+
+`SARIMAX(y, exog=X, order=(p,d,q),`
+`seasonal_order=(P,D,Q,m)).fit()`
+:::
+
+**Model selection workflow:**
+
+1. Unit-root test $y_t$ and $x_t$ separately $\to$ choose $d$
+2. Plot CCF of $(\Delta^d y_t)$ vs.\ $(\Delta^d x_t)$ $\to$ choose lag $L$
+3. Identify ARIMA$(p,d,q)$ for residuals via ACF/PACF
+4. Select $(p,q)$ by AIC; check residuals with Ljung-Box
+
+[*Socratic: if $x_t$ is I(1) but $y_t$ is I(0), should you difference $x_t$ before including it as a regressor?*]{.neutral .smaller}
+
+---
+
+## VAR vs. ARIMAX: When to Use Each
+
+::: {.smaller}
+
+| **Feature** | **VAR** | **ARIMAX** |
+|:---|:---|:---|
+| Direction of causality | Unknown / symmetric | Known (unidirectional) |
+| Number of variables | Any $k$ (keep $k\leq 4$) | 1 outcome + regressors |
+| Feedback loops | Allowed | Not modeled |
+| Interpretability | IRF, FEVD$^\dagger$ | Regression coefficients |
+| Forecasting $x_t$ | Joint (endogenous) | Needs external forecast |
+| Preferred when... | Macro / finance; symmetric | Clear cause $\to$ effect |
+
+:::
+
+[$^\dagger$FEVD = forecast error variance decomposition: fraction of $y_j$'s forecast variance explained by shocks to $y_i$ at each horizon.]{.neutral .smaller}
+
+::: {.warningbox}
+ARIMAX treats $x_t$ as **exogenous**: it assumes $x_t$ does not respond to past $y_t$. If feedback exists, use VAR instead --- otherwise forecasts of $y_t$ will require an external forecast of $x_t$.
+:::
+
+---
+
+# Cointegration and Error Correction
+
+Two non-stationary series that share a long-run trend can be modeled together without differencing away their relationship.
+
+---
+
+## Spurious Regression Revisited
+
+**Recall from Lecture 2,** @GrangerNewbold1974: regressing independent random walks yields spuriously high $R^2$. But some I(1) pairs are *genuinely* linked.
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Spurious:** independent RWs diverge over time
+
+```{=html}
+<svg width="100%" viewBox="0 0 280 90" xmlns="http://www.w3.org/2000/svg" style="max-height:90px;">
+  <line x1="20" y1="75" x2="270" y2="75" stroke="#525252" stroke-width="1.5"/>
+  <line x1="20" y1="75" x2="20"  y2="5"  stroke="#525252" stroke-width="1.5"/>
+  <polyline
+    points="20,65 45,60 70,55 95,57 120,50 145,45 170,47 195,40 220,35 245,38 270,32"
+    fill="none" stroke="#005CA9" stroke-width="2.2"/>
+  <polyline
+    points="20,65 45,68 70,72 95,76 120,79 145,75 170,80 195,83 220,80 245,85 270,88"
+    fill="none" stroke="#E41C38" stroke-width="2.2"/>
+</svg>
+```
+
+**Cointegrated:** common trend, $y_t - \beta x_t \sim I(0)$
+
+```{=html}
+<svg width="100%" viewBox="0 0 280 90" xmlns="http://www.w3.org/2000/svg" style="max-height:90px;">
+  <line x1="20" y1="75" x2="270" y2="75" stroke="#525252" stroke-width="1.5"/>
+  <line x1="20" y1="75" x2="20"  y2="5"  stroke="#525252" stroke-width="1.5"/>
+  <polyline
+    points="20,70 45,64 70,58 95,62 120,55 145,50 170,53 195,46 220,42 245,47 270,40"
+    fill="none" stroke="#005CA9" stroke-width="2.2"/>
+  <polyline
+    points="20,72 45,67 70,61 95,58 120,58 145,53 170,50 195,49 220,44 245,45 270,42"
+    fill="none" stroke="#E41C38" stroke-width="2.2"/>
+</svg>
+```
+:::
+
+::: {.column width="44%"}
+::: {.keybox}
+::: {.smaller}
+**Engle--Granger test** [@EngleGranger1987; @Hamilton1994]:
+
+1. Regress $y_t$ on $x_t$ (levels)
+2. Residuals $\hat{e}_t = y_t - \hat{\beta}x_t$
+3. Augmented Dickey--Fuller (ADF) on $\hat{e}_t$: Reject unit root $\Rightarrow$ cointegrated
+:::
+:::
+
+[*Example: income & consumption --- both I(1), but $c_t - \beta y^d_t \sim I(0)$ (consumption tracks income in the long run).*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## The Error Correction Model (ECM)
+
+If $y_t$ and $x_t$ are cointegrated with equilibrium $y_t = \beta x_t + u_t$ ($u_t \sim I(0)$):
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Error Correction Model
+:::
+::: {.smaller}
+$$\Delta y_t = \underbrace{\alpha(y_{t-1} - \beta x_{t-1})}_{\text{error correction}} + \underbrace{\gamma_1 \Delta y_{t-1} + \delta_1 \Delta x_{t-1} + \cdots}_{\text{short-run dynamics}} + \varepsilon_t$$
+
+$\alpha < 0$: speed of adjustment; $\gamma_1$: own short-run lag; $\delta_1$: cross short-run lag. If $y_{t-1}$ is *above* equilibrium, the ECM term pushes $\Delta y_t < 0$ (mean-reverting).
+:::
+:::
+
+:::: {.columns}
+
+::: {.column width="56%"}
+- ECM captures *both* short-run dynamics and long-run equilibrium in one model
+- Differenced variables $\Rightarrow$ no spurious regression
+- Error correction term $\Rightarrow$ no loss of long-run info
+:::
+
+::: {.column width="40%"}
+::: {.warningbox}
+::: {.smaller}
+**Do not** difference cointegrated series before regression --- this discards the long-run relationship.
+:::
+:::
+:::
+
+::::
+
+[*Example: $\hat{\alpha}=-0.3$, $y_{t-1}-\hat{\beta}x_{t-1}=+2.0$ (10% above equilibrium) $\Rightarrow$ ECM contributes $-0.3\times 2.0 = -0.6$ to $\Delta y_t$ (partial correction).*]{.neutral .smaller}
+
+---
+
+# Key Takeaways and Roadmap
+
+VAR, ARIMAX, cointegration, and ECM in one multivariate framework.
+
+---
+
+## Key Takeaways
+
+::: {.keybox}
+::: {.smaller}
+1. **Granger causality:** $x_t$ Granger-causes $y_t$ if $x_t$'s past improves forecasts of $y_t$ beyond $y_t$'s own past.
+
+2. **VAR:** symmetric multivariate model estimated equation-by-equation; use IRF to trace shock propagation; keep $k$ small.
+
+3. **ARIMAX:** augment ARIMA with exogenous regressors when causal direction is clear; use SARIMAX in statsmodels.
+
+4. **Cointegration:** two I(1) series with a stable long-run relationship --- model as ECM, not as levels or differences alone.
+
+5. **Model choice:** symmetric dynamics $\to$ VAR; clear cause $\to$ ARIMAX; long-run equilibrium $\to$ ECM.
+:::
+:::
+
+[*VAR(1) with $a_{12}=a_{21}=0$ collapses to two independent AR(1) models --- the multivariate framework nests the univariate special case.*]{.neutral .smaller}
+
+---
+
+## What's Next: Forecast Evaluation
+
+We now have five model families:
+
+- Benchmarks (naïve, seasonal naïve, mean, drift)
+- Regression and AR models (Lecture 2)
+- Exponential smoothing / ETS (Lecture 3)
+- ARIMA / SARIMA (Lecture 4)
+- VAR, ARIMAX, ECM (Lecture 5)
+
+**Key question:** how do we rigorously compare these models out-of-sample?
+
+::: {.keybox}
+**Lecture 6:** Forecast evaluation --- walk-forward validation, the Diebold--Mariano test [@Diebold1995], and forecast combination.
+:::
+
+::: {.neutral .smaller style="text-align:center"}
+**Lab 5:** Granger causality tests, VAR fitting and IRF, ARIMAX on RSXFS + consumer sentiment.
+:::
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::

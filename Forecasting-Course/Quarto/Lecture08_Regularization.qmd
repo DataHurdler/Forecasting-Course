@@ -1,0 +1,782 @@
+---
+title: "Regularization"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 8"
+author: "BSAD 8310: Business Forecasting"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture 8: Outline
+
+1. Motivation: Why Regularization?
+2. Ridge Regression (L2)
+3. LASSO Regression (L1)
+4. Elastic Net
+5. Tuning $\lambda$ via Cross-Validation
+6. Application to Forecasting
+
+---
+
+# Motivation: Why Regularization?
+
+OLS breaks down when predictors are many, correlated, or $p \to n$. Regularization trades a little bias for a large variance reduction.
+
+---
+
+## Section Overview
+
+**The problem:** OLS breaks down when predictors are many, correlated, or when $p$ approaches $n$. Regularization adds a penalty that trades a little bias for a large variance reduction.
+
+---
+
+## OLS Instability with Many Predictors
+
+**Recall OLS:** $\hat{\boldsymbol{\beta}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$
+
+**Three failure modes in forecasting:**
+
+1. **Near-multicollinearity** --- $\mathbf{X}^\top\mathbf{X}$ is nearly singular; small data perturbations flip sign and magnitude of $\hat{\boldsymbol{\beta}}$
+2. **High dimensionality** --- with $p$ lags + rolling features + calendar dummies, $p$ can approach or exceed $n$
+3. **Overfitting** --- OLS minimizes in-sample RSS exactly; generalization to new periods is poor
+
+::: {.examplebox}
+::: {.examplebox-title}
+RSXFS Feature Matrix
+:::
+With 12 lags + 3 rolling windows + 12 month dummies = 27 predictors on $n \approx 300$ monthly observations. Small by ML standards, but already enough for OLS instability with correlated lag features.
+:::
+
+---
+
+## The Bias--Variance View
+
+:::: {.columns}
+
+::: {.column width="54%"}
+**OLS is unbiased but high-variance:**
+
+$$\mathbb{E}[\hat{\boldsymbol{\beta}}_{\mathrm{OLS}}] = \boldsymbol{\beta} \quad \text{but} \quad \mathrm{Var}(\hat{\boldsymbol{\beta}}_{\mathrm{OLS}}) \text{ large}$$
+
+**Regularized estimator accepts bias:**
+
+$$\mathbb{E}[\hat{\boldsymbol{\beta}}_{\lambda}] \neq \boldsymbol{\beta} \quad \text{but} \quad \mathrm{Var}(\hat{\boldsymbol{\beta}}_{\lambda}) \text{ smaller}$$
+
+Net effect: **lower MSE** in finite samples when variance reduction exceeds the squared-bias increase.
+:::
+
+::: {.column width="42%"}
+::: {.keybox}
+**Bias--Variance Decomposition**
+
+$\mathrm{MSE} = \mathrm{Bias}^2 + \mathrm{Var} + \sigma^2$
+
+Regularization shifts the tradeoff leftward along the *model complexity* axis. [@Hastie2009]
+:::
+:::
+
+::::
+
+---
+
+## Penalized Regression: General Form
+
+All penalized regression methods solve:
+
+$$\hat{\boldsymbol{\beta}}_\lambda = \arg\min_{\boldsymbol{\beta}} \underbrace{\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2}_{\text{fit (RSS)}} + \lambda \cdot \underbrace{P(\boldsymbol{\beta})}_{\text{penalty}}$$
+
+::: {.smaller}
+
+| **Method** | **Penalty** $P(\boldsymbol{\beta})$ | **Key property** |
+|:---|:---|:---|
+| Ridge | $\|\boldsymbol{\beta}\|_2^2 = \sum_j \beta_j^2$ | Shrinks, never zeros |
+| LASSO | $\|\boldsymbol{\beta}\|_1 = \sum_j |\beta_j|$ | Shrinks + selects |
+| Elastic Net | $\alpha\|\boldsymbol{\beta}\|_1 + (1-\alpha)\|\boldsymbol{\beta}\|_2^2$ | Both |
+
+:::
+
+::: {.neutral .smaller}
+$\lambda \geq 0$ controls penalty strength; $\lambda=0$ recovers OLS; $\lambda \to \infty$ shrinks $\hat{\boldsymbol{\beta}} \to \mathbf{0}$.
+Elastic Net $\alpha$ is the L1/L2 mixing ratio --- distinct from ETS smoothing $\alpha$ (L03) and ECM speed-of-adjustment $\alpha$ (L05).
+Tuning of $\lambda$ (and $\alpha$ for Elastic Net) is covered in Section 5.
+:::
+
+---
+
+# Ridge Regression (L2)
+
+Shrinks all coefficients toward zero; handles multicollinearity with a closed-form solution.
+
+---
+
+## Section Overview
+
+**Ridge regression** adds an L2 penalty that shrinks all coefficients toward zero but never sets them exactly to zero. It has an analytical solution and handles multicollinearity well.
+
+---
+
+## Ridge: Objective and Solution
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Ridge Regression
+:::
+$$\hat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda = \arg\min_{\boldsymbol{\beta}} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_2^2$$
+
+**Analytical solution:**
+$$\hat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda = \left(\mathbf{X}^\top\mathbf{X} + \lambda \mathbf{I}\right)^{-1} \mathbf{X}^\top\mathbf{y}$$
+:::
+
+**Why does this fix near-singularity?**
+
+- $\mathbf{X}^\top\mathbf{X}$ may be near-singular (smallest eigenvalue $\approx 0$)
+- Adding $\lambda\mathbf{I}$ shifts all eigenvalues up by $\lambda$: matrix becomes safely invertible [@HoerlKennard1970]
+- Coefficients shrink by factor $d_j^2 / (d_j^2 + \lambda)$ along each principal direction $j$ (SVD interpretation)
+
+---
+
+## Ridge: Constraint Set Geometry
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Equivalent constrained form:**
+
+$$\min_{\boldsymbol{\beta}} \|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\|_2^2 \quad \text{s.t.}\ \|\boldsymbol{\beta}\|_2^2 \leq t$$
+
+The Ridge constraint set is a **sphere** (circle in 2D). The OLS solution is usually outside; the Ridge solution is the point where the RSS ellipses first touch the sphere.
+
+::: {.warningbox}
+Coefficients are **never exactly zero** --- the sphere has no corners. Ridge does *not* perform variable selection.
+:::
+:::
+
+::: {.column width="48%"}
+```{=html}
+<svg width="100%" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg" style="max-height:240px; display:block; margin:0 auto;">
+  <!-- Constraint circle -->
+  <circle cx="105" cy="130" r="72" fill="#E8F0FA" stroke="#005CA9" stroke-width="1.5"/>
+  <text x="105" y="215" font-size="11" fill="#005CA9" text-anchor="middle">‖β‖₂² ≤ t</text>
+  <!-- Axes -->
+  <line x1="20" y1="130" x2="240" y2="130" stroke="#aaa" stroke-width="1"/>
+  <polygon points="238,126 246,130 238,134" fill="#aaa"/>
+  <text x="248" y="134" font-size="10" fill="#aaa">β₁</text>
+  <line x1="105" y1="240" x2="105" y2="20" stroke="#aaa" stroke-width="1"/>
+  <polygon points="101,22 105,14 109,22" fill="#aaa"/>
+  <text x="108" y="16" font-size="10" fill="#aaa">β₂</text>
+  <!-- OLS solution -->
+  <circle cx="195" cy="65" r="4" fill="#E41C38"/>
+  <text x="200" y="62" font-size="10" fill="#E41C38">OLS β̂</text>
+  <!-- RSS ellipses (3 concentric around OLS) -->
+  <ellipse cx="195" cy="65" rx="36" ry="25" fill="none" stroke="#E41C38" stroke-width="0.8" stroke-dasharray="4,2"/>
+  <ellipse cx="195" cy="65" rx="68" ry="47" fill="none" stroke="#E41C38" stroke-width="0.8" stroke-dasharray="4,2"/>
+  <ellipse cx="195" cy="65" rx="105" ry="73" fill="none" stroke="#E41C38" stroke-width="0.8" stroke-dasharray="4,2"/>
+  <!-- Ridge solution on circle boundary -->
+  <circle cx="156" cy="79" r="4" fill="#005CA9"/>
+  <text x="161" y="76" font-size="10" fill="#005CA9">Ridge β̂ᴿ</text>
+</svg>
+```
+:::
+
+::::
+
+---
+
+## Ridge: Coefficient Path
+
+As $\lambda$ increases from 0 to $\infty$, all coefficients shrink *smoothly* toward zero:
+
+```{=html}
+<svg width="80%" viewBox="0 0 480 240" xmlns="http://www.w3.org/2000/svg" style="max-height:220px; display:block; margin:0 auto;">
+  <!-- Axes -->
+  <line x1="50" y1="200" x2="450" y2="200" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="448,196 456,200 448,204" fill="#1a1a1a"/>
+  <text x="460" y="204" font-size="12" fill="#1a1a1a">log₁₀(λ)</text>
+  <line x1="50" y1="210" x2="50" y2="15" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="46,17 50,9 54,17" fill="#1a1a1a"/>
+  <text x="18" y="12" font-size="12" fill="#1a1a1a">β̂ⱼ</text>
+  <!-- Zero line -->
+  <line x1="50" y1="120" x2="450" y2="120" stroke="#aaa" stroke-width="1" stroke-dasharray="4,3"/>
+  <!-- 5 coefficient paths, smooth curves shrinking to 0 -->
+  <!-- β1: large positive (blue) -->
+  <path d="M50,50 C120,55 200,90 420,118" fill="none" stroke="#005CA9" stroke-width="2.5"/>
+  <!-- β2: moderate positive (red) -->
+  <path d="M50,75 C130,80 210,102 420,119" fill="none" stroke="#E41C38" stroke-width="2.5"/>
+  <!-- β3: negative (green) -->
+  <path d="M50,185 C120,178 200,150 420,122" fill="none" stroke="#15803d" stroke-width="2.5"/>
+  <!-- β4: small positive (gray) -->
+  <path d="M50,95 C140,98 220,108 420,119" fill="none" stroke="#525252" stroke-width="2.5"/>
+  <!-- β5: moderate negative (purple) -->
+  <path d="M50,170 C110,162 190,143 420,121" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+  <!-- OLS label at left -->
+  <text x="28" y="123" font-size="10" fill="#525252" text-anchor="end">OLS</text>
+  <!-- Lambda* vertical dashed line -->
+  <line x1="250" y1="205" x2="250" y2="20" stroke="#525252" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="253" y="17" font-size="10" fill="#525252">λ* (CV)</text>
+  <!-- → 0 label -->
+  <text x="425" y="116" font-size="10" fill="#525252">→ 0</text>
+</svg>
+```
+
+[*Socratic: if two predictors are perfectly correlated, what does Ridge do to their coefficients? What does LASSO do? (Answered in the next section.)*]{.neutral .smaller}
+
+---
+
+## Ridge: Key Properties Summary
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Strengths:**
+
+- Closed-form solution --- fast computation
+- Handles multicollinearity: correlated predictors get *equal* shrinkage (spread out penalty)
+- Continuous, stable in $\lambda$
+- Works when $p > n$
+:::
+
+::: {.column width="48%"}
+**Limitations:**
+
+- **No variable selection** --- all $p$ predictors remain in model
+- Interpretation harder with many near-zero (but non-zero) coefficients
+- Requires **standardized** predictors (or use sklearn `Pipeline` with `StandardScaler`)
+:::
+
+::::
+
+::: {.keybox}
+**When to use Ridge:** when you believe *all* predictors contribute a little (dense signal), or when predictors come in highly correlated groups.
+:::
+
+---
+
+# LASSO Regression (L1)
+
+Shrinks *and* selects: L1 penalty sets irrelevant coefficients to exactly zero.
+
+---
+
+## Section Overview
+
+**LASSO** (Least Absolute Shrinkage and Selection Operator) uses an L1 penalty that both shrinks coefficients *and* sets some exactly to zero. It performs automatic variable selection [@Tibshirani1996].
+
+---
+
+## LASSO: Objective and Sparsity
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+LASSO Regression
+:::
+$$\hat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda = \arg\min_{\boldsymbol{\beta}} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_1$$
+
+$$\|\boldsymbol{\beta}\|_1 = \sum_{j=1}^{p} |\beta_j|$$
+:::
+
+**No closed form** --- solved by **coordinate descent**: update one $\beta_j$ at a time, applying *soft-thresholding*:
+
+$$\hat{\beta}_j \leftarrow \mathrm{sign}(z_j)\,\max\!\left(|z_j| - \tfrac{\lambda}{2},\, 0\right)$$
+
+where $z_j$ is the partial-residual inner product for predictor $j$. When $|z_j| \leq \lambda/2$, coefficient is set **exactly to zero**.
+
+::: {.smaller}
+**Example** ($\lambda=2$, threshold $=1$): $z_j = 1.8 \Rightarrow \hat{\beta}_j = +0.8$; $z_j = 0.7 \Rightarrow \hat{\beta}_j = 0$ [(zeroed out)]{.neutral}.
+:::
+
+---
+
+## LASSO: Constraint Set Geometry
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Equivalent constrained form:**
+
+$$\min_{\boldsymbol{\beta}} \|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\|_2^2 \quad \text{s.t.}\ \|\boldsymbol{\beta}\|_1 \leq t$$
+
+The LASSO constraint set is a **diamond** (rotated square in 2D). The RSS ellipses typically first touch the diamond at a **corner**, where one or more $\beta_j = 0$ exactly.
+
+::: {.keybox}
+The corners of the $\ell_1$ ball are the source of sparsity. In $p$ dimensions: exponentially many corners at coordinate axes.
+:::
+:::
+
+::: {.column width="48%"}
+```{=html}
+<svg width="100%" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg" style="max-height:240px; display:block; margin:0 auto;">
+  <!-- Diamond constraint set -->
+  <polygon points="105,58 177,130 105,202 33,130" fill="#E8F0FA" stroke="#005CA9" stroke-width="1.5"/>
+  <text x="105" y="222" font-size="11" fill="#005CA9" text-anchor="middle">‖β‖₁ ≤ t</text>
+  <!-- Axes -->
+  <line x1="20" y1="130" x2="240" y2="130" stroke="#aaa" stroke-width="1"/>
+  <polygon points="238,126 246,130 238,134" fill="#aaa"/>
+  <text x="248" y="134" font-size="10" fill="#aaa">β₁</text>
+  <line x1="105" y1="240" x2="105" y2="20" stroke="#aaa" stroke-width="1"/>
+  <polygon points="101,22 105,14 109,22" fill="#aaa"/>
+  <text x="108" y="16" font-size="10" fill="#aaa">β₂</text>
+  <!-- OLS solution -->
+  <circle cx="193" cy="67" r="4" fill="#E41C38"/>
+  <text x="198" y="64" font-size="10" fill="#E41C38">OLS β̂</text>
+  <!-- RSS ellipses -->
+  <ellipse cx="193" cy="67" rx="36" ry="25" fill="none" stroke="#E41C38" stroke-width="0.8" stroke-dasharray="4,2"/>
+  <ellipse cx="193" cy="67" rx="68" ry="47" fill="none" stroke="#E41C38" stroke-width="0.8" stroke-dasharray="4,2"/>
+  <ellipse cx="193" cy="67" rx="105" ry="73" fill="none" stroke="#E41C38" stroke-width="0.8" stroke-dasharray="4,2"/>
+  <!-- LASSO solution at right corner (β₂=0) -->
+  <circle cx="177" cy="130" r="4" fill="#005CA9"/>
+  <text x="182" y="127" font-size="10" fill="#005CA9">LASSO β̂ᴸ</text>
+  <text x="182" y="142" font-size="10" fill="#525252">(β̂₂ = 0)</text>
+</svg>
+```
+:::
+
+::::
+
+---
+
+## LASSO: Coefficient Path
+
+As $\lambda$ increases, LASSO coefficients shrink and hit zero at different $\lambda$ values:
+
+```{=html}
+<svg width="80%" viewBox="0 0 480 240" xmlns="http://www.w3.org/2000/svg" style="max-height:220px; display:block; margin:0 auto;">
+  <!-- Axes -->
+  <line x1="50" y1="200" x2="450" y2="200" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="448,196 456,200 448,204" fill="#1a1a1a"/>
+  <text x="460" y="204" font-size="12" fill="#1a1a1a">log₁₀(λ)</text>
+  <line x1="50" y1="210" x2="50" y2="15" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="46,17 50,9 54,17" fill="#1a1a1a"/>
+  <text x="18" y="12" font-size="12" fill="#1a1a1a">β̂ⱼ</text>
+  <!-- Zero line -->
+  <line x1="50" y1="120" x2="450" y2="120" stroke="#aaa" stroke-width="1" stroke-dasharray="4,3"/>
+  <!-- β1: large positive (blue) — last to zero out -->
+  <polyline points="50,50 120,68 178,90 250,115 330,120" fill="none" stroke="#005CA9" stroke-width="2.5"/>
+  <line x1="330" y1="120" x2="450" y2="120" stroke="#005CA9" stroke-width="2.5"/>
+  <!-- β2: moderate positive (red) -->
+  <polyline points="50,75 115,88 168,103 214,120" fill="none" stroke="#E41C38" stroke-width="2.5"/>
+  <line x1="214" y1="120" x2="450" y2="120" stroke="#E41C38" stroke-width="2.5"/>
+  <!-- β3: negative, zeroed early (green) -->
+  <polyline points="50,180 100,165 130,120" fill="none" stroke="#15803d" stroke-width="2.5"/>
+  <line x1="130" y1="120" x2="450" y2="120" stroke="#15803d" stroke-width="2.5"/>
+  <!-- β4: small positive, zeroed early (gray) -->
+  <polyline points="50,98 82,107 105,120" fill="none" stroke="#525252" stroke-width="2.5"/>
+  <line x1="105" y1="120" x2="450" y2="120" stroke="#525252" stroke-width="2.5"/>
+  <!-- β5: moderate negative (purple) -->
+  <polyline points="50,165 90,150 130,132 178,120" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+  <line x1="178" y1="120" x2="450" y2="120" stroke="#7c3aed" stroke-width="2.5"/>
+  <!-- OLS label -->
+  <text x="28" y="123" font-size="10" fill="#525252" text-anchor="end">OLS</text>
+  <!-- Lambda* vertical dashed line -->
+  <line x1="280" y1="205" x2="280" y2="20" stroke="#525252" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="283" y="17" font-size="10" fill="#525252">λ* (CV)</text>
+</svg>
+```
+
+[*Note the kinks (piecewise-linear path) --- a consequence of coordinate descent and the L1 geometry. Ridge paths are smooth curves.*]{.neutral .smaller}
+
+---
+
+## LASSO: Properties and Limitations
+
+:::: {.columns}
+
+::: {.column width="48%"}
+**Strengths:**
+
+- **Automatic variable selection** --- irrelevant lags zeroed out
+- Interpretable: small active set survives
+- Works when $p \gg n$
+- Coefficient path is a diagnostic: shows which features enter first
+:::
+
+::: {.column width="48%"}
+**Limitations:**
+
+- **Grouped predictors problem** --- among correlated features, LASSO picks one arbitrarily and zeros others
+- Non-unique solution when $p > n$
+- Slower than Ridge (no closed form)
+- Sensitive to feature scaling (must standardize)
+:::
+
+::::
+
+::: {.examplebox}
+::: {.examplebox-title}
+RSXFS Application
+:::
+With 12 monthly lags, LASSO typically retains lags 1, 3, 12 and zeros lags 4--11 --- consistent with retail seasonality and recency effects. Rolling-window features may or may not survive depending on $\lambda^*$.
+:::
+
+---
+
+# Elastic Net
+
+Combines L1 and L2 penalties: sparsity from LASSO, grouped selection from Ridge.
+
+---
+
+## Section Overview
+
+**Elastic Net** combines L1 and L2 penalties to get the best of both: sparsity from LASSO and grouped selection from Ridge. It uses two hyperparameters: $\lambda$ (overall strength) and $\alpha$ (mix ratio) [@ZouHastie2005].
+
+[$\alpha$ here is the L1/L2 mixing parameter --- distinct from the level-smoothing $\alpha$ in ETS (Lecture 03) and the ECM speed-of-adjustment $\alpha$ in Lecture 05.]{.neutral .smaller}
+
+---
+
+## Elastic Net: Objective and Geometry
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Elastic Net
+:::
+$$\hat{\boldsymbol{\beta}}^{\mathrm{EN}}_{\lambda,\alpha} = \arg\min_{\boldsymbol{\beta}} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left[\alpha \|\boldsymbol{\beta}\|_1 + (1-\alpha)\|\boldsymbol{\beta}\|_2^2\right]$$
+
+- $\alpha = 1$: pure LASSO
+- $\alpha = 0$: pure Ridge
+- $0 < \alpha < 1$: Elastic Net (interpolates between them)
+:::
+
+**Grouped selection property:** when predictors are correlated, Elastic Net tends to include or exclude them as a group --- unlike LASSO which arbitrarily picks one.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Two hyperparameters to tune:**
+
+- $\lambda$ (penalty magnitude): grid search via CV
+- $\alpha$ (mix): try $\{0.1, 0.5, 0.9\}$ or use `ElasticNetCV`
+:::
+
+::: {.column width="46%"}
+::: {.warningbox}
+Tuning both $\lambda$ and $\alpha$ simultaneously is expensive. Start with fixed $\alpha=0.5$ and tune $\lambda$ only.
+:::
+:::
+
+::::
+
+---
+
+## Ridge vs. LASSO vs. Elastic Net: Decision Guide
+
+::: {.smaller}
+
+| **Situation** | **Ridge** | **LASSO** | **Elastic Net** |
+|:---|:---|:---|:---|
+| Dense signal (all $\beta_j \neq 0$) | Best | Tends to over-zero | Good |
+| Sparse signal (few true features) | Over-retains | Best | Good |
+| Correlated predictors (lag features) | Good (equal shrinkage) | Picks one; drops rest | Best |
+| $p > n$ | Works | Selects $\leq n$ features | Works |
+| Interpretability | Moderate | High (sparse) | Moderate |
+
+:::
+
+[*Socratic: in forecasting with 12 monthly lags, why might Elastic Net outperform pure LASSO? (Hint: are lags 1 and 2 correlated?)*]{.neutral .smaller}
+
+---
+
+# Tuning $\lambda$ via Cross-Validation
+
+Select $\lambda^*$ with `TimeSeriesSplit` to respect temporal ordering.
+
+---
+
+## Section Overview
+
+**Goal:** select $\lambda^*$ that minimizes out-of-sample prediction error. For time series, we must use `TimeSeriesSplit` (not random k-fold) to respect the temporal ordering of observations.
+
+---
+
+## TimeSeriesSplit CV for Regularization
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Procedure:**
+
+1. Define $\lambda$ grid: e.g., $10^{-3}$ to $10^{3}$ (50 points, log-spaced)
+2. For each $\lambda$:
+   - Run `TimeSeriesSplit` with $K=5$ folds
+   - Fit regularized model on each train fold
+   - Record validation RMSE
+3. Select $\lambda^*$ with lowest mean validation RMSE
+4. Refit on train+val with $\lambda^*$; evaluate on test
+
+::: {.warningbox}
+**Never** fit the scaler (`StandardScaler`) on the full data before CV splits --- this constitutes data leakage. Use `sklearn.pipeline.Pipeline`.
+:::
+:::
+
+::: {.column width="44%"}
+```{=html}
+<svg width="100%" viewBox="0 0 310 230" xmlns="http://www.w3.org/2000/svg" style="max-height:220px; display:block; margin:0 auto;">
+  <!-- F1 -->
+  <text x="18" y="28" font-size="10" fill="#005CA9" text-anchor="end">F1</text>
+  <rect x="20" y="14" width="80" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.8" rx="2"/>
+  <rect x="100" y="14" width="34" height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.8" rx="2"/>
+  <!-- F2 -->
+  <text x="18" y="60" font-size="10" fill="#005CA9" text-anchor="end">F2</text>
+  <rect x="20" y="46" width="114" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.8" rx="2"/>
+  <rect x="134" y="46" width="34" height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.8" rx="2"/>
+  <!-- F3 -->
+  <text x="18" y="92" font-size="10" fill="#005CA9" text-anchor="end">F3</text>
+  <rect x="20" y="78" width="148" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.8" rx="2"/>
+  <rect x="168" y="78" width="34" height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.8" rx="2"/>
+  <!-- F4 -->
+  <text x="18" y="124" font-size="10" fill="#005CA9" text-anchor="end">F4</text>
+  <rect x="20" y="110" width="182" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.8" rx="2"/>
+  <rect x="202" y="110" width="34" height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.8" rx="2"/>
+  <!-- F5 -->
+  <text x="18" y="156" font-size="10" fill="#005CA9" text-anchor="end">F5</text>
+  <rect x="20" y="142" width="216" height="22" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.8" rx="2"/>
+  <rect x="236" y="142" width="34" height="22" fill="#D4EDDA" stroke="#15803d" stroke-width="0.8" rx="2"/>
+  <!-- Legend -->
+  <rect x="20" y="178" width="14" height="10" fill="#B8D4EF" stroke="#005CA9" stroke-width="0.7"/>
+  <text x="37" y="187" font-size="10" fill="#005CA9">Train</text>
+  <rect x="90" y="178" width="14" height="10" fill="#D4EDDA" stroke="#15803d" stroke-width="0.7"/>
+  <text x="107" y="187" font-size="10" fill="#15803d">Val</text>
+  <!-- Time axis -->
+  <line x1="20" y1="200" x2="290" y2="200" stroke="#525252" stroke-width="1.2"/>
+  <polygon points="288,196 296,200 288,204" fill="#525252"/>
+  <text x="298" y="204" font-size="10" fill="#525252" font-style="italic">time</text>
+</svg>
+```
+:::
+
+::::
+
+---
+
+## Validation Curve: Selecting $\lambda^*$
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Plot validation RMSE vs. $\log_{10}(\lambda)$:**
+
+```{=html}
+<svg width="100%" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" style="max-height:230px; display:block; margin:0 auto;">
+  <!-- Axes -->
+  <line x1="50" y1="200" x2="300" y2="200" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="298,196 306,200 298,204" fill="#1a1a1a"/>
+  <text x="310" y="204" font-size="11" fill="#1a1a1a">log₁₀(λ)</text>
+  <line x1="50" y1="210" x2="50" y2="20" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="46,22 50,14 54,22" fill="#1a1a1a"/>
+  <text x="22" y="18" font-size="11" fill="#1a1a1a">RMSE</text>
+  <!-- U-shaped validation curve (blue) -->
+  <path d="M60,170 C90,120 120,80 170,72 C210,75 250,110 285,170" fill="none" stroke="#005CA9" stroke-width="2.5"/>
+  <!-- Train curve (dashed gray, monotone decreasing) -->
+  <path d="M60,145 C100,100 150,65 285,40" fill="none" stroke="#525252" stroke-width="1.8" stroke-dasharray="6,3"/>
+  <!-- Optimal lambda marker -->
+  <line x1="170" y1="200" x2="170" y2="73" stroke="#E41C38" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <circle cx="170" cy="72" r="4" fill="#E41C38"/>
+  <text x="175" y="68" font-size="11" fill="#E41C38">λ*</text>
+  <!-- Labels -->
+  <text x="230" y="115" font-size="11" fill="#005CA9">Val</text>
+  <text x="230" y="58" font-size="11" fill="#525252">Train</text>
+  <!-- Region labels -->
+  <text x="82" y="190" font-size="10" fill="#525252">overfit</text>
+  <text x="230" y="155" font-size="10" fill="#525252">underfit</text>
+</svg>
+```
+:::
+
+::: {.column width="44%"}
+**Reading the curve:**
+
+- **Left of $\lambda^*$**: low $\lambda$ $\Rightarrow$ low bias, high variance $\Rightarrow$ overfit (train $\ll$ val)
+- **Right of $\lambda^*$**: high $\lambda$ $\Rightarrow$ high bias, low variance $\Rightarrow$ underfit (both high)
+- **At $\lambda^*$**: optimal bias--variance tradeoff
+
+::: {.keybox}
+**Practical rule:** *one standard error rule* --- pick the largest $\lambda$ within 1 SE of the minimum (slightly more regularized, more robust).
+:::
+:::
+
+::::
+
+[*When would the one-SE rule backfire? (Hint: consider a highly asymmetric validation curve.)*]{.neutral .smaller}
+
+---
+
+# Application to Forecasting
+
+Ridge, LASSO, and Elastic Net on RSXFS retail sales vs. SARIMA baseline.
+
+---
+
+## Section Overview
+
+Apply Ridge, LASSO, and Elastic Net to the RSXFS retail sales series. Use a leakage-free sklearn `Pipeline` and evaluate on a held-out test set against the SARIMA baseline.
+
+---
+
+## sklearn Pipeline for Leakage-Free CV
+
+:::: {.columns}
+
+::: {.column width="48%"}
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge, Lasso
+from sklearn.model_selection import (
+    TimeSeriesSplit, GridSearchCV)
+from sklearn.metrics import mean_squared_error
+
+# Build pipeline (scaler fitted INSIDE CV)
+pipe = Pipeline([
+    ('scaler', StandardScaler()),
+    ('model',  Ridge())
+])
+
+tscv = TimeSeriesSplit(n_splits=5, gap=0)
+# sklearn 'alpha' = our lambda (penalty strength)
+# (for ElasticNet: 'l1_ratio' = our alpha mix)
+param_grid = {'model__alpha':
+    np.logspace(-3, 3, 60)}
+
+gs = GridSearchCV(pipe, param_grid,
+    cv=tscv,
+    scoring='neg_root_mean_squared_error',
+    refit=True)
+gs.fit(X_trainval, y_trainval)
+```
+:::
+
+::: {.column width="48%"}
+```python
+# Evaluate on held-out test set
+y_pred = gs.best_estimator_.predict(X_test)
+rmse_test = np.sqrt(
+    mean_squared_error(y_test, y_pred))
+print(f"Best alpha: {gs.best_params_}")
+print(f"Test RMSE:  {rmse_test:.2f}")
+
+# Inspect coefficients
+coef = gs.best_estimator_.named_steps[
+    'model'].coef_
+feat_names = X_trainval.columns.tolist()
+pd.Series(coef, index=feat_names)\
+  .sort_values().plot.barh()
+```
+
+::: {.keybox}
+**Key:** `StandardScaler` is inside the pipeline. It fits on the train fold only during CV, preventing leakage.
+:::
+:::
+
+::::
+
+---
+
+## Interpreting LASSO Coefficients in Forecasting
+
+**What survives LASSO regularization on RSXFS?**
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Typical surviving features** (at $\lambda^*$):
+
+- **Lag 1** ($y_{t-1}$) --- strongest short-run predictor
+- **Lag 12** ($y_{t-12}$) --- seasonal anchor (same month, prior year)
+- **Lag 3** ($y_{t-3}$) --- quarterly momentum
+- **Rolling mean 12** --- trend level
+- **December dummy** --- holiday retail spike
+
+**Typically zeroed:**
+
+- Lags 4--11 (redundant with lag 1 + lag 12)
+- Rolling std (noisy; insufficient sample)
+:::
+
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Interpretation Rule
+:::
+A LASSO coefficient of zero means the feature adds no predictive value *after* accounting for all other active features. It does not mean the feature is uncorrelated with $y_t$ in isolation.
+:::
+
+[*Compare to ARIMA: ARIMA implicitly uses all lags up to order $p$; LASSO selects the most predictive subset, potentially skipping lags.*]{.neutral .smaller}
+:::
+
+::::
+
+---
+
+## Forecast Comparison: SARIMA vs. Regularized Models
+
+:::: {.columns}
+
+::: {.column width="52%"}
+**Typical results on RSXFS (24-month test set):**
+
+::: {.smaller}
+
+| **Model** | **RMSE** | **MAE** |
+|:---|---:|---:|
+| Seasonal Naïve | 4,210 | 3,120 |
+| SARIMA(1,1,1)(1,1,1)₁₂ | 2,840 | 2,100 |
+| Ridge ($\lambda^*$) | 2,680 | 1,980 |
+| LASSO ($\lambda^*$) | 2,590 | 1,910 |
+| Elastic Net ($\lambda^*$) | 2,540 | 1,890 |
+
+:::
+
+[*Values are illustrative (actual results may vary with feature set and sample period).*]{.neutral .smaller}
+:::
+
+::: {.column width="44%"}
+**Takeaways:**
+
+- All regularized models beat SARIMA on this feature set
+- Elastic Net has a small edge --- lag features are correlated
+- Gains are modest ($\approx$5--10%) --- SARIMA already captures most AR and seasonal structure
+- Larger gains expected in **multi-series** settings (shared regularization) or when many external regressors exist
+:::
+
+::::
+
+---
+
+# Takeaways and References
+
+---
+
+## Lecture 8 Key Takeaways
+
+::: {.keybox}
+1. **OLS instability** with many/correlated predictors motivates regularization --- the bias--variance tradeoff at work.
+2. **Ridge** (L2) shrinks all coefficients smoothly; no variable selection. Best for dense signals or highly correlated groups.
+3. **LASSO** (L1) shrinks *and* zeros coefficients; performs automatic variable selection. Best for sparse signals.
+4. **Elastic Net** combines L1+L2; handles correlated features better than pure LASSO (grouped selection property).
+5. **Tune $\lambda$ via TimeSeriesSplit CV** inside a `Pipeline` to prevent data leakage --- this is non-negotiable for time series.
+:::
+
+**Preview of Lecture 09:** Tree-Based Methods --- Random Forests and XGBoost capture nonlinearities that penalized linear models cannot.
+
+---
+
+## References {.smaller}
+
+::: {#refs}
+:::
