@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{From Trees to Neural Networks}{3}{0}{1}
+\beamer@sectionintoc {2}{Feedforward Networks}{6}{0}{2}
+\beamer@sectionintoc {3}{Training: Loss and Backpropagation}{8}{0}{3}
+\beamer@sectionintoc {4}{PyTorch Implementation}{11}{0}{4}
+\beamer@sectionintoc {5}{Key Takeaways}{15}{0}{5}

@@ -59,6 +59,10 @@
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{definitionbox}{Vanilla RNN}
+        Think of $\mathbf{h}_t$ as the model's ``running summary'' of the
+        series up to step $t$ --- like a manager who reads each month's
+        sales report and updates their mental picture of the trend.
+
         At each step $t$:
         \[
           \mathbf{h}_t = \tanh(\mathbf{W}_h \mathbf{h}_{t-1} + \mathbf{W}_x \mathbf{x}_t + \mathbf{b})

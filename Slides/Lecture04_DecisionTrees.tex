@@ -391,21 +391,23 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{Strengths:}
-      \begin{itemize}[\pos{$\checkmark$}]
+      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
+      \begin{itemize}
         \item Interpretable (can show the path)
         \item No feature scaling needed
         \item Captures nonlinear relationships
         \item Handles missing values well
         \item Fast to train
-      \end{itemize}
+      \end{itemize}}
       \vspace{0.2cm}
       \textbf{Weaknesses:}
-      \begin{itemize}[\negc{$\times$}]
+      {\setbeamertemplate{itemize item}{\negc{$\times$}}
+      \begin{itemize}
         \item High variance --- small data changes $\Rightarrow$ very different tree
         \item Flat predictions within each leaf
         \item Cannot extrapolate beyond training range
         \item Sensitive to outliers (a single outlier can dominate a leaf)
-      \end{itemize}
+      \end{itemize}}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{keybox}

@@ -140,9 +140,11 @@
               containing $X$\% of the probability mass
         \item[Prob.\ of direction] $P(\beta_j > 0)$ or $P(\beta_j < 0)$ ---
               a more natural measure than a $p$-value
-        \item[Rope analysis] What fraction of the posterior falls
-              within a Region Of Practical Equivalence (e.g., $|{\beta_j}| < 0.05$)?
-              Use to decide if an effect is meaningfully non-zero.
+        \item[ROPE analysis] Define a range of ``practically zero'' effects
+              (e.g., $|\beta_j| < 0.05$) --- the Region Of Practical Equivalence.
+              Check what fraction of the posterior falls inside.
+              If most of the posterior is in the ROPE, the effect is statistically
+              present but too small to matter for business decisions.
       \end{description}
     \end{column}
     \begin{column}{0.44\textwidth}
@@ -180,7 +182,13 @@
         \item \textbf{Directed arrows} = causal relationships ($A \to B$ means $A$ causes $B$)
         \item \textbf{Acyclic} = no variable causes itself (directly or indirectly)
       \end{itemize}
-      \vspace{0.2cm}
+      \vspace{0.1cm}
+      \textbf{How to build a DAG:} List all variables relevant to your outcome.
+      For each pair, ask: ``Could $A$ directly cause $B$?''
+      Draw an arrow if yes. Arrows point in the direction of causation,
+      not correlation.
+      \vspace{0.1cm}
+
       \textbf{Why use DAGs for regression?}
       \begin{itemize}\small
         \item Makes the causal story explicit before building the model

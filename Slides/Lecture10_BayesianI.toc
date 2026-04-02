@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{Why Bayesian Thinking?}{3}{0}{1}
+\beamer@sectionintoc {2}{Bayes' Theorem}{5}{0}{2}
+\beamer@sectionintoc {3}{Prior Distributions}{7}{0}{3}
+\beamer@sectionintoc {4}{Posterior Inference with PyMC}{9}{0}{4}
+\beamer@sectionintoc {5}{Key Takeaways}{13}{0}{5}

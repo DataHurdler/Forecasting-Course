@@ -1,0 +1,3 @@
+\beamer@sectionintoc {1}{Bayesian Time Series: Trend and Seasonality}{3}{0}{1}
+\beamer@sectionintoc {2}{Hierarchical Models: Partial Pooling}{7}{0}{2}
+\beamer@sectionintoc {3}{Key Takeaways}{10}{0}{3}

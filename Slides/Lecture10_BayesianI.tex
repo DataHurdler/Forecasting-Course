@@ -152,7 +152,8 @@
         \item Natural prior for regression coefficients
         \item Weakly informative: $\mathcal{N}(0, 1)$ after
               standardizing predictors
-        \item Conjugate prior for Normal likelihood
+        \item Mathematically convenient: Normal prior + Normal likelihood
+              gives a Normal posterior (closed-form solution)
       \end{itemize}
     \end{column}
     \begin{column}{0.33\textwidth}
@@ -189,6 +190,12 @@
 
 % --- Slide: MCMC intuition ---------------------------------------------------
 \begin{frame}{Markov Chain Monte Carlo (MCMC): The Big Idea}
+  \textbf{Analogy:} Imagine exploring a hilly landscape in the dark.
+  You want to map which areas are highest (most probable).
+  MCMC works by randomly walking around: you spend more time in high areas
+  (high probability) than low areas.
+  After thousands of steps, the places you visited most often trace out
+  the shape of the posterior.
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{The problem:} $p(\mathcal{D})$ in Bayes' theorem is

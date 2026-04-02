@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{From Single Trees to Ensembles}{3}{0}{1}
+\beamer@sectionintoc {2}{Bagging: Bootstrap Aggregating}{5}{0}{2}
+\beamer@sectionintoc {3}{Random Forests: Decorrelating the Trees}{8}{0}{3}
+\beamer@sectionintoc {4}{Feature Importance and Interpretation}{11}{0}{4}
+\beamer@sectionintoc {5}{Key Takeaways and Roadmap}{14}{0}{5}

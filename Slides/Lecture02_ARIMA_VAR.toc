@@ -1,0 +1,4 @@
+\beamer@sectionintoc {1}{Stationarity and Differencing}{3}{0}{1}
+\beamer@sectionintoc {2}{ARIMA Models}{7}{0}{2}
+\beamer@sectionintoc {3}{VAR Models}{10}{0}{3}
+\beamer@sectionintoc {4}{Key Takeaways and Roadmap}{15}{0}{4}

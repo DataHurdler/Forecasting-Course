@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{Motivation: Beyond Linear, Without Black Boxes}{3}{0}{1}
+\beamer@sectionintoc {2}{GAM Structure and Smoothing}{6}{0}{2}
+\beamer@sectionintoc {3}{Prophet for Time Series GAMs}{9}{0}{3}
+\beamer@sectionintoc {4}{pyGAM for General Additive Modeling}{12}{0}{4}
+\beamer@sectionintoc {5}{Key Takeaways and Roadmap}{15}{0}{5}

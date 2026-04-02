@@ -41,28 +41,32 @@
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textbf{Linear models (ARIMA, regression):}
-      \begin{itemize}[\pos{$\checkmark$}]
+      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
+      \begin{itemize}
         \item Easy to interpret: each coefficient
               has a clear meaning
         \item Stable, well-understood properties
-      \end{itemize}
-      \begin{itemize}[\negc{$\times$}]
+      \end{itemize}}
+      {\setbeamertemplate{itemize item}{\negc{$\times$}}
+      \begin{itemize}
         \item Assume a constant slope everywhere
         \item Cannot capture nonlinear patterns
         \item Miss threshold effects and curvature
-      \end{itemize}
+      \end{itemize}}
     \end{column}
     \begin{column}{0.48\textwidth}
       \textbf{Fully nonlinear models (trees, neural nets):}
-      \begin{itemize}[\pos{$\checkmark$}]
+      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
+      \begin{itemize}
         \item Flexible --- can capture almost any pattern
         \item High accuracy on complex data
-      \end{itemize}
-      \begin{itemize}[\negc{$\times$}]
+      \end{itemize}}
+      {\setbeamertemplate{itemize item}{\negc{$\times$}}
+      \begin{itemize}
         \item Hard to interpret: why did the model
               make this prediction?
         \item Interactions entangle all variables
-      \end{itemize}
+      \end{itemize}}
     \end{column}
   \end{columns}
   \vspace{0.3cm}
@@ -260,14 +264,16 @@
       \end{itemize}
       \vspace{0.1cm}
       \textbf{When to use Prophet:}
-      \begin{itemize}[\pos{$\checkmark$}]\small
+      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
+      \begin{itemize}\small
         \item Daily, weekly, monthly series with seasonality
         \item Known holiday or event effects
         \item When you need interpretable component plots for stakeholders
-      \end{itemize}
-      \begin{itemize}[\negc{$\times$}]\small
+      \end{itemize}}
+      {\setbeamertemplate{itemize item}{\negc{$\times$}}
+      \begin{itemize}\small
         \item Many correlated external predictors (use pyGAM instead)
-      \end{itemize}
+      \end{itemize}}
     \end{column}
   \end{columns}
 \end{frame}

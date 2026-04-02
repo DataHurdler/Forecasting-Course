@@ -1,0 +1,4 @@
+\beamer@sectionintoc {1}{Why Go Beyond Linear Models?}{3}{0}{1}
+\beamer@sectionintoc {2}{How Decision Trees Work}{6}{0}{2}
+\beamer@sectionintoc {3}{Implementing Decision Trees in Python}{10}{0}{3}
+\beamer@sectionintoc {4}{Limitations and Preview: Ensembles}{14}{0}{4}

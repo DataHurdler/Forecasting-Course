@@ -1,0 +1,202 @@
+---
+title: "Homework 1: Exponential Smoothing, ARIMA & Multivariate Models"
+subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Spring 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Overview
+
+This homework develops hands-on proficiency with two foundational families of forecasting methods: Exponential Smoothing (ETS) and ARIMA-based models, including multivariate extensions via Vector Autoregression (VAR). These techniques are workhorses of operational forecasting in retail, supply chain, and finance — situations where interpretable, statistically grounded forecasts must be produced reliably at scale. By working through real store-level sales data, you will see how model choice and evaluation rigor translate directly into business decisions.
+
+**Learning objectives.** By the end of this assignment you will be able to:
+
+- Apply Simple Exponential Smoothing, Holt's linear trend model, and Holt-Winters to seasonal retail data, and interpret the smoothing parameters
+- Diagnose stationarity using the Augmented Dickey-Fuller test and identify ARIMA order from ACF/PACF plots
+- Evaluate competing models using walk-forward cross-validation and standard accuracy metrics (RMSE, MAE, MAPE)
+- Fit a VAR model, conduct Granger causality tests, and translate results into business-relevant language
+
+---
+
+# Dataset
+
+This homework uses the **Rossmann Store Sales** dataset, a widely studied retail forecasting benchmark drawn from a Kaggle competition. The data contain weekly sales records for 30 Rossmann drug stores across Germany from 2013 to 2015, preprocessed into a consistent weekly panel. Each row represents one store-week combination and includes sales volume, customer count, promotional indicators, competition information, and a set of pre-computed lag features that will be useful for later homeworks.
+
+The preprocessed file is located at `data/processed/rossmann_weekly.csv`. Run the cell below to load the data and confirm the Store 1 series is available before proceeding.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.varmax import VARMAX
+from statsmodels.tsa.stattools import adfuller, acf, pacf, grangercausalitytests
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+import warnings
+warnings.filterwarnings('ignore')
+
+# Load data
+weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
+
+# Focus on Store 1 for univariate models
+store1 = weekly[weekly["Store"] == 1].set_index("WeekStart")["Sales"]
+print(f"Store 1: {len(store1)} weekly observations from {store1.index.min().date()} to {store1.index.max().date()}")
+```
+
+---
+
+# Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does **not** count against your prompt budget.
+
+```
+I am working on Homework 1 for BSAD 8310: Business Forecasting at the University of Nebraska at Omaha.
+
+Dataset: Rossmann Store Sales (preprocessed weekly). Available at `data/processed/rossmann_weekly.csv`. Columns include Store (1–30), WeekStart, Sales, Customers, Promo, StoreType, Assortment, CompetitionDistance, and lag features (Sales_lag1 through Sales_lag52).
+
+This homework covers Exponential Smoothing (ETS) and ARIMA/VAR forecasting using Python and statsmodels. I will ask you questions one at a time. For each:
+1. Write clean, well-commented Python code that runs end-to-end
+2. Interpret outputs in plain English for a business audience
+3. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget is 12 (this context prompt is excluded). I will label each question before asking.
+
+Confirm by responding with: HW01_CONTEXT_ACK
+```
+
+Submit this text as **`INITIAL_PROMPT.md`** in your submission folder.
+:::
+
+---
+
+# Questions
+
+## Q1 — Exploratory Plot
+
+*(Suggested prompts: 1)*
+
+Plot Store 1 weekly sales over the full observation window. After examining the plot, answer the written questions below.
+
+```{python}
+# Plot Store 1 weekly sales over time
+```
+
+> **Your response:** Describe what you see in the plot. Mention trend, any seasonal pattern, and a plausible business explanation. What business factors (promotions, holidays, store events) might explain the peaks and troughs you observe?
+
+---
+
+## Q2 — Exponential Smoothing Models
+
+*(Suggested prompts: 2)*
+
+Split the Store 1 series into a training set (first 100 weeks) and a test set (remaining weeks). Fit the three models listed below on the training set, generate forecasts over the test period, and compute RMSE and MAE for each.
+
+- **Simple Exponential Smoothing (SES)**
+- **Holt's linear trend model**
+- **Holt-Winters (additive seasonality, period = 52)**
+
+Present your accuracy results in a summary table.
+
+```{python}
+train, test = store1.iloc[:100], store1.iloc[100:]
+
+# Fit SES, Holt, and Holt-Winters models; compute RMSE and MAE for each
+```
+
+> **Your response:** Which model performs best on the test set and why? What does the estimated smoothing parameter α tell you about how quickly Store 1 sales respond to recent observations? Is a high or low α appropriate for this series, and what does that imply?
+
+---
+
+## Q3 — ARIMA
+
+*(Suggested prompts: 3)*
+
+Work through the following steps for the Store 1 series.
+
+**(a)** Run the Augmented Dickey-Fuller test. Report the test statistic, p-value, and your conclusion about stationarity. If differencing is needed, apply it and re-test.
+
+**(b)** Plot the ACF and PACF of the (possibly differenced) series. Based on the plots, propose an ARIMA(p, d, q) order and explain your reasoning.
+
+**(c)** Fit your chosen ARIMA model. Report the AIC and compute the forecast RMSE on the test set defined in Q2.
+
+**(d)** Implement walk-forward cross-validation: use an expanding window with a minimum training length of 52 weeks, re-fit your ARIMA at each step, and produce a 1-step-ahead forecast. Report the mean RMSE across all steps.
+
+```{python}
+# (a) ADF test
+# from statsmodels.tsa.stattools import adfuller  -- already imported
+
+# (b) ACF and PACF plots
+
+# (c) Fit ARIMA and compute test RMSE
+
+# (d) Walk-forward CV with expanding window (min 52 weeks), 1-step-ahead forecasts
+```
+
+> **Your response:** Compare the ARIMA walk-forward RMSE to the best ETS model from Q2. Which method would you recommend for a weekly store-level sales forecast and why? Consider accuracy, interpretability, and operational constraints.
+
+---
+
+## Q4 — VAR and Granger Causality
+
+*(Suggested prompts: 3)*
+
+This question extends the analysis to two stores simultaneously.
+
+```{python}
+store2 = weekly[weekly["Store"] == 2].set_index("WeekStart")["Sales"]
+```
+
+**(a)** Test whether Store 2 Sales Granger-causes Store 1 Sales at lag 4 using `grangercausalitytests`. Report the F-statistic and p-value for that lag. What would it mean operationally if one store's sales reliably predict the other's?
+
+**(b)** Align the two series on a common date index. Fit a VAR(4) model on the first 100 weeks of both stores. Forecast the next 4 weeks. Plot actual versus forecast for Store 1 only.
+
+```{python}
+# (a) Granger causality test: does Store 2 Sales Granger-cause Store 1 Sales at lag 4?
+
+# (b) Align series, fit VAR(4) on first 100 weeks, forecast 4 weeks, plot Store 1
+```
+
+> **Your response:** In your own words, what does Granger causality mean? What does *not* finding it tell you about the relationship between these two stores? Is the absence of Granger causality evidence that the stores are independent, or could there be other explanations?
+
+---
+
+## Q5 — Method Comparison
+
+*(Suggested prompts: 0 — write yourself)*
+
+No code required for this question. Write your answer directly below in 150–200 words.
+
+You are a demand planner at Rossmann responsible for producing 12-month store-level sales forecasts, updated monthly. Drawing on your results from Q2–Q4, answer the following:
+
+Which of the methods from this homework (SES, Holt, Holt-Winters, ARIMA, VAR) would you recommend for **production use** at scale, and which would you retain as a **benchmark**? Justify your choice based on forecast accuracy, the operational realities of running 30+ stores, the cost of model maintenance, and interpretability to non-technical stakeholders.
+
+> **Your response:** *(150–200 words)*
+
+---
+
+# Submission Checklist
+
+Before submitting, confirm each item below.
+
+- [ ] All code cells run without errors from top to bottom (Kernel → Restart & Run All)
+- [ ] Written responses are completed in your own words — AI-generated prose is not accepted for written sections
+- [ ] `INITIAL_PROMPT.md` is saved in your submission folder
+- [ ] `PROMPT_LOG.jsonl` is complete with 12 or fewer entries (one entry per Codex prompt sent)
+- [ ] One git commit per Codex prompt used, following the format: `hw01 prompt <id>: <one-line summary>`
+- [ ] `REPORT.md` included with a final business recommendation (3–5 sentences) addressed to a non-technical manager

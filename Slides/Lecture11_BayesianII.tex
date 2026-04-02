@@ -77,7 +77,10 @@
 
 % --- Slide: Bayesian local linear trend model --------------------------------
 \begin{frame}{Bayesian Structural Time Series}
-  A simple Bayesian trend + seasonality model:
+  We decompose a time series into three components: a slowly-changing
+  \textbf{trend}, a repeating \textbf{seasonal pattern}, and random \textbf{noise}.
+  Each component gets its own parameters --- and the Bayesian approach
+  gives us uncertainty estimates on all of them simultaneously.
   \[
     y_t = \mu_t + s_t + \varepsilon_t, \quad \varepsilon_t \sim \mathcal{N}(0, \sigma^2)
   \]
@@ -89,6 +92,9 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{Seasonal component using Fourier features:}
+
+      Seasonality is modeled as smooth waves (sine and cosine curves)
+      that repeat every year. More waves ($K$) = more flexible shapes.
       \[
         s_t = \sum_{k=1}^{K} \left[a_k \cos\!\left(\frac{2\pi k t}{P}\right) + b_k \sin\!\left(\frac{2\pi k t}{P}\right)\right]
       \]
@@ -170,29 +176,32 @@
     \begin{column}{0.33\textwidth}
       \textbf{Complete pooling:}
       Fit one model ignoring stores.
-      \begin{itemize}[\negc{$\times$}]\small
+      {\setbeamertemplate{itemize item}{\negc{$\times$}}
+      \begin{itemize}\small
         \item Assumes all stores are identical
         \item Misses systematic store differences
         \item Wrong predictions for outlier stores
-      \end{itemize}
+      \end{itemize}}
     \end{column}
     \begin{column}{0.33\textwidth}
       \textbf{No pooling:}
       Fit 50 independent models.
-      \begin{itemize}[\negc{$\times$}]\small
+      {\setbeamertemplate{itemize item}{\negc{$\times$}}
+      \begin{itemize}\small
         \item Ignores shared structure
         \item Noisy estimates for stores with few observations
         \item Overfits sparse data stores
-      \end{itemize}
+      \end{itemize}}
     \end{column}
     \begin{column}{0.33\textwidth}
       \textbf{Partial pooling (hierarchical):}
       Store params drawn from a common prior.
-      \begin{itemize}[\pos{$\checkmark$}]\small
+      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
+      \begin{itemize}\small
         \item Each store has its own estimate
         \item Sparse stores shrink toward the group mean
         \item Data-rich stores less affected by prior
-      \end{itemize}
+      \end{itemize}}
     \end{column}
   \end{columns}
   \vspace{0.2cm}

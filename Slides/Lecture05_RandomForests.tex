@@ -311,7 +311,8 @@
   \begin{columns}[T]
     \begin{column}{0.50\textwidth}
       \textbf{Strengths:}
-      \begin{itemize}[\pos{$\checkmark$}]
+      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
+      \begin{itemize}
         \item Robust --- hard to overfit badly
         \item Minimal tuning required
         \item Works well out-of-the-box
@@ -319,16 +320,17 @@
         \item Feature importance for model explanation
         \item Handles mixed features (lags, dummies, macro vars)
         \item Scales to many features
-      \end{itemize}
+      \end{itemize}}
     \end{column}
     \begin{column}{0.46\textwidth}
       \textbf{Weaknesses:}
-      \begin{itemize}[\negc{$\times$}]
+      {\setbeamertemplate{itemize item}{\negc{$\times$}}
+      \begin{itemize}
         \item Not as accurate as boosted trees on well-tuned problems
         \item Cannot extrapolate beyond training range
         \item Memory-intensive for many large trees
         \item Less interpretable than a single tree (but importance still useful)
-      \end{itemize}
+      \end{itemize}}
       \vspace{0.1cm}
       \begin{keybox}
         \small \textbf{Good default:} when you need a solid forecast fast,

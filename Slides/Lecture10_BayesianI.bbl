@@ -1,0 +1,109 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global/global}
+  \entry{Gelman2013}{book}{}{}
+    \name{author}{6}{}{%
+      {{hash=GA}{%
+         family={Gelman},
+         familyi={G\bibinitperiod},
+         given={Andrew},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=CJB}{%
+         family={Carlin},
+         familyi={C\bibinitperiod},
+         given={John\bibnamedelima B.},
+         giveni={J\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=SHS}{%
+         family={Stern},
+         familyi={S\bibinitperiod},
+         given={Hal\bibnamedelima S.},
+         giveni={H\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+      {{hash=DDB}{%
+         family={Dunson},
+         familyi={D\bibinitperiod},
+         given={David\bibnamedelima B.},
+         giveni={D\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=VA}{%
+         family={Vehtari},
+         familyi={V\bibinitperiod},
+         given={Aki},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=RDB}{%
+         family={Rubin},
+         familyi={R\bibinitperiod},
+         given={Donald\bibnamedelima B.},
+         giveni={D\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{2}{%
+      {Chapman}%
+      {Hall/CRC}%
+    }
+    \strng{namehash}{GA+1}
+    \strng{fullhash}{GACJBSHSDDBVARDB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2013}
+    \field{labeldatesource}{}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{edition}{3rd}
+    \field{title}{Bayesian Data Analysis}
+    \list{location}{1}{%
+      {Boca Raton, FL}%
+    }
+    \field{year}{2013}
+  \endentry
+
+  \entry{McElreath2020}{book}{}{}
+    \name{author}{1}{}{%
+      {{hash=MR}{%
+         family={McElreath},
+         familyi={M\bibinitperiod},
+         given={Richard},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{2}{%
+      {Chapman}%
+      {Hall/CRC}%
+    }
+    \strng{namehash}{MR1}
+    \strng{fullhash}{MR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2020}
+    \field{labeldatesource}{}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{edition}{2nd}
+    \field{title}{Statistical Rethinking: A {Bayesian} Course with Examples in
+  {R} and {Stan}}
+    \list{location}{1}{%
+      {Boca Raton, FL}%
+    }
+    \field{year}{2020}
+  \endentry
+\enddatalist
+\endinput

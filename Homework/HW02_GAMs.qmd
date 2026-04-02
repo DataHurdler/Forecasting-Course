@@ -1,0 +1,222 @@
+---
+title: "Homework 2: Generalized Additive Models"
+subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Spring 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Overview
+
+Generalized Additive Models (GAMs) extend linear regression by replacing straight-line effects with flexible smooth functions — one per predictor — that are then added together to produce a forecast. This structure preserves interpretability (you can inspect each component individually) while capturing nonlinear patterns that fixed-slope models miss. Prophet, developed at Meta, applies exactly this idea to time series by decomposing a signal into trend, seasonality, and user-defined regressor effects. This assignment applies both Prophet and pyGAM to daily retail sales data and benchmarks them against the ARIMA/ETS baselines from Homework 1.
+
+**Learning objectives.** By the end of this assignment you will be able to:
+
+- Decompose a time series into trend, weekly seasonality, yearly seasonality, and external regressors using Prophet
+- Interpret Prophet component plots and connect them to concrete business decisions
+- Fit a pyGAM with spline terms for calendar features and linear terms for promotional indicators
+- Compare GAM-family models against ARIMA/ETS on a common holdout set using RMSE
+
+---
+
+# Dataset
+
+This homework switches from weekly to **daily** data. Prophet and pyGAM both benefit from finer time granularity: daily data expose intra-week patterns that are averaged away in weekly aggregates, and Prophet's changepoint detection is more reliable with a denser observation grid.
+
+The preprocessed file is located at `data/processed/rossmann_daily.csv`. Run the cell below to confirm the data loaded correctly before proceeding.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from prophet import Prophet
+from pygam import LinearGAM, s, l, f
+import warnings
+warnings.filterwarnings('ignore')
+
+# Load daily Store 1 data
+daily = pd.read_csv("data/processed/rossmann_daily.csv", parse_dates=["Date"])
+print(f"Store 1 daily: {len(daily)} observations from {daily['Date'].min().date()} to {daily['Date'].max().date()}")
+print(daily[["Date","Sales","Promo","StateHoliday","SchoolHoliday"]].head())
+```
+
+---
+
+# Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does **not** count against your prompt budget.
+
+```
+I am working on Homework 2 for BSAD 8310: Business Forecasting at the University of Nebraska at Omaha.
+
+Dataset: Rossmann Store Sales — daily data for Store 1, available at `data/processed/rossmann_daily.csv`. Columns: Date, Sales, Customers, Promo, Open, StateHoliday, SchoolHoliday, StoreType, Assortment, CompetitionDistance, Promo2.
+
+This homework covers Generalized Additive Models (GAMs) using Prophet and pyGAM in Python. I will ask you questions one at a time. For each:
+1. Write clean, well-commented Python code that runs end-to-end
+2. Interpret model outputs and component plots in plain English for a business audience
+3. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget is 10 (this context prompt is excluded). I will label each question before asking.
+
+Confirm by responding with: HW02_CONTEXT_ACK
+```
+
+Submit this text as **`INITIAL_PROMPT.md`** in your submission folder.
+:::
+
+---
+
+# Questions
+
+## Q1 — Prophet: Fit and Decompose
+
+*(Suggested prompts: 2)*
+
+Prophet requires the input dataframe to have exactly two columns: `ds` (the date) and `y` (the target variable). The starter code below performs that rename and defines the train/test split. Using that split, fit a Prophet model with the settings listed below, generate a forecast over the test period, and produce both plots described.
+
+**Model settings:**
+
+- Yearly seasonality: enabled
+- Weekly seasonality: enabled
+- `changepoint_prior_scale = 0.05` (allows the trend to bend, but conservatively)
+
+**Plots to produce:**
+
+1. Forecast plot with uncertainty bands (use Prophet's built-in `plot()` method)
+2. Component decomposition plot showing trend, weekly seasonality, and yearly seasonality (use `plot_components()`)
+
+```{python}
+# Prophet requires columns named 'ds' (date) and 'y' (target)
+prophet_df = daily[["Date", "Sales"]].rename(columns={"Date": "ds", "Sales": "y"})
+train_prophet = prophet_df.iloc[:700]
+test_prophet  = prophet_df.iloc[700:]
+
+# Fit Prophet, forecast over the test period, and plot results
+```
+
+> **Your response:** Describe what the component plots reveal. When is weekly sales highest? Is there a clear annual pattern? What business decisions could you make from these components?
+
+---
+
+## Q2 — Prophet: Adding Regressors
+
+*(Suggested prompts: 2)*
+
+External regressors allow Prophet to attribute part of the sales signal to known business drivers rather than absorbing them into the trend or seasonality components. The starter code below prepares a dataframe that includes `Promo` and `SchoolHoliday` alongside the required `ds` and `y` columns.
+
+**(a)** Add `Promo` and `SchoolHoliday` as additional regressors using `add_regressor()`, then re-fit the model on the same 700-day training set. Compute RMSE on the test set for this model and for the baseline model from Q1. Present both values in a small summary table.
+
+**(b)** Extract the regressor coefficients from the fitted model. Report the estimated sales lift (in units of `y`) attributable to a promotion day. Provide a brief interpretation of the magnitude: is this a large or small effect relative to typical daily sales?
+
+```{python}
+# Add regressor columns to the dataframe before fitting
+prophet_reg_df = daily[["Date", "Sales", "Promo", "SchoolHoliday"]].rename(
+    columns={"Date": "ds", "Sales": "y"}
+)
+
+# Fit Prophet with Promo and SchoolHoliday as additional regressors
+# Compare RMSE with and without regressors
+# Extract and report regressor coefficients
+```
+
+> **Your response:** Is the promotion effect large enough to be actionable? How would you use this estimate in a business planning meeting?
+
+---
+
+## Q3 — pyGAM
+
+*(Suggested prompts: 2)*
+
+pyGAM fits an additive model directly on a feature matrix rather than on a time index, which makes it easy to include calendar-derived features and binary indicators side by side. The starter code below derives `day_of_year` and `day_of_week` from the `Date` column and constructs training and test arrays.
+
+Fit a `LinearGAM` with the following four terms:
+
+| Term | Predictor | Type | Purpose |
+|------|-----------|------|---------|
+| `s(0)` | `day_of_year` (1–365) | Smooth spline | Captures annual seasonality |
+| `s(1)` | `day_of_week` (0–6) | Smooth spline | Captures within-week pattern |
+| `l(2)` | `Promo` | Linear | Promotional sales lift |
+| `l(3)` | `SchoolHoliday` | Linear | School holiday effect |
+
+After fitting, compute test RMSE. Then plot the partial dependence curves for `day_of_year` and `day_of_week` using the model's `plot_partial_dependence()` method or by calling `partial_dependence()` manually.
+
+```{python}
+from pygam import LinearGAM, s, l
+
+daily["day_of_year"] = daily["Date"].dt.dayofyear
+daily["day_of_week"] = daily["Date"].dt.dayofweek
+
+features = ["day_of_year", "day_of_week", "Promo", "SchoolHoliday"]
+X_train = daily.iloc[:700][features].values
+y_train = daily.iloc[:700]["Sales"].values
+X_test  = daily.iloc[700:][features].values
+y_test  = daily.iloc[700:]["Sales"].values
+
+# Fit LinearGAM, compute test RMSE, plot partial dependence for day_of_year and day_of_week
+```
+
+> **Your response:** Look at the partial dependence plot for `day_of_week`. Which day has the highest predicted sales (all else equal)? Does this match what you saw in the Prophet weekly component?
+
+---
+
+## Q4 — Model Comparison
+
+*(Suggested prompts: 2)*
+
+Collect the test-set RMSE values from Q1, Q2, and Q3 into the summary table below. Fill in the best RMSE you recorded from Homework 1 in the final row.
+
+| Model | Test RMSE | Notes |
+|-------|-----------|-------|
+| Prophet (no regressors) | | |
+| Prophet (with regressors) | | |
+| pyGAM | | |
+| Best HW1 model (ARIMA or ETS) | *from HW1* | |
+
+Then produce a single figure showing actual sales versus predicted sales for all three models trained in this homework over the test period. Use distinct colors and a legend.
+
+```{python}
+# Collect RMSE values from Q1, Q2, Q3 into the summary table above
+# Plot actual vs predicted for the test period for Prophet (both variants) and pyGAM
+# Use a single figure with distinct colors and a legend
+```
+
+> **Your response:** Which model gives the best holdout RMSE? Which model is most interpretable to a non-technical manager? Would you recommend a different model for different use cases (e.g., short-term ops planning vs annual budget)?
+
+---
+
+## Q5 — Reflection
+
+*(Suggested prompts: 0 — write yourself)*
+
+No code required for this question. Write 150–200 words in response to the following scenario.
+
+You are presenting to a retail operations team that currently uses a simple 4-week moving average to forecast store-level sales. Explain why a GAM-based approach (Prophet or pyGAM) would be an upgrade over their current method. In your answer, identify at least two specific insights from your component plots that you would highlight for this audience. Close by disclosing at least one meaningful limitation of GAMs that the team should understand before adopting the approach.
+
+> **Your response:**
+
+---
+
+# Submission Checklist
+
+Before submitting, confirm each item below is complete.
+
+- [ ] All code cells run without errors from a clean kernel restart
+- [ ] Written responses completed in your own words (not copied from Codex output)
+- [ ] `INITIAL_PROMPT.md` saved in your submission folder
+- [ ] `PROMPT_LOG.jsonl` complete with 10 or fewer entries
+- [ ] One git commit per Codex prompt, with message format `hw02 prompt <id>: <summary>`
+- [ ] `REPORT.md` containing a plain-English business recommendation (one paragraph)
