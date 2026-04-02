@@ -1,0 +1,283 @@
+---
+title: "Bayesian Statistics II: Time Series & Hierarchical Models"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 11"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Bayesian Time Series: Trend and Seasonality
+2. Hierarchical Models: Partial Pooling
+3. Key Takeaways
+
+---
+
+# Bayesian Time Series: Trend and Seasonality
+
+Encode structural knowledge about trend and seasonality directly in the model, with uncertainty estimates on each component.
+
+---
+
+## From Frequentist to Bayesian Time Series
+
+:::: {.columns}
+::: {.column width="52%"}
+**What ARIMA and ETS give you:**
+
+- Point forecasts with asymptotic prediction intervals
+- Implicit assumptions about trend and error structure
+- Limited ability to incorporate domain knowledge
+- Single-equation, single-series models
+
+**What Bayesian TS adds:**
+
+- Full posterior distributions over trend, seasonality, and each forecast horizon
+- Explicit priors to incorporate business knowledge ("growth rate is unlikely to exceed 20%")
+- Natural uncertainty propagation through time
+- Hierarchical structure for multiple related series
+:::
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Business Application
+:::
+A retail chain has 500 stores. Rather than fitting 500 independent ARIMA models, a Bayesian hierarchical model shares information across stores:
+
+- Each store gets its own parameters
+- Parameters are drawn from a common distribution (the hierarchy)
+- Sparse data stores borrow strength from stores with more data
+:::
+:::
+::::
+
+---
+
+## Bayesian Structural Time Series
+
+We decompose a time series into three components: a slowly-changing **trend**, a repeating **seasonal pattern**, and random **noise**. Each component gets its own parameters — and the Bayesian approach gives us uncertainty estimates on all of them simultaneously.
+
+A simple Bayesian trend + seasonality model:
+
+$$y_t = \mu_t + s_t + \varepsilon_t, \quad \varepsilon_t \sim \mathcal{N}(0, \sigma^2)$$
+
+where the trend $\mu_t$ evolves according to:
+
+$$\mu_t = \mu_{t-1} + \delta_{t-1} + \eta_t, \qquad \delta_t = \delta_{t-1} + \zeta_t$$
+
+:::: {.columns}
+::: {.column width="52%"}
+**Seasonal component using Fourier features:**
+
+Seasonality is modeled as a sum of smooth waves (sine and cosine curves) that repeat every year. More waves ($K$) = more flexible seasonal shapes.
+
+$$s_t = \sum_{k=1}^{K} \left[a_k \cos\!\left(\frac{2\pi k t}{P}\right) + b_k \sin\!\left(\frac{2\pi k t}{P}\right)\right]$$
+
+where $P$ = period (12 for monthly, 4 for quarterly) and $K$ controls flexibility.
+:::
+::: {.column width="44%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+Local Linear Trend
+:::
+$\mu_t$: level at time $t$
+
+$\delta_t$: slope (trend growth rate)
+
+$\eta_t \sim \mathcal{N}(0, \sigma_\eta^2)$: level shock
+
+$\zeta_t \sim \mathcal{N}(0, \sigma_\zeta^2)$: slope shock
+
+Priors on $\sigma_\eta, \sigma_\zeta$ control how much the trend is allowed to change over time.
+:::
+:::
+::::
+
+---
+
+## Bayesian TS in PyMC
+
+:::: {.columns}
+::: {.column width="55%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Linear Trend + Seasonality
+:::
+```python
+with pm.Model() as ts_model:
+    # Trend priors
+    alpha = pm.Normal('alpha',
+                      mu=y.mean(), sigma=y.std())
+    beta  = pm.Normal('beta', mu=0, sigma=1)
+
+    # Fourier seasonality (K=3)
+    K = 3; P = 12
+    t_idx = np.arange(len(y))
+    fourier = [
+        pm.Normal(f'a{k}', 0, 1) *
+        np.cos(2*np.pi*k*t_idx/P) +
+        pm.Normal(f'b{k}', 0, 1) *
+        np.sin(2*np.pi*k*t_idx/P)
+        for k in range(1, K+1)
+    ]
+    seasonality = sum(fourier)
+
+    mu = alpha + beta * t_idx + seasonality
+    sigma = pm.HalfNormal('sigma', sigma=y.std())
+    obs = pm.Normal('obs', mu=mu,
+                    sigma=sigma, observed=y)
+    trace = pm.sample(2000)
+```
+:::
+:::
+::: {.column width="41%"}
+**What you get:**
+
+- Posterior distribution over the slope $\beta$: is the trend growing or declining? With what probability?
+- Posterior over Fourier coefficients $a_k, b_k$: how strong and what shape is the seasonality?
+- Posterior predictive distribution: credible bands around each forecast horizon, not just a point estimate
+
+::: {.keybox}
+Use `pm.sample_posterior_predictive(trace)` to generate forecast draws. Summarize as: median forecast + 90% credible band.
+:::
+:::
+::::
+
+---
+
+# Hierarchical Models: Partial Pooling
+
+Share information across groups via a common prior distribution. The hierarchy learns what is typical; each group learns its own deviation.
+
+---
+
+## Three Approaches to Multi-Group Data
+
+Suppose we have sales data for $J = 50$ stores, each with limited history.
+
+:::: {.columns}
+::: {.column width="33%"}
+**Complete pooling:**
+
+Fit one model ignoring stores.
+
+::: {.negative}
+- Assumes all stores are identical
+- Misses systematic store differences
+- Wrong predictions for outlier stores
+:::
+:::
+::: {.column width="33%"}
+**No pooling:**
+
+Fit 50 independent models.
+
+::: {.negative}
+- Ignores shared structure
+- Noisy estimates for sparse stores
+- Overfits sparse data stores
+:::
+:::
+::: {.column width="33%"}
+**Partial pooling (hierarchical):**
+
+Store params drawn from a common prior.
+
+::: {.positive}
+- Each store has its own estimate
+- Sparse stores shrink toward the group mean
+- Data-rich stores less affected by prior
+:::
+:::
+::::
+
+::: {.keybox}
+Partial pooling is the Bayesian answer to the bias-variance trade-off: adding a hierarchical prior reduces variance (less overfitting) at the cost of a small bias (shrinkage toward the mean). [@Gelman2013]
+:::
+
+---
+
+## Hierarchical Model: Structure and Code
+
+:::: {.columns}
+::: {.column width="52%"}
+**Partial pooling for store-level intercepts:**
+
+$$y_{it} \sim \mathcal{N}(\alpha_i + \beta t, \sigma^2)$$
+$$\alpha_i \sim \mathcal{N}(\mu_\alpha, \sigma_\alpha^2) \quad \text{(store hierarchy)}$$
+$$\mu_\alpha \sim \mathcal{N}(\bar{y}, \text{SD}(y)), \quad \sigma_\alpha \sim \text{HalfNormal}(1)$$
+
+::: {.examplebox}
+::: {.examplebox-title}
+PyMC Partial Pooling
+:::
+```python
+with pm.Model() as hier:
+    mu_a  = pm.Normal('mu_a', 0, 1)
+    sig_a = pm.HalfNormal('sig_a', 1)
+    alpha = pm.Normal('alpha',
+        mu=mu_a, sigma=sig_a, shape=J)
+    beta = pm.Normal('beta', 0, 1)
+    mu = alpha[store_idx] + beta * t
+    pm.Normal('obs', mu=mu,
+              sigma=1, observed=y)
+```
+:::
+:::
+::: {.column width="44%"}
+::: {.keybox}
+**The key line:**
+`alpha = pm.Normal('alpha', mu=mu_a, sigma=sig_a, shape=J)`
+
+Each store $i$ gets its own $\alpha_i$, but all $\alpha_i$ are drawn from $\mathcal{N}(\mu_\alpha, \sigma_\alpha)$. Learning $\mu_\alpha$ and $\sigma_\alpha$ from data is what makes it hierarchical.
+:::
+
+::: {.warningbox}
+Use the **non-centered parameterization** for better sampling efficiency: $\alpha_i = \mu_\alpha + \sigma_\alpha \cdot z_i$, $z_i \sim \mathcal{N}(0,1)$. PyMC tutorials demonstrate this.
+:::
+:::
+::::
+
+---
+
+## Lecture 11: Key Takeaways
+
+::: {.keybox}
+1. Bayesian time series models decompose the series into **trend**, **seasonality**, and **error**, each with its own prior. The posterior quantifies uncertainty in every component simultaneously.
+
+2. **Fourier features** ($\cos$ and $\sin$ terms) parameterize seasonality with $K$ harmonics. More harmonics = more flexible seasonal patterns.
+
+3. **Hierarchical models** use partial pooling to share information across groups (stores, regions, products). Sparse groups shrink toward the group mean; data-rich groups are less affected.
+
+4. The three pooling options — complete, no, and partial — represent a bias-variance trade-off. Partial pooling (hierarchical) is almost always the best choice for multi-group business data.
+
+5. In PyMC, hierarchical structure is created by giving group-level parameters a shared prior with hyperparameters that are themselves estimated from the data.
+:::
+
+*Next: Bayesian Statistics III — Bayesian linear regression, posterior coefficient distributions, and conditional analysis.*
+
+---
+
+## References
+
+::: {#refs}
+:::

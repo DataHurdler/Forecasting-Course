@@ -1,0 +1,358 @@
+% =============================================================================
+% Lecture 10: Bayesian Statistics I — Foundations
+% BSAD 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+% ---- Lecture metadata --------------------------------------------------------
+\title{Bayesian Statistics I: Foundations}
+\subtitle{BSAD 8310: Business Forecasting --- Lecture 10}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+\date{Spring 2026}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---- Outline ----------------------------------------------------------------
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Why Bayesian Thinking?}
+% =============================================================================
+
+\sectionslide{Why Bayesian Thinking?}{%
+  Frequentist methods give point estimates with confidence intervals.
+  Bayesian methods give full probability distributions over unknowns,
+  encoding uncertainty explicitly.}
+
+% --- Slide: Two ways to think about probability ------------------------------
+\begin{frame}{Frequentist vs.\ Bayesian}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Frequentist (Lectures 1--9):}
+      \begin{itemize}\small
+        \item Parameters $\theta$ are \textbf{fixed but unknown}
+        \item Probability = long-run frequency of events
+        \item A 95\% confidence interval:
+              ``If we repeated this sampling procedure 100 times,
+              95 intervals would contain the true $\theta$''
+        \item Cannot say: ``There is a 95\% chance $\theta$ is in this interval''
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Bayesian:}
+      \begin{itemize}\small
+        \item Parameters $\theta$ are \textbf{random variables with distributions}
+        \item Probability = degree of belief, updated with evidence
+        \item A 95\% credible interval:
+              ``There is a 95\% probability that $\theta$ falls in this interval,
+              given the data we observed''
+        \item Prior beliefs + data $\to$ updated beliefs (posterior)
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    \textbf{Business advantage:} Bayesian forecasts come with full uncertainty
+    distributions --- not just a point estimate and a standard error.
+    You can ask: ``What is the probability that demand exceeds 10,000 units?''
+    and get a direct answer.
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{Bayes' Theorem}
+% =============================================================================
+
+\sectionslide{Bayes' Theorem}{%
+  Prior beliefs + likelihood of data = posterior beliefs.}
+
+% --- Slide: Bayes theorem ----------------------------------------------------
+\begin{frame}{Bayes' Theorem}
+  \begin{definitionbox}{Bayes' Theorem}
+    \[
+      \underbrace{p(\theta \mid \mathcal{D})}_{\text{posterior}} =
+      \frac{\overbrace{p(\mathcal{D} \mid \theta)}^{\text{likelihood}} \cdot
+            \overbrace{p(\theta)}^{\text{prior}}}
+           {\underbrace{p(\mathcal{D})}_{\text{normalizing constant}}}
+      \propto p(\mathcal{D} \mid \theta) \cdot p(\theta)
+    \]
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{description}\small
+        \item[\textbf{Prior} $p(\theta)$] What we believe about $\theta$
+              \emph{before} seeing the data. Encoded as a probability distribution.
+        \item[\textbf{Likelihood} $p(\mathcal{D} \mid \theta)$] How probable is
+              the observed data if $\theta$ were the true value?
+        \item[\textbf{Posterior} $p(\theta \mid \mathcal{D})$] Updated belief
+              about $\theta$ after observing data $\mathcal{D}$.
+      \end{description}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{examplebox}{Business Example}
+        \small
+        A store wants to estimate the conversion rate $\theta$
+        of a new promotion:
+        \begin{itemize}\small
+          \item \textbf{Prior:} based on past promotions,
+                $\theta \sim \text{Beta}(5, 45)$
+                (roughly 10\% conversion)
+          \item \textbf{Data:} 30 conversions from 200 exposures
+          \item \textbf{Posterior:} updated distribution for $\theta$
+                incorporating both prior and new data
+        \end{itemize}
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Prior Distributions}
+% =============================================================================
+
+\sectionslide{Prior Distributions}{%
+  The prior encodes what you know (or assume) before seeing data.
+  Choose it to reflect genuine prior knowledge.}
+
+% --- Slide: Common priors ---------------------------------------------------
+\begin{frame}{Common Prior Distributions}
+  \begin{columns}[T]
+    \begin{column}{0.33\textwidth}
+      \textbf{Beta distribution:}
+      \[
+        \theta \sim \text{Beta}(\alpha, \beta)
+      \]
+      \begin{itemize}\small
+        \item Support: $[0, 1]$
+        \item Natural prior for proportions (conversion rate, market share)
+        \item $\text{Beta}(1,1) = \text{Uniform}[0,1]$
+        \item $\alpha, \beta$: effective counts of successes/failures
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \textbf{Normal distribution:}
+      \[
+        \theta \sim \mathcal{N}(\mu_0, \sigma_0^2)
+      \]
+      \begin{itemize}\small
+        \item Support: $(-\infty, +\infty)$
+        \item Natural prior for regression coefficients
+        \item Weakly informative: $\mathcal{N}(0, 1)$ after
+              standardizing predictors
+        \item Conjugate prior for Normal likelihood
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \textbf{Exponential distribution:}
+      \[
+        \theta \sim \text{Exp}(\lambda)
+      \]
+      \begin{itemize}\small
+        \item Support: $[0, +\infty)$
+        \item Natural prior for positive quantities
+              (variance, arrival rate)
+        \item $\text{HalfNormal}(\sigma)$ also common
+              for standard deviations
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    A \textbf{weakly informative prior} puts most mass on
+    plausible values but does not dominate the likelihood.
+    Better than a flat prior (which can cause sampling problems)
+    and better than an overly tight prior (which ignores data).
+    \parencite{Gelman2013}
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{Posterior Inference with PyMC}
+% =============================================================================
+
+\sectionslide{Posterior Inference with PyMC}{%
+  When we cannot solve Bayes' theorem analytically,
+  Markov Chain Monte Carlo (MCMC) samples from the posterior.}
+
+% --- Slide: MCMC intuition ---------------------------------------------------
+\begin{frame}{Markov Chain Monte Carlo (MCMC): The Big Idea}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{The problem:} $p(\mathcal{D})$ in Bayes' theorem is
+      usually impossible to compute analytically for real models.
+
+      \vspace{0.2cm}
+      \textbf{MCMC solution:} instead of computing the normalizing constant,
+      draw a \emph{sample} from the posterior:
+      \begin{enumerate}\small
+        \item Start at some initial $\theta^{(0)}$
+        \item Propose a new $\theta^*$ nearby
+        \item Accept $\theta^*$ with probability proportional to
+              the posterior ratio: $\min\!\left(1, \frac{p(\theta^*|\mathcal{D})}{p(\theta^{(t)}|\mathcal{D})}\right)$
+        \item After many steps, the chain's distribution
+              converges to $p(\theta \mid \mathcal{D})$
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{definitionbox}{Metropolis Sampling}
+        The simplest MCMC algorithm.
+        PyMC uses more efficient samplers
+        (NUTS --- No-U-Turn Sampler) by default,
+        which adapts the step size and exploits
+        gradient information.
+      \end{definitionbox}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small The posterior \textbf{samples} are the answer:
+        a histogram of samples gives you the full
+        posterior distribution. From samples, you can compute
+        means, medians, credible intervals, and
+        probabilities of any event.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: PyMC example: coin flip -----------------------------------------
+\begin{frame}{PyMC: A First Model}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{Estimating a Conversion Rate}
+        {\small
+        \texttt{import pymc as pm}\\
+        \texttt{import numpy as np}\\[4pt]
+        \texttt{\# Data: 30 successes out of 200 trials}\\
+        \texttt{n\_trials = 200}\\
+        \texttt{n\_success = 30}\\[4pt]
+        \texttt{with pm.Model() as model:}\\
+        \texttt{  \# Prior}\\
+        \texttt{  theta = pm.Beta('theta', alpha=5, beta=45)}\\[4pt]
+        \texttt{  \# Likelihood}\\
+        \texttt{  obs = pm.Binomial('obs',}\\
+        \texttt{    n=n\_trials, p=theta,}\\
+        \texttt{    observed=n\_success)}\\[4pt]
+        \texttt{  \# Sample from posterior (2000 draws)}\\
+        \texttt{  trace = pm.sample(2000, return\_inferencedata=True)}\\[4pt]
+        \texttt{pm.plot\_posterior(trace)}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Reading the output:}
+      \begin{itemize}\small
+        \item \textbf{Posterior mean:} best single estimate of $\theta$
+        \item \textbf{94\% HDI (highest density interval):}
+              the shortest interval containing 94\% of the
+              posterior probability --- the Bayesian analog of a
+              confidence interval
+        \item \textbf{Posterior histogram:} full picture of uncertainty
+      \end{itemize}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small PyMC models are written \emph{generatively}:
+        define priors, then describe how the data are generated
+        given those priors. The sampler does the rest.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Prior predictive checks -----------------------------------------
+\begin{frame}{Prior Predictive Checks}
+  Before fitting the model to data, simulate predictions using
+  \emph{only the prior}. This checks whether the prior is sensible.
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{Prior Predictive Sampling}
+        {\small
+        \texttt{with model:}\\
+        \texttt{  prior\_pred = pm.sample\_prior\_predictive(500)}\\[4pt]
+        \texttt{pm.plot\_prior\_predictive(prior\_pred)}
+        }
+      \end{examplebox}
+      \vspace{0.2cm}
+      \textbf{What to look for:}
+      \begin{itemize}\small
+        \item Does the prior generate plausible data?
+        \item No impossible values (negative sales, probabilities $> 1$)
+        \item Not too concentrated (would override the data)
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{warningbox}
+        \small If prior predictive samples are completely implausible
+        (e.g., sales of 1 billion units), your prior is too wide ---
+        tighten it. If all samples look the same, it is too tight ---
+        widen it.
+      \end{warningbox}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small Prior predictive checks are
+        \textbf{model debugging}. Run them before
+        every Bayesian model to catch
+        specification errors early.
+        \parencite{McElreath2020}
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Key Takeaways}
+% =============================================================================
+
+\sectionslide{Key Takeaways}{%
+  Bayesian inference: beliefs in, beliefs out.
+  Data updates your prior into a posterior.}
+
+% --- Slide: Key takeaways ---------------------------------------------------
+\begin{frame}{Lecture 10: Key Takeaways}
+  \begin{keybox}
+    {\small
+    \begin{enumerate}
+      \item \textbf{Bayesian inference} treats parameters as random variables
+            with probability distributions. The posterior distribution
+            $p(\theta \mid \mathcal{D})$ represents updated beliefs after seeing data.
+
+      \item \textbf{Bayes' theorem:} posterior $\propto$ likelihood $\times$ prior.
+            The normalizing constant $p(\mathcal{D})$ is usually intractable,
+            so we sample instead of computing it.
+
+      \item \textbf{Priors} encode prior knowledge. Use weakly informative priors
+            (Beta, Normal, HalfNormal) to constrain parameters to plausible values
+            without overwhelming the data.
+
+      \item \textbf{MCMC} (specifically NUTS in PyMC) draws samples from the posterior.
+            From samples, compute any summary statistic: mean, median, HDI, or
+            the probability that a parameter exceeds a threshold.
+
+      \item \textbf{Prior predictive checks} verify that your model generates plausible
+            data before fitting. Run them every time.
+    \end{enumerate}
+    }
+  \end{keybox}
+  \muted{\itshape Next: Bayesian Statistics II ---
+  Bayesian time series models, trend and seasonality, hierarchical models.}
+\end{frame}
+
+% --- References ---------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+% =============================================================================
+\end{document}
+% =============================================================================

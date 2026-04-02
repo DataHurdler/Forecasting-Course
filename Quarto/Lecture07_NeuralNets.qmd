@@ -1,0 +1,418 @@
+---
+title: "Introduction to Neural Networks"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 7"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. From Trees to Neural Networks
+2. Feedforward Networks
+3. Training: Loss and Backpropagation
+4. PyTorch Implementation
+5. Key Takeaways
+
+---
+
+# From Trees to Neural Networks
+
+Tree-based methods are powerful but limited by their piecewise-constant predictions. Neural networks learn smooth, continuous functions of arbitrary complexity.
+
+---
+
+## Why Go Beyond Trees?
+
+:::: {.columns}
+::: {.column width="52%"}
+**Tree-based models (L04--L06):**
+
+- Excellent for tabular data with many features
+- Each row treated **independently** — no built-in notion of order or sequence
+- Predictions are piecewise constant: cannot extrapolate beyond training range
+- Feature engineering required for temporal patterns (lag columns, rolling means, etc.)
+:::
+::: {.column width="44%"}
+**What neural networks add:**
+
+- Learn **smooth, continuous** functions directly
+- Flexible architecture: can be adapted for sequences, images, text
+- Can learn hierarchical feature representations automatically
+- PyTorch enables custom architectures and GPU-accelerated training
+:::
+::::
+
+::: {.keybox}
+Neural networks are not always better than XGBoost on tabular data. They shine when: (1) the data is a sequence (time series, text), (2) raw inputs are images or audio, or (3) you have very large amounts of data ($n > 100\text{K}$).
+:::
+
+---
+
+## From Linear Regression to a Single Neuron
+
+:::: {.columns}
+::: {.column width="52%"}
+**Linear regression** (Lecture 02):
+$$\hat{y} = \mathbf{w}^\top \mathbf{x} + b$$
+
+**One neuron** wraps the linear combination in a nonlinear **activation function** $\sigma(\cdot)$:
+$$a = \sigma(\mathbf{w}^\top \mathbf{x} + b)$$
+
+| Activation | Formula | Typical use |
+|-----------|---------|------------|
+| ReLU | $\max(0,z)$ | Hidden layers |
+| Sigmoid | $1/(1+e^{-z})$ | Binary output / gates |
+| Tanh | $\tanh(z)$ | Sequence hidden states |
+| Linear | $z$ | Regression output |
+:::
+::: {.column width="44%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+Why Non-Linearity?
+:::
+Without $\sigma(\cdot)$, stacking layers is equivalent to a single linear model — the composition of linear functions is still linear.
+
+Non-linearity enables a network to approximate **any continuous function** to arbitrary accuracy (universal approximation theorem).
+:::
+
+::: {.examplebox}
+::: {.examplebox-title}
+Business intuition
+:::
+A neuron asks: "Is this pattern present?" If yes (large positive $z$), activate. If no, stay off. ReLU makes this literal.
+:::
+:::
+::::
+
+---
+
+# Feedforward Networks
+
+Stack layers of neurons. Each layer learns higher-level representations of the input.
+
+---
+
+## Feedforward Network: Layers and Forward Pass
+
+Think of a feedforward network as a pipeline: raw inputs enter at one end, pass through several transformation stages (hidden layers), and a prediction exits at the other end. Each stage learns to extract more abstract features from the previous stage.
+
+:::: {.columns}
+::: {.column width="52%"}
+A **feedforward network** (FFN / MLP) has:
+
+- **Input layer:** raw features $\mathbf{x} \in \mathbb{R}^p$
+- **Hidden layers:** $H$ layers, each applying a linear transformation followed by an activation: $$\mathbf{a}^{(\ell)} = \sigma(\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)} + \mathbf{b}^{(\ell)})$$
+- **Output layer:** linear (regression) or softmax (classification)
+
+**Notation:**
+
+- $\mathbf{W}^{(\ell)}$: weight matrix for layer $\ell$
+- $\mathbf{b}^{(\ell)}$: bias vector for layer $\ell$
+- Width = number of neurons per layer
+- Depth = number of hidden layers
+:::
+::: {.column width="44%"}
+::: {.keybox}
+**Practical sizing for forecasting:**
+
+- 2--3 hidden layers
+- 64--256 neurons per layer
+- ReLU activations
+- Dropout 0.2--0.5 for regularization
+
+Wider/deeper networks need more data and more regularization.
+:::
+
+::: {.warningbox}
+Bigger is not always better. Start small, add capacity only if the validation error is still too high.
+:::
+:::
+::::
+
+---
+
+# Training: Loss and Backpropagation
+
+How does the network learn? By computing the error, then propagating it backward to update weights.
+
+---
+
+## Training a Network: Loss, Gradients, and SGD
+
+:::: {.columns}
+::: {.column width="52%"}
+**Step 1: Define a loss function**
+
+For regression: $\mathcal{L} = \frac{1}{n}\sum_i (y_i - \hat{y}_i)^2$ (Mean Squared Error)
+
+**Step 2: Backpropagation**
+
+Work backward through the network to figure out how much each weight contributed to the error, then adjust it. PyTorch computes all gradients automatically — you never need to do the calculus by hand.
+
+::: {.keybox}
+**You do not need to understand calculus to use PyTorch.** Call `loss.backward()` and PyTorch handles all the gradient computation internally.
+:::
+
+**Step 3: Update weights (SGD step)**
+$$\mathbf{W} \leftarrow \mathbf{W} - \eta \frac{\partial \mathcal{L}}{\partial \mathbf{W}}$$
+
+where $\eta$ is the **learning rate**.
+:::
+::: {.column width="44%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+Stochastic Gradient Descent
+:::
+Instead of computing the gradient on all $n$ observations at once (slow), use a random **mini-batch** of size 32--256 per step. One pass through all mini-batches is one **epoch**.
+:::
+
+::: {.keybox}
+**In practice, use Adam optimizer** instead of plain SGD. Adam adapts the learning rate per parameter and converges much faster.
+
+`torch.optim.Adam(lr=1e-3)`
+:::
+:::
+::::
+
+---
+
+## Preventing Overfitting: Dropout and Early Stopping
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+Dropout
+:::
+During training, randomly set a fraction $p$ of neuron outputs to zero on each forward pass. This prevents co-adaptation: neurons cannot rely on specific other neurons being present.
+
+At test time, all neurons are active and outputs are scaled by $(1-p)$.
+:::
+
+PyTorch: `nn.Dropout(p=0.3)`
+:::
+::: {.column width="44%"}
+::: {.warningbox}
+**Early stopping** is essential. Monitor validation loss after every epoch. Stop training when validation loss stops improving for $k$ consecutive epochs (patience). Save the model at the best validation epoch.
+:::
+
+::: {.keybox}
+**Standard regularization toolkit:**
+
+- Dropout (p = 0.2--0.5)
+- Weight decay in Adam (`weight_decay=1e-4`)
+- Early stopping (patience = 10--20)
+- Batch normalization (deeper nets)
+:::
+:::
+::::
+
+---
+
+# PyTorch Implementation
+
+Dataset, DataLoader, model definition, and training loop.
+
+---
+
+## PyTorch: Dataset and DataLoader
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Custom Dataset
+:::
+```python
+import torch
+from torch.utils.data import Dataset, DataLoader
+
+class ForecastDataset(Dataset):
+    def __init__(self, X, y):
+        self.X = torch.tensor(X, dtype=torch.float32)
+        self.y = torch.tensor(y, dtype=torch.float32)
+
+    def __len__(self):
+        return len(self.X)
+
+    def __getitem__(self, idx):
+        return self.X[idx], self.y[idx]
+
+train_ds = ForecastDataset(X_train, y_train)
+train_loader = DataLoader(
+    train_ds, batch_size=64, shuffle=True)
+```
+:::
+:::
+::: {.column width="44%"}
+**Why Dataset and DataLoader?**
+
+- `Dataset`: wraps your data and defines how to get one sample
+- `DataLoader`: handles mini-batching, shuffling, and parallel loading
+- Separates data handling from model logic — easy to swap in different datasets
+
+::: {.warningbox}
+**Time series:** do NOT shuffle. Set `shuffle=False` and use `TimeSeriesSplit` splits on the underlying indices before creating the Dataset.
+:::
+:::
+::::
+
+---
+
+## PyTorch: Defining the Model
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Feedforward Regressor
+:::
+```python
+import torch.nn as nn
+
+class FFNRegressor(nn.Module):
+    def __init__(self, in_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_dim, 128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(64, 1)
+        )
+
+    def forward(self, x):
+        return self.net(x).squeeze(-1)
+
+model = FFNRegressor(in_dim=X_train.shape[1])
+```
+:::
+:::
+::: {.column width="44%"}
+**Key PyTorch concepts:**
+
+- `nn.Module`: base class for all models. Override `__init__` and `forward`.
+- `nn.Sequential`: chains layers in order
+- `nn.Linear(in, out)`: fully connected layer with $in \times out$ weights + bias
+- `nn.ReLU()`: element-wise ReLU activation
+- `nn.Dropout(p)`: dropout layer
+
+::: {.keybox}
+The `forward` method defines what happens on each pass through the network. PyTorch automatically computes gradients via `autograd`.
+:::
+:::
+::::
+
+---
+
+## PyTorch: The Training Loop
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Training Loop
+:::
+```python
+optimizer = torch.optim.Adam(
+    model.parameters(), lr=1e-3)
+criterion = nn.MSELoss()
+
+for epoch in range(100):
+    model.train()
+    for X_batch, y_batch in train_loader:
+        optimizer.zero_grad()
+        y_hat = model(X_batch)
+        loss = criterion(y_hat, y_batch)
+        loss.backward()
+        optimizer.step()
+
+    # Evaluate on validation set
+    model.eval()
+    with torch.no_grad():
+        val_hat = model(X_val_t)
+        val_loss = criterion(val_hat, y_val_t)
+    print(f"Epoch {epoch}: val={val_loss:.2f}")
+```
+:::
+:::
+::: {.column width="44%"}
+**Four required steps per mini-batch:**
+
+1. `zero_grad()`: clear accumulated gradients
+2. Forward pass: compute $\hat{y}$
+3. `loss.backward()`: compute gradients
+4. `optimizer.step()`: update weights
+
+::: {.warningbox}
+Always call `model.eval()` before validation to disable dropout. Use `torch.no_grad()` to skip gradient computation during evaluation (saves memory and time).
+:::
+:::
+::::
+
+---
+
+## Neural Networks vs. Tree Methods
+
+| Method | Handles sequences | Extrapolates | Tuning burden | Best for |
+|--------|-----------------|-------------|--------------|---------|
+| Random Forest | No (needs lags) | No | Low | Tabular, fast baseline |
+| XGBoost | No (needs lags) | No | Medium | Tabular, best accuracy |
+| FFN (MLP) | Partially | Yes | Medium | Tabular + smooth functions |
+| RNN / LSTM | Yes | Yes | High | Sequences, time series |
+
+::: {.keybox}
+**When to use an FFN for forecasting:**
+
+- You have engineered lag and rolling features (same as XGBoost)
+- You want a smooth, continuous forecast function
+- Baseline: XGBoost usually wins on small-to-medium tabular data; FFN may win with larger data or more complex patterns
+:::
+
+---
+
+## Lecture 7: Key Takeaways
+
+::: {.keybox}
+1. A **neuron** combines inputs linearly, then applies a nonlinear **activation function** (ReLU, sigmoid, tanh). Without non-linearity, stacking layers is equivalent to one linear layer.
+
+2. A **feedforward network** stacks layers of neurons. Each layer learns higher-level representations. Depth adds capacity; width adds breadth.
+
+3. **Training** is iterative: compute loss, backpropagate gradients, update weights with Adam. Use mini-batches for efficiency.
+
+4. The **four mandatory steps** per mini-batch in PyTorch: `zero_grad()` → forward pass → `loss.backward()` → `optimizer.step()`.
+
+5. Prevent overfitting with **dropout**, **weight decay**, and **early stopping** on a held-out validation set.
+
+6. For time series, do not shuffle the DataLoader. Use **TimeSeriesSplit** to create train/val splits.
+:::
+
+*Next: CNN Architectures — convolutional filters, pooling, and residual connections for structured data.*
+
+---
+
+## References
+
+::: {#refs}
+:::

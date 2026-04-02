@@ -133,6 +133,10 @@
 
 % --- Slide: Layers and forward pass ------------------------------------------
 \begin{frame}{Feedforward Network: Layers and Forward Pass}
+  Think of a feedforward network as a pipeline: raw inputs enter at one end,
+  pass through several transformation stages (hidden layers),
+  and a prediction exits at the other end.
+  Each stage learns to extract more abstract features from the previous stage.
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       A \textbf{feedforward network} (FFN / MLP) has:
@@ -140,6 +144,7 @@
         \item \textbf{Input layer:} raw features
               $\mathbf{x} \in \mathbb{R}^p$
         \item \textbf{Hidden layers:} $H$ layers, each applying
+              a linear transformation then an activation:
               $\mathbf{a}^{(\ell)} = \sigma(\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)} + \mathbf{b}^{(\ell)})$
         \item \textbf{Output layer:} linear (regression)
               or softmax (classification)
@@ -196,8 +201,15 @@
       \vspace{0.2cm}
       \textbf{Step 2: Backpropagation}
 
-      Apply the chain rule to compute $\frac{\partial \mathcal{L}}{\partial \mathbf{W}^{(\ell)}}$
-      for every weight matrix. PyTorch does this automatically.
+      Work backward through the network to figure out how much each
+      weight contributed to the error, then adjust it.
+      PyTorch computes all gradients automatically ---
+      you never need to do the calculus by hand.
+      \begin{keybox}
+        \small \textbf{You do not need to understand calculus to use PyTorch.}
+        Call \texttt{loss.backward()} and PyTorch handles all
+        gradient computation internally.
+      \end{keybox}
 
       \vspace{0.2cm}
       \textbf{Step 3: Update weights (SGD step)}

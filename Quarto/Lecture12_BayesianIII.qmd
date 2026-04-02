@@ -1,0 +1,291 @@
+---
+title: "Bayesian Statistics III: Bayesian Linear Regression"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 12"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Bayesian Linear Regression
+2. Interpreting Posterior Coefficient Distributions
+3. Directed Acyclic Graphs and Causal Structure
+4. Conditional Analysis and Group-Specific Models
+5. Course Synthesis and Next Steps
+
+---
+
+# Bayesian Linear Regression
+
+OLS gives a single coefficient estimate. Bayesian regression gives a full distribution over every coefficient, quantifying exactly how uncertain we are about each effect.
+
+---
+
+## OLS vs. Bayesian Regression: What Changes?
+
+:::: {.columns}
+::: {.column width="52%"}
+**OLS (Lectures 2 and 8):**
+$$\hat{\boldsymbol{\beta}} = (\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}$$
+
+- Single point estimate $\hat{\boldsymbol{\beta}}$
+- Standard errors derived from asymptotic theory
+- Confidence intervals rely on assumptions about large-sample normality
+- Regularization (Ridge, LASSO) is an ad-hoc fix for overfitting
+:::
+::: {.column width="44%"}
+**Bayesian regression:**
+$$p(\boldsymbol{\beta} \mid \mathbf{y}) \propto p(\mathbf{y} \mid \boldsymbol{\beta}) \cdot p(\boldsymbol{\beta})$$
+
+- Full posterior distribution for each $\beta_j$
+- Credible intervals are exact probability statements
+- Regularization = informative prior (Normal prior ≡ Ridge, LASSO ≡ Laplace prior)
+- Works even with small samples
+:::
+::::
+
+::: {.keybox}
+Bayesian regression answers questions OLS cannot: "What is the probability that the advertising elasticity exceeds 0.5?" or "Is it more likely that price sensitivity increased or decreased?"
+:::
+
+---
+
+## Bayesian Linear Regression in PyMC
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Retail Sales Regression
+:::
+```python
+with pm.Model() as blr:
+    # Weakly informative priors
+    intercept = pm.Normal('intercept',
+        mu=y.mean(), sigma=y.std())
+    beta = pm.Normal('beta',
+        mu=0, sigma=1, shape=X.shape[1])
+    sigma = pm.HalfNormal('sigma',
+                          sigma=y.std())
+
+    # Linear predictor
+    mu = intercept + X @ beta
+
+    # Likelihood
+    pm.Normal('y_obs', mu=mu,
+              sigma=sigma, observed=y)
+
+    trace = pm.sample(2000)
+
+pm.plot_posterior(trace,
+                  var_names=['beta'])
+```
+:::
+:::
+::: {.column width="44%"}
+**Standardize predictors first:**
+
+- Center and scale all $X$ columns before fitting:
+  `X_std = (X - X.mean()) / X.std()`
+- With standardized inputs, $\mathcal{N}(0,1)$ priors on $\beta$ are weakly informative
+- Coefficients are then interpretable as "effect of a 1-SD increase in $x_j$ on $y$"
+
+::: {.keybox}
+A Normal prior on $\beta$ is mathematically equivalent to Ridge regularization. A Laplace (double exponential) prior is equivalent to LASSO. Bayesian inference subsumes regularization.
+:::
+:::
+::::
+
+---
+
+# Interpreting Posterior Coefficient Distributions
+
+Credible intervals, probability of direction, and conditional effect analysis.
+
+---
+
+## Reading Posterior Distributions
+
+:::: {.columns}
+::: {.column width="52%"}
+**For each coefficient $\beta_j$, the posterior gives:**
+
+- **Posterior mean** — best single estimate
+- **Posterior median** — more robust if distribution is skewed
+- **HDI** — Highest Density Interval: shortest interval containing $X$% of the probability mass
+- **Prob. of direction** — $P(\beta_j > 0)$ or $P(\beta_j < 0)$ — a more natural measure than a $p$-value
+- **ROPE analysis** (Region Of Practical Equivalence) — define a range of "practically zero" effects (e.g., $|\beta_j| < 0.05$) and check what fraction of the posterior falls inside. If most of the posterior is in the ROPE, the effect is statistically present but too small to matter for business decisions.
+:::
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Business Example
+:::
+Posterior for advertising elasticity $\beta_{\text{ads}}$:
+
+- Posterior mean: 0.32
+- 94% HDI: [0.18, 0.47]
+- $P(\beta_{\text{ads}} > 0) = 0.998$
+
+**Interpretation:** "There is a 99.8% probability that advertising has a positive effect on sales. A 10% increase in ads is associated with a 3.2% increase in sales (credible range: 1.8%--4.7%)."
+:::
+:::
+::::
+
+---
+
+# Directed Acyclic Graphs and Causal Structure
+
+A Directed Acyclic Graph makes the assumed causal structure explicit, helping decide which variables to include in a model.
+
+---
+
+## Directed Acyclic Graphs (DAGs)
+
+:::: {.columns}
+::: {.column width="52%"}
+A **DAG** is a graph where:
+
+- **Nodes** = variables
+- **Directed arrows** = causal relationships ($A \to B$ means $A$ causes $B$)
+- **Acyclic** = no variable causes itself (directly or indirectly)
+
+**How to build a DAG:** List all variables relevant to your outcome. For each pair, ask: "Could A directly cause B?" Draw an arrow if yes. Arrows point in the direction of causation, not correlation.
+
+**Why use DAGs for regression?**
+
+- Makes the causal story explicit before building the model
+- Identifies **confounders** (variables you must control for)
+- Identifies **colliders** (variables you must NOT control for)
+- Reveals which coefficients have a causal interpretation and which are merely associational
+:::
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Retail Sales DAG
+:::
+Suppose:
+
+- Advertising → Sales
+- Price → Sales
+- Season → Advertising (we advertise more in December)
+- Season → Sales (people buy more in December)
+
+**Season is a confounder:** if you do not control for season, the advertising coefficient absorbs seasonal variation — it is biased upward.
+:::
+:::
+::::
+
+---
+
+# Conditional Analysis and Group-Specific Models
+
+Use posterior samples to ask conditional questions: what happens to the forecast if this variable changes?
+
+---
+
+## Scenario Analysis with Posterior Samples
+
+:::: {.columns}
+::: {.column width="52%"}
+**The power of having posterior samples:** you can answer any question by plugging posterior draws into the prediction formula.
+
+**Procedure:**
+
+1. Draw $S$ samples from the posterior: $\boldsymbol{\beta}^{(1)}, \ldots, \boldsymbol{\beta}^{(S)}$
+2. For a new scenario $\mathbf{x}^*$, compute $\hat{y}^{(s)} = \mathbf{x}^{*\top}\boldsymbol{\beta}^{(s)}$ for each draw $s$
+3. The distribution of $\hat{y}^{(s)}$ over $s$ is the **posterior predictive distribution** for that scenario
+
+::: {.examplebox}
+::: {.examplebox-title}
+"What if we raise price by 5%?"
+:::
+```python
+x_new = x_base.copy()
+x_new['price'] *= 1.05
+beta_draws = trace.posterior['beta'].to_numpy()
+y_draws = beta_draws @ x_new
+print(f"E[sales]: {y_draws.mean():.0f}")
+print(f"95% CI: {np.percentile(y_draws, [2.5, 97.5])}")
+```
+:::
+:::
+::: {.column width="44%"}
+**Group-specific (team / store) models:**
+
+- Use hierarchical structure from L11 to get **store-specific** posterior distributions
+- Scenario analysis then differs by store: the 5% price increase has a different effect in high-elasticity vs. low-elasticity stores
+- Posterior uncertainty quantifies which stores drive the most uncertainty in total revenue
+
+::: {.keybox}
+This is **decision analysis**: choose the action (price, promotion, budget) that maximizes expected profit given the full posterior distribution over outcomes.
+:::
+:::
+::::
+
+---
+
+# Course Synthesis and Next Steps
+
+From classical time series to Bayesian hierarchical models: a complete forecasting toolkit.
+
+---
+
+## Course Method Map
+
+| Method | Data type | Uncertainty | Interpretable | Strengths |
+|--------|-----------|------------|--------------|----------|
+| ETS / ARIMA (L01--02) | Univariate TS | CI | High | Fast, automatic |
+| GAM / Prophet (L03) | TS + predictors | Limited | High | Nonlinear + interpretable |
+| Decision Tree (L04) | Tabular | No | High | Rule-based explanation |
+| Random Forest (L05) | Tabular | OOB CI | Medium | Robust, minimal tuning |
+| XGBoost (L06) | Tabular | No | Low | Best tabular accuracy |
+| FFN / 1D CNN (L07--08) | Tabular / TS | No | Low | Smooth functions, fast |
+| LSTM / Transformer (L09) | Sequences | No | Very low | Long-range dependencies |
+| Bayesian (L10--12) | Any | Full posterior | High | Uncertainty, small samples |
+
+::: {.keybox}
+No single method dominates. Choose based on: (1) data type and size, (2) need for uncertainty quantification, (3) need for interpretability, (4) time to deploy. In practice, combine: use XGBoost for the point forecast and a Bayesian model for uncertainty intervals.
+:::
+
+---
+
+## Lecture 12: Key Takeaways
+
+::: {.keybox}
+1. **Bayesian linear regression** places priors on coefficients and returns a full posterior distribution for each $\beta_j$. A Normal prior is equivalent to Ridge regularization; a Laplace prior is equivalent to LASSO.
+
+2. Posterior coefficient plots give: posterior mean, HDI, and $P(\beta_j > 0)$ — richer information than a single $p$-value.
+
+3. **DAGs** make the causal structure explicit, helping identify confounders (must include) and colliders (must exclude). Always draw the DAG before specifying a regression model.
+
+4. **Scenario analysis** with posterior samples: plug any counterfactual $\mathbf{x}^*$ into posterior draws to get a full predictive distribution for that scenario.
+
+5. **No single method is best for all forecasting problems.** Build intuition for when to use each tool in this course's toolkit, and combine methods (e.g., point forecast + Bayesian uncertainty) when the decision stakes are high.
+:::
+
+---
+
+## References
+
+::: {#refs}
+:::

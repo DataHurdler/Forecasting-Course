@@ -1,0 +1,296 @@
+---
+title: "Bayesian Statistics I: Foundations"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 10"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Why Bayesian Thinking?
+2. Bayes' Theorem
+3. Prior Distributions
+4. Posterior Inference with PyMC
+5. Key Takeaways
+
+---
+
+# Why Bayesian Thinking?
+
+Frequentist methods give point estimates with confidence intervals. Bayesian methods give full probability distributions over unknowns, encoding uncertainty explicitly.
+
+---
+
+## Frequentist vs. Bayesian
+
+:::: {.columns}
+::: {.column width="48%"}
+**Frequentist (Lectures 1--9):**
+
+- Parameters $\theta$ are **fixed but unknown**
+- Probability = long-run frequency of events
+- A 95% confidence interval: "If we repeated this sampling procedure 100 times, 95 intervals would contain the true $\theta$"
+- Cannot say: "There is a 95% chance $\theta$ is in this interval"
+:::
+::: {.column width="48%"}
+**Bayesian:**
+
+- Parameters $\theta$ are **random variables with distributions**
+- Probability = degree of belief, updated with evidence
+- A 95% credible interval: "There is a 95% probability that $\theta$ falls in this interval, given the data we observed"
+- Prior beliefs + data → updated beliefs (posterior)
+:::
+::::
+
+::: {.keybox}
+**Business advantage:** Bayesian forecasts come with full uncertainty distributions — not just a point estimate and a standard error. You can ask: "What is the probability that demand exceeds 10,000 units?" and get a direct answer.
+:::
+
+---
+
+# Bayes' Theorem
+
+Prior beliefs + likelihood of data = posterior beliefs.
+
+---
+
+## Bayes' Theorem
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Bayes' Theorem
+:::
+$$\underbrace{p(\theta \mid \mathcal{D})}_{\text{posterior}} = \frac{\overbrace{p(\mathcal{D} \mid \theta)}^{\text{likelihood}} \cdot \overbrace{p(\theta)}^{\text{prior}}}{\underbrace{p(\mathcal{D})}_{\text{normalizing constant}}} \propto p(\mathcal{D} \mid \theta) \cdot p(\theta)$$
+:::
+
+:::: {.columns}
+::: {.column width="52%"}
+**Terms:**
+
+- **Prior $p(\theta)$** — What we believe about $\theta$ *before* seeing the data. Encoded as a probability distribution.
+- **Likelihood $p(\mathcal{D} \mid \theta)$** — How probable is the observed data if $\theta$ were the true value?
+- **Posterior $p(\theta \mid \mathcal{D})$** — Updated belief about $\theta$ after observing data $\mathcal{D}$.
+:::
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Business Example
+:::
+A store wants to estimate the conversion rate $\theta$ of a new promotion:
+
+- **Prior:** based on past promotions, $\theta \sim \text{Beta}(5, 45)$ (roughly 10% conversion)
+- **Data:** 30 conversions from 200 exposures
+- **Posterior:** updated distribution for $\theta$ incorporating both prior and new data
+:::
+:::
+::::
+
+---
+
+# Prior Distributions
+
+The prior encodes what you know (or assume) before seeing data. Choose it to reflect genuine prior knowledge.
+
+---
+
+## Common Prior Distributions
+
+:::: {.columns}
+::: {.column width="33%"}
+**Beta distribution:**
+$$\theta \sim \text{Beta}(\alpha, \beta)$$
+
+- Support: $[0, 1]$
+- Natural prior for proportions (conversion rate, market share)
+- $\text{Beta}(1,1) = \text{Uniform}[0,1]$
+- $\alpha, \beta$: effective counts of successes/failures
+:::
+::: {.column width="33%"}
+**Normal distribution:**
+$$\theta \sim \mathcal{N}(\mu_0, \sigma_0^2)$$
+
+- Support: $(-\infty, +\infty)$
+- Natural prior for regression coefficients
+- Weakly informative: $\mathcal{N}(0, 1)$ after standardizing predictors
+- Mathematically convenient: the Normal prior combined with a Normal likelihood produces a Normal posterior (closed-form solution)
+:::
+::: {.column width="33%"}
+**Exponential distribution:**
+$$\theta \sim \text{Exp}(\lambda)$$
+
+- Support: $[0, +\infty)$
+- Natural prior for positive quantities (variance, arrival rate)
+- $\text{HalfNormal}(\sigma)$ also common for standard deviations
+:::
+::::
+
+::: {.keybox}
+A **weakly informative prior** puts most mass on plausible values but does not dominate the likelihood. Better than a flat prior (which can cause sampling problems) and better than an overly tight prior (which ignores data). [@Gelman2013]
+:::
+
+---
+
+# Posterior Inference with PyMC
+
+When we cannot solve Bayes' theorem analytically, Markov Chain Monte Carlo (MCMC) samples from the posterior.
+
+---
+
+## Markov Chain Monte Carlo (MCMC): The Big Idea
+
+**Analogy:** Imagine exploring a hilly landscape in the dark. You want to map which areas are highest (most probable). MCMC works by randomly walking around: you spend more time in high areas (high probability) than low areas. After thousands of steps, the places you visited most often trace out the shape of the posterior.
+
+:::: {.columns}
+::: {.column width="52%"}
+**The problem:** $p(\mathcal{D})$ in Bayes' theorem is usually impossible to compute analytically for real models.
+
+**MCMC solution:** instead of computing the normalizing constant, draw a *sample* from the posterior:
+
+1. Start at some initial $\theta^{(0)}$
+2. Propose a new $\theta^*$ nearby
+3. Accept $\theta^*$ with probability proportional to the posterior ratio: $\min\!\left(1, \frac{p(\theta^*|\mathcal{D})}{p(\theta^{(t)}|\mathcal{D})}\right)$
+4. After many steps, the chain's distribution converges to $p(\theta \mid \mathcal{D})$
+:::
+::: {.column width="44%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+Metropolis Sampling
+:::
+The simplest MCMC algorithm. PyMC uses more efficient samplers (NUTS — No-U-Turn Sampler) by default, which adapts the step size and exploits gradient information.
+:::
+
+::: {.keybox}
+The posterior **samples** are the answer: a histogram of samples gives you the full posterior distribution. From samples, you can compute means, medians, credible intervals, and probabilities of any event.
+:::
+:::
+::::
+
+---
+
+## PyMC: A First Model
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Estimating a Conversion Rate
+:::
+```python
+import pymc as pm
+import numpy as np
+
+# Data: 30 successes out of 200 trials
+n_trials = 200
+n_success = 30
+
+with pm.Model() as model:
+    # Prior
+    theta = pm.Beta('theta',
+                    alpha=5, beta=45)
+
+    # Likelihood
+    obs = pm.Binomial('obs',
+        n=n_trials, p=theta,
+        observed=n_success)
+
+    # Sample from posterior (2000 draws)
+    trace = pm.sample(
+        2000, return_inferencedata=True)
+
+pm.plot_posterior(trace)
+```
+:::
+:::
+::: {.column width="44%"}
+**Reading the output:**
+
+- **Posterior mean:** best single estimate of $\theta$
+- **94% HDI (highest density interval):** the shortest interval containing 94% of the posterior probability — the Bayesian analog of a confidence interval
+- **Posterior histogram:** full picture of uncertainty
+
+::: {.keybox}
+PyMC models are written *generatively*: define priors, then describe how the data are generated given those priors. The sampler does the rest.
+:::
+:::
+::::
+
+---
+
+## Prior Predictive Checks
+
+Before fitting the model to data, simulate predictions using *only the prior*. This checks whether the prior is sensible.
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Prior Predictive Sampling
+:::
+```python
+with model:
+    prior_pred = pm.sample_prior_predictive(500)
+
+pm.plot_prior_predictive(prior_pred)
+```
+:::
+
+**What to look for:**
+
+- Does the prior generate plausible data?
+- No impossible values (negative sales, probabilities > 1)
+- Not too concentrated (would override the data)
+:::
+::: {.column width="44%"}
+::: {.warningbox}
+If prior predictive samples are completely implausible (e.g., sales of 1 billion units), your prior is too wide — tighten it. If all samples look the same, it is too tight — widen it.
+:::
+
+::: {.keybox}
+Prior predictive checks are **model debugging**. Run them before every Bayesian model to catch specification errors early. [@McElreath2020]
+:::
+:::
+::::
+
+---
+
+## Lecture 10: Key Takeaways
+
+::: {.keybox}
+1. **Bayesian inference** treats parameters as random variables with probability distributions. The posterior distribution $p(\theta \mid \mathcal{D})$ represents updated beliefs after seeing data.
+
+2. **Bayes' theorem:** posterior $\propto$ likelihood $\times$ prior. The normalizing constant $p(\mathcal{D})$ is usually intractable, so we sample instead of computing it.
+
+3. **Priors** encode prior knowledge. Use weakly informative priors (Beta, Normal, HalfNormal) to constrain parameters to plausible values without overwhelming the data.
+
+4. **MCMC** (specifically NUTS in PyMC) draws samples from the posterior. From samples, compute any summary statistic: mean, median, HDI, or the probability that a parameter exceeds a threshold.
+
+5. **Prior predictive checks** verify that your model generates plausible data before fitting. Run them every time.
+:::
+
+*Next: Bayesian Statistics II — Bayesian time series models, trend and seasonality, hierarchical models.*
+
+---
+
+## References
+
+::: {#refs}
+:::

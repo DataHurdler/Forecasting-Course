@@ -80,9 +80,11 @@ We want flexibility to capture nonlinear relationships while still being able to
 
 ## Why Additivity Matters for Interpretation
 
-Suppose we fit a fully nonlinear model: $y = x_1^2 x_2^2 + \varepsilon$
+In a non-additive model, the effect of one variable depends on the value of another — you cannot describe them separately. In a GAM, each variable's effect is isolated, making the model far easier to explain.
 
-The marginal effect of $x_1$ is: $\frac{\partial y}{\partial x_1} = 2x_1 x_2^2$
+::: {.warningbox}
+**Optional math detail:** Suppose we fit a fully nonlinear model: $y = x_1^2 x_2^2 + \varepsilon$. The marginal effect of $x_1$ is $\frac{\partial y}{\partial x_1} = 2x_1 x_2^2$, which depends on *both* $x_1$ and $x_2$ — you cannot describe the effect of $x_1$ without knowing $x_2$.
+:::
 
 This depends on *both* $x_1$ and $x_2$ — you cannot describe the effect of $x_1$ without knowing $x_2$.
 
@@ -232,7 +234,7 @@ m.fit(df)
 
 # Forecast 12 months ahead
 future = m.make_future_dataframe(
-    periods=12, freq='ME')
+    periods=12, freq='M')
 forecast = m.predict(future)
 
 # Visualize components

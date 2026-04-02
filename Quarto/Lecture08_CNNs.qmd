@@ -1,0 +1,358 @@
+---
+title: "CNN Architectures"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 8"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Convolution: The Core Idea
+2. Pooling and Dropout
+3. CNN Architecture Evolution
+4. 1D CNNs for Time Series
+5. Key Takeaways
+
+---
+
+# Convolution: The Core Idea
+
+Instead of connecting every neuron to every input, a convolutional filter scans locally and shares weights.
+
+---
+
+## Why Convolution?
+
+:::: {.columns}
+::: {.column width="52%"}
+**Problem with fully connected layers:**
+
+- For a $224 \times 224$ image, the input has 50,176 pixels. A single hidden layer with 1,000 neurons needs $50{,}176 \times 1{,}000 = 50\text{M}$ weights — just for one layer.
+- Ignores spatial structure: nearby pixels are related; distant pixels usually are not.
+- Does not generalize: a pattern learned in the top-left corner is not reused elsewhere.
+:::
+::: {.column width="44%"}
+::: {.keybox}
+**Convolutional layer solution:**
+
+- **Local connectivity:** each neuron sees only a small **receptive field** (e.g., $3 \times 3$ pixels)
+- **Weight sharing:** the same filter is applied everywhere in the image
+- **Result:** far fewer parameters; translation invariance
+:::
+:::
+::::
+
+::: {.examplebox}
+::: {.examplebox-title}
+Analogy: Scanning a document
+:::
+A human reader does not memorize a font separately for each position on the page. They learn to recognize the letter "A" once, then apply that recognition wherever it appears. Convolutional filters do exactly this.
+:::
+
+---
+
+## How a Convolutional Layer Works
+
+Imagine sliding a small magnifying glass along a sequence. At each position, the glass examines a short window of values and computes a single number indicating how strongly a pattern is present. This is exactly what a convolutional filter does.
+
+:::: {.columns}
+::: {.column width="52%"}
+**1D convolution (for sequences):**
+$$(f * g)[t] = \sum_{k=0}^{K-1} f[k] \cdot g[t - k]$$
+
+Slide a filter of length $K$ across the sequence, computing a dot product (a weighted sum) at each position.
+
+**Key parameters:**
+
+| Parameter | Description |
+|-----------|-------------|
+| Kernel size | Length of the filter ($K$). Larger = wider receptive field. |
+| Stride | Steps between positions. Stride 2 halves output length. |
+| Padding | Add zeros at edges to preserve output length. |
+| Filters | Number of different filters to learn (output channels). |
+:::
+::: {.column width="44%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+What does a filter detect?
+:::
+Each filter learns to detect a specific **local pattern** (e.g., edges, spikes, seasonal dips). The output of a filter is called a **feature map**: high values indicate where the pattern was found.
+:::
+
+::: {.keybox}
+After the convolution, apply an activation (ReLU) and then **pooling** to reduce the feature map size.
+:::
+:::
+::::
+
+---
+
+# Pooling and Dropout
+
+Pooling reduces spatial size and adds robustness. Dropout prevents co-adaptation of filters.
+
+---
+
+## Pooling: Downsampling Feature Maps
+
+:::: {.columns}
+::: {.column width="52%"}
+After a convolutional layer, apply **pooling** to reduce the size of each feature map:
+
+- **Max pooling:** take the maximum value in each non-overlapping window. Retains the most prominent activation — good for detecting if a feature is *present anywhere* in the window.
+- **Average pooling:** take the mean. Smoother, preserves intensity information.
+- **Global average pooling:** collapse the entire feature map to a single number. Commonly used before the final fully connected layer.
+:::
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Pooling in PyTorch
+:::
+```python
+nn.MaxPool1d(kernel_size=2)
+nn.AvgPool1d(kernel_size=2)
+nn.AdaptiveAvgPool1d(1)   # global
+```
+:::
+
+::: {.keybox}
+Pooling provides **translation invariance**: a pattern detected slightly earlier or later in a sequence still produces the same pooled output.
+:::
+:::
+::::
+
+---
+
+# CNN Architecture Evolution
+
+LeNet → VGG → Inception → ResNet: each generation solved a specific limitation.
+
+::: {.interpretation}
+*These architectures were developed for images, but the same design principles — stacking small filters, skip connections, efficient depth — carry directly into 1D CNNs for time series. Understanding the history helps you make better architectural choices.*
+:::
+
+---
+
+## LeNet to VGG: Depth and Simplicity
+
+:::: {.columns}
+::: {.column width="50%"}
+**LeNet-5 [@LeCun1998]:**
+
+- First practical CNN (1998)
+- 2 conv layers + 3 FC layers; ~60K parameters
+- Input: $32 \times 32$ grayscale; Output: 10 digit classes
+- Proved that learned filters beat hand-crafted features
+
+**VGG-16/19 [@Simonyan2015]:**
+
+- 16--19 layers, all using $3 \times 3$ kernels
+- Key insight: stack multiple $3\times3$ filters instead of one large filter — same receptive field, fewer parameters
+- 138M parameters; very deep but simple pattern
+- Still a strong baseline for transfer learning
+:::
+::: {.column width="46%"}
+::: {.keybox}
+**The $3\times3$ rule:**
+
+Two $3\times3$ conv layers have the same receptive field as one $5\times5$ layer, but use $2 \times (3^2) = 18$ vs. $5^2 = 25$ parameters per channel.
+
+Three $3\times3$ layers match a $7\times7$ layer at 27 vs. 49 parameters.
+
+**Stack small filters, go deep.**
+:::
+:::
+::::
+
+---
+
+## Inception and ResNet: Efficient Depth
+
+:::: {.columns}
+::: {.column width="50%"}
+**GoogLeNet / Inception [@Szegedy2015]:**
+
+- Inception module: apply $1\times1$, $3\times3$, $5\times5$ filters **in parallel**, then concatenate outputs
+- $1\times1$ convolutions reduce channel depth before expensive large-kernel operations (bottleneck)
+- 22 layers deep; only 5M parameters vs. VGG's 138M
+
+**ResNet [@He2016]:**
+
+- **Residual connections:** $\mathbf{a}^{(\ell+2)} = \mathcal{F}(\mathbf{a}^{(\ell)}) + \mathbf{a}^{(\ell)}$
+- Gradient flows directly through the skip connection — solves the vanishing gradient problem in very deep nets
+- Enables 50, 101, 152-layer networks that still train stably
+:::
+::: {.column width="46%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+Residual (Skip) Connection
+:::
+$$\mathbf{a}^{(\ell+2)} = \underbrace{\mathcal{F}(\mathbf{a}^{(\ell)})}_{\text{learned residual}} + \underbrace{\mathbf{a}^{(\ell)}}_{\text{identity}}$$
+
+If the layer learns nothing useful, it can set $\mathcal{F} \approx 0$ and pass the input unchanged. The network only needs to learn the *residual*.
+:::
+
+::: {.keybox}
+ResNet skip connections are now standard across deep learning: Transformers, U-Nets, and most modern architectures include them.
+:::
+:::
+::::
+
+---
+
+# 1D CNNs for Time Series
+
+Apply convolutional filters along the time axis to detect local temporal patterns automatically.
+
+---
+
+## Why Use a 1D CNN for Forecasting?
+
+:::: {.columns}
+::: {.column width="52%"}
+A **1D CNN** applies filters along the *time* dimension:
+
+- Each filter learns to detect a local temporal pattern (a spike, a dip, a ramp-up over $K$ consecutive steps)
+- Multiple filters in parallel learn different patterns
+- Stacking layers increases the effective look-back window: 2 layers of kernel size 5 see 9 time steps in total
+
+**Compared to lag features + XGBoost:**
+
+- No manual feature engineering needed
+- Patterns are learned, not hand-coded
+- But: needs more data to learn effectively
+:::
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+1D Conv in PyTorch
+:::
+```python
+nn.Conv1d(
+    in_channels=1,
+    out_channels=32,
+    kernel_size=5,
+    padding=2
+)
+```
+**Input shape:** `(batch, channels, seq_len)`
+
+A univariate series: `in_channels=1`
+
+Multiple features: `in_channels=p`
+:::
+
+::: {.keybox}
+1D CNNs are fast to train and often competitive with LSTMs on shorter sequences (< 500 time steps).
+:::
+:::
+::::
+
+---
+
+## 1D CNN Forecasting Pipeline in PyTorch
+
+:::: {.columns}
+::: {.column width="55%"}
+::: {.examplebox}
+::: {.examplebox-title}
+CNN Regressor for Time Series
+:::
+```python
+class CNNForecaster(nn.Module):
+    def __init__(self, seq_len, n_feat):
+        super().__init__()
+        self.conv = nn.Sequential(
+            nn.Conv1d(n_feat, 32,
+                      kernel_size=5, padding=2),
+            nn.ReLU(),
+            nn.Conv1d(32, 64,
+                      kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool1d(1)
+        )
+        self.fc = nn.Linear(64, 1)
+
+    def forward(self, x):
+        # x shape: (batch, n_feat, seq_len)
+        h = self.conv(x).squeeze(-1)
+        return self.fc(h).squeeze(-1)
+```
+:::
+:::
+::: {.column width="41%"}
+**Architecture walkthrough:**
+
+1. `Conv1d(n_feat, 32, 5)`: 32 filters of width 5 applied to all features
+2. `ReLU`: non-linearity
+3. `Conv1d(32, 64, 3)`: 64 filters of width 3 applied to 32 feature maps
+4. `AdaptiveAvgPool1d(1)`: collapse to one value per channel (global average)
+5. `Linear(64, 1)`: single forecast output
+
+[Typical RSXFS result: 1D CNN RMSE ≈ 1,600--1,800 with proper windowing.]{.neutral .smaller}
+:::
+::::
+
+---
+
+## CNN Architecture Summary
+
+| Architecture | Year | Key Innovation | Params |
+|-------------|------|---------------|--------|
+| LeNet | 1998 | First practical CNN; conv + pool | ~60K |
+| VGG | 2015 | Deep stack of $3\times3$ filters | ~138M |
+| Inception | 2015 | Parallel multi-scale filters; $1\times1$ bottleneck | ~5M |
+| ResNet | 2016 | Residual (skip) connections; train 100+ layers | ~25M |
+
+::: {.keybox}
+**For business forecasting with 1D CNNs:**
+
+- Use 2--3 `Conv1d` layers with kernel size 3--7
+- Follow with ReLU and global average pooling
+- Skip connections help if stacking more than 4 layers
+- Faster to train than LSTMs; competitive accuracy on shorter sequences
+:::
+
+---
+
+## Lecture 8: Key Takeaways
+
+::: {.keybox}
+1. **Convolutional layers** apply learned filters locally across input positions. This gives **weight sharing** (same filter reused everywhere) and **translation invariance** (pattern recognized regardless of position).
+
+2. **Pooling** downsamples feature maps. Max pooling retains peak activations; global average pooling collapses each feature map to a single value before the output layer.
+
+3. The $3\times3$ rule: stack small filters (VGG principle). Two $3\times3$ layers cover the same field as one $5\times5$ with fewer parameters.
+
+4. **Residual connections** (ResNet) add the input directly to the layer output: $\mathbf{a}^{(\ell+2)} = \mathcal{F}(\mathbf{a}^{(\ell)}) + \mathbf{a}^{(\ell)}$. This stabilizes gradients in very deep networks.
+
+5. **1D CNNs** apply filters along the time axis to detect local temporal patterns. Faster to train than LSTMs; a strong alternative for shorter sequences.
+:::
+
+*Next: RNNs, LSTMs & Transformers — architectures with explicit memory and attention over sequences.*
+
+---
+
+## References
+
+::: {#refs}
+:::

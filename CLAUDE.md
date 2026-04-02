@@ -125,22 +125,21 @@ python scripts/LectureNN_lab.py
 
 ## Current Project State
 
-**Beamer status:** All 12 lectures complete, reviewed, and compiled (0 errors).
-**Quarto status:** All 12 lectures translated.
+**Beamer status:** All 12 new lectures written (Spring 2026 redesign).
+**Quarto status:** All 12 new lectures written.
+**Note:** Old lecture files (Lecture01_Intro.tex through Lecture12_Capstone.tex) remain on disk but are superseded by the redesigned files below.
 
 | Lecture | Beamer | Quarto | Key Content |
 |---------|--------|--------|-------------|
-| 1: Introduction to Forecasting | `Lecture01_Intro.tex` ✓ | `Lecture01_Intro.qmd` ✓ | Point/interval/density forecasts, benchmark models, evaluation setup. |
-| 2: Regression-Based Forecasting | `Lecture02_Regression.tex` ✓ | `Lecture02_Regression.qmd` ✓ | OLS forecasting, prediction intervals, AR models, pitfalls. |
-| 3: Exponential Smoothing | `Lecture03_ETS.tex` ✓ | `Lecture03_ETS.qmd` ✓ | SES, Holt, Holt-Winters, ETS taxonomy, AIC selection. |
-| 4: ARIMA Models | `Lecture04_ARIMA.tex` ✓ | `Lecture04_ARIMA.qmd` ✓ | Stationarity, unit roots, ADF/KPSS, ACF/PACF, ARIMA/SARIMA, auto-ARIMA. |
-| 5: Multivariate Methods | `Lecture05_Multivariate.tex` ✓ | `Lecture05_Multivariate.qmd` ✓ | VAR, ARIMAX, Granger causality, cointegration, ECM. |
-| 6: Forecast Evaluation | `Lecture06_Evaluation.tex` ✓ | `Lecture06_Evaluation.qmd` ✓ | RMSE/MAE/MAPE/MASE, walk-forward CV, DM test, combination. |
-| 7: ML Introduction | `Lecture07_MLIntro.tex` ✓ | `Lecture07_MLIntro.qmd` ✓ | Bias-variance, train/val/test, TimeSeriesSplit CV, pipeline. |
-| 8: Regularization | `Lecture08_Regularization.tex` ✓ | `Lecture08_Regularization.qmd` ✓ | Ridge, LASSO, Elastic Net, coordinate descent, validation curve. |
-| 9: Tree-Based Methods | `Lecture09_Trees.tex` ✓ | `Lecture09_Trees.qmd` ✓ | CART, Random Forests, XGBoost, feature importance. |
-| 10: Neural Networks | `Lecture10_NeuralNets.tex` ✓ | `Lecture10_NeuralNets.qmd` ✓ | FFN, RNN, LSTM gates, vanishing gradient, attention, Keras implementation. |
-| 11: Feature Engineering | `Lecture11_Features.tex` ✓ | `Lecture11_Features.qmd` ✓ | Lag features, rolling stats, leakage-free pipeline, LASSO importance. |
-| 12: Capstone & Applications | `Lecture12_Capstone.tex` ✓ | `Lecture12_Capstone.qmd` ✓ | Decision framework, RSXFS leaderboard, RESGAS case study, deployment. |
-
-<!-- Update Quarto column as lectures are translated -->
+| 1: Intro, ETS & Forecast Evaluation | `Lecture01_ETS_Eval.tex` ✓ | `Lecture01_ETS_Eval.qmd` ✓ | SES, Holt, Holt-Winters, ETS framework, RMSE/MAE/MAPE/MASE, walk-forward CV, DM test. |
+| 2: ARIMA, VAR & Multivariate Models | `Lecture02_ARIMA_VAR.tex` ✓ | `Lecture02_ARIMA_VAR.qmd` ✓ | Stationarity, ARIMA/SARIMA, auto-ARIMA, VAR, Granger causality, ARIMAX. |
+| 3: Generalized Additive Models | `Lecture03_GAMs.tex` ✓ | `Lecture03_GAMs.qmd` ✓ | GAM structure, smoothing penalty, splines, Prophet, pyGAM, partial dependence plots. |
+| 4: Decision Trees | `Lecture04_DecisionTrees.tex` ✓ | `Lecture04_DecisionTrees.qmd` ✓ | Bias-variance tradeoff, CART, entropy/information gain, sklearn, feature importance. |
+| 5: Random Forests | `Lecture05_RandomForests.tex` ✓ | `Lecture05_RandomForests.qmd` ✓ | Bagging, bootstrap aggregation, feature subsampling, OOB error, MDI vs permutation importance. |
+| 6: Boosted Trees & Regularization | `Lecture06_BoostedTrees.tex` ✓ | `Lecture06_BoostedTrees.qmd` ✓ | Gradient boosting, XGBoost (Newton step, regularization, col subsampling), Ridge/LASSO/Elastic Net. |
+| 7: Introduction to Neural Networks | `Lecture07_NeuralNets.tex` ✓ | `Lecture07_NeuralNets.qmd` ✓ | Neurons, activations, FFN layers, MSE loss, backprop, Adam, dropout, PyTorch Dataset/DataLoader/training loop. |
+| 8: CNN Architectures | `Lecture08_CNNs.tex` ✓ | `Lecture08_CNNs.qmd` ✓ | Convolution, pooling, LeNet→VGG→Inception→ResNet, residual connections, 1D CNN for time series. |
+| 9: RNNs, LSTMs & Transformers | `Lecture09_RNNTransformers.tex` ✓ | `Lecture09_RNNTransformers.qmd` ✓ | Vanilla RNN, LSTM gates (forget/input/output/cell), attention, scaled dot-product, Transformer encoder, PyTorch nn.LSTM/nn.TransformerEncoder. |
+| 10: Bayesian Statistics I — Foundations | `Lecture10_BayesianI.tex` ✓ | `Lecture10_BayesianI.qmd` ✓ | Frequentist vs Bayesian, Bayes' theorem, priors (Beta/Normal/Exponential), MCMC/NUTS, PyMC, prior predictive checks. |
+| 11: Bayesian Statistics II — TS & Hierarchical | `Lecture11_BayesianII.tex` ✓ | `Lecture11_BayesianII.qmd` ✓ | Bayesian structural TS, local linear trend, Fourier seasonality, partial pooling, hierarchical models in PyMC. |
+| 12: Bayesian Statistics III — Linear Regression | `Lecture12_BayesianIII.tex` ✓ | `Lecture12_BayesianIII.qmd` ✓ | Bayesian linear regression, posterior coefficient distributions, HDI, DAGs, scenario analysis, course method map. |

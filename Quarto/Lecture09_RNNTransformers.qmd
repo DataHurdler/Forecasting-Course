@@ -1,0 +1,327 @@
+---
+title: "RNNs, LSTMs & Transformers"
+subtitle: "BSAD 8310: Business Forecasting --- Lecture 9"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+date: "Spring 2026"
+format:
+  revealjs:
+    theme: [default, emory-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "BSAD 8310 | University of Nebraska at Omaha | Spring 2026"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Recurrent Neural Networks
+2. LSTM: Long Short-Term Memory
+3. Attention and Transformers
+4. Key Takeaways
+
+---
+
+# Recurrent Neural Networks
+
+Process sequences step-by-step, maintaining a hidden state that carries information across time.
+
+---
+
+## Why Recurrent Networks?
+
+:::: {.columns}
+::: {.column width="52%"}
+**The limitation of FFN and CNN:**
+
+- FFN: each row processed independently — temporal order ignored unless encoded as lag features
+- 1D CNN: local pattern detection within a fixed window — long-range dependencies require many stacked layers
+
+**What an RNN adds:**
+
+- A **hidden state** $\mathbf{h}_t$ passed from step to step
+- At each time step, the network updates its memory based on the new input *and* what it remembered
+- Theoretically, $\mathbf{h}_t$ encodes the entire history $x_1, x_2, \ldots, x_t$
+:::
+::: {.column width="44%"}
+::: {.definitionbox}
+::: {.definitionbox-title}
+Vanilla RNN
+:::
+Think of $\mathbf{h}_t$ as the model's "running summary" of the series up to month $t$ — like a manager who reads each month's sales report and updates their mental picture of the trend.
+
+At each step $t$:
+$$\mathbf{h}_t = \tanh(\mathbf{W}_h \mathbf{h}_{t-1} + \mathbf{W}_x \mathbf{x}_t + \mathbf{b})$$
+$$\hat{y}_t = \mathbf{W}_y \mathbf{h}_t + \mathbf{b}_y$$
+
+Same weights $\mathbf{W}_h, \mathbf{W}_x$ used at every step.
+:::
+
+::: {.warningbox}
+**Vanishing gradient problem:** gradients from distant past steps shrink exponentially during backpropagation through time (BPTT). In practice, vanilla RNNs forget after ~10 steps.
+:::
+:::
+::::
+
+---
+
+# LSTM: Long Short-Term Memory
+
+Gates control what to remember, what to forget, and what to output — solving the vanishing gradient problem.
+
+---
+
+## LSTM: Three Gates and Cell State
+
+:::: {.columns}
+::: {.column width="55%"}
+An LSTM maintains two states: the **cell state** $\mathbf{c}_t$ (long-term memory) and the **hidden state** $\mathbf{h}_t$ (output).
+
+**Three gates + cell update per step:**
+
+1. **Forget gate:** $\mathbf{f}_t = \sigma(\mathbf{W}_f[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_f)$
+   What fraction of the old cell state to keep?
+2. **Input gate:** $\mathbf{i}_t = \sigma(\mathbf{W}_i[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_i)$
+   What new information to write to memory?
+3. **Cell update:** candidate $\tilde{\mathbf{c}}_t = \tanh(\mathbf{W}_c[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_c)$, then $\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t$
+4. **Output gate:** $\mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t)$
+   What part of memory to expose as output?
+:::
+::: {.column width="41%"}
+::: {.keybox}
+**Why does LSTM solve vanishing gradients?**
+
+The cell state $\mathbf{c}_t$ is updated additively (via the forget gate). Gradients can flow backward through additive connections without shrinking — similar to the residual connections in ResNet.
+:::
+
+::: {.examplebox}
+::: {.examplebox-title}
+Business analogy
+:::
+The forget gate decides: "Sales data from 3 years ago is not relevant; forget it." The input gate decides: "This holiday spike is important; remember it."
+:::
+:::
+::::
+
+---
+
+## LSTM for Forecasting in PyTorch
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+LSTM Regressor
+:::
+```python
+class LSTMForecaster(nn.Module):
+    def __init__(self, in_dim,
+                 hidden=128, layers=2):
+        super().__init__()
+        self.lstm = nn.LSTM(
+            in_dim, hidden,
+            num_layers=layers,
+            batch_first=True,
+            dropout=0.2
+        )
+        self.fc = nn.Linear(hidden, 1)
+
+    def forward(self, x):
+        # x: (batch, seq_len, in_dim)
+        out, (h, c) = self.lstm(x)
+        # Use last hidden state
+        return self.fc(h[-1]).squeeze(-1)
+```
+:::
+:::
+::: {.column width="44%"}
+**Key arguments:**
+
+| Argument | Meaning |
+|---------|---------|
+| `batch_first=True` | Input: `(batch, seq_len, features)` |
+| `num_layers` | Stacked LSTMs (2--3 common) |
+| `dropout` | Applied between LSTM layers |
+| `h[-1]` | Last layer's hidden state at final step — encodes full sequence |
+
+::: {.keybox}
+Typical RSXFS result: LSTM RMSE ≈ 1,400--1,600 with sequence length 24 (2 years of history).
+:::
+:::
+::::
+
+---
+
+# Attention and Transformers
+
+Instead of reading sequences step-by-step, attention lets the model look at all positions simultaneously and decide which ones matter.
+
+---
+
+## The Attention Mechanism
+
+:::: {.columns}
+::: {.column width="52%"}
+**Limitation of LSTMs:** even with gating, information from 50+ steps ago may be lost or diluted.
+
+**Attention idea:** at each output step, let the model directly attend to *any* input step, weighted by relevance.
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+Scaled Dot-Product Attention [@Vaswani2017]
+:::
+$$\text{Attention}(Q,K,V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$
+
+$Q$ = queries, $K$ = keys, $V$ = values; $d_k$ = key dimension.
+:::
+:::
+::: {.column width="44%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Business analogy
+:::
+Predicting December sales: the model assigns high attention weight to last December (lag-12) and the preceding November, and low weight to random months in between. The attention score is *learned*, not hard-coded.
+:::
+
+::: {.keybox}
+Attention computes a **weighted average** of the values $V$, where weights come from how well queries $Q$ match keys $K$. High similarity → high weight.
+:::
+:::
+::::
+
+---
+
+## The Transformer Architecture
+
+:::: {.columns}
+::: {.column width="52%"}
+**Key components of a Transformer encoder block:**
+
+1. **Multi-head self-attention:** run $h$ attention heads in parallel, each attending to different aspects of the sequence. Concatenate and project.
+
+2. **Residual connection + LayerNorm:**
+   $\mathbf{z} = \text{LayerNorm}(\mathbf{x} + \text{MultiHead}(\mathbf{x}))$
+
+3. **Feed-forward sublayer:** position-wise FFN applied to each position independently.
+
+4. **Positional encoding:** add sinusoidal position embeddings so the model knows token order (attention itself is permutation-invariant).
+:::
+::: {.column width="44%"}
+::: {.keybox}
+**Why Transformers dominate NLP:**
+
+- No sequential bottleneck — all positions processed in parallel (vs. LSTM's sequential steps)
+- Explicit long-range dependencies via attention weights
+- Scales to billions of parameters (BERT, GPT)
+:::
+
+::: {.examplebox}
+::: {.examplebox-title}
+BERT and GPT
+:::
+BERT [@Devlin2019] (encoder-only) for classification and embedding. GPT (decoder-only) for next-token generation. Both are Transformer variants pre-trained on massive text corpora.
+:::
+:::
+::::
+
+---
+
+## Transformer for Time Series Forecasting
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {.examplebox}
+::: {.examplebox-title}
+Minimal Transformer Encoder in PyTorch
+:::
+```python
+encoder_layer = nn.TransformerEncoderLayer(
+    d_model=64,
+    nhead=4,
+    dim_feedforward=256,
+    dropout=0.1,
+    batch_first=True
+)
+encoder = nn.TransformerEncoder(
+    encoder_layer, num_layers=2)
+
+class TSTransformer(nn.Module):
+    def __init__(self, in_dim):
+        super().__init__()
+        self.proj = nn.Linear(in_dim, 64)
+        self.enc  = encoder
+        self.fc   = nn.Linear(64, 1)
+    def forward(self, x):
+        h = self.enc(self.proj(x))
+        return self.fc(h[:, -1]).squeeze(-1)
+```
+:::
+:::
+::: {.column width="44%"}
+**Practical notes for time series:**
+
+- Add **positional encoding** (or learnable position embeddings) so the model knows temporal order
+- Use **causal masking** to prevent attending to future positions during training
+- Transformers tend to outperform LSTMs on *longer* sequences ($T > 100$) and *multi-variate* time series
+
+::: {.warningbox}
+Transformers need more data than LSTMs. For short monthly business series ($T < 200$), LSTM is often a better starting point.
+:::
+:::
+::::
+
+---
+
+## Sequence Architecture Comparison
+
+| Architecture | Long-range | Parallel | Data need | Best for |
+|-------------|-----------|---------|----------|---------|
+| Vanilla RNN | Poor | No | Low | Very short sequences |
+| LSTM | Good | No | Medium | Monthly/quarterly TS |
+| 1D CNN | Medium | Yes | Medium | Short TS, fast training |
+| Transformer | Excellent | Yes | High | Long sequences, NLP, multivariate |
+
+::: {.keybox}
+**Practical recommendation:**
+
+- Short monthly series ($T < 200$, univariate): start with LSTM
+- Long series or many features: try Transformer
+- Fast prototyping: 1D CNN is quickest to train
+- Production at scale: pre-trained Transformer (e.g., TimesFM, Chronos)
+:::
+
+---
+
+## Lecture 9: Key Takeaways
+
+::: {.keybox}
+1. **RNNs** process sequences step-by-step, passing a hidden state $\mathbf{h}_t$ across time steps. Vanilla RNNs suffer from the vanishing gradient problem and forget information after ~10 steps.
+
+2. **LSTMs** add a cell state $\mathbf{c}_t$ and three gates (forget, input, output) that control information flow. The additive cell update stabilizes gradients over long sequences.
+
+3. **Attention** computes a weighted average over all positions, where weights reflect query-key similarity. It gives direct access to any past time step.
+
+4. **Transformers** stack multi-head self-attention with residual connections and feed-forward layers. All positions are processed in parallel — no sequential bottleneck.
+
+5. In PyTorch: use `nn.LSTM` for sequence models and `nn.TransformerEncoder` for Transformer encoders. Always use `batch_first=True` for time series data.
+:::
+
+*Next: Bayesian Statistics I — foundations of probabilistic inference for business forecasting.*
+
+---
+
+## References
+
+::: {#refs}
+:::

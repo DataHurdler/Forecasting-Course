@@ -75,11 +75,19 @@
 
 % --- Slide: The nonlinear marginal effect problem ----------------------------
 \begin{frame}{Why Additivity Matters for Interpretation}
-  Suppose we fit a fully nonlinear model:
-  $y = x_1^2 x_2^2 + \varepsilon$
+  In a non-additive model, the effect of one variable depends on the value
+  of another --- you cannot describe them separately.
+  In a GAM, each variable's effect is isolated, making the model
+  far easier to explain.
 
-  The marginal effect of $x_1$ is:
-  $\frac{\partial y}{\partial x_1} = 2x_1 x_2^2$
+  \begin{warningbox}
+    \small \textbf{Optional math detail:}
+    Suppose we fit $y = x_1^2 x_2^2 + \varepsilon$.
+    The marginal effect of $x_1$ is
+    $\frac{\partial y}{\partial x_1} = 2x_1 x_2^2$,
+    which depends on \emph{both} $x_1$ and $x_2$ ---
+    you cannot describe the effect of $x_1$ without knowing $x_2$.
+  \end{warningbox}
 
   This depends on \emph{both} $x_1$ and $x_2$ --- you cannot describe
   the effect of $x_1$ without knowing $x_2$.

@@ -1,0 +1,349 @@
+% =============================================================================
+% Lecture 12: Bayesian Statistics III — Bayesian Linear Regression
+% BSAD 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+% ---- Lecture metadata --------------------------------------------------------
+\title{Bayesian Statistics III: Bayesian Linear Regression}
+\subtitle{BSAD 8310: Business Forecasting --- Lecture 12}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+\date{Spring 2026}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---- Outline ----------------------------------------------------------------
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Bayesian Linear Regression}
+% =============================================================================
+
+\sectionslide{Bayesian Linear Regression}{%
+  OLS gives a single coefficient estimate.
+  Bayesian regression gives a full distribution over every coefficient,
+  quantifying exactly how uncertain we are about each effect.}
+
+% --- Slide: OLS vs Bayesian regression ---------------------------------------
+\begin{frame}{OLS vs.\ Bayesian Regression: What Changes?}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{OLS (Lectures 2 and 8):}
+      \[
+        \hat{\boldsymbol{\beta}} = (\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}
+      \]
+      \begin{itemize}\small
+        \item Single point estimate $\hat{\boldsymbol{\beta}}$
+        \item Standard errors derived from asymptotic theory
+        \item Confidence intervals rely on assumptions about
+              large-sample normality
+        \item Regularization (Ridge, LASSO) is an ad-hoc fix for overfitting
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Bayesian regression:}
+      \[
+        p(\boldsymbol{\beta} \mid \mathbf{y}) \propto p(\mathbf{y} \mid \boldsymbol{\beta}) \cdot p(\boldsymbol{\beta})
+      \]
+      \begin{itemize}\small
+        \item Full posterior distribution for each $\beta_j$
+        \item Credible intervals are exact probability statements
+        \item Regularization = informative prior
+              (Normal prior $\equiv$ Ridge, LASSO $\equiv$ Laplace prior)
+        \item Works even with small samples
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.2cm}
+  \begin{keybox}
+    Bayesian regression answers questions OLS cannot:
+    ``What is the probability that the advertising elasticity exceeds 0.5?''
+    or ``Is it more likely that price sensitivity increased or decreased?''
+  \end{keybox}
+\end{frame}
+
+% --- Slide: Bayesian regression in PyMC ------------------------------------
+\begin{frame}{Bayesian Linear Regression in PyMC}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{Retail Sales Regression}
+        {\small
+        \texttt{with pm.Model() as blr:}\\
+        \texttt{  \# Weakly informative priors}\\
+        \texttt{  intercept = pm.Normal('intercept',}\\
+        \texttt{    mu=y.mean(), sigma=y.std())}\\
+        \texttt{  beta = pm.Normal('beta',}\\
+        \texttt{    mu=0, sigma=1, shape=X.shape[1])}\\
+        \texttt{  sigma = pm.HalfNormal('sigma', sigma=y.std())}\\[4pt]
+        \texttt{  \# Linear predictor}\\
+        \texttt{  mu = intercept + X @ beta}\\[4pt]
+        \texttt{  \# Likelihood}\\
+        \texttt{  pm.Normal('y\_obs', mu=mu,}\\
+        \texttt{    sigma=sigma, observed=y)}\\[4pt]
+        \texttt{  trace = pm.sample(2000)}\\[4pt]
+        \texttt{pm.plot\_posterior(trace,}\\
+        \texttt{  var\_names=['beta'])}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Standardize predictors first:}
+      \begin{itemize}\small
+        \item Center and scale all $X$ columns before fitting:
+              \texttt{X\_std = (X - X.mean()) / X.std()}
+        \item With standardized inputs, $\mathcal{N}(0,1)$ priors on
+              $\beta$ are weakly informative
+        \item Coefficients are then interpretable as
+              ``effect of a 1-SD increase in $x_j$ on $y$''
+      \end{itemize}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small A Normal prior on $\beta$ is mathematically equivalent
+        to Ridge regularization. A Laplace (double exponential)
+        prior is equivalent to LASSO.
+        Bayesian inference subsumes regularization.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Interpreting Posterior Coefficient Distributions}
+% =============================================================================
+
+\sectionslide{Interpreting Posterior Coefficient Distributions}{%
+  Credible intervals, probability of direction, and
+  conditional effect analysis.}
+
+% --- Slide: Reading posterior plots -----------------------------------------
+\begin{frame}{Reading Posterior Distributions}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{For each coefficient $\beta_j$, the posterior gives:}
+      \begin{description}\small
+        \item[Posterior mean] Best single estimate
+        \item[Posterior median] More robust if distribution is skewed
+        \item[HDI] Highest Density Interval: shortest interval
+              containing $X$\% of the probability mass
+        \item[Prob.\ of direction] $P(\beta_j > 0)$ or $P(\beta_j < 0)$ ---
+              a more natural measure than a $p$-value
+        \item[Rope analysis] What fraction of the posterior falls
+              within a Region Of Practical Equivalence (e.g., $|{\beta_j}| < 0.05$)?
+              Use to decide if an effect is meaningfully non-zero.
+      \end{description}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{examplebox}{Business Example}
+        Posterior for advertising elasticity $\beta_{\text{ads}}$:
+        \begin{itemize}\small
+          \item Posterior mean: 0.32
+          \item 94\% HDI: [0.18, 0.47]
+          \item $P(\beta_{\text{ads}} > 0) = 0.998$
+        \end{itemize}
+        \textbf{Interpretation:} ``There is a 99.8\% probability
+        that advertising has a positive effect on sales.
+        A 10\% increase in ads is associated with a
+        3.2\% increase in sales (credible range: 1.8\%--4.7\%).''
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Directed Acyclic Graphs and Causal Structure}
+% =============================================================================
+
+\sectionslide{DAGs and Causal Structure}{%
+  A Directed Acyclic Graph makes the assumed causal structure explicit,
+  helping decide which variables to include in a model.}
+
+% --- Slide: DAGs -------------------------------------------------------------
+\begin{frame}{Directed Acyclic Graphs (DAGs)}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      A \textbf{DAG} is a graph where:
+      \begin{itemize}\small
+        \item \textbf{Nodes} = variables
+        \item \textbf{Directed arrows} = causal relationships ($A \to B$ means $A$ causes $B$)
+        \item \textbf{Acyclic} = no variable causes itself (directly or indirectly)
+      \end{itemize}
+      \vspace{0.2cm}
+      \textbf{Why use DAGs for regression?}
+      \begin{itemize}\small
+        \item Makes the causal story explicit before building the model
+        \item Identifies \textbf{confounders} (variables you must control for)
+        \item Identifies \textbf{colliders} (variables you must NOT control for)
+        \item Reveals which coefficients have a causal interpretation
+              and which are merely associational
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{examplebox}{Retail Sales DAG}
+        \small
+        Suppose:
+        \begin{itemize}\small
+          \item Advertising $\to$ Sales
+          \item Price $\to$ Sales
+          \item Season $\to$ Advertising (we advertise more in December)
+          \item Season $\to$ Sales (people buy more in December)
+        \end{itemize}
+        \textbf{Season is a confounder:}
+        if you do not control for season,
+        the advertising coefficient absorbs
+        seasonal variation --- it is biased upward.
+      \end{examplebox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Conditional Analysis and Group-Specific Models}
+% =============================================================================
+
+\sectionslide{Conditional Analysis and Group-Specific Models}{%
+  Use posterior samples to ask conditional questions:
+  what happens to the forecast if this variable changes?}
+
+% --- Slide: Posterior predictive for scenarios --------------------------------
+\begin{frame}{Scenario Analysis with Posterior Samples}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{The power of having posterior samples:}
+      you can answer any question by plugging
+      posterior draws into the prediction formula.
+
+      \vspace{0.2cm}
+      \textbf{Procedure:}
+      \begin{enumerate}\small
+        \item Draw $S$ samples from the posterior:
+              $\boldsymbol{\beta}^{(1)}, \ldots, \boldsymbol{\beta}^{(S)}$
+        \item For a new scenario $\mathbf{x}^*$, compute
+              $\hat{y}^{(s)} = \mathbf{x}^{*\top}\boldsymbol{\beta}^{(s)}$
+              for each draw $s$
+        \item The distribution of $\hat{y}^{(s)}$ over $s$
+              is the \textbf{posterior predictive distribution} for
+              that scenario
+      \end{enumerate}
+
+      \begin{examplebox}{``What if we raise price by 5\%?''}
+        {\small
+        \texttt{x\_new = x\_base.copy()}\\
+        \texttt{x\_new['price'] *= 1.05}\\
+        \texttt{y\_draws = trace.posterior['beta'].values @ x\_new}\\
+        \texttt{print(f"E[sales]: \{y\_draws.mean():.0f\}")}\\
+        \texttt{print(f"95\% CI: \{np.percentile(y\_draws, [2.5,97.5])\}")}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Group-specific (team / store) models:}
+      \begin{itemize}\small
+        \item Use hierarchical structure from L11 to get
+              \textbf{store-specific} posterior distributions
+        \item Scenario analysis then differs by store:
+              the 5\% price increase has a different effect
+              in high-elasticity vs.\ low-elasticity stores
+        \item Posterior uncertainty quantifies which stores
+              drive the most uncertainty in total revenue
+      \end{itemize}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small This is \textbf{decision analysis}:
+        choose the action (price, promotion, budget)
+        that maximizes expected profit given
+        the full posterior distribution over outcomes.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Course Synthesis and Next Steps}
+% =============================================================================
+
+\sectionslide{Course Synthesis and Next Steps}{%
+  From classical time series to Bayesian hierarchical models:
+  a complete forecasting toolkit.}
+
+% --- Slide: Method comparison ------------------------------------------------
+\begin{frame}{Course Method Map}
+  \begin{center}
+    {\footnotesize
+    \begin{tabular}{lllll}
+      \toprule
+      \textbf{Method} & \textbf{Data type} & \textbf{Uncertainty} & \textbf{Interpretable} & \textbf{Strengths} \\
+      \midrule
+      ETS / ARIMA (L01--02) & Univariate TS & CI & High & Fast, automatic \\
+      GAM / Prophet (L03) & TS + predictors & Limited & High & Nonlinear + interpretable \\
+      Decision Tree (L04) & Tabular & No & High & Rule-based explanation \\
+      Random Forest (L05) & Tabular & OOB CI & Medium & Robust, minimal tuning \\
+      XGBoost (L06) & Tabular & No & Low & Best tabular accuracy \\
+      FFN / 1D CNN (L07--08) & Tabular / TS & No & Low & Smooth functions, fast \\
+      LSTM / Transformer (L09) & Sequences & No & Very low & Long-range dependencies \\
+      Bayesian (L10--12) & Any & Full posterior & High & Uncertainty, small samples \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \begin{keybox}
+    \small No single method dominates. Choose based on:
+    (1) data type and size, (2) need for uncertainty quantification,
+    (3) need for interpretability, (4) time to deploy.
+    In practice, combine: use XGBoost for the point forecast
+    and a Bayesian model for uncertainty intervals.
+  \end{keybox}
+\end{frame}
+
+% --- Slide: Key takeaways ---------------------------------------------------
+\begin{frame}{Lecture 12: Key Takeaways}
+  \begin{keybox}
+    {\small
+    \begin{enumerate}
+      \item \textbf{Bayesian linear regression} places priors on coefficients
+            and returns a full posterior distribution for each $\beta_j$.
+            A Normal prior is equivalent to Ridge regularization;
+            a Laplace prior is equivalent to LASSO.
+
+      \item Posterior coefficient plots give:
+            posterior mean, HDI, and $P(\beta_j > 0)$ ---
+            richer information than a single $p$-value.
+
+      \item \textbf{DAGs} make the causal structure explicit,
+            helping identify confounders (must include) and
+            colliders (must exclude). Always draw the DAG before
+            specifying a regression model.
+
+      \item \textbf{Scenario analysis} with posterior samples:
+            plug any counterfactual $\mathbf{x}^*$ into posterior draws
+            to get a full predictive distribution for that scenario.
+
+      \item \textbf{No single method is best for all forecasting problems.}
+            Build intuition for when to use each tool in this course's toolkit,
+            and combine methods (e.g., point forecast + Bayesian uncertainty)
+            when the decision stakes are high.
+    \end{enumerate}
+    }
+  \end{keybox}
+\end{frame}
+
+% --- References ---------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+% =============================================================================
+\end{document}
+% =============================================================================
