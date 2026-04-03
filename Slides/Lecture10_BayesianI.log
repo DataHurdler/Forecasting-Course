@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:40
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  3 APR 2026 09:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1642,66 +1642,42 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 [5
 
 ]
-LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 119.
-
-Overfull \vbox (73.30992pt too high) detected at line 119
+Overfull \vbox (1.37856pt too high) detected at line 115
  []
 
 [6
 
 ] [7
 
-]
-Overfull \vbox (72.5306pt too high) detected at line 180
- []
-
-[8
+] [8
 
 ] [9
 
-]
-LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 233.
-
-Underfull \hbox (badness 10000) in paragraph at lines 233--233
-[]\TU/lmss/m/n/10.95 The simplest MCMC algorithm.
- []
-
-
-Overfull \vbox (43.6442pt too high) detected at line 233
- []
-
-[10
+] [10
 
 ]
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 249.
 
-Underfull \hbox (badness 10000) in paragraph at lines 277--277
-\TU/lmtt/m/n/10 theta = pm.Beta('theta', alpha=5,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 277--277
-\TU/lmtt/m/n/10 trace = pm.sample(2000,
- []
-
-
-Overfull \vbox (85.49239pt too high) detected at line 277
+Overfull \vbox (2.68335pt too high) detected at line 249
  []
 
 [11
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 317--317
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 289.
+
+Underfull \hbox (badness 10000) in paragraph at lines 289--289
 \TU/lmtt/m/n/10 prior_pred =
  []
 
 
-Overfull \vbox (1.57224pt too high) detected at line 317
+Overfull \vbox (1.57224pt too high) detected at line 289
  []
 
 [12
@@ -1741,11 +1717,11 @@ Package logreq Info: Writing requests to 'Lecture10_BayesianI.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52137 strings out of 468174
- 1225479 string characters out of 5433150
- 2014816 words of memory out of 5000000
- 79984 multiletter control sequences out of 15000+600000
- 640107 words of font info for 104 fonts, out of 8000000 for 9000
+ 52169 strings out of 468174
+ 1225991 string characters out of 5433150
+ 2013816 words of memory out of 5000000
+ 80005 multiletter control sequences out of 15000+600000
+ 642589 words of font info for 115 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1921b,5623s stack positions out of 10000i,1000n,20000p,200000b,200000s
 

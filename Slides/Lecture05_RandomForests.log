@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:40
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  3 APR 2026 09:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1645,18 +1645,13 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 137.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 136.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 
-Overfull \hbox (37.45523pt too wide) in paragraph at lines 137--137
-[]\TU/lmtt/m/n/10.95 RandomForestRegressor(oob_score=True) 
- []
-
-
-Overfull \vbox (1.39835pt too high) detected at line 137
+Overfull \vbox (1.39835pt too high) detected at line 136
  []
 
 [7
@@ -1666,17 +1661,13 @@ Overfull \vbox (1.39835pt too high) detected at line 137
 ] [9
 
 ]
-Underfull \hbox (badness 4242) in paragraph at lines 205--205
-[]|\TU/lmss/m/n/10 More = lower variance;
+Underfull \hbox (badness 10000) in paragraph at lines 203--203
+[]|\TU/lmss/m/n/9 More = lower variance;
  []
 
 
-Overfull \hbox (4.3322pt too wide) in paragraph at lines 205--205
-[]|\TU/lmtt/m/n/10 min_samples_leaf| 
- []
-
-
-Overfull \vbox (23.90201pt too high) detected at line 205
+Underfull \hbox (badness 1616) in paragraph at lines 203--203
+[]|\TU/lmss/m/n/9 Higher = smoother predic-
  []
 
 [10
@@ -1684,39 +1675,30 @@ Overfull \vbox (23.90201pt too high) detected at line 205
 ] [11
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 255--255
+Underfull \hbox (badness 10000) in paragraph at lines 252--252
 []\TU/lmss/m/n/10 MDI can be biased toward
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 255--255
+Underfull \hbox (badness 10000) in paragraph at lines 252--252
 \TU/lmss/m/n/10 high-cardinality features. Use
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 255--255
+Underfull \hbox (badness 10000) in paragraph at lines 252--252
 \TU/lmss/bx/n/10 permutation importance
  []
 
 
-Overfull \hbox (8.76129pt too wide) in paragraph at lines 255--255
-\TU/lmss/m/n/10 (\TU/lmtt/m/n/10 inspection.permutation_importance\TU/lmss/m/n/
-10 )
- []
-
-
-Overfull \vbox (12.00488pt too high) detected at line 255
+Underfull \hbox (badness 10000) in paragraph at lines 252--252
+\TU/lmss/m/n/10 (\TU/lmtt/m/n/10 permutation_importance\TU/lmss/m/n/10 ) for a
  []
 
 [12
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 299--299
-[]\TU/lmtt/m/n/10 from sklearn.ensemble import
- []
-
-
-Overfull \vbox (36.68095pt too high) detected at line 299
+Underfull \hbox (badness 10000) in paragraph at lines 292--292
+[]\TU/lmtt/m/n/8 from sklearn.ensemble import
  []
 
 [13
@@ -1759,11 +1741,11 @@ Package logreq Info: Writing requests to 'Lecture05_RandomForests.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52121 strings out of 468174
- 1225029 string characters out of 5433150
- 2015038 words of memory out of 5000000
- 79968 multiletter control sequences out of 15000+600000
- 640107 words of font info for 104 fonts, out of 8000000 for 9000
+ 52158 strings out of 468174
+ 1225639 string characters out of 5433150
+ 2014038 words of memory out of 5000000
+ 79992 multiletter control sequences out of 15000+600000
+ 642597 words of font info for 116 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1925b,5069s stack positions out of 10000i,1000n,20000p,200000b,200000s
 

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:51
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  3 APR 2026 09:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1682,12 +1682,12 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [4
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 108--108
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 107--107
  [][][][][][]  
  []
 
 
-Overfull \vbox (4.78758pt too high) detected at line 108
+Overfull \vbox (1.94214pt too high) detected at line 107
  []
 
 
@@ -1698,12 +1698,8 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [5
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 142--142
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 138--138
  [][][][][][]  
- []
-
-
-Overfull \vbox (58.63957pt too high) detected at line 142
  []
 
 
@@ -1714,12 +1710,12 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [6
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 176--176
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 172--172
  [][][][][][]  
  []
 
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 176.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 172.
 
 Overfull \hbox (5.19066pt too wide) has occurred while \output is active
  [][][][][][]  
@@ -1728,7 +1724,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [7
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 183--183
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 179--179
  [][][][][][]  
  []
 
@@ -1740,16 +1736,12 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [8
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 210--210
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 205--205
  [][][][][][]  
  []
 
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 210.
-
-Overfull \vbox (25.99731pt too high) detected at line 210
- []
-
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 205.
 
 Overfull \hbox (5.19066pt too wide) has occurred while \output is active
  [][][][][][]  
@@ -1758,14 +1750,14 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [9
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 247--247
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 241--241
  [][][][][][]  
  []
 
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <9> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 247.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 241.
 
-Overfull \vbox (21.75017pt too high) detected at line 247
+Overfull \vbox (0.39307pt too high) detected at line 241
  []
 
 
@@ -1776,12 +1768,8 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [10
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 284--284
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 273--273
  [][][][][][]  
- []
-
-
-Overfull \vbox (25.85144pt too high) detected at line 284
  []
 
 
@@ -1792,12 +1780,8 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [11
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 317--317
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 305--305
  [][][][][][]  
- []
-
-
-Overfull \vbox (20.11765pt too high) detected at line 317
  []
 
 
@@ -1808,7 +1792,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [12
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 351--351
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 339--339
  [][][][][][]  
  []
 
@@ -1824,7 +1808,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [13
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 358--358
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 346--346
  [][][][][][]  
  []
 
@@ -1836,7 +1820,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [14
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 395--395
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 383--383
  [][][][][][]  
  []
 
@@ -1848,7 +1832,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [15
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 428--428
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 416--416
  [][][][][][]  
  []
 
@@ -1860,7 +1844,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [16
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 435--435
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 423--423
  [][][][][][]  
  []
 
@@ -1872,7 +1856,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [17
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 477--477
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 465--465
  [][][][][][]  
  []
 
@@ -1884,7 +1868,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [18
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 506--506
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 494--494
  [][][][][][]  
  []
 
@@ -1896,7 +1880,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [19
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 534--534
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 522--522
  [][][][][][]  
  []
 
@@ -1908,7 +1892,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [20
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 539--539
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 527--527
  [][][][][][]  
  []
 
@@ -1920,7 +1904,7 @@ File: beamericonarticle.pdf Graphic file (type pdf)
 <use beamericonarticle.pdf>
 
 LaTeX Font Warning: Font shape `TU/lmss/m/sc' in size <10.95> not available
-(Font)              Font shape `TU/lmr/m/sc' tried instead on input line 539.
+(Font)              Font shape `TU/lmr/m/sc' tried instead on input line 527.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-LatinModernRoman.cfg
@@ -1963,11 +1947,11 @@ Package logreq Info: Writing requests to 'Lecture01_ETS_Eval.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52301 strings out of 468174
- 1230552 string characters out of 5433150
+ 52329 strings out of 468174
+ 1230977 string characters out of 5433150
  2015396 words of memory out of 5000000
- 80128 multiletter control sequences out of 15000+600000
- 640139 words of font info for 108 fonts, out of 8000000 for 9000
+ 80148 multiletter control sequences out of 15000+600000
+ 642613 words of font info for 118 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1920b,5624s stack positions out of 10000i,1000n,20000p,200000b,200000s
 

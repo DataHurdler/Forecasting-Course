@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:40
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  3 APR 2026 09:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1639,23 +1639,11 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 ) [4
 
 ]
-Underfull \hbox (badness 1990) in paragraph at lines 123--123
-[]\TU/lmss/m/n/10.95 A neuron asks: “Is this pattern
- []
-
-
-Overfull \vbox (35.8164pt too high) detected at line 123
- []
-
 [5
 
 ] [6
 
-]
-Overfull \vbox (37.21135pt too high) detected at line 181
- []
-
-[7
+] [7
 
 ] [8
 
@@ -1664,109 +1652,45 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
+ [9
 
-Overfull \vbox (59.62029pt too high) detected at line 237
- []
-
-[9
-
-]
-Overfull \vbox (23.46497pt too high) detected at line 277
- []
-
-[10
+] [10
 
 ] [11
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 329--329
-\TU/lmtt/m/n/10 from torch.utils.data import Dataset,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 329--329
-\TU/lmtt/m/n/10 self.X = torch.tensor(X,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 329--329
-\TU/lmtt/m/n/10 self.y = torch.tensor(y,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 329--329
-\TU/lmtt/m/n/10 train_ds = ForecastDataset(X_train,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 329--329
+Underfull \hbox (badness 10000) in paragraph at lines 306--306
 []\TU/lmss/bx/n/10 Time series: \TU/lmss/m/n/10 do NOT shuf-
  []
 
 
-Underfull \hbox (badness 3815) in paragraph at lines 329--329
+Underfull \hbox (badness 3815) in paragraph at lines 306--306
 \TU/lmss/m/n/10 fle. Set \TU/lmtt/m/n/10 shuffle=False \TU/lmss/m/n/10 and use
  []
 
 
-Overfull \vbox (78.86713pt too high) detected at line 329
+Underfull \hbox (badness 5578) in paragraph at lines 306--306
+\TU/lmtt/m/n/10 TimeSeriesSplit \TU/lmss/m/n/10 on indices before
  []
 
 [12
 
-]
-Overfull \hbox (29.9572pt too wide) in paragraph at lines 376--376
-\TU/lmtt/m/n/10 model = FFNRegressor(in_dim=X_train.shape[1]) 
- []
+] [13
 
-
-Underfull \hbox (badness 1168) in paragraph at lines 376--376
-\TU/lmss/m/n/10 PyTorch automatically computes gradi-
- []
-
-
-Overfull \vbox (64.01141pt too high) detected at line 376
- []
-
-[13
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 422--422
-\TU/lmtt/m/n/10 print(f"Epoch {epoch}:
- []
-
-
-Underfull \hbox (badness 6691) in paragraph at lines 422--422
-\TU/lmss/m/n/10 idation to disable dropout. Use
- []
-
-
-Overfull \vbox (87.301pt too high) detected at line 422
- []
-
-[14
+] [14
 
 ] [15
 
-]
-Overfull \hbox (23.15875pt too wide) in paragraph at lines 461--461
- [] 
- []
-
-[16
+] [16
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 493.
-
-Overfull \vbox (15.90582pt too high) detected at line 493
- []
-
-[17
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 455.
+ [17
 
 ]
 
-LaTeX Warning: Empty bibliography on input line 498.
+LaTeX Warning: Empty bibliography on input line 460.
 
 [18
 
@@ -1792,12 +1716,12 @@ Package logreq Info: Writing requests to 'Lecture07_NeuralNets.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 51894 strings out of 468174
- 1219248 string characters out of 5433150
- 2015908 words of memory out of 5000000
- 79733 multiletter control sequences out of 15000+600000
- 642573 words of font info for 113 fonts, out of 8000000 for 9000
+ 51902 strings out of 468174
+ 1219390 string characters out of 5433150
+ 2013908 words of memory out of 5000000
+ 79737 multiletter control sequences out of 15000+600000
+ 642589 words of font info for 115 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 128i,15n,123p,1922b,1268s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 128i,15n,123p,1922b,1290s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on Lecture07_NeuralNets.pdf (18 pages).

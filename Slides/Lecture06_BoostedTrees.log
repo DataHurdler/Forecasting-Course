@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:40
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  3 APR 2026 09:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1639,71 +1639,36 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
 (Font)              Font shape `TU/lmss/m/sl' tried instead on input line 68.
-
-Overfull \vbox (26.6139pt too high) detected at line 68
- []
-
-[4
+ [4
 
 ]
-Overfull \vbox (44.4114pt too high) detected at line 106
- []
-
 [5
 
 ] [6
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 150.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 149.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
  [7
 
-]
-Underfull \hbox (badness 3547) in paragraph at lines 176--176
-[]|\TU/lmss/m/n/10 Smaller = more robust;
- []
+] [8
 
-
-Underfull \hbox (badness 2538) in paragraph at lines 176--176
-[]|\TU/lmss/m/n/10 Shallow preferred; depth
- []
-
-
-Overfull \hbox (4.3322pt too wide) in paragraph at lines 176--176
-[]|\TU/lmtt/m/n/10 colsample_bytree| 
- []
-
-
-Underfull \hbox (badness 1184) in paragraph at lines 176--176
-[]|\TU/lmss/m/n/10 Feature fraction per tree
- []
-
-
-Overfull \vbox (9.01457pt too high) detected at line 176
- []
-
-[8
-
-]
-Overfull \vbox (44.82097pt too high) detected at line 217
- []
-
-[9
+] [9
 
 ] [10
 
 ]
-Overfull \vbox (3.69261pt too high) detected at line 247
+Overfull \vbox (3.68166pt too high) detected at line 238
  []
 
 [11
 
 ]
-Overfull \vbox (12.94952pt too high) detected at line 297
+Overfull \vbox (0.78792pt too high) detected at line 287
  []
 
 [12
@@ -1750,11 +1715,11 @@ Package logreq Info: Writing requests to 'Lecture06_BoostedTrees.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52123 strings out of 468174
- 1225267 string characters out of 5433150
- 2014847 words of memory out of 5000000
- 79971 multiletter control sequences out of 15000+600000
- 640099 words of font info for 103 fonts, out of 8000000 for 9000
+ 52157 strings out of 468174
+ 1225797 string characters out of 5433150
+ 2013847 words of memory out of 5000000
+ 79992 multiletter control sequences out of 15000+600000
+ 642589 words of font info for 115 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1924b,5467s stack positions out of 10000i,1000n,20000p,200000b,200000s
 

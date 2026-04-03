@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:39
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  3 APR 2026 09:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1619,7 +1619,7 @@ Package biblatex Info: Reference segment=0 on input line 18.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 74.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 69.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -1628,7 +1628,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 74.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 69.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -1637,16 +1637,15 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 74.
-
-Overfull \vbox (31.3827pt too high) detected at line 74
- []
-
-[4
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 69.
+ [4
 
 ]
-Overfull \vbox (22.28201pt too high) detected at line 111
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 104.
+
+Overfull \vbox (2.99155pt too high) detected at line 104
  []
 
 [5
@@ -1654,7 +1653,7 @@ Overfull \vbox (22.28201pt too high) detected at line 111
 ] [6
 
 ]
-Overfull \vbox (36.53903pt too high) detected at line 167
+Overfull \vbox (0.65883pt too high) detected at line 159
  []
 
 [7
@@ -1667,12 +1666,12 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 
-Underfull \hbox (badness 10000) in paragraph at lines 251--251
+Underfull \hbox (badness 10000) in paragraph at lines 243--243
 []\TU/lmss/m/n/10 Tune with \TU/lmtt/m/n/10 max_depth \TU/lmss/m/n/10 and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 251--251
+Underfull \hbox (badness 10000) in paragraph at lines 243--243
 \TU/lmtt/m/n/10 min_samples_leaf\TU/lmss/m/n/10 . Select via
  []
 
@@ -1681,57 +1680,39 @@ Underfull \hbox (badness 10000) in paragraph at lines 251--251
 ] [10
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 308--308
-[]\TU/lmtt/m/n/10 from sklearn.tree import
+Underfull \hbox (badness 10000) in paragraph at lines 295--295
+[]\TU/lmtt/m/n/9 from sklearn.tree import
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 308--308
-\TU/lmtt/m/n/10 from sklearn.model_selection import
+Underfull \hbox (badness 10000) in paragraph at lines 295--295
+\TU/lmtt/m/n/9 from sklearn.model_selection import
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 308--308
-\TU/lmtt/m/n/10 X = make_lag_features(df,
- []
-
-
-Overfull \hbox (21.23082pt too wide) in paragraph at lines 308--308
+Overfull \hbox (21.23082pt too wide) in paragraph at lines 295--295
  [] 
  []
 
 
-Overfull \vbox (77.54097pt too high) detected at line 308
+Overfull \vbox (2.67795pt too high) detected at line 295
  []
 
 [11
 
-]
-Overfull \vbox (15.25548pt too high) detected at line 351
- []
-
-[12
+] [12
 
 ] [13
 
 ] [14
 
-]
-Underfull \hbox (badness 3199) in paragraph at lines 426--426
-[]\TU/lmss/m/n/10.95 This reduces variance dramatically
- []
-
-
-Overfull \vbox (10.06128pt too high) detected at line 426
- []
-
-[15
+] [15
 
 ] [16
 
 ]
 
-LaTeX Warning: Empty bibliography on input line 461.
+LaTeX Warning: Empty bibliography on input line 441.
 
 [17
 
@@ -1758,12 +1739,12 @@ Package logreq Info: Writing requests to 'Lecture04_DecisionTrees.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 51962 strings out of 468174
- 1220710 string characters out of 5433150
+ 51974 strings out of 468174
+ 1220960 string characters out of 5433150
  2014628 words of memory out of 5000000
- 79802 multiletter control sequences out of 15000+600000
- 642565 words of font info for 112 fonts, out of 8000000 for 9000
+ 79810 multiletter control sequences out of 15000+600000
+ 642589 words of font info for 115 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 128i,15n,123p,1925b,1264s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 128i,15n,123p,1925b,1266s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on Lecture04_DecisionTrees.pdf (17 pages).

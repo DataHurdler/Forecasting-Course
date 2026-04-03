@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:54
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  3 APR 2026 09:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1668,11 +1668,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-
-Overfull \vbox (48.83917pt too high) detected at line 199
- []
-
-[8
+ [8
 
 ] [9
 
@@ -1680,26 +1676,12 @@ Overfull \vbox (48.83917pt too high) detected at line 199
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 266.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 253.
  [11
 
-]
-Overfull \vbox (28.62459pt too high) detected at line 303
- []
+] [12
 
-[12
-
-]
-Underfull \hbox (badness 4846) in paragraph at lines 336--336
-[]\TU/lmss/m/n/10.95 Granger causality $\OMS/cmsy/m/n/10.95 6\OT1/cmr/m/n/10.95
- =$ \TU/lmss/m/n/10.95 structural
- []
-
-
-Overfull \vbox (12.8317pt too high) detected at line 336
- []
-
-[13
+] [13
 
 ] [14
 
@@ -1724,7 +1706,8 @@ File: beamericonarticle.pdf Graphic file (type pdf)
 \tf@snm=\write9
 \openout9 = `Lecture02_ARIMA_VAR.snm'.
 
- (./Lecture02_ARIMA_VAR.aux)
+
+(./Lecture02_ARIMA_VAR.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -1736,11 +1719,11 @@ Package logreq Info: Writing requests to 'Lecture02_ARIMA_VAR.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52171 strings out of 468174
- 1225655 string characters out of 5433150
- 2015661 words of memory out of 5000000
- 80005 multiletter control sequences out of 15000+600000
- 645046 words of font info for 123 fonts, out of 8000000 for 9000
+ 52161 strings out of 468174
+ 1225368 string characters out of 5433150
+ 2013661 words of memory out of 5000000
+ 79997 multiletter control sequences out of 15000+600000
+ 645030 words of font info for 121 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1921b,5332s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
