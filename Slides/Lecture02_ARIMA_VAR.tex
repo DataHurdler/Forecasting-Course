@@ -72,7 +72,7 @@
 
 % --- Slide: Unit root + differencing ------------------------------------------
 \begin{frame}{Unit Roots and Differencing}
-  \textbf{AR(1) model:} $y_t = \phi_1\,y_{t-1} + \varepsilon_t$
+  \textbf{AR(1):} $y_t = \phi_1\,y_{t-1} + \varepsilon_t$
   \begin{center}
     {\small
     \begin{tabular}{lll}
@@ -80,29 +80,26 @@
       \textbf{Condition} & \textbf{Behavior} & \textbf{Implication} \\
       \midrule
       $|\phi_1| < 1$ & Shock decays, reverts to mean & Stationary AR(1) \\
-      $\phi_1 = 1$   & Shock persists \emph{permanently} & Random walk --- unit root \\
+      $\phi_1 = 1$   & Shock persists \emph{permanently} & Random walk (unit root) \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
-  \vspace{0.1cm}
   \textbf{First differencing} removes a stochastic trend:
-  \[
-    \Delta y_t = y_t - y_{t-1}
-  \]
-  \textbf{Testing:} \textbf{ADF test} ($H_0$: unit root) and \textbf{KPSS test}
-  ($H_0$: stationary). Use both; they test opposite nulls.
+  $\Delta y_t = y_t - y_{t-1}$\\[3pt]
+  \textbf{Testing:} \textbf{ADF} ($H_0$: unit root) and \textbf{KPSS}
+  ($H_0$: stationary) --- they test opposite nulls; use both.
   \begin{columns}[T]
     \column{0.48\textwidth}
       \begin{keybox}
         {\small $d=0$: already stationary.
         $d=1$: one first difference.
-        $D=1$: one seasonal difference ($\Delta_{12}y_t = y_t - y_{t-12}$).}
+        $D=1$: seasonal difference ($\Delta_{12}y_t = y_t - y_{t-12}$).}
       \end{keybox}
     \column{0.48\textwidth}
       \begin{warningbox}
-        \textbf{Over-differencing} induces negative autocorrelation.
-        Apply unit-root test \emph{after} differencing; stop at $d=1$
+        \small\textbf{Over-differencing} induces negative autocorrelation.
+        Test \emph{after} differencing; stop at $d=1$
         if the result is stationary.
       \end{warningbox}
   \end{columns}

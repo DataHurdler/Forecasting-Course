@@ -82,11 +82,11 @@ AR(1) model: $y_t = \phi_1\,y_{t-1} + \varepsilon_t$
 | Condition | Behavior | Implication |
 |-----------|----------|-------------|
 | $\|\phi_1\| < 1$ | Shock decays, reverts to mean | Stationary AR(1) |
-| $\phi_1 = 1$ | Shock persists *permanently* | Random walk — unit root |
+| $\phi_1 = 1$ | Shock persists *permanently* | Random walk (unit root) |
 
 **First differencing** removes a stochastic trend: $\Delta y_t = y_t - y_{t-1}$
 
-**Testing:** **ADF test** ($H_0$: unit root) and **KPSS test** ($H_0$: stationary). Use both — they test opposite nulls.
+**Testing:** **ADF** ($H_0$: unit root) and **KPSS** ($H_0$: stationary) — they test opposite nulls; use both.
 
 :::: {.columns}
 ::: {.column width="48%"}
