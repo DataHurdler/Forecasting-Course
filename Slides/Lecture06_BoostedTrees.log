@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 12:20
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1481,26 +1481,26 @@ Library `listings` is loaded instead. on input line 29.
  (./Lecture06_BoostedTrees.aux)
 \openout1 = `Lecture06_BoostedTrees.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -1536,7 +1536,7 @@ LaTeX Font Info:    ... okay on input line 19.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 19.
+Package hyperref Info: Link coloring ON on input line 18.
 (./Lecture06_BoostedTrees.out) (./Lecture06_BoostedTrees.out)
 \@outlinefile=\write6
 \openout6 = `Lecture06_BoostedTrees.out'.
@@ -1569,13 +1569,13 @@ Dictionary: translator-theorem-dictionary, Language: English
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-LaTeX Info: Redefining \microtypecontext on input line 19.
-Package microtype Info: Applying patch `item' on input line 19.
-Package microtype Info: Applying patch `toc' on input line 19.
-Package microtype Info: Applying patch `eqnum' on input line 19.
-Package microtype Info: Applying patch `footnote' on input line 19.
-Package microtype Info: Applying patch `verbatim' on input line 19.
-LaTeX Info: Redefining \microtypesetup on input line 19.
+LaTeX Info: Redefining \microtypecontext on input line 18.
+Package microtype Info: Applying patch `item' on input line 18.
+Package microtype Info: Applying patch `toc' on input line 18.
+Package microtype Info: Applying patch `eqnum' on input line 18.
+Package microtype Info: Applying patch `footnote' on input line 18.
+Package microtype Info: Applying patch `verbatim' on input line 18.
+LaTeX Info: Redefining \microtypesetup on input line 18.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: No adjustment of tracking.
@@ -1605,8 +1605,8 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'Lecture06_BoostedTrees.bbl' found.
 
 (./Lecture06_BoostedTrees.bbl)
-Package biblatex Info: Reference section=0 on input line 19.
-Package biblatex Info: Reference segment=0 on input line 19.
+Package biblatex Info: Reference section=0 on input line 18.
+Package biblatex Info: Reference segment=0 on input line 18.
  (./Lecture06_BoostedTrees.nav) [1
 
 ]
@@ -1619,7 +1619,7 @@ Package biblatex Info: Reference segment=0 on input line 19.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 69.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 68.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -1628,7 +1628,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 69.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 68.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -1638,15 +1638,15 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 69.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 68.
 
-Overfull \vbox (26.6139pt too high) detected at line 69
+Overfull \vbox (26.6139pt too high) detected at line 68
  []
 
 [4
 
 ]
-Overfull \vbox (44.4114pt too high) detected at line 107
+Overfull \vbox (44.4114pt too high) detected at line 106
  []
 
 [5
@@ -1655,7 +1655,7 @@ Overfull \vbox (44.4114pt too high) detected at line 107
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 151.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 150.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
@@ -1663,33 +1663,33 @@ Package microtype Info: Loading generic protrusion settings for font family
  [7
 
 ]
-Underfull \hbox (badness 3547) in paragraph at lines 177--177
+Underfull \hbox (badness 3547) in paragraph at lines 176--176
 []|\TU/lmss/m/n/10 Smaller = more robust;
  []
 
 
-Underfull \hbox (badness 2538) in paragraph at lines 177--177
+Underfull \hbox (badness 2538) in paragraph at lines 176--176
 []|\TU/lmss/m/n/10 Shallow preferred; depth
  []
 
 
-Overfull \hbox (4.3322pt too wide) in paragraph at lines 177--177
+Overfull \hbox (4.3322pt too wide) in paragraph at lines 176--176
 []|\TU/lmtt/m/n/10 colsample_bytree| 
  []
 
 
-Underfull \hbox (badness 1184) in paragraph at lines 177--177
+Underfull \hbox (badness 1184) in paragraph at lines 176--176
 []|\TU/lmss/m/n/10 Feature fraction per tree
  []
 
 
-Overfull \vbox (9.01457pt too high) detected at line 177
+Overfull \vbox (9.01457pt too high) detected at line 176
  []
 
 [8
 
 ]
-Overfull \vbox (44.82097pt too high) detected at line 218
+Overfull \vbox (44.82097pt too high) detected at line 217
  []
 
 [9
@@ -1697,13 +1697,13 @@ Overfull \vbox (44.82097pt too high) detected at line 218
 ] [10
 
 ]
-Overfull \vbox (3.69261pt too high) detected at line 248
+Overfull \vbox (3.69261pt too high) detected at line 247
  []
 
 [11
 
 ]
-Overfull \vbox (12.94952pt too high) detected at line 298
+Overfull \vbox (12.94952pt too high) detected at line 297
  []
 
 [12
@@ -1750,10 +1750,10 @@ Package logreq Info: Writing requests to 'Lecture06_BoostedTrees.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52119 strings out of 468174
- 1225212 string characters out of 5433150
- 2014867 words of memory out of 5000000
- 79967 multiletter control sequences out of 15000+600000
+ 52123 strings out of 468174
+ 1225267 string characters out of 5433150
+ 2014847 words of memory out of 5000000
+ 79971 multiletter control sequences out of 15000+600000
  640099 words of font info for 103 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1924b,5467s stack positions out of 10000i,1000n,20000p,200000b,200000s

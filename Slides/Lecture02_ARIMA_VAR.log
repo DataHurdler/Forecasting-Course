@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 12:20
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1481,26 +1481,26 @@ Library `listings` is loaded instead. on input line 29.
  (./Lecture02_ARIMA_VAR.aux)
 \openout1 = `Lecture02_ARIMA_VAR.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -1536,7 +1536,7 @@ LaTeX Font Info:    ... okay on input line 19.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 19.
+Package hyperref Info: Link coloring ON on input line 18.
 (./Lecture02_ARIMA_VAR.out) (./Lecture02_ARIMA_VAR.out)
 \@outlinefile=\write6
 \openout6 = `Lecture02_ARIMA_VAR.out'.
@@ -1569,13 +1569,13 @@ Dictionary: translator-theorem-dictionary, Language: English
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-LaTeX Info: Redefining \microtypecontext on input line 19.
-Package microtype Info: Applying patch `item' on input line 19.
-Package microtype Info: Applying patch `toc' on input line 19.
-Package microtype Info: Applying patch `eqnum' on input line 19.
-Package microtype Info: Applying patch `footnote' on input line 19.
-Package microtype Info: Applying patch `verbatim' on input line 19.
-LaTeX Info: Redefining \microtypesetup on input line 19.
+LaTeX Info: Redefining \microtypecontext on input line 18.
+Package microtype Info: Applying patch `item' on input line 18.
+Package microtype Info: Applying patch `toc' on input line 18.
+Package microtype Info: Applying patch `eqnum' on input line 18.
+Package microtype Info: Applying patch `footnote' on input line 18.
+Package microtype Info: Applying patch `verbatim' on input line 18.
+LaTeX Info: Redefining \microtypesetup on input line 18.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: No adjustment of tracking.
@@ -1605,8 +1605,8 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'Lecture02_ARIMA_VAR.bbl' found.
 
 (./Lecture02_ARIMA_VAR.bbl)
-Package biblatex Info: Reference section=0 on input line 19.
-Package biblatex Info: Reference segment=0 on input line 19.
+Package biblatex Info: Reference section=0 on input line 18.
+Package biblatex Info: Reference segment=0 on input line 18.
  (./Lecture02_ARIMA_VAR.nav) [1
 
 ]
@@ -1619,7 +1619,7 @@ Package biblatex Info: Reference segment=0 on input line 19.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 72.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 71.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -1628,7 +1628,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 72.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 71.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -1637,31 +1637,31 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-Underfull \hbox (badness 3861) in paragraph at lines 72--72
+Underfull \hbox (badness 3861) in paragraph at lines 71--71
 \TU/lmss/bx/n/10.95 Fix: \TU/lmss/m/n/10.95 first-differencing removes a
  []
 
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <9> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 72.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 71.
 
-Overfull \vbox (1.7835pt too high) detected at line 72
+Overfull \vbox (1.7835pt too high) detected at line 71
  []
 
 [4
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 110.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 109.
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 110.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 109.
 
-Overfull \vbox (11.04224pt too high) detected at line 110
+Overfull \vbox (11.04224pt too high) detected at line 109
  []
 
 [5
 
 ]
-Overfull \hbox (6.41083pt too wide) in paragraph at lines 152--152
+Overfull \hbox (6.41083pt too wide) in paragraph at lines 151--151
  [] 
  []
 
@@ -1675,7 +1675,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 
-Overfull \vbox (48.83917pt too high) detected at line 203
+Overfull \vbox (48.83917pt too high) detected at line 202
  []
 
 [8
@@ -1687,19 +1687,19 @@ Overfull \vbox (48.83917pt too high) detected at line 203
 ] [11
 
 ]
-Overfull \vbox (28.62459pt too high) detected at line 307
+Overfull \vbox (28.62459pt too high) detected at line 306
  []
 
 [12
 
 ]
-Underfull \hbox (badness 4846) in paragraph at lines 340--340
+Underfull \hbox (badness 4846) in paragraph at lines 339--339
 []\TU/lmss/m/n/10.95 Granger causality $\OMS/cmsy/m/n/10.95 6\OT1/cmr/m/n/10.95
  =$ \TU/lmss/m/n/10.95 structural
  []
 
 
-Overfull \vbox (12.8317pt too high) detected at line 340
+Overfull \vbox (12.8317pt too high) detected at line 339
  []
 
 [13
@@ -1739,10 +1739,10 @@ Package logreq Info: Writing requests to 'Lecture02_ARIMA_VAR.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52167 strings out of 468174
- 1225600 string characters out of 5433150
- 2015681 words of memory out of 5000000
- 80001 multiletter control sequences out of 15000+600000
+ 52171 strings out of 468174
+ 1225655 string characters out of 5433150
+ 2015661 words of memory out of 5000000
+ 80005 multiletter control sequences out of 15000+600000
  645046 words of font info for 123 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1921b,5332s stack positions out of 10000i,1000n,20000p,200000b,200000s

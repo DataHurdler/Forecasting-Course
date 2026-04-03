@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 12:20
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1481,26 +1481,26 @@ Library `listings` is loaded instead. on input line 29.
  (./Lecture01_ETS_Eval.aux)
 \openout1 = `Lecture01_ETS_Eval.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -1536,7 +1536,7 @@ LaTeX Font Info:    ... okay on input line 19.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 19.
+Package hyperref Info: Link coloring ON on input line 18.
 (./Lecture01_ETS_Eval.out) (./Lecture01_ETS_Eval.out)
 \@outlinefile=\write6
 \openout6 = `Lecture01_ETS_Eval.out'.
@@ -1569,13 +1569,13 @@ Dictionary: translator-theorem-dictionary, Language: English
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-LaTeX Info: Redefining \microtypecontext on input line 19.
-Package microtype Info: Applying patch `item' on input line 19.
-Package microtype Info: Applying patch `toc' on input line 19.
-Package microtype Info: Applying patch `eqnum' on input line 19.
-Package microtype Info: Applying patch `footnote' on input line 19.
-Package microtype Info: Applying patch `verbatim' on input line 19.
-LaTeX Info: Redefining \microtypesetup on input line 19.
+LaTeX Info: Redefining \microtypecontext on input line 18.
+Package microtype Info: Applying patch `item' on input line 18.
+Package microtype Info: Applying patch `toc' on input line 18.
+Package microtype Info: Applying patch `eqnum' on input line 18.
+Package microtype Info: Applying patch `footnote' on input line 18.
+Package microtype Info: Applying patch `verbatim' on input line 18.
+LaTeX Info: Redefining \microtypesetup on input line 18.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: No adjustment of tracking.
@@ -1605,15 +1605,15 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'Lecture01_ETS_Eval.bbl' found.
 
 (./Lecture01_ETS_Eval.bbl)
-Package biblatex Info: Reference section=0 on input line 19.
-Package biblatex Info: Reference segment=0 on input line 19.
+Package biblatex Info: Reference section=0 on input line 18.
+Package biblatex Info: Reference segment=0 on input line 18.
  (./Lecture01_ETS_Eval.nav)
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 19--19
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 18--18
  [][][][][][]  
  []
 
 
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 24--24
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 23--23
  [][][][][][]  
  []
 
@@ -1625,7 +1625,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [1
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 29--29
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 28--28
  [][][][][][]  
  []
 
@@ -1637,7 +1637,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [2
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 36--36
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 35--35
  [][][][][][]  
  []
 
@@ -1649,7 +1649,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [3
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 73--73
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 72--72
  [][][][][][]  
  []
 
@@ -1657,7 +1657,7 @@ Overfull \hbox (5.19066pt too wide) in paragraph at lines 73--73
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 73.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 72.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -1666,7 +1666,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 73.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 72.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -1682,12 +1682,12 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [4
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 110--110
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 109--109
  [][][][][][]  
  []
 
 
-Overfull \vbox (20.34436pt too high) detected at line 110
+Overfull \vbox (20.34436pt too high) detected at line 109
  []
 
 
@@ -1698,12 +1698,12 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [5
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 144--144
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 143--143
  [][][][][][]  
  []
 
 
-Overfull \vbox (58.63957pt too high) detected at line 144
+Overfull \vbox (58.63957pt too high) detected at line 143
  []
 
 
@@ -1714,12 +1714,12 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [6
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 178--178
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 177--177
  [][][][][][]  
  []
 
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 178.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 177.
 
 Overfull \hbox (5.19066pt too wide) has occurred while \output is active
  [][][][][][]  
@@ -1728,7 +1728,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [7
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 185--185
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 184--184
  [][][][][][]  
  []
 
@@ -1740,14 +1740,14 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [8
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 212--212
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 211--211
  [][][][][][]  
  []
 
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 212.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 211.
 
-Overfull \vbox (25.99731pt too high) detected at line 212
+Overfull \vbox (25.99731pt too high) detected at line 211
  []
 
 
@@ -1758,14 +1758,14 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [9
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 249--249
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 248--248
  [][][][][][]  
  []
 
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <9> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 249.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 248.
 
-Overfull \vbox (21.75017pt too high) detected at line 249
+Overfull \vbox (21.75017pt too high) detected at line 248
  []
 
 
@@ -1776,12 +1776,12 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [10
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 286--286
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 285--285
  [][][][][][]  
  []
 
 
-Overfull \vbox (25.85144pt too high) detected at line 286
+Overfull \vbox (25.85144pt too high) detected at line 285
  []
 
 
@@ -1792,12 +1792,12 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [11
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 319--319
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 318--318
  [][][][][][]  
  []
 
 
-Overfull \vbox (20.11765pt too high) detected at line 319
+Overfull \vbox (20.11765pt too high) detected at line 318
  []
 
 
@@ -1808,7 +1808,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [12
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 353--353
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 352--352
  [][][][][][]  
  []
 
@@ -1824,7 +1824,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [13
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 360--360
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 359--359
  [][][][][][]  
  []
 
@@ -1836,7 +1836,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [14
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 397--397
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 396--396
  [][][][][][]  
  []
 
@@ -1848,7 +1848,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [15
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 430--430
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 429--429
  [][][][][][]  
  []
 
@@ -1860,7 +1860,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [16
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 437--437
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 436--436
  [][][][][][]  
  []
 
@@ -1872,7 +1872,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [17
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 479--479
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 478--478
  [][][][][][]  
  []
 
@@ -1884,7 +1884,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [18
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 508--508
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 507--507
  [][][][][][]  
  []
 
@@ -1896,7 +1896,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [19
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 536--536
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 535--535
  [][][][][][]  
  []
 
@@ -1908,7 +1908,7 @@ Overfull \hbox (5.19066pt too wide) has occurred while \output is active
 [20
 
 ]
-Overfull \hbox (5.19066pt too wide) in paragraph at lines 541--541
+Overfull \hbox (5.19066pt too wide) in paragraph at lines 540--540
  [][][][][][]  
  []
 
@@ -1920,7 +1920,7 @@ File: beamericonarticle.pdf Graphic file (type pdf)
 <use beamericonarticle.pdf>
 
 LaTeX Font Warning: Font shape `TU/lmss/m/sc' in size <10.95> not available
-(Font)              Font shape `TU/lmr/m/sc' tried instead on input line 541.
+(Font)              Font shape `TU/lmr/m/sc' tried instead on input line 540.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-LatinModernRoman.cfg
@@ -1963,10 +1963,10 @@ Package logreq Info: Writing requests to 'Lecture01_ETS_Eval.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52298 strings out of 468174
- 1230516 string characters out of 5433150
- 2015416 words of memory out of 5000000
- 80125 multiletter control sequences out of 15000+600000
+ 52302 strings out of 468174
+ 1230571 string characters out of 5433150
+ 2015396 words of memory out of 5000000
+ 80129 multiletter control sequences out of 15000+600000
  640139 words of font info for 108 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1920b,5624s stack positions out of 10000i,1000n,20000p,200000b,200000s

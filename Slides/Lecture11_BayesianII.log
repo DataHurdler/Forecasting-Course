@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 12:26
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1481,26 +1481,26 @@ Library `listings` is loaded instead. on input line 29.
  (./Lecture11_BayesianII.aux)
 \openout1 = `Lecture11_BayesianII.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -1536,7 +1536,7 @@ LaTeX Font Info:    ... okay on input line 19.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 19.
+Package hyperref Info: Link coloring ON on input line 18.
 (./Lecture11_BayesianII.out) (./Lecture11_BayesianII.out)
 \@outlinefile=\write6
 \openout6 = `Lecture11_BayesianII.out'.
@@ -1569,13 +1569,13 @@ Dictionary: translator-theorem-dictionary, Language: English
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-LaTeX Info: Redefining \microtypecontext on input line 19.
-Package microtype Info: Applying patch `item' on input line 19.
-Package microtype Info: Applying patch `toc' on input line 19.
-Package microtype Info: Applying patch `eqnum' on input line 19.
-Package microtype Info: Applying patch `footnote' on input line 19.
-Package microtype Info: Applying patch `verbatim' on input line 19.
-LaTeX Info: Redefining \microtypesetup on input line 19.
+LaTeX Info: Redefining \microtypecontext on input line 18.
+Package microtype Info: Applying patch `item' on input line 18.
+Package microtype Info: Applying patch `toc' on input line 18.
+Package microtype Info: Applying patch `eqnum' on input line 18.
+Package microtype Info: Applying patch `footnote' on input line 18.
+Package microtype Info: Applying patch `verbatim' on input line 18.
+LaTeX Info: Redefining \microtypesetup on input line 18.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: No adjustment of tracking.
@@ -1605,8 +1605,8 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'Lecture11_BayesianII.bbl' found.
 
 (./Lecture11_BayesianII.bbl)
-Package biblatex Info: Reference section=0 on input line 19.
-Package biblatex Info: Reference segment=0 on input line 19.
+Package biblatex Info: Reference section=0 on input line 18.
+Package biblatex Info: Reference segment=0 on input line 18.
  (./Lecture11_BayesianII.nav) [1
 
 ]
@@ -1619,7 +1619,7 @@ Package biblatex Info: Reference segment=0 on input line 19.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 76.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 75.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -1628,7 +1628,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 76.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 75.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -1637,13 +1637,13 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-Overfull \vbox (12.66371pt too high) detected at line 76
+Overfull \vbox (12.66371pt too high) detected at line 75
  []
 
 [4
 
 ]
-Overfull \vbox (50.46812pt too high) detected at line 115
+Overfull \vbox (50.46812pt too high) detected at line 114
  []
 
 [5
@@ -1654,22 +1654,22 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 
-Underfull \hbox (badness 10000) in paragraph at lines 162--162
+Underfull \hbox (badness 10000) in paragraph at lines 161--161
 \TU/lmtt/m/n/10 alpha = pm.Normal('alpha', mu=y.mean(),
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 162--162
+Underfull \hbox (badness 10000) in paragraph at lines 161--161
 \TU/lmtt/m/n/10 sigma = pm.HalfNormal('sigma',
  []
 
 
-Overfull \hbox (49.2745pt too wide) in paragraph at lines 162--162
+Overfull \hbox (49.2745pt too wide) in paragraph at lines 161--161
 []\TU/lmss/m/n/10 Use \TU/lmtt/m/n/10 pm.sample_posterior_predictive(trace)
  []
 
 
-Overfull \vbox (115.28094pt too high) detected at line 162
+Overfull \vbox (115.28094pt too high) detected at line 161
  []
 
 [6
@@ -1677,28 +1677,28 @@ Overfull \vbox (115.28094pt too high) detected at line 162
 ] [7
 
 ]
-Overfull \vbox (0.6806pt too high) detected at line 214
+Overfull \vbox (0.6806pt too high) detected at line 213
  []
 
 [8
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 262--262
+Underfull \hbox (badness 10000) in paragraph at lines 261--261
 []\TU/lmss/bx/n/10.95 The key line: \TU/lmtt/m/n/10.95 alpha =
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 262--262
+Underfull \hbox (badness 10000) in paragraph at lines 261--261
 \TU/lmtt/m/n/10.95 pm.Normal('alpha', mu=mu_a,
  []
 
 
-Underfull \hbox (badness 1325) in paragraph at lines 262--262
+Underfull \hbox (badness 1325) in paragraph at lines 261--261
 []\TU/lmss/m/n/10 Use the \TU/lmss/bx/n/10 non-centered parameteriza-
  []
 
 
-Overfull \vbox (44.34708pt too high) detected at line 262
+Overfull \vbox (44.34708pt too high) detected at line 261
  []
 
 [9
@@ -1707,7 +1707,7 @@ Overfull \vbox (44.34708pt too high) detected at line 262
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 304.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 303.
  [11
 
 ]
@@ -1739,10 +1739,10 @@ Package logreq Info: Writing requests to 'Lecture11_BayesianII.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 52091 strings out of 468174
- 1224468 string characters out of 5433150
- 2015758 words of memory out of 5000000
- 79938 multiletter control sequences out of 15000+600000
+ 52095 strings out of 468174
+ 1224523 string characters out of 5433150
+ 2015738 words of memory out of 5000000
+ 79942 multiletter control sequences out of 15000+600000
  640107 words of font info for 104 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1922b,5315s stack positions out of 10000i,1000n,20000p,200000b,200000s

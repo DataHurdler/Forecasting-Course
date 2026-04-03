@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 12:20
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.3.15)  2 APR 2026 19:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1481,26 +1481,26 @@ Library `listings` is loaded instead. on input line 29.
  (./Lecture07_NeuralNets.aux)
 \openout1 = `Lecture07_NeuralNets.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -1536,7 +1536,7 @@ LaTeX Font Info:    ... okay on input line 19.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 19.
+Package hyperref Info: Link coloring ON on input line 18.
 (./Lecture07_NeuralNets.out) (./Lecture07_NeuralNets.out)
 \@outlinefile=\write6
 \openout6 = `Lecture07_NeuralNets.out'.
@@ -1569,13 +1569,13 @@ Dictionary: translator-theorem-dictionary, Language: English
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-LaTeX Info: Redefining \microtypecontext on input line 19.
-Package microtype Info: Applying patch `item' on input line 19.
-Package microtype Info: Applying patch `toc' on input line 19.
-Package microtype Info: Applying patch `eqnum' on input line 19.
-Package microtype Info: Applying patch `footnote' on input line 19.
-Package microtype Info: Applying patch `verbatim' on input line 19.
-LaTeX Info: Redefining \microtypesetup on input line 19.
+LaTeX Info: Redefining \microtypecontext on input line 18.
+Package microtype Info: Applying patch `item' on input line 18.
+Package microtype Info: Applying patch `toc' on input line 18.
+Package microtype Info: Applying patch `eqnum' on input line 18.
+Package microtype Info: Applying patch `footnote' on input line 18.
+Package microtype Info: Applying patch `verbatim' on input line 18.
+LaTeX Info: Redefining \microtypesetup on input line 18.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: No adjustment of tracking.
@@ -1605,8 +1605,8 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'Lecture07_NeuralNets.bbl' found.
 
 (./Lecture07_NeuralNets.bbl)
-Package biblatex Info: Reference section=0 on input line 19.
-Package biblatex Info: Reference segment=0 on input line 19.
+Package biblatex Info: Reference section=0 on input line 18.
+Package biblatex Info: Reference segment=0 on input line 18.
  (./Lecture07_NeuralNets.nav) [1
 
 ]
@@ -1619,7 +1619,7 @@ Package biblatex Info: Reference segment=0 on input line 19.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 76.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 75.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -1628,7 +1628,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 76.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 75.
 
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -1639,12 +1639,12 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 ) [4
 
 ]
-Underfull \hbox (badness 1990) in paragraph at lines 124--124
+Underfull \hbox (badness 1990) in paragraph at lines 123--123
 []\TU/lmss/m/n/10.95 A neuron asks: “Is this pattern
  []
 
 
-Overfull \vbox (35.8164pt too high) detected at line 124
+Overfull \vbox (35.8164pt too high) detected at line 123
  []
 
 [5
@@ -1652,7 +1652,7 @@ Overfull \vbox (35.8164pt too high) detected at line 124
 ] [6
 
 ]
-Overfull \vbox (37.21135pt too high) detected at line 182
+Overfull \vbox (37.21135pt too high) detected at line 181
  []
 
 [7
@@ -1665,13 +1665,13 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 
-Overfull \vbox (59.62029pt too high) detected at line 238
+Overfull \vbox (59.62029pt too high) detected at line 237
  []
 
 [9
 
 ]
-Overfull \vbox (23.46497pt too high) detected at line 278
+Overfull \vbox (23.46497pt too high) detected at line 277
  []
 
 [10
@@ -1679,69 +1679,69 @@ Overfull \vbox (23.46497pt too high) detected at line 278
 ] [11
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 330--330
+Underfull \hbox (badness 10000) in paragraph at lines 329--329
 \TU/lmtt/m/n/10 from torch.utils.data import Dataset,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 330--330
+Underfull \hbox (badness 10000) in paragraph at lines 329--329
 \TU/lmtt/m/n/10 self.X = torch.tensor(X,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 330--330
+Underfull \hbox (badness 10000) in paragraph at lines 329--329
 \TU/lmtt/m/n/10 self.y = torch.tensor(y,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 330--330
+Underfull \hbox (badness 10000) in paragraph at lines 329--329
 \TU/lmtt/m/n/10 train_ds = ForecastDataset(X_train,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 330--330
+Underfull \hbox (badness 10000) in paragraph at lines 329--329
 []\TU/lmss/bx/n/10 Time series: \TU/lmss/m/n/10 do NOT shuf-
  []
 
 
-Underfull \hbox (badness 3815) in paragraph at lines 330--330
+Underfull \hbox (badness 3815) in paragraph at lines 329--329
 \TU/lmss/m/n/10 fle. Set \TU/lmtt/m/n/10 shuffle=False \TU/lmss/m/n/10 and use
  []
 
 
-Overfull \vbox (78.86713pt too high) detected at line 330
+Overfull \vbox (78.86713pt too high) detected at line 329
  []
 
 [12
 
 ]
-Overfull \hbox (29.9572pt too wide) in paragraph at lines 377--377
+Overfull \hbox (29.9572pt too wide) in paragraph at lines 376--376
 \TU/lmtt/m/n/10 model = FFNRegressor(in_dim=X_train.shape[1]) 
  []
 
 
-Underfull \hbox (badness 1168) in paragraph at lines 377--377
+Underfull \hbox (badness 1168) in paragraph at lines 376--376
 \TU/lmss/m/n/10 PyTorch automatically computes gradi-
  []
 
 
-Overfull \vbox (64.01141pt too high) detected at line 377
+Overfull \vbox (64.01141pt too high) detected at line 376
  []
 
 [13
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 423--423
+Underfull \hbox (badness 10000) in paragraph at lines 422--422
 \TU/lmtt/m/n/10 print(f"Epoch {epoch}:
  []
 
 
-Underfull \hbox (badness 6691) in paragraph at lines 423--423
+Underfull \hbox (badness 6691) in paragraph at lines 422--422
 \TU/lmss/m/n/10 idation to disable dropout. Use
  []
 
 
-Overfull \vbox (87.301pt too high) detected at line 423
+Overfull \vbox (87.301pt too high) detected at line 422
  []
 
 [14
@@ -1749,7 +1749,7 @@ Overfull \vbox (87.301pt too high) detected at line 423
 ] [15
 
 ]
-Overfull \hbox (23.15875pt too wide) in paragraph at lines 462--462
+Overfull \hbox (23.15875pt too wide) in paragraph at lines 461--461
  [] 
  []
 
@@ -1757,16 +1757,16 @@ Overfull \hbox (23.15875pt too wide) in paragraph at lines 462--462
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 494.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 493.
 
-Overfull \vbox (15.90582pt too high) detected at line 494
+Overfull \vbox (15.90582pt too high) detected at line 493
  []
 
 [17
 
 ]
 
-LaTeX Warning: Empty bibliography on input line 499.
+LaTeX Warning: Empty bibliography on input line 498.
 
 [18
 
@@ -1792,10 +1792,10 @@ Package logreq Info: Writing requests to 'Lecture07_NeuralNets.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 51890 strings out of 468174
- 1219193 string characters out of 5433150
- 2015928 words of memory out of 5000000
- 79729 multiletter control sequences out of 15000+600000
+ 51894 strings out of 468174
+ 1219248 string characters out of 5433150
+ 2015908 words of memory out of 5000000
+ 79733 multiletter control sequences out of 15000+600000
  642573 words of font info for 113 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,1922b,1268s stack positions out of 10000i,1000n,20000p,200000b,200000s
