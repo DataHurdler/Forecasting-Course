@@ -84,16 +84,19 @@ A **time series** is an ordered sequence of observations $\{y_1, y_2, \ldots, y_
 ::: {.column width="52%"}
 **Key notation:**
 
+::: {.smaller}
 - $y_t$ — observed value at time $t$
 - $h$ — **forecast horizon** (periods ahead)
 - $\hat{y}_{t+h|t}$ — forecast of $y_{t+h}$ made at time $t$
 - $e_t = y_t - \hat{y}_{t|t-1}$ — **forecast error**
+:::
 :::
 ::: {.column width="44%"}
 ::: {.examplebox}
 ::: {.examplebox-title}
 Example
 :::
+::: {.smaller}
 Forecasting monthly retail sales:
 
 - $h=1$: next month's sales
@@ -102,10 +105,13 @@ Forecasting monthly retail sales:
 Harder as $h$ grows — uncertainty compounds.
 :::
 :::
+:::
 ::::
 
 ::: {.keybox}
-Under squared error loss, the optimal forecast is the **conditional expectation**: $\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]$
+::: {.smaller}
+Under squared error loss, the optimal forecast is the **conditional expectation**: $\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]$, where $\mathcal{F}_t$ is all information available at time $t$.
+:::
 :::
 
 ---
