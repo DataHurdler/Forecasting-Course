@@ -77,11 +77,10 @@
     A \key{time series} is an ordered sequence of observations
     $\{y_1, y_2, \ldots, y_T\}$ where $t$ indexes time.
   \end{definitionbox}
-  \vspace{0.2cm}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{Key notation:}
-      \begin{itemize}
+      \begin{itemize}\small
         \item $y_t$ --- observed value at time $t$
         \item $h$ --- \key{forecast horizon} (periods ahead)
         \item $\hat{y}_{t+h|t}$ --- forecast of $y_{t+h}$ made at time $t$
@@ -90,20 +89,20 @@
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{examplebox}{Example}
-        Forecasting monthly retail sales:\\
+        {\small Forecasting monthly retail sales:\\
         $h=1$: next month's sales\\
         $h=12$: sales 12 months from now\\
-        \medskip
+        \smallskip
         Harder problem as $h$ grows ---
-        uncertainty compounds.
+        uncertainty compounds.}
       \end{examplebox}
     \end{column}
   \end{columns}
-  \vspace{0.2cm}
+  \vspace{0.1cm}
   \begin{keybox}
-    Under squared error loss, the optimal forecast is the
+    \small Under squared error loss, the optimal forecast is the
     \textbf{conditional expectation}:
-    $\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]$
+    $\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]$,
     where $\mathcal{F}_t$ is all information available at time $t$.
   \end{keybox}
 \end{frame}
