@@ -1,0 +1,405 @@
+---
+title: "Homework 5: Deep Learning for Time Series"
+subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Overview
+
+This homework builds four neural network architectures for time series forecasting,
+progressing from simple to complex:
+
+1. **Feedforward Network (FFN)** — treats lagged sales as a flat feature vector
+2. **1D Convolutional Network (CNN)** — slides a learned filter across the sequence
+   to detect local temporal patterns
+3. **LSTM** — processes the sequence step-by-step, maintaining a memory of past states
+4. **Transformer** — attends to all time steps simultaneously, learning which past
+   weeks are most informative
+
+All four are implemented in PyTorch using the same sliding-window dataset infrastructure,
+making it straightforward to compare them on identical train/test splits.
+
+**Learning objectives:**
+
+- Build a PyTorch `Dataset` and `DataLoader` for sliding-window time series data
+- Train FFN, CNN, LSTM, and Transformer models and monitor loss curves
+- Compare all four architectures on holdout RMSE
+- Synthesize results across all five homeworks into a full course comparison
+
+---
+
+## Dataset and Setup
+
+We construct fixed-length sliding windows over each store's weekly sales history.
+Each input is a window of past sales; the target is the next week's sales.
+Part A (FFN, CNN) uses a window of 26 weeks; Part B (LSTM, Transformer) uses 52 weeks.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error
+import warnings
+warnings.filterwarnings('ignore')
+
+RANDOM_STATE = 42
+torch.manual_seed(RANDOM_STATE)
+
+weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
+
+SCALAR_FEATURES = ["Promo", "StoreType", "Assortment", "CompetitionDistance", "Promo2"]
+
+# Temporal split: train < 2015-01-01, test >= 2015-01-01
+cutoff = pd.Timestamp("2015-01-01")
+train_df = weekly[weekly["WeekStart"] < cutoff].copy()
+test_df  = weekly[weekly["WeekStart"] >= cutoff].copy()
+
+print(f"Stores: {weekly['Store'].nunique()} | Train weeks per store (approx): {len(train_df) // weekly['Store'].nunique()}")
+```
+
+---
+
+## Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Paste the following as your first message to Codex. Save it as `INITIAL_PROMPT.md`
+in your submission folder.
+
+```
+I am working on Homework 5 for BSAD 8310: Business Forecasting at the
+University of Nebraska at Omaha.
+
+Dataset: Rossmann Store Sales — weekly aggregated for 30 stores at
+`data/processed/rossmann_weekly.csv`. I am building sliding-window
+sequence models using PyTorch. Temporal split: train < 2015-01-01,
+test >= 2015-01-01. Scalar features: Promo, StoreType, Assortment,
+CompetitionDistance, Promo2.
+
+This homework covers four neural network architectures for time series
+forecasting: FFN, 1D CNN, LSTM, and Transformer encoder (all in PyTorch).
+I will ask you questions one at a time. For each:
+1. Write clean, well-commented PyTorch code that runs end-to-end
+2. Interpret outputs in plain English for a business audience
+3. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget is 15 (this context prompt is excluded). I will label
+each question before asking.
+
+Confirm by responding with: HW05_CONTEXT_ACK
+```
+:::
+
+---
+
+## Part A: FFN and CNN (Window = 26 weeks)
+
+### Q1 — PyTorch Dataset and DataLoader *(Suggested prompts: 2)*
+
+Implement a `SalesWindowDataset` class that:
+
+- Accepts the weekly DataFrame, a list of scalar feature names, a window length,
+  and a `StandardScaler` (fitted on training data only)
+- For each valid position `i` in each store's series, returns:
+  - `x_seq`: normalized sales window of shape `(window,)`
+  - `x_scalar`: the store's scalar features
+  - `y`: the next week's normalized sales
+
+Create training and test `DataLoader` objects with `batch_size=64`,
+`shuffle=True` for training, `shuffle=False` for test.
+
+```{python}
+WINDOW_A = 26   # Part A window
+
+class SalesWindowDataset(Dataset):
+    def __init__(self, weekly_df, scalar_features, window, scaler=None, fit_scaler=False):
+        # TODO: implement
+        pass
+
+    def __len__(self):
+        pass
+
+    def __getitem__(self, idx):
+        # TODO: return (x_seq, x_scalar, y) as torch tensors
+        pass
+
+# Instantiate train and test datasets + dataloaders
+```
+
+> **Your response:** How many samples does your training Dataset contain?
+> Why is this larger than the number of store-week rows in the raw training data?
+
+---
+
+### Q2 — Feedforward Network *(Suggested prompts: 3)*
+
+Build an `FFNForecaster` that:
+
+- Flattens the sales window and concatenates it with the scalar features
+- Two hidden layers: `Linear(input_dim → 128)`, ReLU, `Dropout(0.2)`,
+  `Linear(128 → 64)`, ReLU, `Dropout(0.2)`, `Linear(64 → 1)`
+
+Train for 30 epochs with Adam (`lr=1e-3`) and MSE loss.
+Plot training and validation loss curves. Report test RMSE.
+
+```{python}
+class FFNForecaster(nn.Module):
+    def __init__(self, window, n_scalar):
+        super().__init__()
+        # TODO
+
+    def forward(self, x_seq, x_scalar):
+        # TODO
+        pass
+
+# Training loop (30 epochs)
+```
+
+> **Your response:** Describe the loss curves. Does the model converge cleanly?
+> How does test RMSE compare to the best tree-based model from Homeworks 3–4?
+
+---
+
+### Q3 — 1D Convolutional Network *(Suggested prompts: 3)*
+
+Build a `CNNForecaster` that:
+
+- Two 1D conv layers: `Conv1d(1, 32, kernel_size=3, padding=1)`, ReLU,
+  `Conv1d(32, 64, kernel_size=3, padding=1)`, ReLU
+- Global average pooling over the time dimension
+- Concatenate pooled output with scalar features
+- Linear head: `Linear(64 + n_scalar → 64)`, ReLU, `Linear(64 → 1)`
+
+Note: unsqueeze `x_seq` from `(batch, window)` to `(batch, 1, window)` before
+the first Conv1d.
+
+Train for 30 epochs. Plot loss curves. Report test RMSE.
+
+```{python}
+class CNNForecaster(nn.Module):
+    def __init__(self, window, n_scalar):
+        super().__init__()
+        # TODO
+
+    def forward(self, x_seq, x_scalar):
+        # x_seq: (batch, window) → unsqueeze → (batch, 1, window)
+        # TODO
+        pass
+
+# Training loop (30 epochs)
+```
+
+> **Your response:** How does CNN test RMSE compare to FFN? What does the
+> convolutional kernel "see" that the FFN's flat input does not naturally capture?
+
+---
+
+### Q4 — CNN Window Sensitivity *(Suggested prompts: 2)*
+
+Retrain the CNN with window lengths [13, 26, 52]. Hold all other hyperparameters
+fixed. Report test RMSE for each. Plot window length (x-axis) vs RMSE (y-axis).
+
+```{python}
+window_lengths = [13, 26, 52]
+cnn_rmse = {}
+# Retrain CNN for each window length
+```
+
+> **Your response:** Does a longer window always improve CNN performance?
+> At what length does it perform best, and what might explain the pattern?
+
+---
+
+## Part B: LSTM and Transformer (Window = 52 weeks)
+
+Reuse your `SalesWindowDataset` with `WINDOW_B = 52`. Re-instantiate train/test
+DataLoaders below.
+
+```{python}
+WINDOW_B = 52
+
+# Re-instantiate SalesWindowDataset and DataLoaders with WINDOW_B
+```
+
+---
+
+### Q5 — LSTM Forecaster *(Suggested prompts: 3)*
+
+Build an `LSTMForecaster`:
+
+- `nn.LSTM(input_size=1, hidden_size=64, num_layers=2, batch_first=True, dropout=0.2)`
+- Use final hidden state `h[-1]`
+- Concatenate with scalar features: `Linear(64 + n_scalar → 32)`, ReLU, `Linear(32 → 1)`
+
+Unsqueeze `x_seq` from `(batch, window)` to `(batch, window, 1)` before the LSTM.
+
+Train for 40 epochs with Adam (`lr=1e-3`) and MSE loss. Plot loss curves.
+Report test RMSE.
+
+```{python}
+class LSTMForecaster(nn.Module):
+    def __init__(self, window, n_scalar, hidden=64, layers=2):
+        super().__init__()
+        # TODO
+
+    def forward(self, x_seq, x_scalar):
+        # x_seq: (batch, window) → (batch, window, 1)
+        # TODO
+        pass
+
+# Training loop (40 epochs)
+```
+
+> **Your response:** Describe the training dynamics. Does the LSTM converge
+> smoothly? How does test RMSE compare to the CNN (window=52) from Q4?
+
+---
+
+### Q6 — Transformer Encoder Forecaster *(Suggested prompts: 3)*
+
+Build a `TSTransformer`:
+
+- Linear projection: `Linear(1, d_model=32)` per time step
+- Sinusoidal positional encoding (implement a `PositionalEncoding` module)
+- `nn.TransformerEncoderLayer(d_model=32, nhead=4, dim_feedforward=128,
+  dropout=0.1, batch_first=True)` × 2 layers
+- Take output at the last position `[:, -1, :]`
+- `Linear(32 + n_scalar → 32)`, ReLU, `Linear(32 → 1)`
+
+Train for 40 epochs. Plot loss curves. Report test RMSE.
+
+```{python}
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_len=200):
+        super().__init__()
+        # TODO: sinusoidal PE matrix
+
+    def forward(self, x):
+        # x: (batch, seq_len, d_model)
+        # TODO
+        pass
+
+class TSTransformer(nn.Module):
+    def __init__(self, window, n_scalar, d_model=32, nhead=4):
+        super().__init__()
+        # TODO
+
+    def forward(self, x_seq, x_scalar):
+        # TODO
+        pass
+
+# Training loop (40 epochs)
+```
+
+> **Your response:** How does the Transformer's convergence compare to the LSTM?
+> Does it train faster, slower, or more erratically? What does this suggest about
+> the Transformer's data requirements relative to the LSTM?
+
+---
+
+## Part C: Full Comparison
+
+### Q7 — Deep Learning Architecture Comparison *(Suggested prompts: 1)*
+
+Summarize all four neural network models with their best window lengths and
+test RMSEs. Add the best tree-based model from HW3–4 as a baseline.
+
+| Model | Window | Test RMSE |
+|-------|--------|-----------|
+| FFN | 26 | |
+| CNN (best window) | | |
+| LSTM | 52 | |
+| Transformer | 52 | |
+| Best tree model (HW3/HW4) | — | |
+
+Plot actual vs predicted sales for Store 1 over the test period for all
+four neural network models on the same axes.
+
+```{python}
+# Comparison table and Store 1 actual-vs-predicted plot
+```
+
+> **Your response:** Which architecture performs best? Does the ranking match
+> the theoretical expectation from the lecture (LSTM/Transformer > CNN > FFN
+> for sequence data)?
+
+---
+
+### Q8 — Full Course Comparison *(Suggested prompts: 1)*
+
+Build the complete comparison table spanning all five homeworks.
+Fill in RMSE values from your records.
+
+| Model | Category | Test RMSE |
+|-------|----------|-----------|
+| Holt-Winters | Classical TS | |
+| ARIMA | Classical TS | |
+| Prophet | GAM | |
+| pyGAM | GAM | |
+| Decision Tree | Tree | |
+| Random Forest | Tree | |
+| XGBoost (tuned) | Tree | |
+| FFN | Neural Net | |
+| CNN | Neural Net | |
+| LSTM | Neural Net | |
+| Transformer | Neural Net | |
+
+Sort ascending by RMSE and plot as a horizontal bar chart with category
+color-coding (one color per category).
+
+```{python}
+# Full course comparison plot
+```
+
+> **Your response:** Which category of model performs best on the Rossmann weekly
+> forecasting task? Does adding model complexity (classical → tree → neural net)
+> consistently reduce RMSE? What property of this dataset might explain the result?
+
+---
+
+### Q9 — Reflection *(Suggested prompts: 0 — write yourself)*
+
+No code required. In 200–250 words: Looking at the full comparison table,
+reflect on the arc of methods in this course.
+
+Answer all three:
+
+1. Where did increasing model complexity pay off, and where did it not?
+2. Neural networks are often described as "data hungry." The Rossmann training set
+   has roughly 3,900 store-week sequences. Is that enough? What would you expect
+   to change with 10× more data?
+3. If you were advising a mid-sized retailer with a small data science team,
+   which **two** models from the entire course would you recommend they invest in,
+   and why those two specifically?
+
+> **Your response:**
+
+---
+
+## Submission Checklist
+
+- [ ] All code cells run without errors from top to bottom
+- [ ] Written responses completed in your own words
+- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw05_<your_name>/`
+- [ ] `PROMPT_LOG.jsonl` complete with ≤ 15 entries
+- [ ] One git commit per Codex prompt (`hw05 prompt <id>: <short summary>`)
+- [ ] `REPORT.md` with a clear business recommendation

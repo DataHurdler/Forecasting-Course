@@ -1,0 +1,285 @@
+---
+title: "Homework 7: Bayesian Linear Regression"
+subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Spring 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Overview
+
+Bayesian linear regression replaces OLS point estimates with full posterior
+distributions over every coefficient. Instead of asking "Is beta significant at
+p < 0.05?", you ask "What is the probability that this effect is positive?" and
+"Is the effect large enough to matter for business decisions?"
+
+This final homework fits a Bayesian regression model for store sales as a function
+of promotions, competition, and store characteristics. It also introduces Directed
+Acyclic Graphs (DAGs) as a tool for deciding which variables to include and how to
+interpret the coefficients causally.
+
+**Learning objectives:**
+
+- Draw and interpret a DAG for a business forecasting model
+- Specify weakly informative priors for regression coefficients
+- Read posterior coefficient distributions (HDI, probability of direction)
+- Apply ROPE analysis to distinguish statistical from practical significance
+- Use posterior samples to simulate conditional scenarios
+
+---
+
+## Dataset and Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pymc as pm
+import arviz as az
+from sklearn.preprocessing import StandardScaler
+import statsmodels.api as sm
+import warnings
+warnings.filterwarnings('ignore')
+
+RANDOM_STATE = 42
+
+weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
+
+# Add calendar features
+weekly["month"] = weekly["WeekStart"].dt.month
+weekly["week_of_year"] = weekly["WeekStart"].dt.isocalendar().week.astype(int)
+
+# Drop first 52 weeks of each store (missing lags) and work with complete cases
+df = weekly.dropna(subset=["Sales_lag52"]).copy()
+
+print(f"Modeling dataset: {len(df):,} store-week rows | {df['Store'].nunique()} stores")
+print(df[["Sales","Promo","CompetitionDistance","StoreType","Assortment","month"]].describe())
+```
+
+---
+
+## Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Paste the following as your first message to Codex. Save it as `INITIAL_PROMPT.md`
+in your submission folder.
+
+```
+I am working on Homework 7 for BSAD 8310: Business Forecasting at the
+University of Nebraska at Omaha.
+
+Dataset: Rossmann Store Sales — weekly aggregated for 30 stores at
+`data/processed/rossmann_weekly.csv`. All rows with complete lag features
+are available. Key predictors: Promo, CompetitionDistance, StoreType,
+Assortment, SchoolHoliday, month, Sales_lag52 (as a baseline control).
+
+This homework covers Bayesian linear regression using PyMC (v4+),
+including DAGs, posterior coefficient interpretation, ROPE analysis,
+and conditional scenario simulation. I will ask you questions one at
+a time. For each:
+1. Write clean, well-commented PyMC code that runs end-to-end
+2. Interpret posterior distributions in plain English
+3. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget is 15 (this context prompt is excluded). I will label
+each question before asking.
+
+Confirm by responding with: HW07_CONTEXT_ACK
+```
+:::
+
+---
+
+## Questions
+
+### Q1 — Draw a DAG *(Suggested prompts: 1)*
+
+Before building any model, think carefully about the causal structure.
+
+Draw a Directed Acyclic Graph (DAG) for weekly store sales that includes these
+variables: `Sales`, `Promo`, `CompetitionDistance`, `StoreType`, `Season` (month),
+`SchoolHoliday`, and `Sales_lag52`.
+
+You do not need code for this question. Use a Markdown table or a text diagram
+(ASCII art) to represent your DAG. For each arrow you draw, write a one-sentence
+justification.
+
+Example format:
+```
+Season → Promo      (Rossmann runs more promotions in peak shopping months)
+Season → Sales      (...)
+...
+```
+
+After drawing the DAG, answer: Is there a confounder between `Promo` and `Sales`?
+If so, which variable is it, and what must you do about it in the regression?
+
+> **Your response:**
+
+---
+
+### Q2 — OLS Benchmark *(Suggested prompts: 1)*
+
+Fit an OLS regression (using `statsmodels.OLS`) with the following predictors
+(all standardized except binary variables):
+
+- `Promo` (binary)
+- `log(CompetitionDistance + 1)` (log-transformed to reduce skew)
+- `StoreType` (treat as integer 1–4)
+- `Assortment` (treat as integer 1–3)
+- `SchoolHoliday` (binary)
+- `month` (integer 1–12)
+- `Sales_lag52` (standardized)
+
+Standardize the continuous predictors using `StandardScaler`. Report the
+coefficient table (coefficient, std error, p-value, 95% CI).
+
+```{python}
+PREDICTORS = ["Promo", "CompetitionDistance", "StoreType", "Assortment",
+              "SchoolHoliday", "month", "Sales_lag52"]
+
+scaler = StandardScaler()
+# Prepare X_std and y_std, then fit OLS
+```
+
+> **Your response:** Which predictors have p < 0.05? Which have the largest
+> coefficients? Interpret the `Promo` coefficient in plain English: what does a
+> one-unit increase in `Promo` (0 → 1) correspond to in sales?
+
+---
+
+### Q3 — Bayesian Linear Regression *(Suggested prompts: 3)*
+
+Fit a Bayesian linear regression with the same predictors as Q2 (use standardized
+features). Use weakly informative priors:
+
+- `beta_j ~ Normal(0, 1)` for each standardized predictor
+- `alpha ~ Normal(0, 1)` for the intercept
+- `sigma ~ HalfNormal(1)` for observation noise
+
+Sample with `pm.sample(2000, tune=1000)`. Use `az.summary()` to report the
+posterior mean, standard deviation, and 94% HDI for each coefficient.
+
+```{python}
+# Build and sample Bayesian linear regression
+```
+
+> **Your response:** Compare the posterior means to the OLS coefficients from Q2.
+> Are they similar? What does a wide HDI on a coefficient tell you compared to a
+> narrow HDI?
+
+---
+
+### Q4 — Posterior Visualization *(Suggested prompts: 2)*
+
+Plot the posterior distributions for the three coefficients you consider most
+important for business decisions (choose based on your DAG and the results so far).
+
+For each, report:
+- Posterior mean
+- 94% HDI
+- `P(beta > 0)` — probability the effect is positive
+- Whether the HDI excludes zero (the Bayesian analog of significance)
+
+```{python}
+# Plot posterior distributions and compute P(beta > 0)
+```
+
+> **Your response:** For the `Promo` coefficient, what is the probability it is
+> positive? How does this differ from the OLS p-value interpretation? Which
+> interpretation is more useful for a business decision?
+
+---
+
+### Q5 — ROPE Analysis *(Suggested prompts: 2)*
+
+For each predictor, compute the fraction of the posterior that falls inside the
+Region Of Practical Equivalence (ROPE): `|beta| < 0.05` (in standardized units,
+this corresponds to a change of less than 5% of a standard deviation in Sales —
+practically negligible).
+
+Present results in a table:
+
+| Predictor | Posterior Mean | 94% HDI | % in ROPE | Practically significant? |
+|-----------|---------------|---------|-----------|--------------------------|
+
+A predictor is "practically significant" if less than 5% of its posterior falls
+in the ROPE.
+
+```{python}
+# Compute % of posterior in ROPE for each predictor
+```
+
+> **Your response:** Are there predictors that are statistically credible
+> (HDI excludes zero) but practically insignificant (most posterior in ROPE)?
+> What should a manager do with such a finding?
+
+---
+
+### Q6 — Conditional Scenario Simulation *(Suggested prompts: 2)*
+
+Use posterior samples to answer a business question: **What is the expected
+weekly Sales uplift if Rossmann runs a promotion every week for the next
+quarter, compared to no promotions?**
+
+1. Draw 2,000 posterior samples of all coefficients
+2. For each sample, compute predicted Sales under:
+   - Scenario A: `Promo=1` (all other predictors at their training mean)
+   - Scenario B: `Promo=0` (all other predictors at training mean)
+3. Compute the posterior distribution of the difference (A − B)
+4. Plot the distribution; report mean lift and 90% credible interval
+
+```{python}
+# Posterior scenario simulation
+```
+
+> **Your response:** What is the estimated weekly Sales uplift from running
+> a promotion? How wide is the 90% credible interval? Would you recommend
+> running promotions every week based on this analysis? What additional
+> information would you want before deciding?
+
+---
+
+### Q7 — Course Capstone Reflection *(Suggested prompts: 0 — write yourself)*
+
+No code required. In 200–250 words: Look back at the full arc of this course —
+from exponential smoothing in Homework 1 to Bayesian regression in this homework.
+
+Answer the following:
+
+1. **Which method from the course would you use first** when you encounter a new
+   business forecasting problem, and why? (Consider ease of implementation,
+   interpretability, and typical performance.)
+
+2. **Where does Bayesian inference add the most value** compared to the classical
+   and machine learning methods you used earlier? Give a specific example from
+   your homework results.
+
+3. **What is one limitation** of every method in this course — something none of
+   them handle well — and what would you do in practice to address it?
+
+> **Your response:**
+
+---
+
+## Submission Checklist
+
+- [ ] All code cells run without errors from top to bottom
+- [ ] Written responses completed in your own words
+- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw07_<your_name>/`
+- [ ] `PROMPT_LOG.jsonl` complete with ≤ 15 entries
+- [ ] One git commit per Codex prompt (`hw07 prompt <id>: <short summary>`)
+- [ ] `REPORT.md` with a clear business recommendation

@@ -143,3 +143,23 @@ python scripts/LectureNN_lab.py
 | 10: Bayesian Statistics I — Foundations | `Lecture10_BayesianI.tex` ✓ | `Lecture10_BayesianI.qmd` ✓ | Frequentist vs Bayesian, Bayes' theorem, priors (Beta/Normal/Exponential), MCMC/NUTS, PyMC, prior predictive checks. |
 | 11: Bayesian Statistics II — TS & Hierarchical | `Lecture11_BayesianII.tex` ✓ | `Lecture11_BayesianII.qmd` ✓ | Bayesian structural TS, local linear trend, Fourier seasonality, partial pooling, hierarchical models in PyMC. |
 | 12: Bayesian Statistics III — Linear Regression | `Lecture12_BayesianIII.tex` ✓ | `Lecture12_BayesianIII.qmd` ✓ | Bayesian linear regression, posterior coefficient distributions, HDI, DAGs, scenario analysis, course method map. |
+
+---
+
+## Homework Assignments
+
+**Status:** All 8 assignments written (Spring 2026).
+**Dataset:** Rossmann Store Sales (Kaggle) — 30 stores, weekly aggregated.
+**Data prep:** Run `python scripts/prep_rossmann.py` once to generate `data/processed/rossmann_weekly.csv` and `data/processed/rossmann_daily.csv`.
+**Format:** Quarto `.qmd` (students render to HTML). Each assignment includes an initial Codex prompt and per-question prompt budgets.
+**Student repo:** https://github.com/DataHurdler/Forecasting-Env (Codex workflows, submission structure, validation script).
+
+| HW | File | Lectures | Dataset | Prompt Budget | Key Tasks |
+|----|------|----------|---------|---------------|-----------|
+| 1 | `HW01_ETS_ARIMA.qmd` ✓ | L01 + L02 | Weekly, Store 1 + Store 2 | 12 | ETS (SES/Holt/HW), ARIMA walk-forward CV, VAR, Granger causality |
+| 2 | `HW02_GAMs.qmd` ✓ | L03 | Daily, Store 1 | 10 | Prophet components + regressors, pyGAM splines, model comparison |
+| 3 | `HW03_Trees_RF.qmd` ✓ | L04 + L05 | Weekly, 30 stores | 12 | Decision tree visualization, RF + OOB error, MDI vs permutation importance, walk-forward CV |
+| 4 | `HW04_XGBoost_Regularization.qmd` ✓ | L06 | Weekly, 30 stores | 12 | XGBoost tuning, LASSO regularization path, Elastic Net vs Ridge, cross-model CV comparison |
+| 5 | `HW05_DeepLearning.qmd` ✓ | L07 + L08 + L09 | Weekly, 30 stores (window=26/52) | 15 | PyTorch Dataset/DataLoader, FFN, 1D CNN, LSTM, Transformer + positional encoding, full course comparison |
+| 6 | `HW06_Bayesian_TS_Hierarchical.qmd` ✓ | L10 + L11 | Weekly, Store 1 + 30 stores | 15 | Beta-Binomial prior predictive, Bayesian TS (Fourier), hierarchical partial pooling, shrinkage plot |
+| 7 | `HW07_Bayesian_Regression.qmd` ✓ | L12 | Weekly, 30 stores | 15 | DAG construction, OLS benchmark, Bayesian regression, ROPE analysis, conditional simulation |

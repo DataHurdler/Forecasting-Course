@@ -1,0 +1,290 @@
+---
+title: "BSAD 8310: Business Forecasting"
+subtitle: "Course Syllabus — Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    self-contained: true
+---
+
+---
+
+## Course Information
+
+| | |
+|---|---|
+| **Course** | BSAD 8310: Business Forecasting |
+| **Credits** | 3 |
+| **Term** | Fall 2026 |
+| **Meeting Time** | Thursdays, 6:00 PM – 8:40 PM |
+| **Location** | TBD |
+| **Instructor** | TBD |
+| **Email** | TBD |
+| **Office Hours** | TBD |
+| **Course Website** | TBD |
+
+---
+
+## Course Description
+
+This course develops practical forecasting skills for graduate students in business,
+economics, and data science. Students learn to apply a broad suite of methods —
+from classical time series models to machine learning and Bayesian inference — to
+real business forecasting problems. Emphasis is on implementation in Python,
+interpretation of model outputs for business decision-making, and critical comparison
+of methods across different forecasting contexts.
+
+---
+
+## Learning Objectives
+
+By the end of this course, students will be able to:
+
+1. Apply exponential smoothing, ARIMA, and VAR models to univariate and multivariate
+   business time series and evaluate their forecast accuracy using walk-forward cross-validation.
+2. Build Generalized Additive Models (GAMs) and use Prophet to decompose trend,
+   seasonality, and external regressors.
+3. Engineer features from time series data and apply decision trees, random forests,
+   and gradient boosting to tabular forecasting problems.
+4. Design, train, and evaluate feedforward networks, CNNs, LSTMs, and Transformer
+   encoders for sequence forecasting using PyTorch.
+5. Apply Bayesian inference to specify priors, compute posteriors, and generate
+   calibrated probabilistic forecasts using PyMC.
+6. Communicate model results and business recommendations to both technical and
+   non-technical audiences.
+
+---
+
+## Prerequisites
+
+Graduate standing. Familiarity with basic statistics (regression, hypothesis testing)
+and introductory Python programming is assumed. No prior knowledge of machine learning
+or time series analysis is required.
+
+---
+
+## Required Software
+
+All coursework uses Python. The following packages are required:
+
+```
+pandas, numpy, matplotlib, statsmodels, prophet, pygam,
+scikit-learn, xgboost, torch, pymc, arviz
+```
+
+Students should have a working Python 3.10+ environment with these packages installed
+before the first class. Installation instructions and a test script are provided in
+the course repository.
+
+---
+
+## Course Materials
+
+All lecture slides (Beamer PDF and interactive RevealJS), homework assignments, and
+data files are distributed through the course repository. There is no required textbook.
+Selected readings are listed under individual lectures below.
+
+---
+
+## Course Schedule
+
+Dates are subject to adjustment. Any changes will be announced in class and posted to
+the course site.
+
+| Week | Date | Topic | Homework |
+|------|------|-------|----------|
+| 1  | Aug 27 | **L01:** Introduction, Exponential Smoothing & Forecast Evaluation | |
+| 2  | Sep 3  | **L02:** ARIMA, VAR & Multivariate Models | HW1 assigned |
+| 3  | Sep 10 | **L03:** Generalized Additive Models | |
+| 4  | Sep 17 | **L04:** Decision Trees | HW1 due; HW2 assigned; **project groups due** |
+| 5  | Sep 24 | **L05:** Random Forests | |
+| 6  | Oct 1  | **L06:** Boosted Trees & Regularization | HW2 due; HW3 assigned |
+| 7  | Oct 8  | **L07:** Introduction to Neural Networks | |
+| 8  | Oct 15 | **L08:** CNN Architectures | HW3 due; HW4 assigned |
+| —  | Oct 19–20 | *Fall Break — No Class* | |
+| 9  | Oct 22 | **L09:** RNNs, LSTMs & Transformers | **Project proposal due; HW5 assigned** |
+| 10 | Oct 29 | **L10:** Bayesian Statistics I — Foundations | HW4 due |
+| 11 | Nov 5  | **L11:** Bayesian Statistics II — Time Series & Hierarchical | |
+| 12 | Nov 12 | **L12:** Bayesian Statistics III — Bayesian Linear Regression | |
+| 13 | Nov 19 | Project work session / consultations | HW5 due |
+| —  | Nov 26 | *Thanksgiving Break — No Class* | |
+| 14 | Dec 3  | Project work session / consultations | |
+| 15 | Dec 10 | Last class / project consultations | |
+| —  | Dec 15 | **Final Project Report Due** (Finals Week) | |
+
+*Note: Homework assignments HW7 and HW8 cover Bayesian methods and may be assigned
+as standalone work or incorporated into the final project at the instructor's discretion.*
+
+---
+
+## Assignments and Grading
+
+### Homework Assignments
+
+There are **5 graded homework assignments** (HW1–HW5). Each is completed as a
+Quarto (`.qmd`) document rendered to HTML and submitted through the course repository.
+
+Each homework includes:
+- Starter code and data loading
+- Analytical questions with Python implementation
+- Written interpretation questions requiring your own reasoning
+- A short `REPORT.md` with your business recommendation
+
+Homework is designed to be completed with the assistance of an AI coding tool (see
+AI Use Policy below). Questions emphasize interpretation, judgment, and business
+reasoning — tasks where AI assistance is a tool, not a substitute for understanding.
+
+### Final Project
+
+The final project is completed in **groups of 2–3 students**. Groups are formed by
+Week 4 and submitted to the instructor for approval.
+
+**Dataset requirements:** Each group selects a real business dataset of their choosing.
+The dataset must:
+- Be a time series or convertible to one (e.g., daily, weekly, or monthly observations)
+- Have at least 100 time periods
+- Have a clear, specific business forecasting question (e.g., "forecast weekly demand
+  for SKU X to support inventory decisions" — not just "predict a number")
+
+**Required content:** The final report must:
+1. Fit at least **3 methods from at least 2 different course parts** (e.g., one
+   classical time series method, one tree-based method, and one neural network or
+   Bayesian model)
+2. Use **walk-forward cross-validation** for all model comparisons
+3. Include a **business recommendation section** written for a non-technical
+   decision-maker — actionable, jargon-free, and grounded in your results
+4. Include a **methods reflection** that explains which model performed best and
+   connects that result to characteristics of your specific dataset
+
+**Deliverables:**
+
+| Deliverable | Due Date | Description |
+|-------------|----------|-------------|
+| Group formation | Sep 17 (Week 4) | Submit group members to instructor |
+| Project proposal | Nov 19 (Week 13) | 1–2 pages: dataset, business question, planned methods, preliminary EDA |
+| Final report | Dec 15 (Finals Week) | Full written report (details below) |
+
+**Final report format:** Submit as a rendered Quarto HTML file (`.qmd` + `.html`)
+through the course repository. The report should include all code, outputs, and
+written analysis in a single self-contained document. There is no page limit, but
+conciseness is valued: a well-organized 15–20 page report is better than a
+disorganized 40-page one.
+
+The grading rubric will be distributed by Week 6.
+
+### Grading Breakdown
+
+| Component | Weight |
+|-----------|--------|
+| Homework (HW1–HW5) | TBD |
+| Final Project | TBD |
+| **Total** | **100%** |
+
+### Grading Scale
+
+| Grade | Range |
+|-------|-------|
+| A | 90–100% |
+| B | 80–89% |
+| C | 70–79% |
+| D | 60–69% |
+| F | Below 60% |
+
+---
+
+## AI Use Policy
+
+This course explicitly permits and encourages the use of AI coding assistants
+(such as Codex, GitHub Copilot, or ChatGPT) for homework assignments.
+The course infrastructure is designed around this: each assignment includes a
+required initial prompt and a prompt budget (maximum number of AI interactions per assignment).
+
+**You are responsible for your results.** AI tools help write code; you are
+responsible for understanding and explaining the output. Grading emphasizes:
+
+- Correct interpretation of model results in business language
+- Reasoned justification of methodological choices
+- Diagnosing unexpected or poor results rather than accepting them uncritically
+- Written reflection questions that require genuine understanding
+
+**Prompt logging is required.** Students must maintain a `PROMPT_LOG.jsonl` file
+recording every AI interaction for each assignment. Submissions without a complete
+prompt log will receive a grade deduction.
+
+**Written responses must be your own.** Analytical interpretation and business
+recommendation sections must be written by you, not generated by AI. Using AI
+to write your interpretations defeats the purpose of the assignment and
+violates the spirit (though not the letter) of this policy.
+
+---
+
+## Online and In-Person Attendance
+
+This course is offered simultaneously in-person and fully online. All lecture slides
+are designed to be self-contained: an online student watching asynchronously can
+follow without attending the live session.
+
+In-person attendance is encouraged but not graded. Recordings of class sessions
+will be made available within 48 hours of each meeting when possible.
+
+---
+
+## Late Work Policy
+
+Homework submitted late will be penalized **10% per calendar day** up to a maximum
+of 5 days. Homework submitted more than 5 days late will receive a grade of zero.
+Extensions may be granted for documented emergencies; contact the instructor
+before the deadline.
+
+---
+
+## Academic Integrity
+
+All work submitted must represent your own understanding and analysis. The AI use
+policy above describes the boundaries for AI assistance. Beyond AI tools:
+
+- Do not share code or written responses with other students.
+- Do not submit another student's work as your own.
+- Citations are required for any external sources used in written sections.
+
+Violations will be handled according to UNO's Academic Integrity Policy.
+See [TBD: link to UNO Academic Integrity Policy].
+
+---
+
+## Accessibility and Accommodations
+
+Students with disabilities who require accommodations should contact the
+UNO Accessibility Services Center and provide documentation to the instructor
+within the first two weeks of the semester. The instructor is committed to
+providing an accessible learning environment for all students.
+
+---
+
+## Course Communication
+
+The instructor will respond to email within 48 business hours. For questions about
+homework, please post to the course discussion board so that all students benefit
+from the answer. For personal or grade-related matters, email directly.
+
+---
+
+## A Note on Difficulty and Pacing
+
+This course covers a wide range of methods — from classical statistics to deep
+learning to Bayesian inference. Some weeks will be more familiar to you than others
+depending on your background. Students with a data science background may find
+Parts 1–2 straightforward and Part 4 (Bayesian) more challenging. Economics students
+may find the reverse. MBA students will find Parts 1–2 most accessible and should
+expect to invest extra time in Parts 3–4.
+
+The methods build on each other. Falling behind in one week makes the next harder.
+Use office hours early and often.
+
+---
+
+*Syllabus subject to change. Any modifications will be announced in class and
+posted to the course website with at least one week's notice.*

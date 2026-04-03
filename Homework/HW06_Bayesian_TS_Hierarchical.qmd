@@ -1,0 +1,316 @@
+---
+title: "Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models"
+subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Spring 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Overview
+
+Bayesian inference treats model parameters as random variables with probability
+distributions. Instead of a single point estimate, you get a full posterior
+distribution over every parameter — and over every forecast. This matters for
+business: you can ask "What is the probability that next month's sales exceed our
+budget target?" and get a direct, calibrated answer.
+
+This homework has three parts. **Part A** (Lecture 10) builds a Beta-Binomial model
+for promotion lift. **Part B** (Lecture 11) fits a Bayesian structural time series
+model to Store 1. **Part C** (Lecture 11) extends to a hierarchical model across
+all 30 stores, demonstrating partial pooling.
+
+**Learning objectives:**
+
+- Specify priors, likelihood, and posterior in PyMC
+- Run prior predictive checks before fitting
+- Fit a Bayesian trend + Fourier seasonality model to weekly sales
+- Build a hierarchical model with store-level partial pooling
+- Visualize and interpret the shrinkage effect of partial pooling
+
+---
+
+## Dataset and Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pymc as pm
+import arviz as az
+import warnings
+warnings.filterwarnings('ignore')
+
+RANDOM_STATE = 42
+
+weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
+
+# Store 1 for Parts A and B
+store1 = weekly[weekly["Store"] == 1].sort_values("WeekStart").reset_index(drop=True)
+
+# All 30 stores for Part C
+all_stores = weekly.sort_values(["Store", "WeekStart"]).reset_index(drop=True)
+
+print(f"Store 1: {len(store1)} weekly observations")
+print(f"All stores: {len(all_stores)} rows, {all_stores['Store'].nunique()} stores")
+```
+
+---
+
+## Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Paste the following as your first message to Codex. Save it as `INITIAL_PROMPT.md`
+in your submission folder.
+
+```
+I am working on Homework 7 for BSAD 8310: Business Forecasting at the
+University of Nebraska at Omaha.
+
+Dataset: Rossmann Store Sales — weekly aggregated at
+`data/processed/rossmann_weekly.csv`.
+- Part A + B use Store 1 only (weekly Sales and Promo columns).
+- Part C uses all 30 stores.
+
+This homework covers Bayesian inference using PyMC (v4+):
+  - Part A: Beta-Binomial model for promotion lift
+  - Part B: Bayesian structural time series (trend + Fourier seasonality)
+  - Part C: Hierarchical partial pooling model across 30 stores
+
+I will ask you questions one at a time. For each:
+1. Write clean, well-commented PyMC code that runs end-to-end
+2. Interpret posterior distributions in plain English for a business audience
+3. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget is 15 (this context prompt is excluded). I will label
+each question before asking.
+
+Confirm by responding with: HW06_CONTEXT_ACK
+```
+:::
+
+---
+
+## Part A: Bayesian Foundations — Promotion Lift
+
+### A1 — Prior Predictive Check *(Suggested prompts: 2)*
+
+We want to estimate the weekly promotion rate — the probability that any given week
+runs a promotion — and see how that rate varies. Model the number of promotion weeks
+out of the total using a Beta-Binomial model:
+
+- Prior: `theta ~ Beta(2, 2)` (weakly informative; centered at 0.5)
+- Likelihood: `obs ~ Binomial(n=len(store1), p=theta)`
+- Observed: total number of promotion weeks in Store 1's history
+
+**Before fitting:** run `pm.sample_prior_predictive(500)` and plot the prior
+predictive distribution. Does it generate plausible values for the number of
+promotion weeks?
+
+```{python}
+n_total = len(store1)
+n_promo = store1["Promo"].sum()
+print(f"Store 1: {n_promo} promotion weeks out of {n_total} ({100*n_promo/n_total:.1f}%)")
+
+# Build and prior-predictive-check the Beta-Binomial model
+```
+
+> **Your response:** What range of values does the prior predictive distribution
+> cover? Is the prior too wide, too narrow, or appropriate? How would you tighten
+> it if you already knew promotions run roughly 40% of weeks?
+
+---
+
+### A2 — Posterior Inference *(Suggested prompts: 2)*
+
+Fit the Beta-Binomial model from A1 using `pm.sample(2000)`.
+Report:
+
+- Posterior mean and 94% HDI for `theta`
+- `P(theta > 0.5)` — probability that promotions run more than half the time
+- Plot the posterior distribution with the HDI shaded
+
+```{python}
+# Sample and summarize the posterior
+```
+
+> **Your response:** Interpret the posterior in one sentence suitable for a
+> non-technical manager. What does the HDI tell you that a frequentist
+> confidence interval cannot?
+
+---
+
+## Part B: Bayesian Time Series — Store 1
+
+### B1 — Bayesian Trend + Fourier Seasonality *(Suggested prompts: 3)*
+
+Fit a Bayesian structural time series model for Store 1 weekly sales with:
+
+- Linear trend: `alpha ~ Normal(y.mean(), y.std())`, `beta ~ Normal(0, 1)`
+- Fourier seasonality with K=3 harmonics and period P=52:
+  `a_k, b_k ~ Normal(0, sigma_s)` for k=1,2,3
+- Observation noise: `sigma ~ HalfNormal(y.std())`
+- Likelihood: `Sales ~ Normal(mu, sigma)`
+
+Use the first 100 weeks as training; the remaining weeks as test.
+Sample with `pm.sample(1000, tune=1000)`.
+
+```{python}
+y = store1["Sales"].values
+t = np.arange(len(y))
+y_train, y_test = y[:100], y[100:]
+t_train, t_test = t[:100], t[100:]
+K, P = 3, 52
+
+# Build and sample the Bayesian TS model
+```
+
+> **Your response:** What is the posterior mean and 94% HDI for the slope `beta`?
+> Is the trend increasing or decreasing? With what probability?
+
+---
+
+### B2 — Posterior Predictive Forecast *(Suggested prompts: 2)*
+
+Generate posterior predictive samples for the test period using
+`pm.sample_posterior_predictive`. Plot:
+
+1. Training data
+2. Test data (actual)
+3. Posterior predictive median + 90% credible band for the test period
+
+Also compute test RMSE using the posterior predictive median. Compare to the
+best classical model from Homework 1.
+
+```{python}
+# Generate and plot posterior predictive forecast
+```
+
+> **Your response:** How wide are the 90% credible bands? Does the actual test
+> data fall within them? What does a wide band tell a demand planner compared to
+> a narrow band?
+
+---
+
+## Part C: Hierarchical Model — 30 Stores
+
+### C1 — Partial Pooling Model *(Suggested prompts: 3)*
+
+Fit a hierarchical model for all 30 stores simultaneously. Each store gets its
+own intercept `alpha_i`, but all intercepts are drawn from a shared Normal distribution:
+
+```
+mu_alpha ~ Normal(0, 1)              # group mean (standardized)
+sigma_alpha ~ HalfNormal(1)          # group spread
+alpha_i ~ Normal(mu_alpha, sigma_alpha)   # store intercepts (shape=30)
+beta ~ Normal(0, 1)                  # shared weekly trend
+sigma ~ HalfNormal(1)                # observation noise
+Sales_it ~ Normal(alpha_i + beta * t, sigma)
+```
+
+Standardize Sales and the time index before fitting. Use `pm.sample(1000, tune=1000)`.
+
+```{python}
+from sklearn.preprocessing import StandardScaler
+
+# Standardize
+scaler = StandardScaler()
+all_stores["Sales_std"] = scaler.fit_transform(all_stores[["Sales"]])
+all_stores["t_std"] = (
+    all_stores.groupby("Store")["WeekStart"]
+    .transform(lambda x: (x - x.min()).dt.days / 7)
+)
+all_stores["t_std"] = (all_stores["t_std"] - all_stores["t_std"].mean()) / all_stores["t_std"].std()
+
+store_idx = all_stores["Store"].values - 1   # 0-indexed
+J = all_stores["Store"].nunique()
+
+# Build and sample the hierarchical model
+```
+
+> **Your response:** What are the posterior mean and 94% HDI for `sigma_alpha`?
+> A large `sigma_alpha` means stores differ a lot from each other.
+> A small value means they are similar. What does your posterior suggest?
+
+---
+
+### C2 — Shrinkage Plot *(Suggested prompts: 2)*
+
+The key result of partial pooling is **shrinkage**: stores with fewer observations
+get pulled toward the group mean; stores with more data retain their own estimate.
+
+Compute for each store:
+- The no-pooling estimate: store mean of standardized Sales
+- The partial-pooling estimate: posterior mean of `alpha_i`
+
+Plot these as two connected points per store (a caterpillar plot), sorted by
+no-pooling estimate. Highlight the 5 stores with the fewest observations.
+
+```{python}
+# Shrinkage plot: no-pooling vs partial-pooling store intercepts
+```
+
+> **Your response:** Do the 5 stores with the fewest observations show more
+> shrinkage than data-rich stores? Explain in one sentence why partial pooling is
+> preferable to fitting 30 independent models for sparse stores.
+
+---
+
+### C3 — Pooling Comparison *(Suggested prompts: 2)*
+
+Compare test RMSE for three pooling strategies on a held-out last-13-weeks split
+for each store:
+
+| Strategy | Description | Mean Test RMSE |
+|----------|-------------|----------------|
+| Complete pooling | One intercept for all stores | |
+| No pooling | 30 independent intercepts (separate fits) | |
+| Partial pooling | Hierarchical model from C1 | |
+
+For the complete and no-pooling models, use simple OLS (statsmodels or sklearn).
+For partial pooling, use the posterior predictive mean from C1.
+
+```{python}
+# Fit complete pooling and no-pooling baselines; compare RMSE
+```
+
+> **Your response:** Which strategy gives the lowest mean test RMSE? Is the
+> difference between partial and no pooling larger for stores with few
+> observations or for stores with many? Why?
+
+---
+
+### Q_Final — Reflection *(Suggested prompts: 0 — write yourself)*
+
+No code required. In 150–200 words: Rossmann has 1,115 stores. You have only
+modeled 30. Explain how the hierarchical model would scale to all 1,115 stores —
+specifically, what happens to the group-level estimates `mu_alpha` and `sigma_alpha`
+as more stores are added. Then describe one business decision at Rossmann
+(inventory, staffing, promotion scheduling) that would be improved by having a
+well-calibrated posterior distribution over future sales rather than just a
+point forecast.
+
+> **Your response:**
+
+---
+
+## Submission Checklist
+
+- [ ] All code cells run without errors from top to bottom
+- [ ] Written responses completed in your own words
+- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw06_<your_name>/`
+- [ ] `PROMPT_LOG.jsonl` complete with ≤ 15 entries
+- [ ] One git commit per Codex prompt (`hw06 prompt <id>: <short summary>`)
+- [ ] `REPORT.md` with a clear business recommendation

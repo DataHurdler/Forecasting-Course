@@ -39,40 +39,30 @@
     a { color: #012169; }
     a:hover { color: #B9975B; }
 
-    .wip {
-      background: #fffbf0;
-      border: 1px solid #e8dcc8;
-      padding: 0.9em 1.2em;
-      margin-bottom: 2em;
-      font-size: 0.93em;
-      color: #6b5a30;
-      line-height: 1.7;
-    }
-
     .byline {
       color: #888;
       font-size: 0.9em;
       margin-bottom: 2em;
     }
 
-    .guide-btn {
-      display: inline-block;
-      background: #012169;
-      color: #fff;
-      padding: 0.6em 1.4em;
-      text-decoration: none;
+    .part-label {
       font-family: -apple-system, system-ui, sans-serif;
-      font-size: 0.92em;
-      margin-top: 0.5em;
+      font-size: 0.78em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #B9975B;
+      margin-top: 2em;
+      margin-bottom: 0.4em;
     }
-    .guide-btn:hover { background: #B9975B; color: #fff; }
 
     .overview-list {
       list-style: none;
       padding: 0;
+      margin: 0;
     }
     .overview-list li {
-      padding: 0.5em 0;
+      padding: 0.55em 0;
       border-bottom: 1px solid #f0f0f0;
     }
     .overview-list li:last-child { border-bottom: none; }
@@ -83,24 +73,11 @@
     }
     .overview-list .desc {
       color: #666;
-      font-size: 0.9em;
+      font-size: 0.88em;
     }
-
-    code {
-      font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-      font-size: 0.85em;
-      background: #f5f5f5;
-      padding: 0.15em 0.4em;
-    }
-
-    pre {
-      background: #f8f8f8;
-      border: 1px solid #e5e5e5;
-      padding: 1.2em 1.4em;
-      overflow-x: auto;
-      font-size: 0.85em;
-      line-height: 1.7;
-      font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    .overview-list .links {
+      font-family: -apple-system, system-ui, sans-serif;
+      font-size: 0.82em;
     }
 
     .footer {
@@ -111,129 +88,104 @@
       color: #999;
     }
 
-    /* ── Responsive: tablets ── */
     @media (max-width: 768px) {
-      body {
-        font-size: 1.1rem;
-        padding: 1.5em 1em;
-      }
-
+      body { font-size: 1.1rem; padding: 1.5em 1em; }
       h1 { font-size: 1.6em; }
-      h2 { font-size: 1.1em; }
-
-      pre {
-        font-size: 0.78em;
-        padding: 0.9em 1em;
-      }
     }
-
-    /* ── Responsive: phones ── */
     @media (max-width: 480px) {
-      body {
-        font-size: 1rem;
-        padding: 1.2em 0.8em;
-        line-height: 1.6;
-      }
-
+      body { font-size: 1rem; padding: 1.2em 0.8em; }
       h1 { font-size: 1.4em; }
-
-      .guide-btn {
-        display: block;
-        text-align: center;
-        padding: 0.7em 1em;
-      }
-
-      pre {
-        font-size: 0.72em;
-        padding: 0.8em;
-        word-break: break-all;
-        white-space: pre-wrap;
-      }
-
-      .overview-list li {
-        padding: 0.6em 0;
-      }
-
-      .overview-list .desc {
-        font-size: 0.85em;
-      }
     }
   </style>
 </head>
 <body>
 
   <h1>BSAD 8310: Business Forecasting</h1>
-  <div class="byline">University of Nebraska at Omaha &middot; Spring 2026</div>
+  <div class="byline">University of Nebraska at Omaha &middot; Department of Economics</div>
 
-  <p>Lecture slides and Python lab notebooks for BSAD 8310. Each lecture is available as an interactive RevealJS presentation (HTML), a printable PDF, and a companion Jupyter notebook.</p>
+  <p>Lecture slides for BSAD 8310. Each lecture is available as an interactive
+  RevealJS presentation (HTML) and a printable PDF.</p>
 
   <h2>Lectures</h2>
 
+  <div class="part-label">Part 1 &mdash; Time Series Models</div>
   <ul class="overview-list">
     <li>
-      <strong>Lecture 1: Introduction to Forecasting</strong><br>
-      <span class="desc">Point, interval, and density forecasts &mdash; benchmark models &mdash; evaluation setup</span><br>
-      <a href="slides/Lecture01_Intro.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture01_Intro.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture01_Intro.ipynb" download>Notebook</a>
+      <strong>Lecture 1: Introduction, Exponential Smoothing &amp; Forecast Evaluation</strong><br>
+      <span class="desc">SES &mdash; Holt &mdash; Holt-Winters &mdash; ETS framework &mdash; RMSE/MAE/MAPE/MASE &mdash; walk-forward CV &mdash; Diebold-Mariano test</span><br>
+      <span class="links"><a href="slides/Lecture01_ETS_Eval.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture01_ETS_Eval.pdf">PDF</a></span>
     </li>
     <li>
-      <strong>Lecture 2: Regression-Based Forecasting</strong><br>
-      <span class="desc">OLS forecasting &mdash; prediction intervals &mdash; AR models &mdash; common pitfalls</span><br>
-      <a href="slides/Lecture02_Regression.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture02_Regression.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture02_Regression.ipynb" download>Notebook</a>
+      <strong>Lecture 2: ARIMA, VAR &amp; Multivariate Models</strong><br>
+      <span class="desc">Stationarity &mdash; ADF test &mdash; ARIMA/SARIMA &mdash; auto-ARIMA &mdash; VAR &mdash; Granger causality &mdash; ARIMAX</span><br>
+      <span class="links"><a href="slides/Lecture02_ARIMA_VAR.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture02_ARIMA_VAR.pdf">PDF</a></span>
     </li>
     <li>
-      <strong>Lecture 3: Exponential Smoothing</strong><br>
-      <span class="desc">SES &mdash; Holt &mdash; Holt-Winters &mdash; ETS taxonomy &mdash; AIC model selection</span><br>
-      <a href="slides/Lecture03_ETS.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture03_ETS.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture03_ETS.ipynb" download>Notebook</a>
+      <strong>Lecture 3: Generalized Additive Models</strong><br>
+      <span class="desc">GAM structure &mdash; smoothing penalty &mdash; splines &mdash; Prophet &mdash; pyGAM &mdash; partial dependence plots</span><br>
+      <span class="links"><a href="slides/Lecture03_GAMs.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture03_GAMs.pdf">PDF</a></span>
+    </li>
+  </ul>
+
+  <div class="part-label">Part 2 &mdash; Tree-Based Models</div>
+  <ul class="overview-list">
+    <li>
+      <strong>Lecture 4: Decision Trees</strong><br>
+      <span class="desc">Bias-variance tradeoff &mdash; CART &mdash; entropy &amp; information gain &mdash; sklearn &mdash; feature importance</span><br>
+      <span class="links"><a href="slides/Lecture04_DecisionTrees.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture04_DecisionTrees.pdf">PDF</a></span>
     </li>
     <li>
-      <strong>Lecture 4: ARIMA Models</strong><br>
-      <span class="desc">Stationarity &mdash; unit roots &mdash; ADF/KPSS tests &mdash; ACF/PACF &mdash; ARIMA/SARIMA &mdash; auto-ARIMA</span><br>
-      <a href="slides/Lecture04_ARIMA.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture04_ARIMA.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture04_ARIMA.ipynb" download>Notebook</a>
+      <strong>Lecture 5: Random Forests</strong><br>
+      <span class="desc">Bagging &mdash; bootstrap aggregation &mdash; feature subsampling &mdash; OOB error &mdash; MDI vs permutation importance</span><br>
+      <span class="links"><a href="slides/Lecture05_RandomForests.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture05_RandomForests.pdf">PDF</a></span>
     </li>
     <li>
-      <strong>Lecture 5: Multivariate Methods</strong><br>
-      <span class="desc">VAR &mdash; ARIMAX &mdash; Granger causality &mdash; cointegration &mdash; ECM</span><br>
-      <a href="slides/Lecture05_Multivariate.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture05_Multivariate.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture05_Multivariate.ipynb" download>Notebook</a>
+      <strong>Lecture 6: Boosted Trees &amp; Regularization</strong><br>
+      <span class="desc">Gradient boosting &mdash; XGBoost &mdash; Newton step &mdash; Ridge &mdash; LASSO &mdash; Elastic Net</span><br>
+      <span class="links"><a href="slides/Lecture06_BoostedTrees.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture06_BoostedTrees.pdf">PDF</a></span>
+    </li>
+  </ul>
+
+  <div class="part-label">Part 3 &mdash; Deep Learning</div>
+  <ul class="overview-list">
+    <li>
+      <strong>Lecture 7: Introduction to Neural Networks</strong><br>
+      <span class="desc">Neurons &mdash; activations &mdash; backpropagation &mdash; Adam &mdash; dropout &mdash; PyTorch Dataset/DataLoader/training loop</span><br>
+      <span class="links"><a href="slides/Lecture07_NeuralNets.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture07_NeuralNets.pdf">PDF</a></span>
     </li>
     <li>
-      <strong>Lecture 6: Forecast Evaluation</strong><br>
-      <span class="desc">RMSE/MAE/MAPE/MASE &mdash; walk-forward CV &mdash; Diebold-Mariano test &mdash; forecast combination</span><br>
-      <a href="slides/Lecture06_Evaluation.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture06_Evaluation.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture06_Evaluation.ipynb" download>Notebook</a>
+      <strong>Lecture 8: CNN Architectures</strong><br>
+      <span class="desc">Convolution &mdash; pooling &mdash; LeNet &rarr; VGG &rarr; Inception &rarr; ResNet &mdash; residual connections &mdash; 1D CNN for time series</span><br>
+      <span class="links"><a href="slides/Lecture08_CNNs.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture08_CNNs.pdf">PDF</a></span>
     </li>
     <li>
-      <strong>Lecture 7: Machine Learning Introduction</strong><br>
-      <span class="desc">Bias-variance tradeoff &mdash; train/val/test &mdash; TimeSeriesSplit CV &mdash; pipeline</span><br>
-      <a href="slides/Lecture07_MLIntro.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture07_MLIntro.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture07_MLIntro.ipynb" download>Notebook</a>
+      <strong>Lecture 9: RNNs, LSTMs &amp; Transformers</strong><br>
+      <span class="desc">Vanilla RNN &mdash; LSTM gates &mdash; attention &mdash; scaled dot-product &mdash; Transformer encoder &mdash; positional encoding</span><br>
+      <span class="links"><a href="slides/Lecture09_RNNTransformers.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture09_RNNTransformers.pdf">PDF</a></span>
+    </li>
+  </ul>
+
+  <div class="part-label">Part 4 &mdash; Bayesian Models</div>
+  <ul class="overview-list">
+    <li>
+      <strong>Lecture 10: Bayesian Statistics I &mdash; Foundations</strong><br>
+      <span class="desc">Frequentist vs Bayesian &mdash; Bayes' theorem &mdash; priors &mdash; MCMC/NUTS &mdash; PyMC &mdash; prior predictive checks</span><br>
+      <span class="links"><a href="slides/Lecture10_BayesianI.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture10_BayesianI.pdf">PDF</a></span>
     </li>
     <li>
-      <strong>Lecture 8: Regularization</strong><br>
-      <span class="desc">Ridge &mdash; LASSO &mdash; Elastic Net &mdash; coordinate descent &mdash; validation curve</span><br>
-      <a href="slides/Lecture08_Regularization.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture08_Regularization.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture08_Regularization.ipynb" download>Notebook</a>
+      <strong>Lecture 11: Bayesian Statistics II &mdash; Time Series &amp; Hierarchical Models</strong><br>
+      <span class="desc">Bayesian structural TS &mdash; local linear trend &mdash; Fourier seasonality &mdash; partial pooling &mdash; hierarchical models in PyMC</span><br>
+      <span class="links"><a href="slides/Lecture11_BayesianII.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture11_BayesianII.pdf">PDF</a></span>
     </li>
     <li>
-      <strong>Lecture 9: Tree-Based Methods</strong><br>
-      <span class="desc">CART &mdash; Random Forests &mdash; XGBoost &mdash; feature importance</span><br>
-      <a href="slides/Lecture09_Trees.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture09_Trees.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture09_Trees.ipynb" download>Notebook</a>
-    </li>
-    <li>
-      <strong>Lecture 10: Neural Networks</strong><br>
-      <span class="desc">FFN &mdash; RNN &mdash; LSTM gates &mdash; vanishing gradient &mdash; attention &mdash; Keras implementation</span><br>
-      <a href="slides/Lecture10_NeuralNets.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture10_NeuralNets.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture10_NeuralNets.ipynb" download>Notebook</a>
-    </li>
-    <li>
-      <strong>Lecture 11: Feature Engineering</strong><br>
-      <span class="desc">Lag features &mdash; rolling statistics &mdash; leakage-free pipeline &mdash; LASSO importance</span><br>
-      <a href="slides/Lecture11_Features.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture11_Features.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture11_Features.ipynb" download>Notebook</a>
-    </li>
-    <li>
-      <strong>Lecture 12: Capstone &amp; Applications</strong><br>
-      <span class="desc">Decision framework &mdash; RSXFS leaderboard &mdash; RESGAS case study &mdash; deployment</span><br>
-      <a href="slides/Lecture12_Capstone.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture12_Capstone.pdf">PDF</a> &nbsp;&middot;&nbsp; <a href="notebooks/Lecture12_Capstone.ipynb" download>Notebook</a>
+      <strong>Lecture 12: Bayesian Statistics III &mdash; Bayesian Linear Regression</strong><br>
+      <span class="desc">Bayesian regression &mdash; posterior coefficient distributions &mdash; HDI &mdash; DAGs &mdash; ROPE analysis &mdash; scenario simulation</span><br>
+      <span class="links"><a href="slides/Lecture12_BayesianIII.html">Slides</a> &nbsp;&middot;&nbsp; <a href="slides/Lecture12_BayesianIII.pdf">PDF</a></span>
     </li>
   </ul>
 
   <div class="footer">
-    Department of Economics &middot; University of Nebraska at Omaha
+    BSAD 8310: Business Forecasting &mdash; University of Nebraska at Omaha &mdash; Department of Economics
   </div>
 
 </body>

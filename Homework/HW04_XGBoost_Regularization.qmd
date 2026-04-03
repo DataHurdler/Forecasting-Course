@@ -1,0 +1,274 @@
+---
+title: "Homework 4: Boosted Trees and Regularization"
+subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Spring 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Overview
+
+Boosting builds trees sequentially — each new tree corrects the errors left by the previous ones.
+XGBoost is the dominant gradient boosting implementation for tabular data, and it often
+outperforms Random Forests given proper tuning. Regularized linear models (LASSO, Ridge,
+Elastic Net) take a different approach: they shrink coefficients toward zero, performing
+automatic feature selection while keeping the model interpretable.
+
+This homework applies both families to the same Rossmann dataset from Homework 3, and ends
+with a head-to-head comparison across all methods tried in the course so far.
+
+**Learning objectives:**
+
+- Fit XGBoost and interpret gain-based feature importance
+- Tune `learning_rate` and `max_depth` using time-series cross-validation
+- Read a LASSO regularization path to identify robust vs fragile features
+- Compare LASSO, Ridge, and Elastic Net on test RMSE and sparsity
+- Synthesize walk-forward CV results across all models
+
+---
+
+## Dataset and Setup
+
+We use the same weekly Rossmann dataset and temporal split from Homework 3.
+All 30 stores, features include lag sales, promotions, store attributes, and calendar variables.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import xgboost as xgb
+from sklearn.linear_model import Lasso, Ridge, ElasticNet
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
+from sklearn.metrics import mean_squared_error
+import warnings
+warnings.filterwarnings('ignore')
+
+RANDOM_STATE = 42
+
+weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
+weekly["month"] = weekly["WeekStart"].dt.month
+weekly["week_of_year"] = weekly["WeekStart"].dt.isocalendar().week.astype(int)
+
+FEATURES = [
+    "Sales_lag1", "Sales_lag4", "Sales_lag13", "Sales_lag26", "Sales_lag52",
+    "Promo", "StateHoliday", "SchoolHoliday", "StoreType", "Assortment",
+    "CompetitionDistance", "Promo2", "month", "week_of_year", "DaysOpen"
+]
+TARGET = "Sales"
+
+df = weekly.dropna(subset=FEATURES).copy()
+cutoff = pd.Timestamp("2015-01-01")
+train = df[df["WeekStart"] < cutoff]
+test  = df[df["WeekStart"] >= cutoff]
+
+X_train, y_train = train[FEATURES].values, train[TARGET].values
+X_test,  y_test  = test[FEATURES].values,  test[TARGET].values
+
+print(f"Train: {len(X_train):,} rows | Test: {len(X_test):,} rows")
+```
+
+---
+
+## Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Paste the following as your first message to Codex. Save it as `INITIAL_PROMPT.md`
+in your submission folder.
+
+```
+I am working on Homework 4 for BSAD 8310: Business Forecasting at the
+University of Nebraska at Omaha.
+
+Dataset: Rossmann Store Sales — weekly aggregated for 30 stores at
+`data/processed/rossmann_weekly.csv`. Same feature set and temporal split
+as Homework 3 (train < 2015-01-01, test >= 2015-01-01). Features include
+lag sales (lag1–lag52), promotion flags, store attributes (StoreType,
+Assortment, CompetitionDistance), and calendar features.
+
+This homework covers XGBoost and regularized linear regression (LASSO,
+Ridge, Elastic Net) for sales forecasting using Python. I will ask you
+questions one at a time. For each:
+1. Write clean, well-commented Python code that runs end-to-end
+2. Interpret outputs in plain English for a business audience
+3. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget is 12 (this context prompt is excluded). I will label
+each question before asking.
+
+Confirm by responding with: HW04_CONTEXT_ACK
+```
+:::
+
+---
+
+## Questions
+
+### Q1 — XGBoost Baseline *(Suggested prompts: 2)*
+
+Fit an `xgb.XGBRegressor` with the following hyperparameters:
+
+- `n_estimators=200`
+- `learning_rate=0.1`
+- `max_depth=5`
+- `subsample=0.8`
+- `colsample_bytree=0.8`
+- `random_state=42`
+
+Report the test RMSE. Compare it to the Random Forest RMSE you recorded in Homework 3
+(enter that value in a comment). Then plot the XGBoost feature importances using
+`importance_type="gain"` as a horizontal bar chart sorted descending.
+
+```{python}
+# Fit XGBoost baseline and plot feature importances
+```
+
+> **Your response:** Does XGBoost outperform Random Forest on test RMSE? Based on the
+> gain-based importance plot, which features matter most for boosting?
+
+---
+
+### Q2 — Hyperparameter Tuning *(Suggested prompts: 2)*
+
+Conduct a grid search over:
+
+- `learning_rate`: [0.01, 0.05, 0.1]
+- `max_depth`: [3, 5, 7]
+
+Hold `n_estimators=300` fixed. Use `TimeSeriesSplit(n_splits=3)` as the CV strategy
+and negative RMSE as the scoring metric. Report the best hyperparameter combination,
+its CV RMSE, and its test RMSE.
+
+```{python}
+from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
+
+param_grid = {
+    "learning_rate": [0.01, 0.05, 0.1],
+    "max_depth": [3, 5, 7],
+}
+# Complete the grid search here
+```
+
+> **Your response:** Why must you use `TimeSeriesSplit` rather than standard k-fold CV
+> for this problem? What would go wrong if you used standard k-fold?
+
+---
+
+### Q3 — LASSO Regularization Path *(Suggested prompts: 2)*
+
+Standardize the features using `StandardScaler` (LASSO is sensitive to feature scale).
+Fit LASSO at 30 values of `alpha` spaced logarithmically from 1 to 10,000.
+Plot the regularization path: coefficient values on the y-axis, log₁₀(alpha) on the
+x-axis, one line per feature labeled by name.
+
+Identify: which features shrink to zero first (at the smallest alpha)? Which are the
+last to shrink (most robust to regularization)?
+
+```{python}
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled  = scaler.transform(X_test)
+
+alphas = np.logspace(0, 4, 30)
+# Fit LASSO at each alpha and collect coefficients
+```
+
+> **Your response:** Which feature is the last to shrink to zero as alpha increases?
+> What does that tell you about its importance for predicting weekly sales?
+
+---
+
+### Q4 — Elastic Net vs LASSO vs Ridge *(Suggested prompts: 2)*
+
+Fix `alpha=100`. Fit:
+
+- `Lasso(alpha=100)`
+- `ElasticNet(alpha=100, l1_ratio=0.9)`
+- `ElasticNet(alpha=100, l1_ratio=0.5)`
+- `ElasticNet(alpha=100, l1_ratio=0.1)`
+- `Ridge(alpha=100)`
+
+For each model report test RMSE and the number of non-zero coefficients.
+Present results in a table.
+
+```{python}
+models = {
+    "LASSO (l1=1.0)":        Lasso(alpha=100),
+    "Elastic Net (l1=0.9)":  ElasticNet(alpha=100, l1_ratio=0.9),
+    "Elastic Net (l1=0.5)":  ElasticNet(alpha=100, l1_ratio=0.5),
+    "Elastic Net (l1=0.1)":  ElasticNet(alpha=100, l1_ratio=0.1),
+    "Ridge (l1=0.0)":        Ridge(alpha=100),
+}
+# Fit each, collect RMSE and non-zero count
+```
+
+> **Your response:** Which configuration gives the best test RMSE? When would you prefer
+> LASSO over Ridge in a business forecasting context — and when would you prefer Ridge?
+
+---
+
+### Q5 — Walk-Forward CV Comparison *(Suggested prompts: 2)*
+
+Re-use the expanding-window walk-forward CV framework from Homework 3
+(13-week steps, cutoffs from 2014-01-01 to 2015-01-01). Compare four models:
+
+- Best XGBoost (tuned hyperparameters from Q2)
+- `RandomForestRegressor(n_estimators=200, random_state=42)` (refit or import your HW3 RMSE)
+- `Lasso(alpha=100)` with scaled features
+- `Ridge(alpha=100)` with scaled features
+
+Report mean CV RMSE for each in a summary table.
+
+```{python}
+cutoffs = pd.date_range("2014-01-01", "2015-01-01", freq="13W")
+# Walk-forward CV loop
+```
+
+> **Your response:** Does walk-forward CV change the ranking of models compared to the
+> single test-set evaluation? What does that tell you about the stability of each model
+> over time?
+
+---
+
+### Q6 — Recommendation Memo *(Suggested prompts: 0 — write yourself)*
+
+No code required. In 150–200 words, write a recommendation memo addressed to the
+Rossmann analytics leadership team. You must choose **one** model to deploy in
+production for weekly store-level sales forecasting. Your options are:
+
+- Best ETS or ARIMA (Homework 1)
+- Best GAM / Prophet (Homework 2)
+- Random Forest (Homework 3)
+- XGBoost (this homework)
+
+Cover: (1) your choice and the evidence supporting it (CV RMSE, interpretability,
+ease of maintenance), (2) one risk you would monitor after deployment, and (3) whether
+you would keep any of the other models as a benchmark or fallback.
+
+> **Your response:**
+
+---
+
+## Submission Checklist
+
+Before submitting, confirm:
+
+- [ ] All code cells run without errors from top to bottom
+- [ ] Written responses completed in your own words (not AI-generated prose)
+- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw04_<your_name>/`
+- [ ] `PROMPT_LOG.jsonl` complete with ≤ 12 entries
+- [ ] One git commit per Codex prompt (`hw04 prompt <id>: <short summary>`)
+- [ ] `REPORT.md` with a clear business recommendation
