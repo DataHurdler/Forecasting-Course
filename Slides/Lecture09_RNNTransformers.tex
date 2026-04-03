@@ -39,43 +39,38 @@
 \begin{frame}{Why Recurrent Networks?}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \textbf{The limitation of FFN and CNN:}
-      \begin{itemize}\small
+      \textbf{Limitations of FFN and CNN:}
+      \begin{itemize}\footnotesize
         \item FFN: each row processed independently ---
               temporal order ignored unless encoded as lag features
         \item 1D CNN: local pattern detection within a fixed window ---
               long-range dependencies require many stacked layers
       \end{itemize}
-      \vspace{0.2cm}
+      \vspace{0.1cm}
       \textbf{What an RNN adds:}
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize
         \item A \textbf{hidden state} $\mathbf{h}_t$ passed from step to step
-        \item At each time step, the network updates its memory
-              based on the new input \emph{and} what it remembered
-        \item Theoretically, $\mathbf{h}_t$ encodes the entire history
-              $x_1, x_2, \ldots, x_t$
+        \item Updates memory based on new input \emph{and} prior memory
+        \item Theoretically encodes entire history $x_1, \ldots, x_t$
       \end{itemize}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{definitionbox}{Vanilla RNN}
-        Think of $\mathbf{h}_t$ as the model's ``running summary'' of the
-        series up to step $t$ --- like a manager who reads each month's
-        sales report and updates their mental picture of the trend.
-
-        At each step $t$:
+        \small
+        $\mathbf{h}_t$ is the model's running summary up to step $t$.
+        At each step:
         \[
           \mathbf{h}_t = \tanh(\mathbf{W}_h \mathbf{h}_{t-1} + \mathbf{W}_x \mathbf{x}_t + \mathbf{b})
         \]
         \[
           \hat{y}_t = \mathbf{W}_y \mathbf{h}_t + \mathbf{b}_y
         \]
-        Same weights $\mathbf{W}_h, \mathbf{W}_x$ used at every step.
+        Same weights used at every step.
       \end{definitionbox}
       \begin{warningbox}
-        \small \textbf{Vanishing gradient problem:}
-        gradients from distant past steps shrink exponentially
-        during backpropagation through time (BPTT).
-        In practice, vanilla RNNs forget after $\sim$10 steps.
+        \small \textbf{Vanishing gradient:}
+        gradients shrink exponentially during BPTT.
+        Vanilla RNNs forget after $\sim$10 steps.
       \end{warningbox}
     \end{column}
   \end{columns}
@@ -93,36 +88,33 @@
 \begin{frame}{LSTM: Three Gates and Cell State}
   \begin{columns}[T]
     \begin{column}{0.55\textwidth}
-      An LSTM maintains two states: the \textbf{cell state} $\mathbf{c}_t$
-      (long-term memory) and the \textbf{hidden state} $\mathbf{h}_t$ (output).
+      LSTM maintains: \textbf{cell state} $\mathbf{c}_t$ (long-term) and
+      \textbf{hidden state} $\mathbf{h}_t$ (output).
 
-      \vspace{0.2cm}
-      \textbf{Three gates + cell update per step:}
-      \begin{enumerate}\small
+      \vspace{0.1cm}
+      \textbf{Four operations per step:}
+      \begin{enumerate}\footnotesize
         \item \textbf{Forget gate:} $\mathbf{f}_t = \sigma(\mathbf{W}_f[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_f)$\\
-              What fraction of the old cell state to keep?
+              What fraction of old cell state to keep?
         \item \textbf{Input gate:} $\mathbf{i}_t = \sigma(\mathbf{W}_i[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_i)$\\
               What new information to write to memory?
-        \item \textbf{Cell update:} candidate $\tilde{\mathbf{c}}_t = \tanh(\mathbf{W}_c[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_c)$\\
-              then $\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t$
+        \item \textbf{Cell update:} $\tilde{\mathbf{c}}_t = \tanh(\mathbf{W}_c[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_c)$;
+              $\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t$
         \item \textbf{Output gate:} $\mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t)$\\
               What part of memory to expose as output?
       \end{enumerate}
     \end{column}
     \begin{column}{0.41\textwidth}
       \begin{keybox}
-        \textbf{Why does LSTM solve vanishing gradients?}
-
-        The cell state $\mathbf{c}_t$ is updated additively
-        (via the forget gate). Gradients can flow backward
-        through additive connections without shrinking ---
-        similar to the residual connections in ResNet.
+        \small\textbf{Why LSTM solves vanishing gradients:}
+        $\mathbf{c}_t$ is updated additively via the forget gate.
+        Gradients flow through additive connections without
+        shrinking --- like residual connections in ResNet.
       \end{keybox}
       \vspace{0.1cm}
       \begin{examplebox}{Business analogy}
-        The forget gate decides: ``Sales data from 3 years ago
-        is not relevant; forget it.'' The input gate decides:
-        ``This holiday spike is important; remember it.''
+        \small Forget gate: ``3-year-old data is irrelevant; forget it.''
+        Input gate: ``This holiday spike matters; remember it.''
       \end{examplebox}
     \end{column}
   \end{columns}
@@ -133,21 +125,17 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{examplebox}{LSTM Regressor}
-        {\small
+        {\footnotesize
         \texttt{class LSTMForecaster(nn.Module):}\\
         \texttt{  def \_\_init\_\_(self, in\_dim, hidden=128, layers=2):}\\
         \texttt{    super().\_\_init\_\_()}\\
-        \texttt{    self.lstm = nn.LSTM(}\\
-        \texttt{      in\_dim, hidden,}\\
-        \texttt{      num\_layers=layers,}\\
-        \texttt{      batch\_first=True,}\\
-        \texttt{      dropout=0.2}\\
-        \texttt{    )}\\
-        \texttt{    self.fc = nn.Linear(hidden, 1)}\\[4pt]
+        \texttt{    self.lstm = nn.LSTM(in\_dim, hidden,}\\
+        \texttt{      num\_layers=layers, batch\_first=True,}\\
+        \texttt{      dropout=0.2)}\\
+        \texttt{    self.fc = nn.Linear(hidden, 1)}\\[2pt]
         \texttt{  def forward(self, x):}\\
         \texttt{    \# x: (batch, seq\_len, in\_dim)}\\
         \texttt{    out, (h, c) = self.lstm(x)}\\
-        \texttt{    \# Use last hidden state}\\
         \texttt{    return self.fc(h[-1]).squeeze(-1)}
         }
       \end{examplebox}
@@ -155,15 +143,14 @@
     \begin{column}{0.44\textwidth}
       \textbf{Key arguments:}
       \begin{description}\small
-        \item[\texttt{batch\_first=True}] Input shape: \texttt{(batch, seq\_len, features)}
+        \item[\texttt{batch\_first=True}] Input: \texttt{(batch, seq\_len, features)}
         \item[\texttt{num\_layers}] Stacked LSTMs (2--3 common)
         \item[\texttt{dropout}] Applied between LSTM layers
-        \item[\texttt{h[-1]}] Last layer's hidden state at final time step
-              --- encodes the full sequence
+        \item[\texttt{h[-1]}] Last hidden state --- encodes full sequence
       \end{description}
       \vspace{0.1cm}
       \begin{keybox}
-        \small Typical RSXFS result: LSTM RMSE $\approx$ 1,400--1,600
+        \small Typical result: LSTM RMSE $\approx$ 1,400--1,600
         with sequence length 24 (2 years of history).
       \end{keybox}
     \end{column}
@@ -186,10 +173,9 @@
       \textbf{Limitation of LSTMs:} even with gating,
       information from 50+ steps ago may be lost or diluted.
 
-      \vspace{0.1cm}
-      \textbf{Attention idea:} at each output step,
-      let the model directly attend to \emph{any} input step,
-      weighted by relevance.
+      \vspace{0.05cm}
+      \textbf{Attention idea:} let the model attend to
+      \emph{any} input step, weighted by relevance.
 
       \begin{definitionbox}{Scaled Dot-Product Attention \parencite{Vaswani2017}}
         \[
@@ -201,18 +187,15 @@
     \begin{column}{0.44\textwidth}
       \begin{examplebox}{Business analogy}
         \small
-        Predicting December sales: the model assigns high
-        attention weight to last December (lag-12) and the
-        preceding November, and low weight to random months
-        in between. The attention score is \emph{learned},
-        not hard-coded.
+        Predicting December sales: high attention to last December
+        (lag-12) and preceding November; low weight to other months.
+        Attention scores are \emph{learned}, not hard-coded.
       \end{examplebox}
       \vspace{0.1cm}
       \begin{keybox}
         \small Attention computes a \textbf{weighted average}
-        of the values $V$, where weights come from how
-        well queries $Q$ match keys $K$.
-        High similarity $\to$ high weight.
+        of values $V$, where weights reflect how well
+        queries $Q$ match keys $K$.
       \end{keybox}
     \end{column}
   \end{columns}
@@ -222,39 +205,35 @@
 \begin{frame}{The Transformer Architecture}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \textbf{Key components of a Transformer encoder block:}
-      \begin{enumerate}\small
+      \textbf{Transformer encoder block components:}
+      \begin{enumerate}\footnotesize
         \item \textbf{Multi-head self-attention:}
-              run $h$ attention heads in parallel, each attending
-              to different aspects of the sequence.
-              Concatenate and project: $\text{MultiHead}(Q,K,V) = \text{concat}(\text{head}_1,\ldots,\text{head}_h)W^O$
-        \item \textbf{Residual connection + LayerNorm:}
+              $h$ heads in parallel; project:
+              $\text{MultiHead}(Q,K,V) = \text{concat}(\text{head}_1,\ldots,\text{head}_h)W^O$
+        \item \textbf{Residual + LayerNorm:}
               $\mathbf{z} = \text{LayerNorm}(\mathbf{x} + \text{MultiHead}(\mathbf{x}))$
         \item \textbf{Feed-forward sublayer:}
-              position-wise FFN applied to each position independently.
+              position-wise FFN applied independently.
         \item \textbf{Positional encoding:}
-              add sinusoidal position embeddings so the model
-              knows token order (attention itself is permutation-invariant).
+              sinusoidal embeddings encode order
+              (attention is permutation-invariant).
       \end{enumerate}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{keybox}
         \small
         \textbf{Why Transformers dominate NLP:}
-        \begin{itemize}\small
-          \item No sequential bottleneck --- all positions processed
-                in parallel (vs.\ LSTM's sequential steps)
-          \item Explicit long-range dependencies via attention weights
+        \begin{itemize}\footnotesize
+          \item All positions processed in parallel (no sequential bottleneck)
+          \item Explicit long-range dependencies via attention
           \item Scales to billions of parameters (BERT, GPT)
         \end{itemize}
       \end{keybox}
       \vspace{0.1cm}
       \begin{examplebox}{BERT and GPT}
         \small BERT \parencite{Devlin2019} (encoder-only) for
-        classification and embedding.
-        GPT (decoder-only) for next-token generation.
-        Both are Transformer variants pre-trained on
-        massive text corpora.
+        classification; GPT (decoder-only) for generation.
+        Both pre-trained on massive text corpora.
       \end{examplebox}
     \end{column}
   \end{columns}
@@ -264,44 +243,33 @@
 \begin{frame}{Transformer for Time Series Forecasting}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \begin{examplebox}{Minimal Transformer Encoder in PyTorch}
-        {\small
-        \texttt{encoder\_layer = nn.TransformerEncoderLayer(}\\
-        \texttt{  d\_model=64,}\\
-        \texttt{  nhead=4,}\\
+      \begin{examplebox}{Minimal Transformer Encoder}
+        {\scriptsize
+        \texttt{enc\_layer = nn.TransformerEncoderLayer(}\\
+        \texttt{  d\_model=64, nhead=4,}\\
         \texttt{  dim\_feedforward=256,}\\
-        \texttt{  dropout=0.1,}\\
-        \texttt{  batch\_first=True}\\
-        \texttt{)}\\
+        \texttt{  dropout=0.1, batch\_first=True)}\\
         \texttt{encoder = nn.TransformerEncoder(}\\
-        \texttt{  encoder\_layer, num\_layers=2)}\\[4pt]
-        \texttt{class TSTransformer(nn.Module):}\\
-        \texttt{  def \_\_init\_\_(self, in\_dim):}\\
-        \texttt{    super().\_\_init\_\_()}\\
-        \texttt{    self.proj = nn.Linear(in\_dim, 64)}\\
-        \texttt{    self.enc  = encoder}\\
-        \texttt{    self.fc   = nn.Linear(64, 1)}\\
-        \texttt{  def forward(self, x):}\\
-        \texttt{    h = self.enc(self.proj(x))}\\
-        \texttt{    return self.fc(h[:, -1]).squeeze(-1)}
+        \texttt{  enc\_layer, num\_layers=2)}\\
+        \texttt{self.proj = nn.Linear(in\_dim, 64)}\\
+        \texttt{self.enc  = encoder}\\
+        \texttt{self.fc   = nn.Linear(64, 1)}\\
+        \texttt{def forward(self, x):}\\
+        \texttt{  h = self.enc(self.proj(x))}\\
+        \texttt{  return self.fc(h[:,-1]).squeeze(-1)}
         }
       \end{examplebox}
     \end{column}
     \begin{column}{0.44\textwidth}
-      \textbf{Practical notes for time series:}
-      \begin{itemize}\small
-        \item Add \textbf{positional encoding} (or learnable position embeddings)
-              so the model knows temporal order
-        \item Use \textbf{causal masking} to prevent the model from attending
-              to future positions during training
-        \item Transformers tend to outperform LSTMs on
-              \emph{longer} sequences ($T > 100$) and
-              \emph{multi-variate} time series
+      \textbf{Practical notes:}
+      \begin{itemize}\footnotesize\itemsep0pt
+        \item Add \textbf{positional encoding} so the model knows temporal order
+        \item Use \textbf{causal masking} to block future positions during training
+        \item Outperforms LSTMs on longer sequences ($T > 100$)
       \end{itemize}
-      \vspace{0.1cm}
       \begin{warningbox}
-        \small Transformers need more data than LSTMs.
-        For short monthly business series ($T < 200$),
+        \footnotesize Transformers need more data than LSTMs.
+        For short monthly series ($T < 200$),
         LSTM is often a better starting point.
       \end{warningbox}
     \end{column}

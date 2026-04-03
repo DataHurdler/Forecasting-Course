@@ -44,12 +44,11 @@
       \[
         \hat{\boldsymbol{\beta}} = (\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}
       \]
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize
         \item Single point estimate $\hat{\boldsymbol{\beta}}$
         \item Standard errors derived from asymptotic theory
-        \item Confidence intervals rely on assumptions about
-              large-sample normality
-        \item Regularization (Ridge, LASSO) is an ad-hoc fix for overfitting
+        \item Confidence intervals rely on large-sample normality
+        \item Regularization (Ridge, LASSO) is an ad-hoc fix
       \end{itemize}
     \end{column}
     \begin{column}{0.44\textwidth}
@@ -57,20 +56,20 @@
       \[
         p(\boldsymbol{\beta} \mid \mathbf{y}) \propto p(\mathbf{y} \mid \boldsymbol{\beta}) \cdot p(\boldsymbol{\beta})
       \]
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize
         \item Full posterior distribution for each $\beta_j$
         \item Credible intervals are exact probability statements
         \item Regularization = informative prior
-              (Normal prior $\equiv$ Ridge, LASSO $\equiv$ Laplace prior)
+              (Normal $\equiv$ Ridge; Laplace $\equiv$ LASSO)
         \item Works even with small samples
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.2cm}
+  \vspace{0.1cm}
   \begin{keybox}
-    Bayesian regression answers questions OLS cannot:
-    ``What is the probability that the advertising elasticity exceeds 0.5?''
-    or ``Is it more likely that price sensitivity increased or decreased?''
+    \small Bayesian regression answers questions OLS cannot:
+    ``What is the probability that advertising elasticity exceeds 0.5?''
+    or ``Did price sensitivity increase or decrease?''
   \end{keybox}
 \end{frame}
 
@@ -79,40 +78,32 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{examplebox}{Retail Sales Regression}
-        {\small
+        {\scriptsize
         \texttt{with pm.Model() as blr:}\\
-        \texttt{  \# Weakly informative priors}\\
         \texttt{  intercept = pm.Normal('intercept',}\\
         \texttt{    mu=y.mean(), sigma=y.std())}\\
         \texttt{  beta = pm.Normal('beta',}\\
         \texttt{    mu=0, sigma=1, shape=X.shape[1])}\\
-        \texttt{  sigma = pm.HalfNormal('sigma', sigma=y.std())}\\[4pt]
-        \texttt{  \# Linear predictor}\\
-        \texttt{  mu = intercept + X @ beta}\\[4pt]
-        \texttt{  \# Likelihood}\\
-        \texttt{  pm.Normal('y\_obs', mu=mu,}\\
-        \texttt{    sigma=sigma, observed=y)}\\[4pt]
-        \texttt{  trace = pm.sample(2000)}\\[4pt]
-        \texttt{pm.plot\_posterior(trace,}\\
-        \texttt{  var\_names=['beta'])}
+        \texttt{  sigma = pm.HalfNormal('sigma', y.std())}\\[1pt]
+        \texttt{  mu = intercept + X @ beta}\\[1pt]
+        \texttt{  pm.Normal('y\_obs', mu, sigma, observed=y)}\\[1pt]
+        \texttt{  trace = pm.sample(2000)}\\[1pt]
+        \texttt{pm.plot\_posterior(trace, var\_names=['beta'])}
         }
       \end{examplebox}
     \end{column}
     \begin{column}{0.44\textwidth}
       \textbf{Standardize predictors first:}
-      \begin{itemize}\small
-        \item Center and scale all $X$ columns before fitting:
-              \texttt{X\_std = (X - X.mean()) / X.std()}
-        \item With standardized inputs, $\mathcal{N}(0,1)$ priors on
-              $\beta$ are weakly informative
-        \item Coefficients are then interpretable as
-              ``effect of a 1-SD increase in $x_j$ on $y$''
+      \begin{itemize}\footnotesize
+        \item Center and scale: \texttt{X\_std = (X - X.mean()) / X.std()}
+        \item With standardized inputs, $\mathcal{N}(0,1)$ priors are
+              weakly informative
+        \item Coefficients = ``effect of 1-SD increase in $x_j$ on $y$''
       \end{itemize}
       \vspace{0.1cm}
       \begin{keybox}
-        \small A Normal prior on $\beta$ is mathematically equivalent
-        to Ridge regularization. A Laplace (double exponential)
-        prior is equivalent to LASSO.
+        \small A Normal prior on $\beta$ is equivalent to Ridge
+        regularization. A Laplace prior is equivalent to LASSO.
         Bayesian inference subsumes regularization.
       \end{keybox}
     \end{column}
@@ -131,33 +122,30 @@
 \begin{frame}{Reading Posterior Distributions}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \textbf{For each coefficient $\beta_j$, the posterior gives:}
-      \begin{description}\small
+      \textbf{For each $\beta_j$, the posterior gives:}
+      \begin{description}\footnotesize
         \item[Posterior mean] Best single estimate
         \item[Posterior median] More robust if distribution is skewed
         \item[HDI] Highest Density Interval: shortest interval
               containing $X$\% of the probability mass
         \item[Prob.\ of direction] $P(\beta_j > 0)$ or $P(\beta_j < 0)$ ---
-              a more natural measure than a $p$-value
-        \item[ROPE analysis] Define a range of ``practically zero'' effects
-              (e.g., $|\beta_j| < 0.05$) --- the Region Of Practical Equivalence.
-              Check what fraction of the posterior falls inside.
-              If most of the posterior is in the ROPE, the effect is statistically
-              present but too small to matter for business decisions.
+              more natural than a $p$-value
+        \item[ROPE] Region Of Practical Equivalence: fraction of the
+              posterior in $|\beta_j| < \delta$ (``negligible effect'').
+              High ROPE mass = statistically present but practically irrelevant.
       \end{description}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{examplebox}{Business Example}
-        Posterior for advertising elasticity $\beta_{\text{ads}}$:
-        \begin{itemize}\small
+        \small Posterior for advertising elasticity $\beta_{\text{ads}}$:
+        \begin{itemize}\footnotesize
           \item Posterior mean: 0.32
           \item 94\% HDI: [0.18, 0.47]
           \item $P(\beta_{\text{ads}} > 0) = 0.998$
         \end{itemize}
-        \textbf{Interpretation:} ``There is a 99.8\% probability
-        that advertising has a positive effect on sales.
-        A 10\% increase in ads is associated with a
-        3.2\% increase in sales (credible range: 1.8\%--4.7\%).''
+        \textbf{Interpretation:} ``99.8\% probability of a positive
+        effect. A 10\% increase in ads raises sales by 3.2\%
+        (credible range: 1.8\%--4.7\%).''
       \end{examplebox}
     \end{column}
   \end{columns}
@@ -176,41 +164,36 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       A \textbf{DAG} is a graph where:
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize
         \item \textbf{Nodes} = variables
-        \item \textbf{Directed arrows} = causal relationships ($A \to B$ means $A$ causes $B$)
-        \item \textbf{Acyclic} = no variable causes itself (directly or indirectly)
+        \item \textbf{Directed arrows} = causal relationships ($A \to B$: $A$ causes $B$)
+        \item \textbf{Acyclic} = no variable causes itself
       \end{itemize}
-      \vspace{0.1cm}
-      \textbf{How to build a DAG:} List all variables relevant to your outcome.
-      For each pair, ask: ``Could $A$ directly cause $B$?''
-      Draw an arrow if yes. Arrows point in the direction of causation,
-      not correlation.
-      \vspace{0.1cm}
+      \vspace{0.05cm}
+      \textbf{How to build:} For each variable pair, ask ``Could $A$ directly cause $B$?''
+      Draw an arrow if yes; direction = causation, not correlation.
 
-      \textbf{Why use DAGs for regression?}
-      \begin{itemize}\small
-        \item Makes the causal story explicit before building the model
-        \item Identifies \textbf{confounders} (variables you must control for)
-        \item Identifies \textbf{colliders} (variables you must NOT control for)
-        \item Reveals which coefficients have a causal interpretation
-              and which are merely associational
+      \vspace{0.05cm}
+      \textbf{Why use DAGs?}
+      \begin{itemize}\footnotesize
+        \item Makes causal structure explicit before modeling
+        \item Identifies \textbf{confounders} (must control for)
+        \item Identifies \textbf{colliders} (must NOT control for)
+        \item Clarifies which coefficients are causal vs.\ associational
       \end{itemize}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{examplebox}{Retail Sales DAG}
-        \small
-        Suppose:
-        \begin{itemize}\small
+        \footnotesize
+        \begin{itemize}\footnotesize
           \item Advertising $\to$ Sales
           \item Price $\to$ Sales
-          \item Season $\to$ Advertising (we advertise more in December)
-          \item Season $\to$ Sales (people buy more in December)
+          \item Season $\to$ Advertising
+          \item Season $\to$ Sales
         \end{itemize}
         \textbf{Season is a confounder:}
-        if you do not control for season,
-        the advertising coefficient absorbs
-        seasonal variation --- it is biased upward.
+        omitting it causes the advertising coefficient
+        to absorb seasonal variation --- biased upward.
       \end{examplebox}
     \end{column}
   \end{columns}
@@ -228,50 +211,42 @@
 \begin{frame}{Scenario Analysis with Posterior Samples}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \textbf{The power of having posterior samples:}
-      you can answer any question by plugging
-      posterior draws into the prediction formula.
-
-      \vspace{0.2cm}
-      \textbf{Procedure:}
-      \begin{enumerate}\small
-        \item Draw $S$ samples from the posterior:
-              $\boldsymbol{\beta}^{(1)}, \ldots, \boldsymbol{\beta}^{(S)}$
-        \item For a new scenario $\mathbf{x}^*$, compute
+      \small\textbf{Procedure:}
+      \begin{enumerate}\footnotesize
+        \item Draw $S$ posterior samples $\boldsymbol{\beta}^{(1)}, \ldots, \boldsymbol{\beta}^{(S)}$
+        \item For scenario $\mathbf{x}^*$, compute
               $\hat{y}^{(s)} = \mathbf{x}^{*\top}\boldsymbol{\beta}^{(s)}$
-              for each draw $s$
-        \item The distribution of $\hat{y}^{(s)}$ over $s$
-              is the \textbf{posterior predictive distribution} for
-              that scenario
+        \item The distribution of $\hat{y}^{(s)}$ is the
+              \textbf{posterior predictive distribution}
       \end{enumerate}
-
+      \vspace{0.1cm}
       \begin{examplebox}{``What if we raise price by 5\%?''}
-        {\small
+        {\scriptsize
         \texttt{x\_new = x\_base.copy()}\\
         \texttt{x\_new['price'] *= 1.05}\\
-        \texttt{y\_draws = trace.posterior['beta'].values @ x\_new}\\
+        \texttt{b = trace.posterior['beta'].values}\\
+        \texttt{y\_draws = b @ x\_new}\\
         \texttt{print(f"E[sales]: \{y\_draws.mean():.0f\}")}\\
-        \texttt{print(f"95\% CI: \{np.percentile(y\_draws, [2.5,97.5])\}")}
+        \texttt{print(f"95\% CI: \{np.percentile(y\_draws,[2.5,97.5])\}")}
         }
       \end{examplebox}
     \end{column}
     \begin{column}{0.44\textwidth}
-      \textbf{Group-specific (team / store) models:}
-      \begin{itemize}\small
-        \item Use hierarchical structure from L11 to get
-              \textbf{store-specific} posterior distributions
-        \item Scenario analysis then differs by store:
-              the 5\% price increase has a different effect
-              in high-elasticity vs.\ low-elasticity stores
-        \item Posterior uncertainty quantifies which stores
-              drive the most uncertainty in total revenue
+      \textbf{Group-specific models:}
+      \begin{itemize}\footnotesize
+        \item Hierarchical structure (L11) gives
+              \textbf{store-specific} posteriors
+        \item Scenario effects differ by store:
+              high-elasticity vs.\ low-elasticity
+        \item Posterior uncertainty reveals which
+              stores drive total revenue risk
       \end{itemize}
       \vspace{0.1cm}
       \begin{keybox}
-        \small This is \textbf{decision analysis}:
-        choose the action (price, promotion, budget)
+        \small \textbf{Decision analysis:}
+        choose the action (price, promo, budget)
         that maximizes expected profit given
-        the full posterior distribution over outcomes.
+        the full posterior over outcomes.
       \end{keybox}
     \end{column}
   \end{columns}
@@ -288,10 +263,10 @@
 % --- Slide: Method comparison ------------------------------------------------
 \begin{frame}{Course Method Map}
   \begin{center}
-    {\footnotesize
+    {\scriptsize
     \begin{tabular}{lllll}
       \toprule
-      \textbf{Method} & \textbf{Data type} & \textbf{Uncertainty} & \textbf{Interpretable} & \textbf{Strengths} \\
+      \textbf{Method} & \textbf{Data} & \textbf{Uncertainty} & \textbf{Interpretable} & \textbf{Strengths} \\
       \midrule
       ETS / ARIMA (L01--02) & Univariate TS & CI & High & Fast, automatic \\
       GAM / Prophet (L03) & TS + predictors & Limited & High & Nonlinear + interpretable \\

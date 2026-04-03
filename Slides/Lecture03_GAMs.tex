@@ -115,34 +115,35 @@
 % --- Slide: GAM definition ---------------------------------------------------
 \begin{frame}{What Is a GAM?}
   \begin{definitionbox}{Generalized Additive Model}
+    \vspace{-4pt}
     \[
       y = \alpha + f_1(x_1) + f_2(x_2) + \cdots + f_k(x_k) + \varepsilon
     \]
-    where each $f_j(\cdot)$ is a \textbf{smooth, nonlinear function}
+    \vspace{-6pt}
+    \small where each $f_j(\cdot)$ is a \textbf{smooth, nonlinear function}
     estimated from the data \parencite{Wood2017}.
   \end{definitionbox}
-  \vspace{0.2cm}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{Key properties:}
-      \begin{itemize}
-        \item Each $f_j(\cdot)$ is flexible --- it can be linear, curved,
+      \begin{itemize}\footnotesize
+        \item Each $f_j(\cdot)$ is flexible --- linear, curved,
               U-shaped, or threshold-like
-        \item Model is additive --- effects are \emph{independent}
+        \item Additive --- effects are \emph{independent}
               and easy to visualize
-        \item Each function is estimated to minimize prediction error
+        \item Each function minimizes prediction error
               subject to a smoothness penalty
       \end{itemize}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{examplebox}{Business Application}
-        Modeling retail sales with:
-        \begin{itemize}\small
-          \item $f_1(\text{time})$: long-run trend (nonlinear)
+        \small Modeling retail sales with:
+        \begin{itemize}\footnotesize
+          \item $f_1(\text{time})$: long-run trend
           \item $f_2(\text{month})$: seasonal effect
           \item $f_3(\text{unemployment})$: economic sensitivity
         \end{itemize}
-        Each effect is plotted and interpreted separately.
+        Each effect plotted and interpreted separately.
       \end{examplebox}
     \end{column}
   \end{columns}
@@ -177,9 +178,8 @@
       \end{keybox}
     \end{column}
   \end{columns}
-  \vspace{0.1cm}
-  \textbf{Splines} are the mathematical tool used to represent $f(x)$:
-  piecewise polynomial functions that connect smoothly at \textbf{knot} points.
+  \muted{\footnotesize \textbf{Splines} represent $f(x)$:
+  piecewise polynomials that connect smoothly at \textbf{knot} points.}
 \end{frame}
 
 % =============================================================================
@@ -231,47 +231,36 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{examplebox}{Prophet on Retail Sales}
-        {\small
-        \texttt{from prophet import Prophet}\\[4pt]
-        \texttt{\# Data must have columns 'ds' and 'y'}\\
-        \texttt{df = pd.DataFrame(\{}\\
-        \texttt{  'ds': pd.to\_datetime(dates),}\\
-        \texttt{  'y': sales\_values}\\
-        \texttt{\})}\\[4pt]
-        \texttt{\# Fit the model}\\
+        {\scriptsize
+        \texttt{from prophet import Prophet}\\
+        \texttt{df = pd.DataFrame(\{'ds': dates, 'y': sales\})}\\
         \texttt{m = Prophet(}\\
-        \texttt{  changepoint\_prior\_scale=0.05,}\\
-        \texttt{  yearly\_seasonality=True}\\
-        \texttt{)}\\
-        \texttt{m.fit(df)}\\[4pt]
-        \texttt{\# Forecast 12 months ahead}\\
+        \texttt{\ \ changepoint\_prior\_scale=0.05,}\\
+        \texttt{\ \ yearly\_seasonality=True)}\\
+        \texttt{m.fit(df)}\\
         \texttt{future = m.make\_future\_dataframe(}\\
-        \texttt{  periods=12, freq='M')}\\
-        \texttt{forecast = m.predict(future)}\\[4pt]
-        \texttt{\# Visualize components}\\
+        \texttt{\ \ periods=12, freq='M')}\\
+        \texttt{forecast = m.predict(future)}\\
         \texttt{m.plot\_components(forecast)}
         }
       \end{examplebox}
     \end{column}
     \begin{column}{0.44\textwidth}
-      \textbf{The component plots:}
-      \begin{itemize}\small
-        \item \textbf{Trend:} overall long-run direction with changepoints
+      \textbf{Component plots:}
+      \begin{itemize}\footnotesize
+        \item \textbf{Trend:} long-run direction with changepoints
         \item \textbf{Yearly seasonality:} seasonal wave across months
         \item \textbf{Weekly seasonality:} day-of-week pattern
-              (useful for daily data)
       \end{itemize}
-      \vspace{0.1cm}
-      \textbf{When to use Prophet:}
+      \textbf{When to use:}
       {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
-      \begin{itemize}\small
-        \item Daily, weekly, monthly series with seasonality
-        \item Known holiday or event effects
-        \item When you need interpretable component plots for stakeholders
+      \begin{itemize}\footnotesize
+        \item Daily/weekly/monthly series with seasonality
+        \item Known holiday effects; interpretable plots needed
       \end{itemize}}
       {\setbeamertemplate{itemize item}{\negc{$\times$}}
-      \begin{itemize}\small
-        \item Many correlated external predictors (use pyGAM instead)
+      \begin{itemize}\footnotesize
+        \item Many correlated external predictors (use pyGAM)
       \end{itemize}}
     \end{column}
   \end{columns}
@@ -291,19 +280,14 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{examplebox}{pyGAM Example}
-        {\small
-        \texttt{from pygam import LinearGAM, s, f, l}\\[4pt]
-        \texttt{\# s() = spline (smooth nonlinear)}\\
-        \texttt{\# l() = linear term}\\
-        \texttt{\# f() = factor (categorical)}\\[4pt]
+        {\footnotesize
+        \texttt{from pygam import LinearGAM, s, f, l}\\[2pt]
+        \texttt{\# s()=spline\ \ l()=linear\ \ f()=factor}\\[2pt]
         \texttt{gam = LinearGAM(}\\
-        \texttt{  s(0) + s(1) + s(2) + f(3)}\\
-        \texttt{)}\\
-        \texttt{gam = gam.gridsearch(X, y)}\\[4pt]
-        \texttt{\# Plot partial dependence}\\
+        \texttt{\ \ s(0) + s(1) + s(2) + f(3))}\\
+        \texttt{gam = gam.gridsearch(X, y)}\\[2pt]
         \texttt{pdep, confi = gam.partial\_dependence(}\\
-        \texttt{  term=0, width=0.95)}\\[4pt]
-        \texttt{\# Predict}\\
+        \texttt{\ \ term=0, width=0.95)}\\[2pt]
         \texttt{y\_hat = gam.predict(X\_new)}
         }
       \end{examplebox}

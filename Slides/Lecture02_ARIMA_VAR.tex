@@ -157,24 +157,14 @@
 % --- Slide: ARIMA definition --------------------------------------------------
 \begin{frame}{ARIMA($p$,$d$,$q$)}
   \begin{definitionbox}{ARIMA($p$,$d$,$q$) Model}
-    Apply an ARMA($p$,$q$) to the $d$-times differenced series:
-    \[
-      y_t = c + \sum_{i=1}^{p}\phi_i\,y_{t-i}
-              + \varepsilon_t
-              + \sum_{j=1}^{q}\theta_j\,\varepsilon_{t-j}
-      \quad \text{after differencing $d$ times}
-    \]
+    {\small Apply an ARMA($p$,$q$) to the $d$-times differenced series:
+    $y_t = c + \sum_{i=1}^{p}\phi_i y_{t-i} + \varepsilon_t + \sum_{j=1}^{q}\theta_j\varepsilon_{t-j}$}
   \end{definitionbox}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Parameters:}
+      \textbf{Parameters \& special cases:}
       \begin{itemize}\small
-        \item $p$: AR lags (past values)
-        \item $d$: number of differences needed
-        \item $q$: MA lags (past errors)
-      \end{itemize}
-      \textbf{Key special cases:}
-      \begin{itemize}\small
+        \item $p$: AR lags; $d$: differences; $q$: MA lags
         \item ARIMA(0,1,0): random walk
         \item ARIMA(0,1,1): equivalent to SES
         \item ARIMA(1,0,0): AR(1)
@@ -182,15 +172,12 @@
     \end{column}
     \begin{column}{0.48\textwidth}
       \begin{examplebox}{Numeric Example}
-        ARIMA(1,1,0) with $\hat{\phi}_1=0.5$:\\
-        $y_{100}=120$, $y_{99}=118$\\
-        $\Delta y_{100} = 2$\\[3pt]
-        Forecast:
+        \small ARIMA(1,1,0) with $\hat{\phi}_1=0.5$:\\
+        $y_{100}=120$, $y_{99}=118$, $\Delta y_{100}=2$\\
         $\hat{y}_{101|100} = 120 + 0.5 \times 2 = \mathbf{121}$
       \end{examplebox}
       \begin{keybox}
-        \small
-        \textbf{Python:}
+        \small\textbf{Python:}
         \texttt{pmdarima.auto\_arima()} searches automatically.
         \texttt{statsmodels.SARIMAX} fits any specified model.
       \end{keybox}
@@ -270,7 +257,7 @@
   For two stationary series $y_{1t}$ and $y_{2t}$:
   \[
     \begin{cases}
-      y_{1t} = c_1 + a_{11}\,y_{1,t-1} + a_{12}\,y_{2,t-1} + \varepsilon_{1t}\\[4pt]
+      y_{1t} = c_1 + a_{11}\,y_{1,t-1} + a_{12}\,y_{2,t-1} + \varepsilon_{1t}\\[2pt]
       y_{2t} = c_2 + a_{21}\,y_{1,t-1} + a_{22}\,y_{2,t-1} + \varepsilon_{2t}
     \end{cases}
   \]
@@ -278,26 +265,22 @@
     \begin{column}{0.52\textwidth}
       \textbf{Key ideas:}
       \begin{itemize}\small
-        \item $a_{12}$: how much $y_{2,t-1}$ predicts $y_{1t}$
-              (what univariate AR misses)
-        \item Each equation estimated by OLS (same regressors)
-        \item Order $p$ chosen by BIC
+        \item $a_{12}$: how much $y_{2,t-1}$ predicts $y_{1t}$ (what univariate AR misses)
+        \item Each equation estimated by OLS; order $p$ chosen by BIC
+        \item If $a_{12}=a_{21}=0$: reduces to separate AR models
       \end{itemize}
-      \vspace{0.1cm}
-      \textbf{VAR generalizes:} if $a_{12}=a_{21}=0$, each equation
-      reduces to a separate AR model.
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{warningbox}
-        \textbf{Parameter explosion:}
-        VAR($p$) with $k$ variables has $k^2 p$ coefficients.\\[3pt]
-        $k=5$, $p=4$: \textbf{100 coefficients}!\\[3pt]
+        \small\textbf{Parameter explosion:}
+        VAR($p$) with $k$ variables has $k^2 p$ coefficients.\\[2pt]
+        $k=5$, $p=4$: \textbf{100 coefficients}!\\[2pt]
         Keep $k \leq 4$ unless using LASSO-VAR.
       \end{warningbox}
     \end{column}
   \end{columns}
   \begin{keybox}
-    \textbf{Python:} \texttt{statsmodels.tsa.vector\_ar.var\_model.VAR}\\
+    \small\textbf{Python:} \texttt{statsmodels.tsa.vector\_ar.var\_model.VAR}\\
     Use \texttt{var.fit(maxlags=p, ic=`bic')} for automatic order selection.
   \end{keybox}
 \end{frame}
@@ -323,16 +306,15 @@
     \end{column}
     \begin{column}{0.41\textwidth}
       \begin{warningbox}
-        Granger causality $\neq$ structural causality.
+        \small Granger causality $\neq$ structural causality.
         It tests \emph{predictive content},
         not whether $x_t$ mechanically causes $y_t$.
       \end{warningbox}
     \end{column}
   \end{columns}
   \muted{\footnotesize\itshape
-    Impulse response functions (IRFs) trace how a shock to one variable
-    propagates through the VAR system over time. Useful for understanding
-    the dynamics, not just the forecasts.}
+    Impulse response functions (IRFs) trace how a shock propagates
+    through the VAR system over time.}
 \end{frame}
 
 % --- Slide: ARIMAX -----------------------------------------------------------

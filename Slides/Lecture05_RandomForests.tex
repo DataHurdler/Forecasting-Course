@@ -115,8 +115,7 @@
               all trees where $i$ was NOT in the bootstrap sample
               ($\approx 37\%$ of all trees)
         \item Average those predictions $\to \hat{y}_i^{\text{OOB}}$
-        \item Compute RMSE across all observations:
-              OOB RMSE $\approx$ 5-fold CV RMSE
+        \item Compute RMSE: OOB RMSE $\approx$ 5-fold CV RMSE
       \end{enumerate}
     \end{column}
     \begin{column}{0.44\textwidth}
@@ -125,7 +124,7 @@
         No need to set aside a separate validation set or run CV.
         Use it for tuning hyperparameters.
 
-        \texttt{RandomForestRegressor(oob\_score=True)}
+        {\footnotesize\texttt{RandomForestRegressor(oob\_score=True)}}
       \end{keybox}
     \end{column}
   \end{columns}
@@ -170,7 +169,7 @@
 % --- Slide: RF hyperparameters -----------------------------------------------
 \begin{frame}{Random Forest Hyperparameters}
   \begin{center}
-    {\small
+    {\footnotesize
     \begin{tabular}{p{3.0cm}p{2.8cm}p{1.8cm}p{4.0cm}}
       \toprule
       \textbf{Parameter} & \textbf{sklearn name} & \textbf{Default} & \textbf{Effect} \\
@@ -184,13 +183,12 @@
     \end{tabular}
     }
   \end{center}
-  \vspace{0.2cm}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{Recommended starting point:}
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize
         \item \texttt{n\_estimators=500}, \texttt{max\_features='sqrt'}
-        \item \texttt{min\_samples\_leaf=5} for smooth time series predictions
+        \item \texttt{min\_samples\_leaf=5} for smoother predictions
         \item \texttt{oob\_score=True} to monitor without separate CV
       \end{itemize}
     \end{column}
@@ -214,10 +212,9 @@
 % --- Slide: Feature importance -----------------------------------------------
 \begin{frame}{Random Forest Feature Importance}
   \begin{definitionbox}{Mean Decrease in Impurity (MDI)}
-    For each feature $j$: average the total reduction in node impurity
-    (variance for regression) across all splits on feature $j$,
-    weighted by the fraction of observations in each node.
-    Normalize to sum to 1.
+    \small For each feature $j$: average the total reduction in node impurity
+    across all splits on feature $j$, weighted by the fraction of observations
+    in each node. Normalize to sum to 1.
   \end{definitionbox}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
@@ -241,14 +238,14 @@
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{keybox}
-        RF importance aggregates across \textbf{hundreds of trees}.
-        It is more stable than a single tree's importance.
+        \small RF importance aggregates across \textbf{hundreds of trees}.
+        More stable than a single tree's importance.
       \end{keybox}
       \begin{warningbox}
         \small MDI can be biased toward high-cardinality features.
         Use \textbf{permutation importance}
-        (\texttt{inspection.permutation\_importance}) for a less
-        biased measure on the test set.
+        (\texttt{permutation\_importance}) for a less biased
+        measure on the test set.
       \end{warningbox}
     \end{column}
   \end{columns}
@@ -259,19 +256,16 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{examplebox}{sklearn Code Template}
-        {\small
-        \texttt{from sklearn.ensemble import RandomForestRegressor}\\[4pt]
+        {\scriptsize
+        \texttt{from sklearn.ensemble import RandomForestRegressor}\\
         \texttt{rf = RandomForestRegressor(}\\
         \texttt{    n\_estimators=500,}\\
         \texttt{    max\_features='sqrt',}\\
         \texttt{    min\_samples\_leaf=5,}\\
         \texttt{    oob\_score=True,}\\
-        \texttt{    random\_state=42}\\
-        \texttt{)}\\
-        \texttt{rf.fit(X\_train, y\_train)}\\[4pt]
-        \texttt{\# OOB error (free CV)}\\
-        \texttt{print(rf.oob\_score\_)}\\[4pt]
-        \texttt{\# Feature importance}\\
+        \texttt{    random\_state=42)}\\
+        \texttt{rf.fit(X\_train, y\_train)}\\
+        \texttt{print(rf.oob\_score\_)}\\
         \texttt{importances = rf.feature\_importances\_}
         }
       \end{examplebox}
@@ -279,7 +273,7 @@
     \begin{column}{0.44\textwidth}
       \textbf{Typical performance on RSXFS:}
       \begin{center}
-        {\small
+        {\footnotesize
         \begin{tabular}{ll}
           \toprule
           \textbf{Model} & \textbf{Test RMSE} \\
@@ -291,9 +285,8 @@
         \end{tabular}
         }
       \end{center}
-      \vspace{0.1cm}
-      \muted{\small RF reduces RMSE by $\approx$35--40\% vs.\ a
-      single tree on this dataset.}
+      \muted{\footnotesize RF reduces RMSE by $\approx$35--40\%
+      vs.\ a single tree on this dataset.}
     \end{column}
   \end{columns}
 \end{frame}

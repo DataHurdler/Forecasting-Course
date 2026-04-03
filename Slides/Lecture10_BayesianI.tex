@@ -81,37 +81,33 @@
 % --- Slide: Bayes theorem ----------------------------------------------------
 \begin{frame}{Bayes' Theorem}
   \begin{definitionbox}{Bayes' Theorem}
+    \vspace{-0.3cm}
     \[
       \underbrace{p(\theta \mid \mathcal{D})}_{\text{posterior}} =
       \frac{\overbrace{p(\mathcal{D} \mid \theta)}^{\text{likelihood}} \cdot
             \overbrace{p(\theta)}^{\text{prior}}}
-           {\underbrace{p(\mathcal{D})}_{\text{normalizing constant}}}
+           {\underbrace{p(\mathcal{D})}_{\text{normalizing const.}}}
       \propto p(\mathcal{D} \mid \theta) \cdot p(\theta)
     \]
+    \vspace{-0.3cm}
   \end{definitionbox}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{description}\small
-        \item[\textbf{Prior} $p(\theta)$] What we believe about $\theta$
-              \emph{before} seeing the data. Encoded as a probability distribution.
-        \item[\textbf{Likelihood} $p(\mathcal{D} \mid \theta)$] How probable is
-              the observed data if $\theta$ were the true value?
-        \item[\textbf{Posterior} $p(\theta \mid \mathcal{D})$] Updated belief
-              about $\theta$ after observing data $\mathcal{D}$.
+        \item[\textbf{Prior} $p(\theta)$] Beliefs about $\theta$ before data.
+        \item[\textbf{Likelihood} $p(\mathcal{D} \mid \theta)$] Probability of data given $\theta$.
+        \item[\textbf{Posterior} $p(\theta \mid \mathcal{D})$] Updated belief after observing $\mathcal{D}$.
       \end{description}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{examplebox}{Business Example}
         \small
-        A store wants to estimate the conversion rate $\theta$
-        of a new promotion:
-        \begin{itemize}\small
-          \item \textbf{Prior:} based on past promotions,
-                $\theta \sim \text{Beta}(5, 45)$
-                (roughly 10\% conversion)
-          \item \textbf{Data:} 30 conversions from 200 exposures
-          \item \textbf{Posterior:} updated distribution for $\theta$
-                incorporating both prior and new data
+        Estimating conversion rate $\theta$:
+        \begin{itemize}\footnotesize
+          \item \textbf{Prior:} $\theta \sim \text{Beta}(5, 45)$
+                ($\approx$10\% from past promotions)
+          \item \textbf{Data:} 30 conversions / 200 exposures
+          \item \textbf{Posterior:} updated $\theta$ distribution
         \end{itemize}
       \end{examplebox}
     \end{column}
@@ -131,51 +127,45 @@
   \begin{columns}[T]
     \begin{column}{0.33\textwidth}
       \textbf{Beta distribution:}
-      \[
+      \vspace{-0.2cm}\[
         \theta \sim \text{Beta}(\alpha, \beta)
-      \]
-      \begin{itemize}\small
+      \]\vspace{-0.3cm}
+      \begin{itemize}\footnotesize
         \item Support: $[0, 1]$
-        \item Natural prior for proportions (conversion rate, market share)
+        \item Prior for proportions (conversion rate, market share)
         \item $\text{Beta}(1,1) = \text{Uniform}[0,1]$
-        \item $\alpha, \beta$: effective counts of successes/failures
+        \item $\alpha, \beta$: counts of successes/failures
       \end{itemize}
     \end{column}
     \begin{column}{0.33\textwidth}
       \textbf{Normal distribution:}
-      \[
+      \vspace{-0.2cm}\[
         \theta \sim \mathcal{N}(\mu_0, \sigma_0^2)
-      \]
-      \begin{itemize}\small
+      \]\vspace{-0.3cm}
+      \begin{itemize}\footnotesize
         \item Support: $(-\infty, +\infty)$
-        \item Natural prior for regression coefficients
-        \item Weakly informative: $\mathcal{N}(0, 1)$ after
-              standardizing predictors
-        \item Mathematically convenient: Normal prior + Normal likelihood
-              gives a Normal posterior (closed-form solution)
+        \item Prior for regression coefficients
+        \item Weakly informative: $\mathcal{N}(0, 1)$ after standardizing
+        \item Normal prior + Normal likelihood $\to$ Normal posterior
       \end{itemize}
     \end{column}
     \begin{column}{0.33\textwidth}
       \textbf{Exponential distribution:}
-      \[
+      \vspace{-0.2cm}\[
         \theta \sim \text{Exp}(\lambda)
-      \]
-      \begin{itemize}\small
+      \]\vspace{-0.3cm}
+      \begin{itemize}\footnotesize
         \item Support: $[0, +\infty)$
-        \item Natural prior for positive quantities
-              (variance, arrival rate)
-        \item $\text{HalfNormal}(\sigma)$ also common
-              for standard deviations
+        \item Prior for positive quantities (variance, rate)
+        \item $\text{HalfNormal}(\sigma)$ common for std.\ deviations
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.2cm}
+  \vspace{0.1cm}
   \begin{keybox}
-    A \textbf{weakly informative prior} puts most mass on
-    plausible values but does not dominate the likelihood.
-    Better than a flat prior (which can cause sampling problems)
-    and better than an overly tight prior (which ignores data).
-    \parencite{Gelman2013}
+    \small A \textbf{weakly informative prior} concentrates mass on plausible values
+    without dominating the likelihood --- better than flat priors (sampling problems)
+    or overly tight priors (ignores data). \parencite{Gelman2013}
   \end{keybox}
 \end{frame}
 
@@ -189,44 +179,34 @@
 
 % --- Slide: MCMC intuition ---------------------------------------------------
 \begin{frame}{Markov Chain Monte Carlo (MCMC): The Big Idea}
-  \textbf{Analogy:} Imagine exploring a hilly landscape in the dark.
-  You want to map which areas are highest (most probable).
-  MCMC works by randomly walking around: you spend more time in high areas
-  (high probability) than low areas.
-  After thousands of steps, the places you visited most often trace out
-  the shape of the posterior.
+  \small\textbf{Analogy:} Exploring a hilly landscape in the dark --- you spend more time
+  in high-probability areas. After many steps, visited locations trace the posterior.
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{The problem:} $p(\mathcal{D})$ in Bayes' theorem is
-      usually impossible to compute analytically for real models.
+      usually intractable for real models.
 
-      \vspace{0.2cm}
-      \textbf{MCMC solution:} instead of computing the normalizing constant,
-      draw a \emph{sample} from the posterior:
+      \vspace{0.1cm}
+      \textbf{MCMC solution:} sample from the posterior instead:
       \begin{enumerate}\small
-        \item Start at some initial $\theta^{(0)}$
+        \item Start at initial $\theta^{(0)}$
         \item Propose a new $\theta^*$ nearby
-        \item Accept $\theta^*$ with probability proportional to
-              the posterior ratio: $\min\!\left(1, \frac{p(\theta^*|\mathcal{D})}{p(\theta^{(t)}|\mathcal{D})}\right)$
-        \item After many steps, the chain's distribution
-              converges to $p(\theta \mid \mathcal{D})$
+        \item Accept $\theta^*$ with probability
+              $\min\!\left(1, \frac{p(\theta^*|\mathcal{D})}{p(\theta^{(t)}|\mathcal{D})}\right)$
+        \item After many steps, the chain converges to $p(\theta \mid \mathcal{D})$
       \end{enumerate}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{definitionbox}{Metropolis Sampling}
-        The simplest MCMC algorithm.
-        PyMC uses more efficient samplers
-        (NUTS --- No-U-Turn Sampler) by default,
-        which adapts the step size and exploits
-        gradient information.
+        \small The simplest MCMC algorithm.
+        PyMC uses NUTS (No-U-Turn Sampler) by default ---
+        adapts step size and exploits gradient information.
       \end{definitionbox}
       \vspace{0.1cm}
       \begin{keybox}
         \small The posterior \textbf{samples} are the answer:
-        a histogram of samples gives you the full
-        posterior distribution. From samples, you can compute
-        means, medians, credible intervals, and
-        probabilities of any event.
+        compute means, medians, credible intervals, and
+        event probabilities directly from the sample histogram.
       \end{keybox}
     \end{column}
   \end{columns}
@@ -237,21 +217,18 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{examplebox}{Estimating a Conversion Rate}
-        {\small
-        \texttt{import pymc as pm}\\
-        \texttt{import numpy as np}\\[4pt]
-        \texttt{\# Data: 30 successes out of 200 trials}\\
-        \texttt{n\_trials = 200}\\
-        \texttt{n\_success = 30}\\[4pt]
+        {\footnotesize
+        \texttt{import pymc as pm}\\[2pt]
+        \texttt{\# 30 successes out of 200 trials}\\
+        \texttt{n\_trials, n\_success = 200, 30}\\[2pt]
         \texttt{with pm.Model() as model:}\\
-        \texttt{  \# Prior}\\
-        \texttt{  theta = pm.Beta('theta', alpha=5, beta=45)}\\[4pt]
-        \texttt{  \# Likelihood}\\
+        \texttt{  theta = pm.Beta('theta',}\\
+        \texttt{    alpha=5, beta=45)}\\
         \texttt{  obs = pm.Binomial('obs',}\\
         \texttt{    n=n\_trials, p=theta,}\\
-        \texttt{    observed=n\_success)}\\[4pt]
-        \texttt{  \# Sample from posterior (2000 draws)}\\
-        \texttt{  trace = pm.sample(2000, return\_inferencedata=True)}\\[4pt]
+        \texttt{    observed=n\_success)}\\
+        \texttt{  trace = pm.sample(2000,}\\
+        \texttt{    return\_inferencedata=True)}\\[2pt]
         \texttt{pm.plot\_posterior(trace)}
         }
       \end{examplebox}
@@ -260,17 +237,12 @@
       \textbf{Reading the output:}
       \begin{itemize}\small
         \item \textbf{Posterior mean:} best single estimate of $\theta$
-        \item \textbf{94\% HDI (highest density interval):}
-              the shortest interval containing 94\% of the
-              posterior probability --- the Bayesian analog of a
-              confidence interval
-        \item \textbf{Posterior histogram:} full picture of uncertainty
+        \item \textbf{94\% HDI:} shortest interval with 94\% posterior mass (Bayesian credible interval)
+        \item \textbf{Posterior histogram:} full uncertainty picture
       \end{itemize}
-      \vspace{0.1cm}
       \begin{keybox}
-        \small PyMC models are written \emph{generatively}:
-        define priors, then describe how the data are generated
-        given those priors. The sampler does the rest.
+        \small PyMC models are \emph{generative}: define priors,
+        describe data generation, and the sampler does the rest.
       \end{keybox}
     \end{column}
   \end{columns}

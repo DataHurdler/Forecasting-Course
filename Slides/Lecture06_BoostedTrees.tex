@@ -57,12 +57,12 @@
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.3cm}
+  \vspace{0.1cm}
   \begin{examplebox}{Analogy: Correcting a Forecast Iteratively}
-    Forecast 1: ``Sales will be \$50,000.'' \quad Actual: \$60,000.\\
-    Error: $+$\$10,000.\\[3pt]
+    \small
+    Forecast 1: ``Sales will be \$50,000.'' \quad Actual: \$60,000. \quad Error: $+$\$10,000.\\[2pt]
     Forecast 2: ``The first model was short by \$10,000.''\\
-    Combined prediction: \$50,000 $+$ \$10,000 $=$ \textbf{\$60,000}.\\[3pt]
+    Combined prediction: \$50,000 $+$ \$10,000 $=$ \textbf{\$60,000}.\\[2pt]
     Each stage corrects the remaining error from all previous stages.
   \end{examplebox}
 \end{frame}
@@ -70,37 +70,36 @@
 % --- Slide: Boosting algorithm -----------------------------------------------
 \begin{frame}{The Gradient Boosting Algorithm}
   \begin{definitionbox}{Gradient Boosting (for squared-error loss)}
-    {\small
-    Initialize $F_0(\mathbf{x}) = \bar{y}$. \quad For $b = 1, \ldots, B$:
-    \begin{enumerate}
+    {\footnotesize
+    Initialize $F_0(\mathbf{x}) = \bar{y}$. For $b = 1, \ldots, B$:
+    \begin{enumerate}\itemsep0pt\topsep0pt
       \item Compute residuals: $r_i^{(b)} = y_i - F_{b-1}(\mathbf{x}_i)$
-      \item Fit a shallow tree $T_b$ to the residuals $\{(\mathbf{x}_i, r_i^{(b)})\}$
+      \item Fit a shallow tree $T_b$ to $\{(\mathbf{x}_i, r_i^{(b)})\}$
       \item Update: $F_b = F_{b-1} + \eta\, T_b$
     \end{enumerate}
     Final prediction: $\hat{y} = F_B(\mathbf{x})$
     }
   \end{definitionbox}
+  \vspace{-0.2cm}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{The learning rate $\eta$:}
-      \begin{itemize}\small
-        \item Small $\eta$ (0.01--0.1): each tree makes a tiny step ---
-              requires many trees but more robust
-        \item Large $\eta$ ($> 0.3$): fast but risky --- can overshoot
+      \begin{itemize}\footnotesize\itemsep0pt
+        \item Small $\eta$ (0.01--0.1): tiny step per tree ---
+              requires more trees but more robust
+        \item Large $\eta$ ($> 0.3$): fast but risks overshooting
         \item \textbf{Rule:} smaller $\eta$ + more trees + early stopping
               typically wins
       \end{itemize}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{keybox}
-        Trees are \textbf{shallow} (depth 3--6).
+        \footnotesize Trees are \textbf{shallow} (depth 3--6).
         Each corrects a small fraction of the total error.
-        The ensemble slowly converges to a good prediction.
+        The ensemble slowly converges.\\[2pt]
+        \textbf{Warning:} always use \textbf{early stopping} ---
+        without it, boosting will overfit.
       \end{keybox}
-      \begin{warningbox}
-        \small Always use \textbf{early stopping} on a
-        validation set. Without it, boosting will overfit.
-      \end{warningbox}
     \end{column}
   \end{columns}
 \end{frame}
@@ -152,7 +151,7 @@
 % --- Slide: XGBoost key hyperparameters --------------------------------------
 \begin{frame}{XGBoost: Key Hyperparameters}
   \begin{center}
-    {\small
+    {\footnotesize
     \begin{tabular}{p{2.6cm}p{2.8cm}p{1.8cm}p{4.0cm}}
       \toprule
       \textbf{Parameter} & \textbf{XGB name} & \textbf{Typical} & \textbf{Effect} \\
@@ -180,8 +179,7 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{examplebox}{Code Template}
-        {\small
-        \texttt{import xgboost as xgb}\\[4pt]
+        {\scriptsize
         \texttt{model = xgb.XGBRegressor(}\\
         \texttt{  n\_estimators=1000,}\\
         \texttt{  learning\_rate=0.05,}\\
@@ -189,29 +187,23 @@
         \texttt{  subsample=0.8,}\\
         \texttt{  colsample\_bytree=0.8,}\\
         \texttt{  early\_stopping\_rounds=50,}\\
-        \texttt{  random\_state=42}\\
-        \texttt{)}\\[4pt]
+        \texttt{  random\_state=42)}\\
         \texttt{model.fit(}\\
         \texttt{  X\_train, y\_train,}\\
         \texttt{  eval\_set=[(X\_val, y\_val)],}\\
-        \texttt{  verbose=False}\\
-        \texttt{)}
+        \texttt{  verbose=False)}
         }
       \end{examplebox}
     \end{column}
     \begin{column}{0.44\textwidth}
       \textbf{Cross-validation for time series:}
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize\itemsep0pt
         \item Use \texttt{TimeSeriesSplit} with the sklearn API
-        \item Reserve last 20\% of data as final test set
-        \item Use \texttt{early\_stopping\_rounds=50}:
-              stops training when validation RMSE does not improve
-              for 50 consecutive rounds
+        \item Reserve last 20\% as final test set
+        \item \texttt{early\_stopping\_rounds=50}: stops if val.\ RMSE stalls for 50 rounds
       \end{itemize}
-      \vspace{0.1cm}
-      \muted{\small Typical RSXFS result:\\
-      XGBoost RMSE $\approx$ 1,500--1,700\\
-      (vs.\ RF $\approx$ 1,800)}
+      \muted{\footnotesize Typical RSXFS result:
+      XGBoost RMSE $\approx$ 1,500--1,700 (vs.\ RF $\approx$ 1,800).}
     \end{column}
   \end{columns}
 \end{frame}
@@ -232,7 +224,6 @@
   \]
   This can overfit badly when the number of predictors $k$ is large
   relative to $n$.
-
   \textbf{Regularization idea:} add a penalty on the size of coefficients:
   \[
     \text{minimize } \underbrace{\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}
@@ -254,7 +245,7 @@
       \[
         \lambda \sum_j \beta_j^2
       \]
-      \begin{itemize}\small
+      \begin{itemize}\small\itemsep1pt
         \item Shrinks all coefficients toward zero
         \item Keeps all predictors in the model
         \item Best when many predictors are all
@@ -267,7 +258,7 @@
       \[
         \lambda \sum_j |\beta_j|
       \]
-      \begin{itemize}\small
+      \begin{itemize}\small\itemsep1pt
         \item Sets some coefficients \emph{exactly to zero}
         \item Performs automatic variable selection
         \item Best when only a few predictors matter
@@ -279,7 +270,7 @@
       \[
         \lambda_1 \sum_j |\beta_j| + \lambda_2 \sum_j \beta_j^2
       \]
-      \begin{itemize}\small
+      \begin{itemize}\small\itemsep1pt
         \item Combination of LASSO + Ridge
         \item Groups correlated predictors together
         \item Best with many correlated features
@@ -287,9 +278,8 @@
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.2cm}
   \begin{keybox}
-    In all cases, $\lambda$ is chosen by \textbf{cross-validation}
+    \small In all cases, $\lambda$ is chosen by \textbf{cross-validation}
     (use \texttt{TimeSeriesSplit}).
     Python: \texttt{Ridge}, \texttt{Lasso}, \texttt{ElasticNet}
     in \texttt{sklearn.linear\_model}.

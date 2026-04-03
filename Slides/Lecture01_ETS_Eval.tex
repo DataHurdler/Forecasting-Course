@@ -98,7 +98,6 @@
       \end{examplebox}
     \end{column}
   \end{columns}
-  \vspace{0.1cm}
   \begin{keybox}
     \small Under squared error loss, the optimal forecast is the
     \textbf{conditional expectation}:
@@ -110,12 +109,10 @@
 % --- Slide: Time series components -------------------------------------------
 \begin{frame}{Components of a Time Series}
   Any time series can be decomposed (additive form):
-  \[
-    y_t = T_t + S_t + C_t + I_t
-  \]
+  $y_t = T_t + S_t + C_t + I_t$
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \begin{itemize}
+      \begin{itemize}\small
         \item \key{$T_t$: Trend} --- long-run direction
         \item \key{$S_t$: Seasonality} --- regular calendar-driven pattern
         \item \key{$C_t$: Cycle} --- medium-run business cycle swings
@@ -124,19 +121,18 @@
     \end{column}
     \begin{column}{0.48\textwidth}
       \begin{examplebox}{Which Components Matter?}
-        \begin{itemize}
-          \item \textbf{Retail sales:} strong trend + seasonality
+        \begin{itemize}\small
+          \item \textbf{Retail sales:} trend + seasonality
           \item \textbf{Quarterly GDP:} trend + cycle
-          \item \textbf{Daily stock returns:} mostly irregular
-          \item \textbf{Energy demand:} all four components
+          \item \textbf{Daily stocks:} mostly irregular
+          \item \textbf{Energy demand:} all four
         \end{itemize}
       \end{examplebox}
     \end{column}
   \end{columns}
-  \vspace{0.2cm}
   \begin{warningbox}
-    \textbf{Ignoring seasonality causes large, systematic errors.}
-    A non-seasonal model applied to monthly retail data will
+    \small\textbf{Ignoring seasonality causes large, systematic errors.}
+    A non-seasonal model on monthly retail data will
     consistently under-forecast in December and over-forecast in January.
   \end{warningbox}
 \end{frame}
@@ -187,15 +183,14 @@
   Most classical methods treat every historical observation equally ---
   but what if the world \textbf{changes}?
   \begin{examplebox}{Business Context}
-    A retailer's sales pattern shifts after a store renovation.
-    A method that treats pre-renovation data equally will take months to adapt,
-    systematically over- or under-forecasting throughout.
+    \small A retailer's sales pattern shifts after a store renovation.
+    Equal-weighting pre-renovation data leads to months of systematic
+    over- or under-forecasting.
   \end{examplebox}
-  \vspace{0.2cm}
-  \textbf{Exponential weighting idea:} assign geometrically declining weights
-  to past observations so that \emph{recent} observations matter more.
+  \textbf{Exponential weighting:} assign geometrically declining weights
+  so that \emph{recent} observations matter more.
   \begin{center}
-    \begin{tabular}{lcc}
+    {\small\begin{tabular}{lcc}
       \toprule
       Observation & Age & Weight \\
       \midrule
@@ -203,10 +198,10 @@
       $y_{T-1}$ & 1 & $\alpha(1-\alpha)$ \\
       $y_{T-2}$ & 2 & $\alpha(1-\alpha)^2$ \\
       \bottomrule
-    \end{tabular}
+    \end{tabular}}
   \end{center}
-  \muted{\small Parameter $\alpha \in (0,1]$ controls how fast old data is
-  \textbf{forgotten}. High $\alpha$ = short memory; low $\alpha$ = long memory.}
+  \muted{\small Parameter $\alpha \in (0,1]$ controls forgetting rate.
+  High $\alpha$ = short memory; low $\alpha$ = long memory.}
 \end{frame}
 
 % --- Slide: SES ---------------------------------------------------------------
@@ -222,7 +217,7 @@
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textbf{Large $\alpha$ (e.g.\ 0.8):}
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize
         \item Reacts quickly to shocks
         \item Noisy, volatile forecasts
         \item Good for rapidly changing series
@@ -230,16 +225,15 @@
     \end{column}
     \begin{column}{0.48\textwidth}
       \textbf{Small $\alpha$ (e.g.\ 0.1):}
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize
         \item Slow to adapt
         \item Smooth, stable forecasts
         \item Good for slowly evolving series
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.2cm}
   \begin{keybox}
-    Special cases: $\alpha = 1$ $\Rightarrow$ na\"{i}ve forecast.
+    \small Special cases: $\alpha = 1$ $\Rightarrow$ na\"{i}ve forecast.
     $\alpha \to 0$ $\Rightarrow$ historical mean.
     SES \textbf{nests} both benchmarks.
   \end{keybox}
@@ -248,36 +242,31 @@
 
 % --- Slide: Holt ---------------------------------------------------------------
 \begin{frame}{Holt's Method: Adding Trend}
-  SES produces a \emph{flat} forecast. If the series has a trend, we need
-  to track both level and slope.
+  SES produces a \emph{flat} forecast. If the series has a trend, track both level and slope.
   \begin{definitionbox}{Holt's Linear Exponential Smoothing \parencite{Holt2004}}
     {\small
-    \textbf{Level:} $\;\ell_t = \alpha\, y_t + (1-\alpha)\,(\ell_{t-1} + b_{t-1})$\\[3pt]
-    \textbf{Trend:} $\;b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}$\\[3pt]
+    \textbf{Level:} $\;\ell_t = \alpha\, y_t + (1-\alpha)\,(\ell_{t-1} + b_{t-1})$\\[2pt]
+    \textbf{Trend:} $\;b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}$\\[2pt]
     \textbf{Forecast:} $\hat{y}_{T+h|T} = \ell_T + h\,b_T$
     }
   \end{definitionbox}
-  \vspace{0.1cm}
   \begin{columns}[T]
     \begin{column}{0.50\textwidth}
       \begin{warningbox}
-        \textbf{Linear extrapolation can be unrealistic for long horizons.}
-        Trends rarely continue forever.
+        \small\textbf{Linear extrapolation can be unrealistic for long horizons.}
         Use the \textbf{damped trend} variant for $h > 6$:
         $\hat{y}_{T+h|T} = \ell_T + \sum_{j=1}^{h}\phi^j b_T$,
-        where $0 < \phi < 1$ causes the trend to taper off.
+        where $0 < \phi < 1$ tapers the trend.
       \end{warningbox}
     \end{column}
     \begin{column}{0.46\textwidth}
       \begin{examplebox}{Interpretation}
-        $\ell_t$: where the series \emph{is} now\\
+        \small$\ell_t$: where the series \emph{is} now\\
         $b_t$: the current growth rate\\
-        $\phi$: how fast the trend fades
-        \medskip
-
-        \textbf{$\phi = 0.85$}: the long-run
-        forecast converges to a finite ceiling
-        rather than growing forever.
+        $\phi$: how fast the trend fades\\[2pt]
+        \textbf{$\phi = 0.85$}: forecast converges
+        to a finite ceiling rather than
+        growing forever.
       \end{examplebox}
     \end{column}
   \end{columns}
@@ -285,12 +274,11 @@
 
 % --- Slide: Holt-Winters -------------------------------------------------------
 \begin{frame}{Holt-Winters: Level, Trend, and Seasonality}
-  For series with \emph{both} trend and seasonality, add a third component.
   \begin{definitionbox}{Holt-Winters Additive Method \parencite{Winters1960}}
-    {\small
-    $\ell_t = \alpha(y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})$\\[2pt]
-    $b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}$\\[2pt]
-    $s_t = \gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma)\,s_{t-m}$\\[2pt]
+    {\footnotesize
+    $\ell_t = \alpha(y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})$\\[1pt]
+    $b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}$\\[1pt]
+    $s_t = \gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma)\,s_{t-m}$\\[1pt]
     \textbf{Forecast:} $\hat{y}_{T+h|T} = \ell_T + h\,b_T + s_{T+h-m}$
     \quad ($m$ = seasonal period)
     }
@@ -300,18 +288,18 @@
       \textbf{Additive vs.\ Multiplicative:}
       \begin{itemize}\small
         \item \textbf{Additive:} seasonal swings are constant in size
-        \item \textbf{Multiplicative:} seasonal swings grow with the level
+        \item \textbf{Multiplicative:} swings grow with the level
               (use for retail sales, tourism)
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
       \begin{examplebox}{US Retail Sales}
-        The December holiday spike grows each year
+        \small The December holiday spike grows each year
         as overall sales grow $\Rightarrow$
         \textbf{multiplicative seasonality}.
       \end{examplebox}
-      \muted{\small Requires $\geq 2m$ obs. to initialize;
-      $m=12$ for monthly data.}
+      \muted{\footnotesize Requires $\geq 2m$ obs.\ to initialize
+      ($m=12$ for monthly).}
     \end{column}
   \end{columns}
 \end{frame}

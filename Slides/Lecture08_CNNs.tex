@@ -63,51 +63,44 @@
       \end{keybox}
     \end{column}
   \end{columns}
-  \vspace{0.2cm}
+  \vspace{0.1cm}
   \begin{examplebox}{Analogy: Scanning a document}
-    A human reader does not memorize a font separately for each position
-    on the page. They learn to recognize the letter ``A'' once, then
-    apply that recognition wherever it appears. Convolutional filters
-    do exactly this.
+    \small A human reader does not memorize a font separately for each position
+    on the page. They recognize the letter ``A'' once and apply it everywhere.
+    Convolutional filters do exactly this.
   \end{examplebox}
 \end{frame}
 
 % --- Slide: How convolution works --------------------------------------------
 \begin{frame}{How a Convolutional Layer Works}
-  Imagine sliding a small magnifying glass along a sequence.
-  At each position, the glass examines a short window of values and
-  computes a single number indicating how strongly a pattern is present.
-  This is exactly what a convolutional filter does.
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \textbf{1D convolution (for sequences):}
       \[
         (f * g)[t] = \sum_{k=0}^{K-1} f[k] \cdot g[t - k]
       \]
-      Slide a filter of length $K$ across the sequence,
-      computing a dot product (a weighted sum) at each position.
+      {\small Slide a filter of length $K$ across the sequence,
+      computing a dot product at each position.}
 
-      \vspace{0.2cm}
+      \vspace{0.02cm}
       \textbf{Key parameters:}
-      \begin{description}\small
-        \item[Kernel size] Length of the filter ($K$). Larger = wider receptive field.
-        \item[Stride] Steps between positions. Stride 2 halves the output length.
-        \item[Padding] Add zeros at edges to keep output the same length
-              (\texttt{padding='same'}).
-        \item[Filters] Number of different filters to learn (output channels).
+      \begin{description}\footnotesize\itemsep0pt
+        \item[Kernel size] Length $K$. Larger = wider receptive field.
+        \item[Stride] Steps between positions. Stride 2 halves output.
+        \item[Padding] Zeros at edges (\texttt{padding='same'}).
+        \item[Filters] Number of filters to learn (output channels).
       \end{description}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{definitionbox}{What does a filter detect?}
-        Each filter learns to detect a specific \textbf{local pattern}
+        \small Each filter learns to detect a specific \textbf{local pattern}
         (e.g., edges, spikes, seasonal dips).
-        The output of a filter is called a \textbf{feature map}:
+        The output is a \textbf{feature map}:
         high values indicate where the pattern was found.
       \end{definitionbox}
-      \vspace{0.1cm}
       \begin{keybox}
-        \small After the convolution, apply an activation (ReLU) and
-        then \textbf{pooling} to reduce the feature map size.
+        \small After convolution, apply ReLU then
+        \textbf{pooling} to reduce feature map size.
       \end{keybox}
     \end{column}
   \end{columns}
@@ -181,31 +174,28 @@
     \begin{column}{0.50\textwidth}
       \textbf{LeNet-5 \parencite{LeCun1998}:}
       \begin{itemize}\small
-        \item First practical CNN (1998)
-        \item 2 conv layers + 3 FC layers; ~60K parameters
-        \item Input: $32 \times 32$ grayscale; Output: 10 digit classes
-        \item Proved that learned filters beat hand-crafted features
+        \item First practical CNN (1998); $\sim$60K parameters
+        \item 2 conv + 3 FC layers; $32\times32$ grayscale input
+        \item Proved learned filters beat hand-crafted features
       \end{itemize}
       \vspace{0.1cm}
       \textbf{VGG-16/19 \parencite{Simonyan2015}:}
       \begin{itemize}\small
-        \item 16--19 layers, all using $3 \times 3$ kernels
-        \item Key insight: stack multiple $3\times3$ filters instead of
-              one large filter --- same receptive field, fewer parameters
-        \item 138M parameters; very deep but simple pattern
-        \item Still a strong baseline for transfer learning
+        \item 16--19 layers, all $3 \times 3$ kernels
+        \item Stack multiple $3\times3$ filters instead of one large
+              filter: same receptive field, fewer parameters
+        \item 138M parameters; strong transfer learning baseline
       \end{itemize}
     \end{column}
     \begin{column}{0.46\textwidth}
       \begin{keybox}
-        \textbf{The $3\times3$ rule:}
-        Two $3\times3$ conv layers have the same receptive field
-        as one $5\times5$ layer, but use
-        $2 \times (3^2) = 18$ vs.\ $5^2 = 25$ parameters per channel.
-        Three $3\times3$ layers match a $7\times7$ layer
-        at 27 vs.\ 49 parameters.
+        \small \textbf{The $3\times3$ rule:}
+        Two $3\times3$ layers = same field as one $5\times5$,
+        but $2\times9=18$ vs.\ $25$ params per channel.
+        Three $3\times3$ layers match $7\times7$
+        at 27 vs.\ 49 params.
 
-        Stack small filters, go deep.
+        \textbf{Stack small filters, go deep.}
       \end{keybox}
     \end{column}
   \end{columns}
@@ -217,35 +207,35 @@
     \begin{column}{0.50\textwidth}
       \textbf{GoogLeNet / Inception \parencite{Szegedy2015}:}
       \begin{itemize}\small
-        \item Inception module: apply $1\times1$, $3\times3$, $5\times5$
-              filters \textbf{in parallel}, then concatenate outputs
-        \item $1\times1$ convolutions reduce channel depth before expensive
-              large-kernel operations (bottleneck)
-        \item 22 layers deep; only 5M parameters vs.\ VGG's 138M
+        \item Inception module: $1\times1$, $3\times3$, $5\times5$
+              filters \textbf{in parallel}, outputs concatenated
+        \item $1\times1$ convolutions reduce channel depth (bottleneck)
+        \item 22 layers; only 5M params vs.\ VGG's 138M
       \end{itemize}
       \vspace{0.1cm}
       \textbf{ResNet \parencite{He2016}:}
       \begin{itemize}\small
         \item \textbf{Residual connections:}
               $\mathbf{a}^{(\ell+2)} = \mathcal{F}(\mathbf{a}^{(\ell)}) + \mathbf{a}^{(\ell)}$
-        \item Gradient flows directly through the skip connection ---
-              solves the vanishing gradient problem in very deep nets
-        \item Enables 50, 101, 152-layer networks that still train stably
+        \item Gradient flows through the skip connection ---
+              solves vanishing gradients in deep nets
+        \item Enables 50, 101, 152-layer stable training
       \end{itemize}
     \end{column}
     \begin{column}{0.46\textwidth}
       \begin{definitionbox}{Residual (Skip) Connection}
         \[
-          \mathbf{a}^{(\ell+2)} = \underbrace{\mathcal{F}(\mathbf{a}^{(\ell)})}_{\text{learned residual}} + \underbrace{\mathbf{a}^{(\ell)}}_{\text{identity}}
+          \mathbf{a}^{(\ell+2)} = \underbrace{\mathcal{F}(\mathbf{a}^{(\ell)})}_{\text{residual}} + \underbrace{\mathbf{a}^{(\ell)}}_{\text{identity}}
         \]
-        If the layer learns nothing useful, it can set
-        $\mathcal{F} \approx 0$ and pass the input unchanged.
-        The network only needs to learn the \emph{residual}.
+        \small If the layer learns nothing useful, set
+        $\mathcal{F} \approx 0$ and pass input unchanged.
+        The network learns only the \emph{residual}.
       \end{definitionbox}
+      \vspace{0.05cm}
       \begin{keybox}
-        \small ResNet skip connections are now standard
-        across deep learning: Transformers, U-Nets, and
-        most modern architectures include them.
+        \small Skip connections are now standard:
+        Transformers, U-Nets, and most modern
+        architectures include them.
       \end{keybox}
     \end{column}
   \end{columns}
@@ -265,18 +255,18 @@
     \begin{column}{0.52\textwidth}
       A \textbf{1D CNN} applies filters along the \emph{time} dimension:
       \begin{itemize}\small
-        \item Each filter learns to detect a local temporal pattern
-              (a spike, a dip, a ramp-up over $K$ consecutive steps)
-        \item Multiple filters in parallel learn different patterns
-        \item Stacking layers increases the effective look-back window:
-              2 layers of kernel size 5 see 9 time steps in total
+        \item Each filter detects a local temporal pattern
+              (spike, dip, ramp over $K$ steps)
+        \item Multiple parallel filters learn different patterns
+        \item Stacking layers widens the look-back:
+              2 layers of kernel size 5 see 9 steps total
       \end{itemize}
-      \vspace{0.2cm}
-      \textbf{Compared to lag features + XGBoost:}
+      \vspace{0.15cm}
+      \textbf{vs.\ lag features + XGBoost:}
       \begin{itemize}\small
         \item No manual feature engineering needed
         \item Patterns are learned, not hand-coded
-        \item But: needs more data to learn effectively
+        \item Tradeoff: needs more data to learn effectively
       \end{itemize}
     \end{column}
     \begin{column}{0.44\textwidth}
@@ -289,17 +279,17 @@
         \texttt{  padding=2}\\
         \texttt{)}
         }
-        \vspace{0.1cm}
+        \vspace{0.05cm}
         {\footnotesize
-        \textbf{Input shape:} \texttt{(batch, channels, seq\_len)}\\
-        A univariate series: \texttt{in\_channels=1}\\
-        Multiple features: \texttt{in\_channels=p}
+        \textbf{Input:} \texttt{(batch, channels, seq\_len)}\\
+        Univariate: \texttt{in\_channels=1};
+        multivariate: \texttt{in\_channels=p}
         }
       \end{examplebox}
       \begin{keybox}
         \small 1D CNNs are fast to train and
-        often competitive with LSTMs on
-        shorter sequences (< 500 time steps).
+        competitive with LSTMs on
+        shorter sequences ($<$500 steps).
       \end{keybox}
     \end{column}
   \end{columns}
@@ -310,10 +300,9 @@
   \begin{columns}[T]
     \begin{column}{0.55\textwidth}
       \begin{examplebox}{CNN Regressor for Time Series}
-        {\small
+        {\tiny
         \texttt{class CNNForecaster(nn.Module):}\\
         \texttt{  def \_\_init\_\_(self, seq\_len, n\_feat):}\\
-        \texttt{    super().\_\_init\_\_()}\\
         \texttt{    self.conv = nn.Sequential(}\\
         \texttt{      nn.Conv1d(n\_feat, 32, kernel\_size=5, padding=2),}\\
         \texttt{      nn.ReLU(),}\\
@@ -321,25 +310,22 @@
         \texttt{      nn.ReLU(),}\\
         \texttt{      nn.AdaptiveAvgPool1d(1)}\\
         \texttt{    )}\\
-        \texttt{    self.fc = nn.Linear(64, 1)}\\[4pt]
+        \texttt{    self.fc = nn.Linear(64, 1)}\\[0pt]
         \texttt{  def forward(self, x):}\\
-        \texttt{    \# x shape: (batch, n\_feat, seq\_len)}\\
-        \texttt{    h = self.conv(x).squeeze(-1)}\\
-        \texttt{    return self.fc(h).squeeze(-1)}
+        \texttt{    return self.fc(self.conv(x).squeeze(-1)).squeeze(-1)}
         }
       \end{examplebox}
     \end{column}
     \begin{column}{0.41\textwidth}
       \textbf{Architecture walkthrough:}
-      \begin{enumerate}\small
-        \item \texttt{Conv1d(n\_feat, 32, 5)}: 32 filters of width 5 applied to all features
+      \begin{enumerate}\footnotesize\itemsep0pt
+        \item \texttt{Conv1d(n\_feat, 32, 5)}: 32 filters, width 5
         \item \texttt{ReLU}: non-linearity
-        \item \texttt{Conv1d(32, 64, 3)}: 64 filters of width 3 applied to 32 feature maps
-        \item \texttt{AdaptiveAvgPool1d(1)}: collapse to one value per channel (global average)
-        \item \texttt{Linear(64, 1)}: single forecast output
+        \item \texttt{Conv1d(32, 64, 3)}: 64 filters, width 3
+        \item \texttt{AdaptiveAvgPool1d(1)}: global avg pool
+        \item \texttt{Linear(64, 1)}: forecast output
       \end{enumerate}
-      \vspace{0.1cm}
-      \muted{\small Typical RSXFS result: 1D CNN RMSE $\approx$ 1,600--1,800 with proper windowing.}
+      \muted{\footnotesize Typical RSXFS result: 1D CNN RMSE $\approx$ 1,600--1,800.}
     \end{column}
   \end{columns}
 \end{frame}

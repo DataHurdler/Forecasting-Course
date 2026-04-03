@@ -37,45 +37,39 @@
 
 % --- Slide: Linear model limitation ------------------------------------------
 \begin{frame}{The Limits of Linear Models}
-  Lectures 1--3 used models of the form
-  $\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots$ ---
-  a \textbf{constant slope} for every value of $x$.
   \begin{columns}[T]
     \begin{column}{0.50\textwidth}
       \textbf{Problems with linear models:}
-      \begin{itemize}
-        \item \textbf{No interactions:} the effect of advertising on sales
-              may be larger during holiday season ---
-              a linear model cannot capture this
-        \item \textbf{No threshold effects:} consumer spending may be flat
+      \begin{itemize}\small
+        \item \textbf{No interactions:} the holiday-season advertising effect
+              cannot be captured by a constant slope
+        \item \textbf{No threshold effects:} spending may be flat
               until unemployment drops below 5\%, then jump
-        \item \textbf{Symmetric predictions:} extreme values drive
+        \item \textbf{Symmetric predictions:} extreme values distort
               coefficients in both directions equally
       \end{itemize}
     \end{column}
     \begin{column}{0.46\textwidth}
       \begin{examplebox}{Retail Sales Example}
-        Monthly sales depend on:
-        \begin{itemize}\small
+        \small Monthly sales depend on:
+        \begin{itemize}\footnotesize
           \item Last year's same-month sales (trend)
           \item Whether it's December (seasonality)
-          \item Unemployment rate (economic conditions)
+          \item Unemployment rate (conditions)
         \end{itemize}
-        \medskip
-        The December effect is much \emph{larger} when the economy
-        is strong. This is an interaction that linear models miss.
+        The December effect is \emph{larger} in a strong economy ---
+        an interaction linear models miss.
       \end{examplebox}
     \end{column}
   \end{columns}
   \begin{keybox}
-    Decision trees and ensemble methods capture nonlinear relationships
-    and interactions \textbf{automatically}, without needing to specify them.
+    \small Decision trees capture nonlinear relationships and interactions
+    \textbf{automatically}, without needing to specify them.
   \end{keybox}
 \end{frame}
 
 % --- Slide: Bias-variance tradeoff overview ----------------------------------
 \begin{frame}{The Bias--Variance Tradeoff}
-  Every forecasting model faces a fundamental tension:
   \begin{definitionbox}{Bias--Variance Decomposition}
     \[
       \text{Expected MSE} = \underbrace{\text{Bias}^2}_{\text{systematic error}}
@@ -103,10 +97,9 @@
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.2cm}
   \begin{keybox}
-    \textbf{Goal:} find the right complexity level that balances bias and variance.
-    This is why we always evaluate \emph{out-of-sample}.
+    \textbf{Goal:} find the right complexity that balances bias and variance ---
+    always evaluate \emph{out-of-sample}.
   \end{keybox}
 \end{frame}
 
@@ -150,16 +143,15 @@
     \end{column}
     \begin{column}{0.46\textwidth}
       \textbf{Key properties:}
-      \begin{itemize}\small
+      \begin{itemize}\footnotesize
         \item \textbf{Non-parametric} --- no functional form assumed
-        \item \textbf{Nonlinear} --- can capture threshold effects
+        \item \textbf{Nonlinear} --- captures threshold effects
         \item \textbf{Interpretable} --- decision path is readable
-        \item \textbf{Handles mixed features} --- lags, rolling stats,
-              dummies all treated equally
-        \item \textbf{Scale-invariant} --- no need to standardize
+        \item \textbf{Mixed features} --- lags, rolling stats, dummies
+        \item \textbf{Scale-invariant} --- no standardization needed
       \end{itemize}
       \begin{warningbox}
-        A single \emph{deep} tree \textbf{overfits severely}.
+        \small A single \emph{deep} tree \textbf{overfits severely}.
         Ensembles (Random Forests, XGBoost) fix this.
       \end{warningbox}
     \end{column}
@@ -262,20 +254,16 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{examplebox}{sklearn Code Template}
-        {\small
+        {\footnotesize
         \texttt{from sklearn.tree import DecisionTreeRegressor}\\
-        \texttt{from sklearn.model\_selection import TimeSeriesSplit}\\[4pt]
-        \texttt{\# Build features}\\
+        \texttt{from sklearn.model\_selection import TimeSeriesSplit}\\[2pt]
         \texttt{X = make\_lag\_features(df, lags=[1,2,3,12])}\\
-        \texttt{y = df['sales']}\\[4pt]
-        \texttt{\# Fit a tree}\\
+        \texttt{y = df['sales']}\\[2pt]
         \texttt{tree = DecisionTreeRegressor(}\\
-        \texttt{  max\_depth=5,}\\
-        \texttt{  min\_samples\_leaf=10,}\\
-        \texttt{  random\_state=42}\\
-        \texttt{)}\\
-        \texttt{tree.fit(X\_train, y\_train)}\\[4pt]
-        \texttt{\# Predict}\\
+        \texttt{\ \ max\_depth=5,}\\
+        \texttt{\ \ min\_samples\_leaf=10,}\\
+        \texttt{\ \ random\_state=42)}\\
+        \texttt{tree.fit(X\_train, y\_train)}\\[2pt]
         \texttt{y\_hat = tree.predict(X\_test)}
         }
       \end{examplebox}
@@ -296,7 +284,6 @@
         \end{tabular}
         }
       \end{center}
-      \vspace{0.2cm}
       \begin{warningbox}
         \small Always use \texttt{TimeSeriesSplit}
         for cross-validation.
@@ -336,15 +323,13 @@
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{keybox}
-        Feature importance tells you \textbf{which variables the tree
-        found most useful} for splitting. This is a quick way to
+        \small Feature importance tells you \textbf{which variables the
+        tree found most useful} for splitting --- a quick way to
         screen which predictors matter most.
       \end{keybox}
       \begin{warningbox}
-        \small Feature importance can be biased toward
-        high-cardinality (many-valued) features.
-        SHAP values give more reliable individual-level
-        attributions for important decisions.
+        \small Can be biased toward high-cardinality features.
+        SHAP values give more reliable individual-level attributions.
       \end{warningbox}
     \end{column}
   \end{columns}
@@ -398,29 +383,24 @@
         \item Handles missing values well
         \item Fast to train
       \end{itemize}}
-      \vspace{0.2cm}
       \textbf{Weaknesses:}
       {\setbeamertemplate{itemize item}{\negc{$\times$}}
-      \begin{itemize}
+      \begin{itemize}\small
         \item High variance --- small data changes $\Rightarrow$ very different tree
         \item Flat predictions within each leaf
         \item Cannot extrapolate beyond training range
-        \item Sensitive to outliers (a single outlier can dominate a leaf)
+        \item Sensitive to outliers in a leaf
       \end{itemize}}
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{keybox}
-        \textbf{The ensemble solution:}
-        Instead of trusting one tree, average many trees trained on
-        different bootstrap samples of the data.
-
-        This reduces variance dramatically while keeping the
-        interpretability benefits of individual trees at the feature
-        importance level.
+        \small\textbf{The ensemble solution:}
+        Average many trees trained on different bootstrap samples.
+        This reduces variance dramatically while retaining
+        feature-importance interpretability.
       \end{keybox}
-      \vspace{0.1cm}
-      \muted{\small On standard benchmarks, Random Forests
-      improve over single trees by 20--40\% in RMSE.}
+      \muted{\small Random Forests improve over single trees
+      by 20--40\% in RMSE on standard benchmarks.}
     \end{column}
   \end{columns}
 \end{frame}
