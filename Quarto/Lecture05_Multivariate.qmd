@@ -5,7 +5,7 @@ author: "Department of Economics"
 institute: "University of Nebraska at Omaha"
 format:
   revealjs:
-    theme: [default, emory-clean.scss]
+    theme: [default, uno-clean.scss]
     slide-number: true
     show-slide-number: all
     transition: fade

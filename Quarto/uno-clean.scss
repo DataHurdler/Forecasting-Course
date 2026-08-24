@@ -2,15 +2,28 @@
 
 // ==============================================================================
 // UNO COLOR PALETTE
-// University of Nebraska at Omaha — BSAD 8310: Business Forecasting
-// Matches Beamer Preambles/header.tex exactly
+// University of Nebraska at Omaha — ECON 8310: Business Forecasting
+// Matches Beamer Preambles/header.tex exactly.
+//
+// UNO's official colors are crimson (PMS 186 / #D71920) and black. Everything
+// structural draws from those two. Warnings deliberately use amber, not
+// crimson, so that alarm stays distinguishable from the brand color.
 // ==============================================================================
 
-$primary-blue:   #005CA9;   // unoblue  — headings, structure, keybox
-$primary-red:    #E41C38;   // unored   — frame rule, warnings, subitem bullets
-$primary-gray:   #525252;   // unogray  — muted text, subtitles
-$uno-green:      #15803d;   // unogreen — examples, positive annotations
-$light-bg:       #E8F0FA;   // unolightblue — section slide backgrounds
+$uno-crimson:    #D71920;   // unocrimson — primary brand: headings, rules, keybox
+$uno-black:      #1A1A1A;   // unoblack   — secondary brand: titles, body text
+$primary-gray:   #525252;   // unogray    — muted text, subtitles
+$uno-amber:      #B45309;   // unoamber   — warnings
+$uno-green:      #15803d;   // unogreen   — examples, positive annotations
+
+// Data-visualization only — NOT brand chrome. Kept so charts and diagrams have
+// distinguishable series.
+$data-blue:      #005CA9;
+
+// Backward-compatible aliases for rules further down this file.
+$primary-blue:   $uno-crimson;
+$primary-red:    $uno-crimson;
+$light-bg:       #FDECEA;   // unolightblue — section slide backgrounds
 
 // Semantic mapping
 $jet:    #1a1a1a;
@@ -281,24 +294,21 @@ $selection-bg: $light-bg !default;
 // BOX ENVIRONMENTS — UNO-branded, matching Beamer tcolorbox definitions
 // ==============================================================================
 
-// keybox: solid unoblue with white text — matches Beamer keybox exactly
+// keybox: pale crimson tint + crimson left rule — matches Beamer keybox
 .keybox {
-  background-color: $primary-blue;
-  color: white;
+  background-color: #FDECEA;
+  color: $uno-black;
+  border-left: 3px solid $uno-crimson;
   padding: 0.8em 1.2em;
   margin: 1.2em 0;
-  border-radius: 6px;
+  border-radius: 4px;
   line-height: 1.6;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-  // Force white text on all children (math, spans, etc.)
-  p, li, span, .math { color: white !important; }
 }
 
-// definitionbox: unolightblue bg, unoblue left rule — matches Beamer definitionbox
+// definitionbox: neutral dark left rule on gray tint — matches Beamer definitionbox
 .definitionbox {
-  background-color: #E8F0FA;
-  border-left: 3px solid $primary-blue;
+  background-color: #F4F4F5;
+  border-left: 3px solid $uno-black;
   padding: 0.8em 1.2em;
   margin: 1.0em 0;
   border-radius: 4px;
@@ -306,16 +316,16 @@ $selection-bg: $light-bg !default;
 
   .definitionbox-title {
     font-weight: 700;
-    color: $primary-blue;
+    color: $uno-black;
     margin-bottom: 0.4em;
     font-size: 1em;
   }
 }
 
-// warningbox: unolightred bg, unored left rule — matches Beamer warningbox
+// warningbox: amber left rule on amber tint — matches Beamer warningbox
 .warningbox {
-  background-color: #FDECEA;
-  border-left: 3px solid $primary-red;
+  background-color: #FEF3E2;
+  border-left: 3px solid $uno-amber;
   padding: 0.8em 1.2em;
   margin: 1.0em 0;
   border-radius: 4px;

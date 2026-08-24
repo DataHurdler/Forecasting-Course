@@ -190,3 +190,37 @@ The key insight: each enforces independence differently — role tension, depend
 [LEARN:scheduling] `CronCreate` is session-only in practice — it dies with the REPL (hit 2026-04-16 via a rate-limit termination). Work that must survive session death uses **Routines** (cloud-side). CronCreate is fine for short polling inside a live session, not "run this in an hour".
 
 [LEARN:hooks] PreCompact hooks can BLOCK (modern protocol), which is how `pre-compact.py` can hold compaction while a plan is still DRAFT. Any such block must be opt-in, must fire at most once, and must fail open — a guard that can wedge a session is worse than the context it saves.
+
+## Slide Design (ECON 8310 house style)
+
+[LEARN:design] House style is **single column by default**. Two columns only when the
+side-by-side IS the pedagogical point (bagging vs boosting, Ridge vs LASSO, strengths vs
+weaknesses). Two columns create two containers and each gets filled with a box, which is
+the mechanism that produced 76% two-column / 98% boxed slides course-wide.
+
+[LEARN:design] Box budget: at most ONE box per slide, target ~55-60% of content slides
+boxed so plain slides exist for the box to contrast against. Reserve each type for one
+job -- definitionbox = formal definitions, examplebox = worked examples and code,
+warningbox = genuine pitfalls, keybox = key results and the terminal takeaways. Transitions,
+forward pointers, and motivational framing go in **prose**, not a box.
+
+[LEARN:latex] Beamer `\setbeamercolor{frametitle}{fg=...}` must be a DARK color whenever the
+custom `\setbeamertemplate{frametitle}` draws no background bar. The original header paired
+`fg=white` with a bar-less template, rendering every frame title invisible on white.
+
+[LEARN:latex] tcolorbox `coltitle` must differ from `colbacktitle`. `colbacktitle` defaults to
+`colframe`, so `colframe=X, coltitle=X` renders the box title invisible. Set
+`colbacktitle` to the body tint and `coltitle` to the accent color.
+
+[LEARN:latex] hyperref's `linkcolor` beats both `\setbeamercolor{...}` and `\color{...}`
+for anything Beamer wraps in an internal link. This bites in two places: `\tableofcontents`
+entries (setting `\setbeamercolor{section in toc}` has NO effect) and the footline's
+`\insertshorttitle`. Control TOC/cross-ref color via `\hypersetup{linkcolor=...}` globally;
+for a one-off override wrap it, e.g.
+`\begingroup\hypersetup{linkcolor=white}\color{white}\insertshorttitle\endgroup`.
+Keep `linkcolor` neutral (black) and reserve the brand color for `urlcolor`.
+
+[LEARN:design] UNO's official colors are **crimson #D71920 and black** -- not blue. The
+`unoblue` #005CA9 in the original header was inherited from the template's source
+institution (the theme file was still named `emory-clean.scss`). Crimson is the brand
+color and carries no alarm meaning, so `warningbox` uses **amber #B45309** instead.
