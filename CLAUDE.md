@@ -71,27 +71,69 @@ python scripts/LectureNN_lab.py
 
 ## Skills Quick Reference
 
+The full workflow ships in `.claude/` (60 skills, 18 agents, 8 hooks, 30 rules), inherited
+from the [claude-code-my-workflow](https://github.com/pedrohcgs/claude-code-my-workflow)
+template at v2.5.1. The ones that matter most for this course:
+
+**Slides and lectures**
+
 | Command | What It Does |
 |---------|-------------|
 | `/compile-latex [file]` | 3-pass XeLaTeX + bibtex |
 | `/deploy [LectureNN_Title]` | Render Quarto + sync to docs/ |
+| `/create-lecture` | Full lecture creation workflow |
+| `/translate-to-quarto [file]` | Beamer → Quarto translation |
+| `/qa-quarto [LectureN]` | Adversarial Quarto vs Beamer QA |
 | `/extract-tikz [LectureN]` | TikZ → PDF → SVG |
-| `/proofread [file]` | Grammar/typo/overflow review |
+| `/new-diagram` | Author a new TikZ diagram |
+| `/slide-excellence [file]` | Combined multi-agent review |
 | `/visual-audit [file]` | Slide layout audit |
 | `/pedagogy-review [file]` | Narrative, notation, pacing review |
-| `/review-r [file]` | R code quality review (R scripts only) |
-| `/qa-quarto [LectureN]` | Adversarial Quarto vs Beamer QA |
-| `/slide-excellence [file]` | Combined multi-agent review |
-| `/translate-to-quarto [file]` | Beamer → Quarto translation |
-| `/validate-bib` | Cross-reference citations |
+| `/proofread [file]` | Grammar/typo/overflow review |
 | `/devils-advocate` | Challenge slide design |
-| `/create-lecture` | Full lecture creation workflow |
-| `/commit [msg]` | Stage, commit, PR, merge |
+| `/validate-bib` | Cross-reference citations |
+
+**Teaching**
+
+| Command | What It Does |
+|---------|-------------|
+| `/syllabus` | Draft or revise the syllabus |
+| `/scaffold-exercises` | Generate problem sets / homework scaffolding |
+| `/teach-from-paper [file]` | Turn a paper into teaching material |
+
+**Analysis and code**
+
+| Command | What It Does |
+|---------|-------------|
+| `/data-analysis [dataset]` | End-to-end Python analysis (statsmodels/sklearn) |
+| `/review-r [file]` | R code quality review (R scripts only) |
+| `/capture-environment` | Record the runtime environment |
+| `/diagnose` | Debug a failing build or script |
+
+**Research**
+
+| Command | What It Does |
+|---------|-------------|
 | `/lit-review [topic]` | Literature search + synthesis |
 | `/research-ideation [topic]` | Research questions + strategies |
 | `/interview-me [topic]` | Interactive research interview |
 | `/review-paper [file]` | Manuscript review |
-| `/data-analysis [dataset]` | End-to-end Python analysis (statsmodels/sklearn) |
+
+**Session and repo**
+
+| Command | What It Does |
+|---------|-------------|
+| `/commit [msg]` | Stage, commit, PR, merge |
+| `/checkpoint` | Save a session checkpoint |
+| `/context-status` | Report context usage |
+| `/compress-session` | Compress the session log |
+| `/learn` | Record a [LEARN] entry to MEMORY.md |
+| `/verify-claims` | Check stated claims against reality |
+| `/deep-audit` | Full repo audit |
+
+Run `ls .claude/skills` for the complete list. Gate scripts live in `scripts/`
+(`check-*.py`); `scripts/backtest.sh` runs them all, though several are
+template-maintenance gates that this course repo does not satisfy.
 
 ---
 

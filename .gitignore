@@ -1,0 +1,76 @@
+# ==============================================================================
+# .gitignore for Academic Claude Code Projects
+# ==============================================================================
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.synctex.gz
+*.run.xml
+*-blx.bib
+
+# Compiled PDFs (uncomment to track specific PDFs)
+# *.pdf
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Rdata
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Claude Code local files (not shared across machines)
+.claude/settings.local.json
+.claude/state/
+CLAUDE.local.md
+
+# IDE
+# .vscode/settings.json ships in the template (carries shipped Claude Code permission-mode
+# recommendations — see TROUBLESHOOTING.md "Permissions / bypass / statusline" for the typo
+# fix forkers need). Other .vscode/ content is developer-machine-specific.
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Quarto rendering artifacts
+.quarto/
+
+# quality_reports/ — KEPT IN VERSION CONTROL for this repo.
+# Upstream excludes these because a *template* should not ship project-internal
+# content. This is a real course project: plans, specs, session logs, and merge
+# reports are part of the record and stay tracked.
+
+# R analysis outputs (generated artifacts; keep scripts, ignore outputs)
+scripts/R/_outputs/
+
+# Output artifacts — uncomment lines below based on your preference
+# *.rds
+# output/**/*.rds
+
+# Quarto render artifacts beside their .qmd sources (regenerable; quality_score
+# renders them during gating). Published HTML lives in docs/, never here.
+# Quarto/*.html is TRACKED here (docs/ is synced from it by scripts/sync_to_docs.sh)
+Quarto/*_files/
+
+# stray 0-byte file from a shell redirect typo
+null
