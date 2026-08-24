@@ -66,5 +66,62 @@
     \field{journaltitle}{Machine Learning}
     \field{year}{2001}
   \endentry
+
+  \entry{Chen2016}{inproceedings}{}{}
+    \name{author}{2}{}{%
+      {{hash=CT}{%
+         family={Chen},
+         familyi={C\bibinitperiod},
+         given={Tianqi},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=GC}{%
+         family={Guestrin},
+         familyi={G\bibinitperiod},
+         given={Carlos},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{CTGC1}
+    \strng{fullhash}{CTGC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2016}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{booktitle}{Proceedings of the 22nd ACM SIGKDD International
+  Conference on Knowledge Discovery and Data Mining}
+    \field{pages}{785\bibrangedash 794}
+    \field{title}{{XGBoost}: A Scalable Tree Boosting System}
+    \field{year}{2016}
+  \endentry
+
+  \entry{Molnar2022}{book}{}{}
+    \name{author}{1}{}{%
+      {{hash=MC}{%
+         family={Molnar},
+         familyi={M\bibinitperiod},
+         given={Christoph},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{MC1}
+    \strng{fullhash}{MC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{edition}{2nd}
+    \field{note}{Open access}
+    \field{title}{Interpretable Machine Learning: A Guide for Making Black Box
+  Models Explainable}
+    \verb{url}
+    \verb https://christophm.github.io/interpretable-ml-book/
+    \endverb
+    \field{year}{2022}
+  \endentry
 \enddatalist
 \endinput

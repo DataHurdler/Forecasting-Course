@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2025)
+This is BibTeX, Version 0.99e (TeX Live 2026)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Lecture04_DecisionTrees.aux
 The style file: biblatex.bst
@@ -22,44 +22,44 @@ Database file #2: ../Bibliography_base.bib
 Biblatex version: 3.21
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 1 entry,
+You've used 4 entries,
             6402 wiz_defined-function locations,
-            1203 strings with 9044 characters,
-and the built_in function-call counts, 1534 in all, are:
-= -- 73
-> -- 70
-< -- 1
-+ -- 49
-- -- 28
-* -- 32
-:= -- 370
+            1227 strings with 9626 characters,
+and the built_in function-call counts, 31455 in all, are:
+= -- 2646
+> -- 399
+< -- 111
++ -- 930
+- -- 139
+* -- 2205
+:= -- 3845
 add.period$ -- 0
-call.type$ -- 1
-change.case$ -- 0
+call.type$ -- 4
+change.case$ -- 69
 chr.to.int$ -- 42
-cite$ -- 0
-duplicate$ -- 11
-empty$ -- 104
-format.name$ -- 0
-if$ -- 325
+cite$ -- 6
+duplicate$ -- 3137
+empty$ -- 2694
+format.name$ -- 222
+if$ -- 6302
 int.to.chr$ -- 0
-int.to.str$ -- 0
+int.to.str$ -- 10
 missing$ -- 0
-newline$ -- 20
-num.names$ -- 0
-pop$ -- 47
+newline$ -- 146
+num.names$ -- 170
+pop$ -- 1202
 preamble$ -- 1
-purify$ -- 0
+purify$ -- 89
 quote$ -- 0
-skip$ -- 78
+skip$ -- 672
 stack$ -- 0
-substring$ -- 154
-swap$ -- 1
-text.length$ -- 20
-text.prefix$ -- 0
+substring$ -- 5023
+swap$ -- 540
+text.length$ -- 102
+text.prefix$ -- 3
 top$ -- 1
-type$ -- 22
+type$ -- 124
 warning$ -- 0
-while$ -- 64
+while$ -- 478
 width$ -- 0
-write$ -- 20
+write$ -- 143

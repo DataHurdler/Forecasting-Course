@@ -1,5 +1,5 @@
 % =============================================================================
-% Lecture 06: Boosted Trees & Regularization
+% Lecture 06: Regularization & Model Selection
 % BSAD 8310: Business Forecasting
 % University of Nebraska at Omaha
 % =============================================================================
@@ -9,7 +9,7 @@
 \input{header}
 
 % ---- Lecture metadata --------------------------------------------------------
-\title{Boosted Trees \& Regularization}
+\title{Regularization \& Model Selection}
 \subtitle{BSAD 8310: Business Forecasting --- Lecture 6}
 \author{Department of Economics}
 \institute{University of Nebraska at Omaha}
@@ -28,262 +28,323 @@
 \end{frame}
 
 % =============================================================================
-\section{Gradient Boosting}
+\section{The Problem: Too Many Predictors}
 % =============================================================================
 
-\sectionslide{Gradient Boosting}{%
-  Instead of averaging independent trees, fit each new tree to the errors
-  of all previous trees.}
-
-% --- Slide: Boosting vs. bagging ---------------------------------------------
-\begin{frame}{Boosting vs.\ Bagging: The Core Difference}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Bagging (Random Forest):}
-      \begin{itemize}\small
-        \item Trees built \textbf{in parallel}, independently
-        \item Each tree tries to predict $y$ directly
-        \item Average reduces variance
-        \item Adding more trees does not reduce bias
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{Boosting:}
-      \begin{itemize}\small
-        \item Trees built \textbf{sequentially}
-        \item Each tree fits the \emph{errors} of the previous ensemble
-        \item Adding more trees reduces both bias AND variance (carefully)
-        \item Risk: can overfit if trees are too deep or too many
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \vspace{0.1cm}
-  \begin{examplebox}{Analogy: Correcting a Forecast Iteratively}
-    \small
-    Forecast 1: ``Sales will be \$50,000.'' \quad Actual: \$60,000. \quad Error: $+$\$10,000.\\[2pt]
-    Forecast 2: ``The first model was short by \$10,000.''\\
-    Combined prediction: \$50,000 $+$ \$10,000 $=$ \textbf{\$60,000}.\\[2pt]
-    Each stage corrects the remaining error from all previous stages.
-  \end{examplebox}
-\end{frame}
-
-% --- Slide: Boosting algorithm -----------------------------------------------
-\begin{frame}{The Gradient Boosting Algorithm}
-  \begin{definitionbox}{Gradient Boosting (for squared-error loss)}
-    {\footnotesize
-    Initialize $F_0(\mathbf{x}) = \bar{y}$. For $b = 1, \ldots, B$:
-    \begin{enumerate}\itemsep0pt\topsep0pt
-      \item Compute residuals: $r_i^{(b)} = y_i - F_{b-1}(\mathbf{x}_i)$
-      \item Fit a shallow tree $T_b$ to $\{(\mathbf{x}_i, r_i^{(b)})\}$
-      \item Update: $F_b = F_{b-1} + \eta\, T_b$
-    \end{enumerate}
-    Final prediction: $\hat{y} = F_B(\mathbf{x})$
-    }
-  \end{definitionbox}
-  \vspace{-0.2cm}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{The learning rate $\eta$:}
-      \begin{itemize}\footnotesize\itemsep0pt
-        \item Small $\eta$ (0.01--0.1): tiny step per tree ---
-              requires more trees but more robust
-        \item Large $\eta$ ($> 0.3$): fast but risks overshooting
-        \item \textbf{Rule:} smaller $\eta$ + more trees + early stopping
-              typically wins
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \footnotesize Trees are \textbf{shallow} (depth 3--6).
-        Each corrects a small fraction of the total error.
-        The ensemble slowly converges.\\[2pt]
-        \textbf{Warning:} always use \textbf{early stopping} ---
-        without it, boosting will overfit.
-      \end{keybox}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-% =============================================================================
-\section{XGBoost}
-% =============================================================================
-
-\sectionslide{XGBoost}{%
-  Three improvements over vanilla boosting: second-order optimization,
-  explicit regularization, and column subsampling.}
-
-% --- Slide: XGBoost innovations -----------------------------------------------
-\begin{frame}{XGBoost: Three Advances \parencite{Chen2016}}
-  \begin{columns}[T]
-    \begin{column}{0.56\textwidth}
-      \begin{enumerate}
-        \item \textbf{Newton step (2nd-order optimization):}
-              Uses the gradient \emph{and} curvature (Hessian)
-              of the loss function to compute more precise tree-fitting directions.
-              Converges faster than first-order boosting.
-
-        \item \textbf{Explicit regularization:}
-              Penalizes the number of leaves ($\gamma$) and the magnitude
-              of leaf weights ($\lambda$) directly in the objective.
-              Guards against overfitting without relying on early stopping alone.
-
-        \item \textbf{Column subsampling:}
-              Like Random Forests, randomly samples features per tree and per split.
-              Reduces correlation and improves generalization.
-      \end{enumerate}
-    \end{column}
-    \begin{column}{0.40\textwidth}
-      \begin{keybox}
-        XGBoost dominated Kaggle competitions from 2014--2018.
-        It consistently outperforms vanilla gradient boosting
-        on tabular data.
-      \end{keybox}
-      \vspace{0.2cm}
-      \textbf{Other popular options:}
-      \begin{itemize}\small
-        \item \texttt{LightGBM} --- faster on large datasets
-        \item \texttt{CatBoost} --- handles categorical features natively
-      \end{itemize}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-% --- Slide: XGBoost key hyperparameters --------------------------------------
-\begin{frame}{XGBoost: Key Hyperparameters}
-  \begin{center}
-    {\footnotesize
-    \begin{tabular}{p{2.6cm}p{2.8cm}p{1.8cm}p{4.0cm}}
-      \toprule
-      \textbf{Parameter} & \textbf{XGB name} & \textbf{Typical} & \textbf{Effect} \\
-      \midrule
-      Number of trees & \texttt{n\_estimators} & 500--2000 & More + small $\eta$ = better (use early stopping) \\
-      Learning rate & \texttt{learning\_rate} & 0.01--0.1 & Smaller = more robust; needs more trees \\
-      Tree depth & \texttt{max\_depth} & 3--6 & Shallow preferred; depth $>$6 risks overfit \\
-      Row subsample & \texttt{subsample} & 0.7--0.9 & Fraction of training rows per tree \\
-      Col.\ subsample & \texttt{colsample\_bytree} & 0.7--0.9 & Feature fraction per tree (like RF) \\
-      L2 leaf penalty & \texttt{reg\_lambda} & 1 & Ridge on leaf weights; stabilizes \\
-      \bottomrule
-    \end{tabular}
-    }
-  \end{center}
-  \begin{keybox}
-    \small \textbf{Practical starting point:}
-    \texttt{learning\_rate=0.05}, \texttt{max\_depth=4},
-    \texttt{n\_estimators=1000} with early stopping on validation RMSE.
-    Tune \texttt{max\_depth} and \texttt{subsample} via \texttt{TimeSeriesSplit}.
-  \end{keybox}
-\end{frame}
-
-% --- Slide: XGBoost Python ---------------------------------------------------
-\begin{frame}{XGBoost in Python}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{examplebox}{Code Template}
-        {\scriptsize
-        \texttt{model = xgb.XGBRegressor(}\\
-        \texttt{  n\_estimators=1000,}\\
-        \texttt{  learning\_rate=0.05,}\\
-        \texttt{  max\_depth=4,}\\
-        \texttt{  subsample=0.8,}\\
-        \texttt{  colsample\_bytree=0.8,}\\
-        \texttt{  early\_stopping\_rounds=50,}\\
-        \texttt{  random\_state=42)}\\
-        \texttt{model.fit(}\\
-        \texttt{  X\_train, y\_train,}\\
-        \texttt{  eval\_set=[(X\_val, y\_val)],}\\
-        \texttt{  verbose=False)}
-        }
-      \end{examplebox}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \textbf{Cross-validation for time series:}
-      \begin{itemize}\footnotesize\itemsep0pt
-        \item Use \texttt{TimeSeriesSplit} with the sklearn API
-        \item Reserve last 20\% as final test set
-        \item \texttt{early\_stopping\_rounds=50}: stops if val.\ RMSE stalls for 50 rounds
-      \end{itemize}
-      \muted{\footnotesize Typical RSXFS result:
-      XGBoost RMSE $\approx$ 1,500--1,700 (vs.\ RF $\approx$ 1,800).}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-% =============================================================================
-\section{Regularization for Linear Models}
-% =============================================================================
-
-\sectionslide{Regularization for Linear Models}{%
-  When you have many predictors, penalize the size of coefficients
-  to prevent overfitting.}
+\sectionslide{The Problem: Too Many Predictors}{%
+  Feature engineering gives us more predictors than we can safely estimate.
+  Something has to decide which ones survive.}
 
 % --- Slide: Why regularize ---------------------------------------------------
 \begin{frame}{Why Regularize?}
-  Ordinary least squares (OLS) minimizes:
-  \[
-    \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2
-  \]
-  This can overfit badly when the number of predictors $k$ is large
-  relative to $n$.
-  \textbf{Regularization idea:} add a penalty on the size of coefficients:
-  \[
-    \text{minimize } \underbrace{\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}
-  \]
-  $\lambda > 0$ controls the strength of the penalty.
-  \begin{keybox}
-    The penalty \textbf{shrinks} coefficients toward zero,
-    reducing variance at the cost of a small increase in bias.
-    With the right $\lambda$ (tuned by cross-validation), the
-    net effect is a more accurate out-of-sample forecast.
-  \end{keybox}
+  OLS minimizes $\sum_{i}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2$.
+  A weekly model with lags, calendar dummies, promotions, and macro series can
+  easily carry $k = 60$ predictors on $n = 150$ observations --- OLS will fit
+  that sample beautifully and forecast badly.
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{What goes wrong:}
+      \begin{itemize}\small\itemsep0pt
+        \item Variance of $\hat{\boldsymbol{\beta}}$ grows with $k$
+        \item Correlated predictors give unstable, wildly large
+              coefficients with opposing signs
+        \item When $k > n$ there is no unique solution at all
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        \small \textbf{Regularization:} add a penalty on coefficient size,
+        \[
+          \underbrace{\textstyle\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}}
+          + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}
+        \]
+        Accept a little bias to buy a large reduction in variance.
+      \end{keybox}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-% --- Slide: Ridge, LASSO, Elastic Net ----------------------------------------
-\begin{frame}{Ridge, LASSO, and Elastic Net}
+% --- Slide: Subset selection -------------------------------------------------
+\begin{frame}{Subset Selection: The Classical Answer}
+  Before shrinkage, the standard approach was to \emph{count} predictors
+  rather than shrink them \parencite{Guyon2003}.
   \begin{columns}[T]
-    \begin{column}{0.33\textwidth}
-      \textbf{Ridge ($\ell_2$):}
-      \[
-        \lambda \sum_j \beta_j^2
-      \]
-      \begin{itemize}\small\itemsep1pt
-        \item Shrinks all coefficients toward zero
-        \item Keeps all predictors in the model
-        \item Best when many predictors are all
-              somewhat relevant
-        \parencite{HoerlKennard1970}
+    \begin{column}{0.50\textwidth}
+      \textbf{Best subset:}
+      \begin{itemize}\footnotesize\itemsep0pt
+        \item Fit all $2^k$ models, pick the best
+        \item Exact --- hopeless past $k \approx 30$
+      \end{itemize}
+      \vspace{0.1cm}
+      \textbf{Stepwise:}
+      \begin{itemize}\footnotesize\itemsep0pt
+        \item Forward: add the best predictor, repeat
+        \item Backward: start full, drop the weakest, repeat
+        \item Greedy --- can miss the best combination
       \end{itemize}
     \end{column}
-    \begin{column}{0.33\textwidth}
-      \textbf{LASSO ($\ell_1$):}
-      \[
-        \lambda \sum_j |\beta_j|
-      \]
-      \begin{itemize}\small\itemsep1pt
-        \item Sets some coefficients \emph{exactly to zero}
-        \item Performs automatic variable selection
-        \item Best when only a few predictors matter
-        \parencite{Tibshirani1996}
+    \begin{column}{0.46\textwidth}
+      \textbf{Chosen by:} adjusted $R^2$, AIC, AICc, BIC, or CV.
+      \vspace{0.1cm}
+      \begin{warningbox}
+        \footnotesize Subset selection is \textbf{discrete} --- in or out.
+        Small data changes flip predictors in and out, so the selected
+        model is itself high-variance.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+  \muted{\footnotesize This is the approach in \emph{FPP} \S7.5. Shrinkage
+  replaces the in-or-out decision with a continuous dial --- more stable,
+  and easier to tune.}
+\end{frame}
+
+% =============================================================================
+\section{Shrinkage Methods}
+% =============================================================================
+
+\sectionslide{Shrinkage Methods}{%
+  Keep every predictor, but pull its coefficient toward zero.}
+
+% --- Slide: Ridge ------------------------------------------------------------
+\begin{frame}{Ridge Regression ($\ell_2$)}
+  \begin{definitionbox}{Ridge \parencite{HoerlKennard1970}}
+    \[
+      \hat{\boldsymbol{\beta}}^{\text{ridge}}
+      = \arg\min_{\boldsymbol{\beta}} \;
+        \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2
+        \; + \; \lambda \sum_{j=1}^{k} \beta_j^2
+    \]
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Behavior:}
+      \begin{itemize}\small\itemsep0pt
+        \item Shrinks all coefficients, none exactly to zero
+        \item $\lambda = 0$ is OLS; $\lambda \to \infty$ sends all
+              $\beta_j \to 0$
+        \item Handles correlated predictors gracefully --- splits the
+              coefficient between them
       \end{itemize}
     \end{column}
-    \begin{column}{0.33\textwidth}
-      \textbf{Elastic Net:}
-      \[
-        \lambda_1 \sum_j |\beta_j| + \lambda_2 \sum_j \beta_j^2
-      \]
-      \begin{itemize}\small\itemsep1pt
-        \item Combination of LASSO + Ridge
-        \item Groups correlated predictors together
-        \item Best with many correlated features
-        \parencite{ZouHastie2005}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        \small \textbf{Use when} you believe most predictors carry
+        a little signal and you want to keep them all.
+      \end{keybox}
+      \vspace{0.1cm}
+      \begin{warningbox}
+        \footnotesize \textbf{Standardize first.} The penalty is not
+        scale-invariant --- dollars and thousands of dollars are penalized
+        differently.
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: LASSO ------------------------------------------------------------
+\begin{frame}{LASSO ($\ell_1$)}
+  \begin{definitionbox}{LASSO \parencite{Tibshirani1996}}
+    \[
+      \hat{\boldsymbol{\beta}}^{\text{lasso}}
+      = \arg\min_{\boldsymbol{\beta}} \;
+        \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2
+        \; + \; \lambda \sum_{j=1}^{k} |\beta_j|
+    \]
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Behavior:}
+      \begin{itemize}\small\itemsep0pt
+        \item Sets some coefficients \textbf{exactly} to zero
+        \item Selection and estimation in one step
+        \item Yields a sparse, readable model --- valuable when you
+              must explain the forecast
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        \small \textbf{Use when} you believe only a handful of predictors
+        genuinely matter and you want the model to tell you which.
+      \end{keybox}
+      \vspace{0.1cm}
+      \begin{warningbox}
+        \footnotesize Among correlated predictors LASSO keeps \emph{one}
+        arbitrarily and zeros the rest. Do not read the survivor as
+        ``the important one.''
+      \end{warningbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Why LASSO zeros out ----------------------------------------------
+\begin{frame}{Why LASSO Zeros Out and Ridge Does Not}
+  Both solve ``minimize squared error subject to a budget on coefficient size.''
+  The shape of the budget is what differs.
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Ridge:} budget $\sum_j \beta_j^2 \le t$ --- a \textbf{circle}.
+      \begin{itemize}\small\itemsep0pt
+        \item Smooth boundary with no corners
+        \item The contours of the squared-error surface almost never
+              touch it on an axis
+        \item So coefficients get small, but not zero
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{LASSO:} budget $\sum_j |\beta_j| \le t$ --- a \textbf{diamond}.
+      \begin{itemize}\small\itemsep0pt
+        \item Corners sit exactly on the axes
+        \item Contours are very likely to first touch a corner
+        \item Touching a corner means $\beta_j = 0$ for that predictor
       \end{itemize}
     \end{column}
   \end{columns}
   \begin{keybox}
-    \small In all cases, $\lambda$ is chosen by \textbf{cross-validation}
-    (use \texttt{TimeSeriesSplit}).
-    Python: \texttt{Ridge}, \texttt{Lasso}, \texttt{ElasticNet}
-    in \texttt{sklearn.linear\_model}.
+    \small The sparsity of LASSO is a geometric accident of the $\ell_1$ ball
+    having corners --- not a statistical test of significance. A zeroed
+    coefficient means ``not worth its budget here,'' not ``proven irrelevant.''
+    See \textcite{James2021} \S6.2 for the full picture.
   \end{keybox}
+\end{frame}
+
+% --- Slide: Elastic Net ------------------------------------------------------
+\begin{frame}{Elastic Net: Both Penalties at Once}
+  \begin{definitionbox}{Elastic Net \parencite{ZouHastie2005}}
+    \[
+      \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2
+      \; + \; \lambda \left[ \alpha \sum_j |\beta_j|
+      + (1-\alpha) \sum_j \beta_j^2 \right]
+    \]
+    $\lambda$ sets the total penalty; $\alpha \in [0,1]$ sets the mix
+    ($\alpha=1$ is LASSO, $\alpha=0$ is Ridge).
+  \end{definitionbox}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Why the mix helps:}
+      \begin{itemize}\small\itemsep0pt
+        \item Keeps LASSO's ability to zero out predictors
+        \item Adds Ridge's \textbf{grouping effect}: correlated predictors
+              enter or leave together rather than one arbitrarily surviving
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        \small \textbf{Forecasting default.} Lagged predictors are correlated
+        almost by construction --- $y_{t-1}$ and $y_{t-2}$ move together.
+        Elastic Net is usually the safer starting point over pure LASSO.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Choosing the Penalty}
+% =============================================================================
+
+\sectionslide{Choosing the Penalty}{%
+  $\lambda$ is not estimated from the model. It is tuned --- and how you
+  tune it decides whether the model generalizes.}
+
+% --- Slide: Regularization path ----------------------------------------------
+\begin{frame}{The Regularization Path}
+  Fit the model across a grid of $\lambda$ values and trace each coefficient.
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Reading the path, left to right:}
+      \begin{itemize}\small\itemsep0pt
+        \item At small $\lambda$: coefficients near their OLS values, model
+              is dense and unstable
+        \item As $\lambda$ grows: coefficients shrink; under LASSO they drop
+              to zero one by one
+        \item At large $\lambda$: only the most robust predictors survive
+        \item At $\lambda \to \infty$: intercept-only, the mean forecast
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{keybox}
+        \small The \textbf{order} in which predictors leave is informative:
+        the last survivors are the ones that hold up under the most pressure.
+        Report this ordering --- it is far more stable than a single
+        model's coefficient table.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: Choosing lambda --------------------------------------------------
+\begin{frame}{Choosing $\lambda$ by Cross-Validation}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Procedure:}
+      \begin{enumerate}\small\itemsep0pt
+        \item Define a grid of $\lambda$, usually log-spaced
+        \item For each $\lambda$, run walk-forward CV and record mean
+              validation RMSE
+        \item Pick the $\lambda$ minimizing CV error
+        \item Refit on all training data at that $\lambda$
+      \end{enumerate}
+      \vspace{0.1cm}
+      \textbf{The one-standard-error rule:} choose the largest $\lambda$
+      whose CV error is within one standard error of the minimum ---
+      a simpler model at essentially the same accuracy.
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{warningbox}
+        \small \textbf{Never use \texttt{KFold} here.} Random folds put future
+        observations in the training set and past ones in validation. The CV
+        error will look excellent and the forecast will fail
+        \parencite{Bergmeir2018}.
+      \end{warningbox}
+      \vspace{0.1cm}
+      \begin{keybox}
+        \small Use \texttt{TimeSeriesSplit}, exactly as in Lecture 1's
+        walk-forward evaluation.
+      \end{keybox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{In Practice}
+% =============================================================================
+
+\sectionslide{In Practice}{%
+  Standardize, tune on a time-aware split, and read the path.}
+
+% --- Slide: Python -----------------------------------------------------------
+\begin{frame}{Regularization in Python}
+  \begin{columns}[T]
+    \begin{column}{0.54\textwidth}
+      \begin{examplebox}{Code Template}
+        {\scriptsize
+        \texttt{from sklearn.linear\_model import ElasticNetCV}\\
+        \texttt{from sklearn.pipeline import make\_pipeline}\\
+        \texttt{from sklearn.preprocessing import StandardScaler}\\
+        \texttt{from sklearn.model\_selection import TimeSeriesSplit}\\[2pt]
+        \texttt{model = make\_pipeline(}\\
+        \texttt{  StandardScaler(),}\\
+        \texttt{  ElasticNetCV(}\\
+        \texttt{    l1\_ratio=[.1, .5, .7, .9, .95, 1],}\\
+        \texttt{    cv=TimeSeriesSplit(n\_splits=5),}\\
+        \texttt{    random\_state=42))}\\[2pt]
+        \texttt{model.fit(X\_train, y\_train)}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \textbf{Notes:}
+      \begin{itemize}\footnotesize\itemsep0pt
+        \item \texttt{make\_pipeline} keeps scaling \emph{inside} each CV
+              fold --- scaling on the full sample leaks information
+        \item \texttt{l1\_ratio} is $\alpha$: the Ridge/LASSO mix
+        \item \texttt{...CV} variants tune $\lambda$; plain
+              \texttt{Ridge}/\texttt{Lasso} take it fixed
+        \item \texttt{lasso\_path()} returns the full path
+      \end{itemize}
+      \muted{\footnotesize \texttt{sklearn} calls the penalty
+      \texttt{alpha}, not \texttt{lambda}.}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 % =============================================================================
@@ -291,61 +352,61 @@
 % =============================================================================
 
 \sectionslide{Key Takeaways and Roadmap}{%
-  Tree-Based Methods: a complete toolkit for nonlinear forecasting.}
+  Shrinkage is the linear-model counterpart to what trees do by pruning.}
 
-% --- Slide: Method comparison ------------------------------------------------
-\begin{frame}{Tree-Based Methods: Comparison}
+% --- Slide: Which method when -------------------------------------------------
+\begin{frame}{Linear Methods: Which One When}
   \begin{center}
     {\small
-    \begin{tabular}{lllll}
+    \begin{tabular}{llll}
       \toprule
-      \textbf{Method} & \textbf{Parallelism} & \textbf{Interpretable} & \textbf{Tuning} & \textbf{Typical accuracy} \\
+      \textbf{Method} & \textbf{Penalty} & \textbf{Zeros out?} & \textbf{Best when} \\
       \midrule
-      Decision Tree & Parallel (1 tree) & High & Low & Baseline \\
-      Random Forest & Parallel ($B$ trees) & Medium & Low & Good \\
-      XGBoost & Sequential ($B$ trees) & Low & Higher & Best \\
-      \midrule
-      Ridge / LASSO & N/A (linear) & High & Low & Good (linear data) \\
+      OLS & none & no & $k \ll n$, predictors uncorrelated \\
+      Stepwise & discrete & yes & Few candidate predictors, need a story \\
+      Ridge & $\ell_2$ & no & Many predictors, all mildly useful \\
+      LASSO & $\ell_1$ & yes & Few predictors truly matter \\
+      Elastic Net & both & yes & Many \emph{correlated} predictors \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
   \begin{keybox}
-    \textbf{When to use what:}
-    \begin{itemize}\small
-      \item \textbf{Interpretability needed:} Decision Tree
-      \item \textbf{Robust first model:} Random Forest
-      \item \textbf{Best accuracy on tabular data:} XGBoost
-      \item \textbf{Many correlated linear predictors:} Elastic Net / LASSO
-    \end{itemize}
+    \small \textbf{Connection to Lecture 5.} Trees and shrinkage solve the same
+    problem in different geometries. XGBoost's \texttt{reg\_lambda} is
+    literally a Ridge penalty on leaf weights, and its \texttt{gamma} penalizes
+    leaf count the way LASSO penalizes nonzero coefficients. Regularization is
+    not a linear-model topic --- it is how every flexible model is kept honest.
   \end{keybox}
 \end{frame}
 
 % --- Slide: Key takeaways ---------------------------------------------------
 \begin{frame}{Lecture 6: Key Takeaways}
   \begin{keybox}
-    {\small
-    \begin{enumerate}
-      \item \textbf{Boosting} builds trees \emph{sequentially}, each fitting the errors
-            of the previous ensemble. It reduces both bias and variance when properly tuned.
+    {\footnotesize
+    \begin{enumerate}\itemsep1pt
+      \item With many predictors OLS overfits: coefficient variance grows with
+            $k$, and with $k > n$ there is no unique solution at all.
 
-      \item \textbf{XGBoost} improves on vanilla boosting with second-order optimization,
-            explicit regularization on leaf weights/count, and column subsampling.
+      \item \textbf{Subset selection} counts predictors in or out. It is discrete,
+            greedy, and unstable --- small data changes flip the selected model.
 
-      \item Use \textbf{early stopping} with XGBoost: always set aside a validation set
-            and stop when validation RMSE stops improving.
+      \item \textbf{Shrinkage} replaces that switch with a dial. Ridge ($\ell_2$)
+            shrinks everything smoothly; LASSO ($\ell_1$) shrinks and zeros out;
+            Elastic Net does both and keeps correlated predictors together.
 
-      \item \textbf{Regularization} (Ridge, LASSO, Elastic Net) penalizes coefficient size
-            to prevent overfitting in linear models with many predictors.
-            LASSO performs automatic variable selection.
+      \item \textbf{Standardize first}, inside each CV fold --- none of these
+            penalties are scale-invariant. \textbf{$\lambda$ is tuned, not
+            estimated}: use \texttt{TimeSeriesSplit}, never random $K$-fold,
+            which leaks the future.
 
-      \item Choose by cross-validation: $\lambda$ for regularization, tree depth and
-            learning rate for boosting. Always use \texttt{TimeSeriesSplit}.
+      \item The \textbf{regularization path} --- the order in which predictors
+            drop out --- is a more stable finding than any single coefficient table.
     \end{enumerate}
     }
   \end{keybox}
   \muted{\itshape Next: Introduction to Neural Networks (PyTorch) ---
-  beyond trees to flexible function approximators for sequence data.}
+  where these same penalties reappear as weight decay and dropout.}
 \end{frame}
 
 % --- References ---------------------------------------------------------------

@@ -1,4 +1,5 @@
-\beamer@sectionintoc {1}{Gradient Boosting}{3}{0}{1}
-\beamer@sectionintoc {2}{XGBoost}{6}{0}{2}
-\beamer@sectionintoc {3}{Regularization for Linear Models}{10}{0}{3}
-\beamer@sectionintoc {4}{Key Takeaways and Roadmap}{13}{0}{4}
+\beamer@sectionintoc {1}{The Problem: Too Many Predictors}{3}{0}{1}
+\beamer@sectionintoc {2}{Shrinkage Methods}{6}{0}{2}
+\beamer@sectionintoc {3}{Choosing the Penalty}{11}{0}{3}
+\beamer@sectionintoc {4}{In Practice}{14}{0}{4}
+\beamer@sectionintoc {5}{Key Takeaways and Roadmap}{16}{0}{5}

@@ -16,5 +16,133 @@
   {}
 \endgroup
 
-\datalist[entry]{nyt/global//global/global/global}\enddatalist
+\datalist[entry]{nyt/global//global/global/global}
+  \entry{Breiman1984}{book}{}{}
+    \name{author}{4}{}{%
+      {{hash=BL}{%
+         family={Breiman},
+         familyi={B\bibinitperiod},
+         given={Leo},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=FJH}{%
+         family={Friedman},
+         familyi={F\bibinitperiod},
+         given={Jerome\bibnamedelima H.},
+         giveni={J\bibinitperiod\bibinitdelim H\bibinitperiod},
+      }}%
+      {{hash=ORA}{%
+         family={Olshen},
+         familyi={O\bibinitperiod},
+         given={Richard\bibnamedelima A.},
+         giveni={R\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=SCJ}{%
+         family={Stone},
+         familyi={S\bibinitperiod},
+         given={Charles\bibnamedelima J.},
+         giveni={C\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Wadsworth}%
+    }
+    \strng{namehash}{BL+1}
+    \strng{fullhash}{BLFJHORASCJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1984}
+    \field{labeldatesource}{}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{title}{Classification and Regression Trees}
+    \list{location}{1}{%
+      {Belmont, CA}%
+    }
+    \field{year}{1984}
+  \endentry
+
+  \entry{James2021}{book}{}{}
+    \name{author}{5}{}{%
+      {{hash=JG}{%
+         family={James},
+         familyi={J\bibinitperiod},
+         given={Gareth},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=WD}{%
+         family={Witten},
+         familyi={W\bibinitperiod},
+         given={Daniela},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=HT}{%
+         family={Hastie},
+         familyi={H\bibinitperiod},
+         given={Trevor},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=TR}{%
+         family={Tibshirani},
+         familyi={T\bibinitperiod},
+         given={Robert},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=TJ}{%
+         family={Taylor},
+         familyi={T\bibinitperiod},
+         given={Jonathan},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{JG+1}
+    \strng{fullhash}{JGWDHTTRTJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2023}
+    \field{labeldatesource}{}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{edition}{1st}
+    \field{title}{An Introduction to Statistical Learning with Applications in
+  {Python}}
+    \verb{url}
+    \verb https://www.statlearning.com/
+    \endverb
+    \list{location}{1}{%
+      {New York}%
+    }
+    \field{year}{2023}
+  \endentry
+
+  \entry{Molnar2022}{book}{}{}
+    \name{author}{1}{}{%
+      {{hash=MC}{%
+         family={Molnar},
+         familyi={M\bibinitperiod},
+         given={Christoph},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{MC1}
+    \strng{fullhash}{MC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{edition}{2nd}
+    \field{note}{Open access}
+    \field{title}{Interpretable Machine Learning: A Guide for Making Black Box
+  Models Explainable}
+    \verb{url}
+    \verb https://christophm.github.io/interpretable-ml-book/
+    \endverb
+    \field{year}{2022}
+  \endentry
+\enddatalist
 \endinput

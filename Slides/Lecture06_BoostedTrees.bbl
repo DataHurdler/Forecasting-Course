@@ -17,34 +17,71 @@
 \endgroup
 
 \datalist[entry]{nyt/global//global/global/global}
-  \entry{Chen2016}{inproceedings}{}{}
-    \name{author}{2}{}{%
-      {{hash=CT}{%
-         family={Chen},
-         familyi={C\bibinitperiod},
-         given={Tianqi},
-         giveni={T\bibinitperiod},
-      }}%
-      {{hash=GC}{%
-         family={Guestrin},
-         familyi={G\bibinitperiod},
-         given={Carlos},
+  \entry{Bergmeir2018}{article}{}{}
+    \name{author}{3}{}{%
+      {{hash=BC}{%
+         family={Bergmeir},
+         familyi={B\bibinitperiod},
+         given={Christoph},
          giveni={C\bibinitperiod},
       }}%
+      {{hash=HRJ}{%
+         family={Hyndman},
+         familyi={H\bibinitperiod},
+         given={Rob\bibnamedelima J.},
+         giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=KB}{%
+         family={Koo},
+         familyi={K\bibinitperiod},
+         given={Bonsoo},
+         giveni={B\bibinitperiod},
+      }}%
     }
-    \strng{namehash}{CTGC1}
-    \strng{fullhash}{CTGC1}
+    \strng{namehash}{BC+1}
+    \strng{fullhash}{BCHRJKB1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{labelyear}{2016}
+    \field{labelyear}{2018}
     \field{labeldatesource}{}
-    \field{sortinit}{C}
-    \field{sortinithash}{C}
-    \field{booktitle}{Proceedings of the 22nd ACM SIGKDD International
-  Conference on Knowledge Discovery and Data Mining}
-    \field{pages}{785\bibrangedash 794}
-    \field{title}{{XGBoost}: A Scalable Tree Boosting System}
-    \field{year}{2016}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{pages}{70\bibrangedash 83}
+    \field{title}{A Note on the Validity of Cross-Validation for Evaluating
+  Autoregressive Time Series Prediction}
+    \field{volume}{120}
+    \field{journaltitle}{Computational Statistics \& Data Analysis}
+    \field{year}{2018}
+  \endentry
+
+  \entry{Guyon2003}{article}{}{}
+    \name{author}{2}{}{%
+      {{hash=GI}{%
+         family={Guyon},
+         familyi={G\bibinitperiod},
+         given={Isabelle},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=EA}{%
+         family={Elisseeff},
+         familyi={E\bibinitperiod},
+         given={Andr{\'e}},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{GIEA1}
+    \strng{fullhash}{GIEA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2003}
+    \field{labeldatesource}{}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{pages}{1157\bibrangedash 1182}
+    \field{title}{An Introduction to Variable and Feature Selection}
+    \field{volume}{3}
+    \field{journaltitle}{Journal of Machine Learning Research}
+    \field{year}{2003}
   \endentry
 
   \entry{HoerlKennard1970}{article}{}{}
@@ -77,6 +114,62 @@
     \field{volume}{12}
     \field{journaltitle}{Technometrics}
     \field{year}{1970}
+  \endentry
+
+  \entry{James2021}{book}{}{}
+    \name{author}{5}{}{%
+      {{hash=JG}{%
+         family={James},
+         familyi={J\bibinitperiod},
+         given={Gareth},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=WD}{%
+         family={Witten},
+         familyi={W\bibinitperiod},
+         given={Daniela},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=HT}{%
+         family={Hastie},
+         familyi={H\bibinitperiod},
+         given={Trevor},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=TR}{%
+         family={Tibshirani},
+         familyi={T\bibinitperiod},
+         given={Robert},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=TJ}{%
+         family={Taylor},
+         familyi={T\bibinitperiod},
+         given={Jonathan},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{JG+1}
+    \strng{fullhash}{JGWDHTTRTJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2023}
+    \field{labeldatesource}{}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{edition}{1st}
+    \field{title}{An Introduction to Statistical Learning with Applications in
+  {Python}}
+    \verb{url}
+    \verb https://www.statlearning.com/
+    \endverb
+    \list{location}{1}{%
+      {New York}%
+    }
+    \field{year}{2023}
   \endentry
 
   \entry{Tibshirani1996}{article}{}{}

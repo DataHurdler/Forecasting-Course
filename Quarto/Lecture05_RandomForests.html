@@ -442,7 +442,7 @@
   <meta name="generator" content="quarto-1.7.33">
 
   <meta name="author" content="Department of Economics">
-  <title>Random Forests</title>
+  <title>Tree Ensembles: Random Forests &amp; Boosted Trees</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -1071,7 +1071,7 @@ margin-right: 0; }
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Random Forests</h1>
+  <h1 class="title">Tree Ensembles: Random Forests &amp; Boosted Trees</h1>
   <p class="subtitle">BSAD 8310: Business Forecasting — Lecture 5</p>
 
 <div class="quarto-title-authors">
@@ -1093,6 +1093,8 @@ Department of Economics
 <li>Bagging: Bootstrap Aggregating</li>
 <li>Random Forests: Decorrelating the Trees</li>
 <li>Feature Importance and Interpretation</li>
+<li>Gradient Boosting</li>
+<li>XGBoost</li>
 <li>Key Takeaways</li>
 </ol>
 </section>
@@ -1268,8 +1270,8 @@ Department of Economics
 <h1>Feature Importance and Interpretation</h1>
 <p>Which predictors matter most? RF gives a data-driven answer.</p>
 </section>
-<section id="random-forest-feature-importance" class="slide level2">
-<h2>Random Forest Feature Importance</h2>
+<section id="random-forest-feature-importance-molnar2022" class="slide level2">
+<h2>Random Forest Feature Importance <span class="citation" data-cites="Molnar2022">(<a href="#/references" role="doc-biblioref" onclick>Molnar 2022</a>)</span></h2>
 <div class="definitionbox">
 <div class="definitionbox-title">
 <p>Mean Decrease in Impurity (MDI)</p>
@@ -1374,18 +1376,278 @@ Department of Economics
 <p><span class="neutral smaller">RF reduces RMSE by ~35–40% vs. a single tree on this dataset.</span></p>
 </div></div>
 </section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="gradient-boosting" class="title-slide slide level1 center">
+<h1>Gradient Boosting</h1>
+<p>Instead of averaging independent trees, fit each new tree to the errors of all previous trees.</p>
+</section>
+<section id="boosting-vs.-bagging-the-core-difference" class="slide level2">
+<h2>Boosting vs. Bagging: The Core Difference</h2>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>Bagging (Random Forest):</strong></p>
+<ul>
+<li>Trees built <strong>in parallel</strong>, independently</li>
+<li>Each tree tries to predict <span class="math inline">\(y\)</span> directly</li>
+<li>Average reduces variance</li>
+<li>Adding more trees does not reduce bias</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>Boosting:</strong></p>
+<ul>
+<li>Trees built <strong>sequentially</strong></li>
+<li>Each tree fits the <em>errors</em> of the previous ensemble</li>
+<li>Adding more trees reduces both bias AND variance (carefully)</li>
+<li>Risk: can overfit if trees are too deep or too many</li>
+</ul>
+</div></div>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Analogy: Correcting a Forecast Iteratively</p>
+</div>
+<p>Forecast 1: “Sales will be $50,000.”   Actual: $60,000.   Error: +$10,000.</p>
+<p>Forecast 2: “The first model was short by $10,000.”</p>
+<p>Combined prediction: $50,000 + $10,000 = <strong>$60,000</strong>.</p>
+<p>Each stage corrects the remaining error from all previous stages.</p>
+</div>
+</section>
+<section id="the-gradient-boosting-algorithm" class="slide level2">
+<h2>The Gradient Boosting Algorithm</h2>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Gradient Boosting (for squared-error loss)</p>
+</div>
+<p>Initialize <span class="math inline">\(F_0(\mathbf{x}) = \bar{y}\)</span>. For <span class="math inline">\(b = 1, \ldots, B\)</span>:</p>
+<ol type="1">
+<li>Compute residuals: <span class="math inline">\(r_i^{(b)} = y_i - F_{b-1}(\mathbf{x}_i)\)</span></li>
+<li>Fit a <strong>shallow tree</strong> <span class="math inline">\(T_b\)</span> to the residuals <span class="math inline">\(\{(\mathbf{x}_i, r_i^{(b)})\}\)</span></li>
+<li>Update: <span class="math inline">\(F_b = F_{b-1} + \eta\, T_b\)</span></li>
+</ol>
+<p>Final prediction: <span class="math inline">\(\hat{y} = F_B(\mathbf{x})\)</span></p>
+</div>
+<div class="columns">
+<div class="column" style="width:52%;">
+<p><strong>The learning rate <span class="math inline">\(\eta\)</span>:</strong></p>
+<ul>
+<li>Small <span class="math inline">\(\eta\)</span> (0.01–0.1): each tree makes a tiny step — requires many trees but more robust</li>
+<li>Large <span class="math inline">\(\eta\)</span> (&gt; 0.3): fast but risky — can overshoot</li>
+<li><strong>Rule:</strong> smaller <span class="math inline">\(\eta\)</span> + more trees + early stopping typically wins</li>
+</ul>
+</div><div class="column" style="width:44%;">
+<div class="keybox">
+<p>Trees are <strong>shallow</strong> (depth 3–6). Each corrects a small fraction of the total error. The ensemble slowly converges to a good prediction.</p>
+</div>
+<div class="warningbox">
+<p>Always use <strong>early stopping</strong> on a validation set. Without it, boosting will overfit.</p>
+</div>
+</div></div>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="xgboost" class="title-slide slide level1 center">
+<h1>XGBoost</h1>
+<p>Three improvements over vanilla boosting: second-order optimization, explicit regularization, and column subsampling.</p>
+</section>
+<section id="xgboost-three-advances" class="slide level2">
+<h2>XGBoost: Three Advances</h2>
+<div class="interpretation">
+<p><em>XGBoost dominated Kaggle competitions from 2014–2018. It consistently outperforms vanilla gradient boosting on tabular data <span class="citation" data-cites="Chen2016">(<a href="#/references" role="doc-biblioref" onclick>Chen and Guestrin 2016</a>)</span>.</em></p>
+</div>
+<div class="columns">
+<div class="column" style="width:56%;">
+<ol type="1">
+<li><p><strong>Newton step (2nd-order optimization):</strong> Uses the gradient <em>and</em> curvature (Hessian) of the loss function. Converges faster than first-order boosting.</p></li>
+<li><p><strong>Explicit regularization:</strong> Penalizes the number of leaves (<span class="math inline">\(\gamma\)</span>) and the magnitude of leaf weights (<span class="math inline">\(\lambda\)</span>) directly in the objective. Guards against overfitting without relying on early stopping alone.</p></li>
+<li><p><strong>Column subsampling:</strong> Like Random Forests, randomly samples features per tree and per split. Reduces correlation and improves generalization.</p></li>
+</ol>
+</div><div class="column" style="width:40%;">
+<div class="keybox">
+<p>Newton step ⟹ more precise gradient direction.</p>
+<p>Regularization ⟹ guards against overfitting.</p>
+<p>Together: XGBoost outperforms vanilla GBM on most benchmarks.</p>
+</div>
+<p><strong>Other popular options:</strong></p>
+<ul>
+<li><code>LightGBM</code> — faster on large datasets</li>
+<li><code>CatBoost</code> — handles categorical features natively</li>
+</ul>
+</div></div>
+</section>
+<section id="xgboost-key-hyperparameters" class="slide level2">
+<h2>XGBoost: Key Hyperparameters</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 29%">
+<col style="width: 24%">
+<col style="width: 24%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>XGB name</th>
+<th>Typical</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Number of trees</td>
+<td><code>n_estimators</code></td>
+<td>500–2000</td>
+<td>More + small <span class="math inline">\(\eta\)</span> = better</td>
+</tr>
+<tr class="even">
+<td>Learning rate</td>
+<td><code>learning_rate</code></td>
+<td>0.01–0.1</td>
+<td>Smaller = more robust</td>
+</tr>
+<tr class="odd">
+<td>Tree depth</td>
+<td><code>max_depth</code></td>
+<td>3–6</td>
+<td>Shallow preferred</td>
+</tr>
+<tr class="even">
+<td>Row subsample</td>
+<td><code>subsample</code></td>
+<td>0.7–0.9</td>
+<td>Fraction of training rows per tree</td>
+</tr>
+<tr class="odd">
+<td>Col. subsample</td>
+<td><code>colsample_bytree</code></td>
+<td>0.7–0.9</td>
+<td>Feature fraction per tree</td>
+</tr>
+<tr class="even">
+<td>L2 leaf penalty</td>
+<td><code>reg_lambda</code></td>
+<td>1</td>
+<td>Ridge on leaf weights</td>
+</tr>
+</tbody>
+</table>
+<div class="keybox">
+<p><strong>Practical starting point:</strong> <code>learning_rate=0.05</code>, <code>max_depth=4</code>, <code>n_estimators=1000</code> with early stopping on validation RMSE. Tune <code>max_depth</code> and <code>subsample</code> via <code>TimeSeriesSplit</code>.</p>
+</div>
+</section>
+<section id="xgboost-in-python" class="slide level2">
+<h2>XGBoost in Python</h2>
+<div class="columns">
+<div class="column" style="width:52%;">
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Code Template</p>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href></a><span class="im">import</span> xgboost <span class="im">as</span> xgb</span>
+<span id="cb3-2"><a href></a></span>
+<span id="cb3-3"><a href></a>model <span class="op">=</span> xgb.XGBRegressor(</span>
+<span id="cb3-4"><a href></a>    n_estimators<span class="op">=</span><span class="dv">1000</span>,</span>
+<span id="cb3-5"><a href></a>    learning_rate<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb3-6"><a href></a>    max_depth<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb3-7"><a href></a>    subsample<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb3-8"><a href></a>    colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb3-9"><a href></a>    early_stopping_rounds<span class="op">=</span><span class="dv">50</span>,</span>
+<span id="cb3-10"><a href></a>    random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb3-11"><a href></a>)</span>
+<span id="cb3-12"><a href></a></span>
+<span id="cb3-13"><a href></a>model.fit(</span>
+<span id="cb3-14"><a href></a>    X_train, y_train,</span>
+<span id="cb3-15"><a href></a>    eval_set<span class="op">=</span>[(X_val, y_val)],</span>
+<span id="cb3-16"><a href></a>    verbose<span class="op">=</span><span class="va">False</span></span>
+<span id="cb3-17"><a href></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:44%;">
+<p><strong>Cross-validation for time series:</strong></p>
+<ul>
+<li>Use <code>TimeSeriesSplit</code> with the sklearn API</li>
+<li>Reserve last 20% of data as final test set</li>
+<li><code>early_stopping_rounds=50</code>: stops training when validation RMSE does not improve for 50 consecutive rounds</li>
+</ul>
+<p><span class="neutral smaller">Typical RSXFS result: XGBoost RMSE ≈ 1,500–1,700 (vs. RF ≈ 1,800)</span></p>
+</div></div>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="key-takeaways-and-roadmap" class="title-slide slide level1 center">
+<h1>Key Takeaways and Roadmap</h1>
+<p>Bagging reduces variance; boosting reduces bias. Together they cover most of what tabular forecasting needs.</p>
+</section>
+<section id="tree-methods-which-one-when" class="slide level2">
+<h2>Tree Methods: Which One When</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Training</th>
+<th>Interpretable</th>
+<th>Tuning</th>
+<th>Typical accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Decision Tree</td>
+<td>Single tree</td>
+<td>High</td>
+<td>Low</td>
+<td>Baseline</td>
+</tr>
+<tr class="even">
+<td>Random Forest</td>
+<td>Parallel (<span class="math inline">\(B\)</span> trees)</td>
+<td>Medium</td>
+<td>Low</td>
+<td>Good</td>
+</tr>
+<tr class="odd">
+<td>XGBoost</td>
+<td>Sequential (<span class="math inline">\(B\)</span> trees)</td>
+<td>Low</td>
+<td>Higher</td>
+<td>Best</td>
+</tr>
+</tbody>
+</table>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>Random Forest strengths:</strong></p>
+<ul>
+<li>Robust — hard to overfit badly</li>
+<li>Minimal tuning; good out-of-the-box</li>
+<li>OOB error gives free cross-validation</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>Shared limitation:</strong></p>
+<ul>
+<li>Neither can extrapolate beyond the training range — a hard constraint for trending series</li>
+</ul>
+</div></div>
+<div class="keybox">
+<p><strong>Practical order:</strong> start with a Random Forest — it is hard to make catastrophically wrong. Move to XGBoost when you have the time to tune and need the last few points of accuracy.</p>
+</div>
+</section>
 <section id="lecture-5-key-takeaways" class="slide level2">
 <h2>Lecture 5: Key Takeaways</h2>
 <div class="keybox">
 <ol type="1">
-<li><p><strong>Ensembles</strong> work because independent errors cancel. Averaging many imperfect models outperforms any single model.</p></li>
-<li><p><strong>Bagging</strong> trains <span class="math inline">\(B\)</span> trees on bootstrap samples and averages. Variance reduces as <span class="math inline">\(B\)</span> grows, but floors at <span class="math inline">\(\rho\sigma^2\)</span>.</p></li>
-<li><p><strong>Random Forests</strong> add random feature subsampling at each split to reduce <span class="math inline">\(\rho\)</span> (pairwise tree correlation) — the key innovation over plain bagging.</p></li>
-<li><p><strong>OOB error</strong> is free cross-validation: each observation is left out of ~37% of trees, providing an unbiased estimate of generalization error.</p></li>
-<li><p><strong>Feature importance</strong> (averaged across all trees) is a stable, data-driven way to identify which predictors matter most for forecasting.</p></li>
+<li><p><strong>Ensembles</strong> work because independent errors cancel. Averaging many imperfect models beats any single model.</p></li>
+<li><p><strong>Bagging</strong> averages <span class="math inline">\(B\)</span> trees fit to bootstrap samples; variance falls as <span class="math inline">\(B\)</span> grows but floors at <span class="math inline">\(\rho\sigma^2\)</span>. <strong>Random Forests</strong> subsample features at each split to cut <span class="math inline">\(\rho\)</span> — the key gain over plain bagging.</p></li>
+<li><p><strong>OOB error</strong> is free cross-validation: each observation sits out ~37% of trees, giving an unbiased generalization estimate.</p></li>
+<li><p><strong>Boosting</strong> inverts the idea — trees are built sequentially, each fitting the ensemble’s remaining errors. Bagging attacks variance; boosting attacks bias. <strong>XGBoost</strong> adds a Newton step, penalties on leaf count and weights, and column subsampling.</p></li>
+<li><p>Tune by cross-validation, always with <code>TimeSeriesSplit</code> — a random split leaks the future into the past — and pair boosting with <strong>early stopping</strong>.</p></li>
 </ol>
 </div>
-<p><em>Next: Boosted Trees &amp; Regularization — sequential error correction with XGBoost, and Ridge/LASSO for linear models.</em></p>
+<p><em>Next: Regularization &amp; Model Selection — choosing among many predictors by shrinking coefficients rather than counting them.</em></p>
 </section>
 <section id="references" class="slide level2 smaller scrollable">
 <h2>References</h2>
@@ -1395,6 +1657,12 @@ Breiman, Leo. 1996. <span>“Bagging Predictors.”</span> <em>Machine Learning<
 </div>
 <div id="ref-Breiman2001" class="csl-entry" role="listitem">
 Breiman, Leo. 2001. <span>“Random Forests.”</span> <em>Machine Learning</em> 45 (1): 5–32.
+</div>
+<div id="ref-Chen2016" class="csl-entry" role="listitem">
+Chen, Tianqi, and Carlos Guestrin. 2016. <span>“<span>XGBoost</span>: A Scalable Tree Boosting System.”</span> <em>Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining</em>, 785–94.
+</div>
+<div id="ref-Molnar2022" class="csl-entry" role="listitem">
+Molnar, Christoph. 2022. <em>Interpretable Machine Learning: A Guide for Making Black Box Models Explainable</em>. 2nd ed. <a href="https://christophm.github.io/interpretable-ml-book/">https://christophm.github.io/interpretable-ml-book/</a>.
 </div>
 </div>
 

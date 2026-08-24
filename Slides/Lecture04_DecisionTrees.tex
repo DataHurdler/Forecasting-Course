@@ -69,7 +69,7 @@
 \end{frame}
 
 % --- Slide: Bias-variance tradeoff overview ----------------------------------
-\begin{frame}{The Bias--Variance Tradeoff}
+\begin{frame}{The Bias--Variance Tradeoff \parencite{James2021}}
   \begin{definitionbox}{Bias--Variance Decomposition}
     \[
       \text{Expected MSE} = \underbrace{\text{Bias}^2}_{\text{systematic error}}
@@ -159,7 +159,7 @@
 \end{frame}
 
 % --- Slide: CART algorithm ---------------------------------------------------
-\begin{frame}{The CART Algorithm (Regression)}
+\begin{frame}{The CART Algorithm (Regression) \parencite{Breiman1984}}
   \textbf{CART (Classification and Regression Trees)} builds the tree
   greedily from top to bottom:
 
@@ -295,7 +295,7 @@
 \end{frame}
 
 % --- Slide: Feature importance -----------------------------------------------
-\begin{frame}{Feature Importance}
+\begin{frame}{Feature Importance \parencite{Molnar2022}}
   \begin{definitionbox}{Impurity-Based Feature Importance}
     For each feature $j$, sum the total reduction in variance across all splits
     where feature $j$ was used, weighted by the fraction of observations in each node.

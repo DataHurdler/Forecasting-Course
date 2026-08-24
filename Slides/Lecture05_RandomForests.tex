@@ -1,5 +1,5 @@
 % =============================================================================
-% Lecture 05: Random Forests
+% Lecture 05: Tree Ensembles --- Random Forests & Boosted Trees
 % BSAD 8310: Business Forecasting
 % University of Nebraska at Omaha
 % =============================================================================
@@ -9,7 +9,7 @@
 \input{header}
 
 % ---- Lecture metadata --------------------------------------------------------
-\title{Random Forests}
+\title{Tree Ensembles: Random Forests \& Boosted Trees}
 \subtitle{BSAD 8310: Business Forecasting --- Lecture 5}
 \author{Department of Economics}
 \institute{University of Nebraska at Omaha}
@@ -210,7 +210,7 @@
   Which predictors matter most? RF gives a data-driven answer.}
 
 % --- Slide: Feature importance -----------------------------------------------
-\begin{frame}{Random Forest Feature Importance}
+\begin{frame}{Random Forest Feature Importance \parencite{Molnar2022}}
   \begin{definitionbox}{Mean Decrease in Impurity (MDI)}
     \small For each feature $j$: average the total reduction in node impurity
     across all splits on feature $j$, weighted by the fraction of observations
@@ -292,72 +292,264 @@
 \end{frame}
 
 % =============================================================================
-\section{Key Takeaways and Roadmap}
+\section{Gradient Boosting}
 % =============================================================================
 
-\sectionslide{Key Takeaways and Roadmap}{%
-  Random Forests are robust, accurate, and require little tuning.}
+\sectionslide{Gradient Boosting}{%
+  Instead of averaging independent trees, fit each new tree to the errors
+  of all previous trees.}
 
-% --- Slide: When to use RF ---------------------------------------------------
-\begin{frame}{Random Forests: Strengths and Weaknesses}
+% --- Slide: Boosting vs. bagging ---------------------------------------------
+\begin{frame}{Boosting vs.\ Bagging: The Core Difference}
   \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \textbf{Strengths:}
-      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
-      \begin{itemize}
-        \item Robust --- hard to overfit badly
-        \item Minimal tuning required
-        \item Works well out-of-the-box
-        \item OOB error provides free CV
-        \item Feature importance for model explanation
-        \item Handles mixed features (lags, dummies, macro vars)
-        \item Scales to many features
-      \end{itemize}}
+    \begin{column}{0.48\textwidth}
+      \textbf{Bagging (Random Forest):}
+      \begin{itemize}\small
+        \item Trees built \textbf{in parallel}, independently
+        \item Each tree tries to predict $y$ directly
+        \item Average reduces variance
+        \item Adding more trees does not reduce bias
+      \end{itemize}
     \end{column}
-    \begin{column}{0.46\textwidth}
-      \textbf{Weaknesses:}
-      {\setbeamertemplate{itemize item}{\negc{$\times$}}
-      \begin{itemize}
-        \item Not as accurate as boosted trees on well-tuned problems
-        \item Cannot extrapolate beyond training range
-        \item Memory-intensive for many large trees
-        \item Less interpretable than a single tree (but importance still useful)
-      \end{itemize}}
-      \vspace{0.1cm}
+    \begin{column}{0.48\textwidth}
+      \textbf{Boosting:}
+      \begin{itemize}\small
+        \item Trees built \textbf{sequentially}
+        \item Each tree fits the \emph{errors} of the previous ensemble
+        \item Adding more trees reduces both bias AND variance (carefully)
+        \item Risk: can overfit if trees are too deep or too many
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.1cm}
+  \begin{examplebox}{Analogy: Correcting a Forecast Iteratively}
+    \small
+    Forecast 1: ``Sales will be \$50,000.'' \quad Actual: \$60,000. \quad Error: $+$\$10,000.\\[2pt]
+    Forecast 2: ``The first model was short by \$10,000.''\\
+    Combined prediction: \$50,000 $+$ \$10,000 $=$ \textbf{\$60,000}.\\[2pt]
+    Each stage corrects the remaining error from all previous stages.
+  \end{examplebox}
+\end{frame}
+
+% --- Slide: Boosting algorithm -----------------------------------------------
+\begin{frame}{The Gradient Boosting Algorithm}
+  \begin{definitionbox}{Gradient Boosting (for squared-error loss)}
+    {\footnotesize
+    Initialize $F_0(\mathbf{x}) = \bar{y}$. For $b = 1, \ldots, B$:
+    \begin{enumerate}\itemsep0pt\topsep0pt
+      \item Compute residuals: $r_i^{(b)} = y_i - F_{b-1}(\mathbf{x}_i)$
+      \item Fit a shallow tree $T_b$ to $\{(\mathbf{x}_i, r_i^{(b)})\}$
+      \item Update: $F_b = F_{b-1} + \eta\, T_b$
+    \end{enumerate}
+    Final prediction: $\hat{y} = F_B(\mathbf{x})$
+    }
+  \end{definitionbox}
+  \vspace{-0.2cm}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{The learning rate $\eta$:}
+      \begin{itemize}\footnotesize\itemsep0pt
+        \item Small $\eta$ (0.01--0.1): tiny step per tree ---
+              requires more trees but more robust
+        \item Large $\eta$ ($> 0.3$): fast but risks overshooting
+        \item \textbf{Rule:} smaller $\eta$ + more trees + early stopping
+              typically wins
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
       \begin{keybox}
-        \small \textbf{Good default:} when you need a solid forecast fast,
-        start with a Random Forest. It is hard to make catastrophically wrong.
+        \footnotesize Trees are \textbf{shallow} (depth 3--6).
+        Each corrects a small fraction of the total error.
+        The ensemble slowly converges.\\[2pt]
+        \textbf{Warning:} always use \textbf{early stopping} ---
+        without it, boosting will overfit.
       \end{keybox}
     \end{column}
   \end{columns}
 \end{frame}
 
+% =============================================================================
+\section{XGBoost}
+% =============================================================================
+
+\sectionslide{XGBoost}{%
+  Three improvements over vanilla boosting: second-order optimization,
+  explicit regularization, and column subsampling.}
+
+% --- Slide: XGBoost innovations -----------------------------------------------
+\begin{frame}{XGBoost: Three Advances \parencite{Chen2016}}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      \begin{enumerate}
+        \item \textbf{Newton step (2nd-order optimization):}
+              Uses the gradient \emph{and} curvature (Hessian)
+              of the loss function to compute more precise tree-fitting directions.
+              Converges faster than first-order boosting.
+
+        \item \textbf{Explicit regularization:}
+              Penalizes the number of leaves ($\gamma$) and the magnitude
+              of leaf weights ($\lambda$) directly in the objective.
+              Guards against overfitting without relying on early stopping alone.
+
+        \item \textbf{Column subsampling:}
+              Like Random Forests, randomly samples features per tree and per split.
+              Reduces correlation and improves generalization.
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \begin{keybox}
+        XGBoost dominated Kaggle competitions from 2014--2018.
+        It consistently outperforms vanilla gradient boosting
+        on tabular data.
+      \end{keybox}
+      \vspace{0.2cm}
+      \textbf{Other popular options:}
+      \begin{itemize}\small
+        \item \texttt{LightGBM} --- faster on large datasets
+        \item \texttt{CatBoost} --- handles categorical features natively
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- Slide: XGBoost key hyperparameters --------------------------------------
+\begin{frame}{XGBoost: Key Hyperparameters}
+  \begin{center}
+    {\footnotesize
+    \begin{tabular}{p{2.6cm}p{2.8cm}p{1.8cm}p{4.0cm}}
+      \toprule
+      \textbf{Parameter} & \textbf{XGB name} & \textbf{Typical} & \textbf{Effect} \\
+      \midrule
+      Number of trees & \texttt{n\_estimators} & 500--2000 & More + small $\eta$ = better (use early stopping) \\
+      Learning rate & \texttt{learning\_rate} & 0.01--0.1 & Smaller = more robust; needs more trees \\
+      Tree depth & \texttt{max\_depth} & 3--6 & Shallow preferred; depth $>$6 risks overfit \\
+      Row subsample & \texttt{subsample} & 0.7--0.9 & Fraction of training rows per tree \\
+      Col.\ subsample & \texttt{colsample\_bytree} & 0.7--0.9 & Feature fraction per tree (like RF) \\
+      L2 leaf penalty & \texttt{reg\_lambda} & 1 & Ridge on leaf weights; stabilizes \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \begin{keybox}
+    \small \textbf{Practical starting point:}
+    \texttt{learning\_rate=0.05}, \texttt{max\_depth=4},
+    \texttt{n\_estimators=1000} with early stopping on validation RMSE.
+    Tune \texttt{max\_depth} and \texttt{subsample} via \texttt{TimeSeriesSplit}.
+  \end{keybox}
+\end{frame}
+
+% --- Slide: XGBoost Python ---------------------------------------------------
+\begin{frame}{XGBoost in Python}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{examplebox}{Code Template}
+        {\scriptsize
+        \texttt{model = xgb.XGBRegressor(}\\
+        \texttt{  n\_estimators=1000,}\\
+        \texttt{  learning\_rate=0.05,}\\
+        \texttt{  max\_depth=4,}\\
+        \texttt{  subsample=0.8,}\\
+        \texttt{  colsample\_bytree=0.8,}\\
+        \texttt{  early\_stopping\_rounds=50,}\\
+        \texttt{  random\_state=42)}\\
+        \texttt{model.fit(}\\
+        \texttt{  X\_train, y\_train,}\\
+        \texttt{  eval\_set=[(X\_val, y\_val)],}\\
+        \texttt{  verbose=False)}
+        }
+      \end{examplebox}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \textbf{Cross-validation for time series:}
+      \begin{itemize}\footnotesize\itemsep0pt
+        \item Use \texttt{TimeSeriesSplit} with the sklearn API
+        \item Reserve last 20\% as final test set
+        \item \texttt{early\_stopping\_rounds=50}: stops if val.\ RMSE stalls for 50 rounds
+      \end{itemize}
+      \muted{\footnotesize Typical RSXFS result:
+      XGBoost RMSE $\approx$ 1,500--1,700 (vs.\ RF $\approx$ 1,800).}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Key Takeaways and Roadmap}
+% =============================================================================
+
+\sectionslide{Key Takeaways and Roadmap}{%
+  Bagging reduces variance; boosting reduces bias. Together they cover
+  most of what tabular forecasting needs.}
+
+% --- Slide: Which method when -------------------------------------------------
+\begin{frame}{Tree Methods: Which One When}
+  \begin{center}
+    {\small
+    \begin{tabular}{lllll}
+      \toprule
+      \textbf{Method} & \textbf{Training} & \textbf{Interpretable} & \textbf{Tuning} & \textbf{Typical accuracy} \\
+      \midrule
+      Decision Tree & Single tree & High & Low & Baseline \\
+      Random Forest & Parallel ($B$ trees) & Medium & Low & Good \\
+      XGBoost & Sequential ($B$ trees) & Low & Higher & Best \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Random Forest strengths:}
+      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
+      \begin{itemize}\small\itemsep0pt
+        \item Robust --- hard to overfit badly
+        \item Minimal tuning; good out-of-the-box
+        \item OOB error gives free cross-validation
+      \end{itemize}}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Shared limitation:}
+      {\setbeamertemplate{itemize item}{\negc{$\times$}}
+      \begin{itemize}\small\itemsep0pt
+        \item Neither can extrapolate beyond the training range ---
+              a hard constraint for trending series
+      \end{itemize}}
+    \end{column}
+  \end{columns}
+  \begin{keybox}
+    \small \textbf{Practical order:} start with a Random Forest --- it is hard to make
+    catastrophically wrong. Move to XGBoost when you have the time to tune and
+    need the last few points of accuracy.
+  \end{keybox}
+\end{frame}
+
 % --- Slide: Key takeaways ---------------------------------------------------
 \begin{frame}{Lecture 5: Key Takeaways}
   \begin{keybox}
-    {\small
-    \begin{enumerate}
+    {\footnotesize
+    \begin{enumerate}\itemsep1pt
       \item \textbf{Ensembles} work because independent errors cancel.
-            Averaging many imperfect models outperforms any single model.
+            Averaging many imperfect models beats any single model.
 
-      \item \textbf{Bagging} trains $B$ trees on bootstrap samples and averages.
-            Variance reduces as $B$ grows, but floors at $\rho\sigma^2$.
+      \item \textbf{Bagging} averages $B$ trees fit to bootstrap samples;
+            variance falls as $B$ grows but floors at $\rho\sigma^2$.
+            \textbf{Random Forests} subsample features at each split to cut
+            $\rho$ --- the key gain over plain bagging.
 
-      \item \textbf{Random Forests} add random feature subsampling at each split
-            to reduce $\rho$ (pairwise tree correlation) --- the key innovation
-            over plain bagging.
+      \item \textbf{OOB error} is free cross-validation: each observation sits
+            out $\approx$37\% of trees, giving an unbiased generalization estimate.
 
-      \item \textbf{OOB error} is free cross-validation:
-            each observation is left out of $\approx$37\% of trees,
-            providing an unbiased estimate of generalization error.
+      \item \textbf{Boosting} inverts the idea --- trees are built sequentially,
+            each fitting the ensemble's remaining errors. Bagging attacks
+            variance; boosting attacks bias. \textbf{XGBoost} adds a Newton step,
+            penalties on leaf count and weights, and column subsampling.
 
-      \item \textbf{Feature importance} (averaged across all trees) is a stable,
-            data-driven way to identify which predictors matter most for forecasting.
+      \item Tune by cross-validation, always with \texttt{TimeSeriesSplit} ---
+            a random split leaks the future into the past --- and pair boosting
+            with \textbf{early stopping}.
     \end{enumerate}
     }
   \end{keybox}
-  \muted{\itshape Next: Boosted Trees \& Regularization ---
-  sequential error correction with XGBoost, and Ridge/LASSO for linear models.}
+  \muted{\itshape Next: Regularization \& Model Selection ---
+  choosing among many predictors by shrinking coefficients rather than counting them.}
 \end{frame}
 
 % --- References ---------------------------------------------------------------

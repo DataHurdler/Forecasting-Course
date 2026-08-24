@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2025)
+This is BibTeX, Version 0.99e (TeX Live 2026)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Lecture05_RandomForests.aux
 The style file: biblatex.bst
@@ -22,44 +22,44 @@ Database file #2: ../Bibliography_base.bib
 Biblatex version: 3.21
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 3 entries,
+You've used 5 entries,
             6402 wiz_defined-function locations,
-            1217 strings with 9173 characters,
-and the built_in function-call counts, 10249 in all, are:
-= -- 600
-> -- 237
-< -- 47
-+ -- 233
-- -- 78
-* -- 641
-:= -- 1169
+            1232 strings with 9559 characters,
+and the built_in function-call counts, 20888 in all, are:
+= -- 1315
+> -- 424
+< -- 102
++ -- 505
+- -- 147
+* -- 1407
+:= -- 2254
 add.period$ -- 0
-call.type$ -- 3
-change.case$ -- 22
+call.type$ -- 5
+change.case$ -- 42
 chr.to.int$ -- 42
-cite$ -- 4
-duplicate$ -- 1051
-empty$ -- 976
-format.name$ -- 100
-if$ -- 2170
+cite$ -- 8
+duplicate$ -- 2290
+empty$ -- 1968
+format.name$ -- 214
+if$ -- 4361
 int.to.chr$ -- 0
-int.to.str$ -- 6
+int.to.str$ -- 10
 missing$ -- 0
-newline$ -- 70
-num.names$ -- 88
-pop$ -- 711
+newline$ -- 125
+num.names$ -- 170
+pop$ -- 1404
 preamble$ -- 1
-purify$ -- 26
+purify$ -- 53
 quote$ -- 0
-skip$ -- 409
+skip$ -- 743
 stack$ -- 0
-substring$ -- 883
-swap$ -- 281
-text.length$ -- 66
-text.prefix$ -- 2
+substring$ -- 2010
+swap$ -- 565
+text.length$ -- 122
+text.prefix$ -- 4
 top$ -- 1
-type$ -- 90
+type$ -- 158
 warning$ -- 0
-while$ -- 174
+while$ -- 317
 width$ -- 0
-write$ -- 68
+write$ -- 121
