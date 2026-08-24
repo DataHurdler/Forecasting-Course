@@ -1,8 +1,8 @@
 ---
 title: "Homework 3: Decision Trees and Random Forests"
-subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
 author: "Your Name"
-date: "Spring 2026"
+date: "Fall 2026"
 format:
   html:
     theme: cosmo
@@ -78,7 +78,7 @@ print(f"Modeling dataset: {len(df):,} store-week rows, {df['Store'].nunique()} s
 Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does **not** count against your prompt budget.
 
 ```
-I am working on Homework 3 for BSAD 8310: Business Forecasting at the University of Nebraska at Omaha.
+I am working on Homework 3 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
 Dataset: Rossmann Store Sales — weekly aggregated for 30 stores, at `data/processed/rossmann_weekly.csv`. Features include lag sales (lag1 through lag52), promotion flags, store attributes (StoreType, Assortment, CompetitionDistance), and calendar features.
 

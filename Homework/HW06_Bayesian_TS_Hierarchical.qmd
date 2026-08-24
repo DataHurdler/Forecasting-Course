@@ -1,8 +1,8 @@
 ---
 title: "Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models"
-subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
 author: "Your Name"
-date: "Spring 2026"
+date: "Fall 2026"
 format:
   html:
     theme: cosmo
@@ -76,7 +76,7 @@ Paste the following as your first message to Codex. Save it as `INITIAL_PROMPT.m
 in your submission folder.
 
 ```
-I am working on Homework 7 for BSAD 8310: Business Forecasting at the
+I am working on Homework 7 for ECON 8310: Business Forecasting at the
 University of Nebraska at Omaha.
 
 Dataset: Rossmann Store Sales — weekly aggregated at

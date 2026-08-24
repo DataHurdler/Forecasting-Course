@@ -1,8 +1,8 @@
 ---
 title: "Homework 1: Exponential Smoothing, ARIMA & Multivariate Models"
-subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
 author: "Your Name"
-date: "Spring 2026"
+date: "Fall 2026"
 format:
   html:
     theme: cosmo
@@ -66,7 +66,7 @@ print(f"Store 1: {len(store1)} weekly observations from {store1.index.min().date
 Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does **not** count against your prompt budget.
 
 ```
-I am working on Homework 1 for BSAD 8310: Business Forecasting at the University of Nebraska at Omaha.
+I am working on Homework 1 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
 Dataset: Rossmann Store Sales (preprocessed weekly). Available at `data/processed/rossmann_weekly.csv`. Columns include Store (1–30), WeekStart, Sales, Customers, Promo, StoreType, Assortment, CompetitionDistance, and lag features (Sales_lag1 through Sales_lag52).
 

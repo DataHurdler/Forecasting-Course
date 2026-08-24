@@ -312,7 +312,6 @@ For example, if the class has trouble understanding a specific topic, I might ta
 - Reading: ISLP §8.1
 
 ### Week 5 (Sep. 24, 2026)
-- All materials online. No class.
 - Lecture 5: Tree Ensembles — Random Forests & Boosted Trees
 - Reading: ISLP §8.2; XGBoost "Introduction to Boosted Trees"; FPP §12.4 Python ed. / §12.5 R ed. for the bagging intuition
 

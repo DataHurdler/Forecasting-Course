@@ -1,8 +1,8 @@
 ---
 title: "Homework 2: Generalized Additive Models"
-subtitle: "BSAD 8310: Business Forecasting — University of Nebraska at Omaha"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
 author: "Your Name"
-date: "Spring 2026"
+date: "Fall 2026"
 format:
   html:
     theme: cosmo
@@ -61,7 +61,7 @@ print(daily[["Date","Sales","Promo","StateHoliday","SchoolHoliday"]].head())
 Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does **not** count against your prompt budget.
 
 ```
-I am working on Homework 2 for BSAD 8310: Business Forecasting at the University of Nebraska at Omaha.
+I am working on Homework 2 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
 Dataset: Rossmann Store Sales — daily data for Store 1, available at `data/processed/rossmann_daily.csv`. Columns: Date, Sales, Customers, Promo, Open, StateHoliday, SchoolHoliday, StoreType, Assortment, CompetitionDistance, Promo2.
 

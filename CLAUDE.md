@@ -1,6 +1,6 @@
 # CLAUDE.MD -- Academic Project Development with Claude Code
 
-**Project:** BSAD 8310: Business Forecasting
+**Project:** ECON 8310: Business Forecasting
 **Institution:** University of Nebraska at Omaha
 **Branch:** main
 
@@ -169,7 +169,7 @@ template-maintenance gates that this course repo does not satisfy.
 
 **Beamer status:** All 12 new lectures written (Spring 2026 redesign).
 **Quarto status:** All 12 new lectures written.
-**Note:** Old lecture files (Lecture01_Intro.tex through Lecture12_Capstone.tex) remain on disk but are superseded by the redesigned files below.
+**Note:** The pre-redesign lecture set (Lecture01_Intro through Lecture12_Capstone) was removed in the Fall 2026 cleanup; it remains recoverable from git history. Its lab notebooks (`scripts/Lecture*.ipynb`) and QA reports (`quality_reports/`) were deliberately kept — the notebooks are the only worked Python in the repo outside Homework/.
 
 | Lecture | Beamer | Quarto | Key Content |
 |---------|--------|--------|-------------|

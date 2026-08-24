@@ -1,7 +1,7 @@
 """
 prep_rossmann.py
 ----------------
-Prepares the Rossmann Store Sales dataset for BSAD 8310 homework assignments.
+Prepares the Rossmann Store Sales dataset for ECON 8310 homework assignments.
 
 Input files (download from Kaggle: rossmann-store-sales):
   data/raw/train.csv   -- daily store-level sales
