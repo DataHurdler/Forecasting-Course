@@ -190,9 +190,9 @@ You must answer all homework questions.
 At least one question will be checked for credit, except for homework assignments that are graded for completion.
 If you really do not know how to proceed with a homework question, you should email me.
 
-There are 7 homework assignments, each worth 20 points, for a total of 140 points.
+There are 7 homework assignments, each worth 30 points, for a total of 210 points.
 Several assignments are submitted in parts across multiple weeks. **The parts of an assignment
-split that assignment's 20 points between them** — they are not 20 points each. Each part has its
+split that assignment's 30 points between them** — they are not 30 points each. Each part has its
 own Codex context prompt and its own prompt budget. See the weekly schedule below for due dates.
 Each assignment is a Quarto (`.qmd`) document rendered to HTML and submitted through the course repository, together with your `PROMPT_LOG.jsonl` and a short `REPORT.md` containing your business recommendation.
 
@@ -210,10 +210,10 @@ Which lectures each assignment draws on:
 Due dates are in the **weekly schedule** at the end of this syllabus.
 
 ### Pop Quizzes
-Throughout the semester, there are 3 pop quizzes, each is worth 20 points, for a total of 60 points.
+Throughout the semester, there are 3 pop quizzes, each is worth 30 points, for a total of 90 points.
 
 ### Final Project
-The final project is completed in **groups of 2–3 students** and is worth 200 points.
+The final project is completed in **groups of 2–3 students** and is worth 100 points — a quarter of the course grade.
 Groups are formed by Week 4 and submitted to me for approval.
 
 **Dataset requirements.** Each group selects a real business dataset of its choosing. The dataset must:
@@ -231,10 +231,10 @@ Groups are formed by Week 4 and submitted to me for approval.
 
 | Deliverable | Due | Points |
 |---|---|---|
-| Group formation | Week 4 (Sep. 17) | 10 |
-| Project proposal — 1–2 pages: dataset, business question, planned methods, preliminary EDA | Week 9 (Oct. 22) | 40 |
-| In-class presentation | Week 17 (Dec. 17) | 30 |
-| Final report | Dec. 18 | 120 |
+| Group formation | Week 4 (Sep. 17) | 5 |
+| Project proposal — 1–2 pages: dataset, business question, planned methods, preliminary EDA | Week 9 (Oct. 22) | 20 |
+| In-class presentation | Week 17 (Dec. 17) | 15 |
+| Final report | Dec. 18 | 60 |
 
 **Final report format.** Submit as a rendered Quarto HTML file (`.qmd` + `.html`) through the course repository.
 The report should include all code, outputs, and written analysis in a single self-contained document.
@@ -244,9 +244,9 @@ The grading rubric will be distributed by Week 6.
 ### Points and Letter Grades
 | Component | Points |
 |---|---|
-| Homework (7 × 20) | 140 |
-| Pop quizzes (3 × 20) | 60 |
-| Final project | 200 |
+| Homework (7 × 30) | 210 |
+| Pop quizzes (3 × 30) | 90 |
+| Final project | 100 |
 | **Total** | **400** |
 
 Students with full attendance will be awareded 10 extra points. There are time-sensitive extra point opportunities throughout the semester. Please pay attention to annoucements in-class or on Canvas.
