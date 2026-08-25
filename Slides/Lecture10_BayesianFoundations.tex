@@ -284,21 +284,21 @@
       ESS & $> 400$ & Effective sample size --- 8{,}000 correlated draws may carry as much
       information as 200 independent ones. \\[2pt]
       Divergences & $0$ & The sampler hit terrain it could not navigate. Even a few means the
-      posterior is explored incorrectly. \\
+      posterior is explored wrongly. \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
 
-  \texttt{az.summary(idata)} prints $\hat{R}$ and ESS per parameter. On the model above:
-  $\hat{R} = 1.00$, ESS 3{,}275, zero divergences. \textbf{Report all three} --- skipping this is
-  the same class of error as \texttt{KFold} on a time series.
+  \texttt{az.summary(idata, ci\_kind="hdi", ci\_prob=0.94)} prints the interval, $\hat{R}$ and ESS.
+  \textbf{Pass both arguments} --- ArviZ now defaults to an 89\% equal-tailed interval, not the HDI.
+
+  On the model above: $\hat{R} = 1.00$, ESS 3{,}686, zero divergences. \textbf{Report all three.}
 \end{frame}
 
 % --- Slide: prior predictive checks -----------------------------------------
 \begin{frame}{Prior Predictive Checks \parencite{McElreath2020}}
-  Before touching the data, simulate from the prior alone. If it implies nonsense, you want to
-  know now.
+  Before touching the data, simulate from the prior alone.
 
   \begin{examplebox}{Two lines}
     {\scriptsize\linespread{1.0}\selectfont

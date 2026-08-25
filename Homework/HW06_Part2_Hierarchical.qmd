@@ -75,7 +75,8 @@ print(f"{weekly.series.nunique()} series | CA_1 FOODS: {len(ca1)} weeks | "
 ## Report diagnostics with every model
 
 Lecture 10 gave you three checks, and this assignment expects all three for **every** model you
-fit: $\hat{R} < 1.01$, ESS $> 400$, and **zero divergences**. `az.summary(idata)` gives the first
+fit: $\hat{R} < 1.01$, ESS $> 400$, and **zero divergences**.
+`az.summary(idata, ci_kind="hdi", ci_prob=0.94)` gives the first
 two; `pm.sample` reports divergences as it runs.
 
 A model that fails these has not converged, and its posterior means nothing — report the failure

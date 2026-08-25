@@ -1,0 +1,232 @@
+---
+title: "Lab 10: Priors, Posteriors, and Checking the Sampler"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Every model so far returned a number. Today's returns a **distribution**, and the work shifts
+accordingly: less about fitting, more about deciding what you believe beforehand and checking
+whether the machinery actually worked.
+
+The question is small on purpose so the workflow stays visible: **what fraction of weeks are
+high-SNAP weeks at CA_1 FOODS?** You will state a prior, check it before looking at the data, fit
+the model, verify the sampler, and then ask the posterior questions no point estimate can answer.
+
+**Time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
+`data/processed/m5_weekly.csv`. Each fit takes about ten seconds.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pymc as pm
+import arviz as az
+import warnings, logging
+warnings.filterwarnings('ignore')
+logging.getLogger('pymc').setLevel(logging.ERROR)
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first.")
+
+weekly = pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
+ca1 = weekly[(weekly.store_id == "CA_1") & (weekly.cat_id == "FOODS")]
+
+N_WEEKS = len(ca1)
+N_HIGH  = int((ca1.snap_days >= 5).sum())
+print(f"CA_1 FOODS: {N_HIGH} high-SNAP weeks out of {N_WEEKS} "
+      f"({100*N_HIGH/N_WEEKS:.0f}% observed)")
+```
+
+::: {.callout-warning}
+## ArviZ changed its default interval
+
+`az.summary(idata)` now reports an **89% equal-tailed interval** (`eti89_lb`, `eti89_ub`). This
+course uses the **highest density interval**, which is the *shortest* interval containing a given
+probability mass.
+
+Always ask for it: `az.summary(idata, ci_kind="hdi", ci_prob=0.94)`.
+
+For a symmetric posterior the two nearly coincide. For a skewed one they do not, and the HDI is
+the honest summary.
+:::
+
+---
+
+# Step 1 — Check the prior before you use it
+
+We will model the count of high-SNAP weeks as Beta-Binomial. Start with `Beta(2, 2)` — weakly
+informative, centred at 0.5.
+
+**Before fitting anything**, ask what that prior alone implies about the data.
+
+```{python}
+with pm.Model() as model:
+    theta = pm.Beta("theta", alpha=2, beta=2)
+    obs   = pm.Binomial("obs", n=N_WEEKS, p=theta, observed=N_HIGH)
+    prior_pred = pm.sample_prior_predictive(500, random_seed=42)
+
+sim = prior_pred.prior_predictive["obs"].values.ravel()
+fig, ax = plt.subplots(figsize=(8, 3))
+ax.hist(sim, bins=40)
+ax.axvline(N_HIGH, color="crimson", lw=2, label=f"observed = {N_HIGH}")
+ax.set_xlabel("simulated high-SNAP weeks out of 277"); ax.legend()
+plt.tight_layout()
+print(f"prior predictive spans {sim.min()} to {sim.max()} weeks")
+```
+
+**Read the plot.** The prior thinks almost any count is plausible — from nearly zero to nearly
+every week. The observed value sits comfortably inside, so the prior is not *wrong*.
+
+But is it *good*? SNAP is disbursed on a published calendar. We are not genuinely ignorant here,
+and a prior that entertains "every week is a high-SNAP week" is entertaining something we know is
+false.
+
+---
+
+# Step 2 — Fit it
+
+```{python}
+with model:
+    idata = pm.sample(2000, tune=1000, chains=4, progressbar=False, random_seed=42)
+
+summary = az.summary(idata, ci_kind="hdi", ci_prob=0.94)
+print(summary.round(4).to_string())
+```
+
+The posterior mean sits between the prior mean of 0.5 and the observed proportion — much closer
+to the data, because 277 observations carry far more weight than a `Beta(2, 2)` prior.
+
+---
+
+# Step 3 — Did the sampler work?
+
+MCMC always returns samples. Whether they came from the posterior is a separate question, and one
+you are expected to answer every time.
+
+```{python}
+n_div = int(idata.sample_stats.diverging.sum())
+print(f"R-hat        {summary.r_hat.max():.3f}    (want < 1.01)")
+print(f"ESS (bulk)   {summary.ess_bulk.min():.0f}      (want > 400)")
+print(f"divergences  {n_div}        (want 0)")
+
+az.plot_trace(idata, var_names=["theta"]);
+plt.tight_layout()
+```
+
+**Read the trace plot.** On the right, four chains overlapping in a band with no drift and no
+stuck stretches — that is what convergence looks like. On the left, four densities lying on top
+of one another.
+
+If the chains had separated, $\hat{R}$ would exceed 1.01 and nothing downstream would mean
+anything.
+
+---
+
+# Step 4 — Ask the posterior a question
+
+The posterior is a set of samples, so any question about $\theta$ is answered by counting.
+
+```{python}
+theta = idata.posterior["theta"].values.ravel()
+
+print(f"P(theta > 0.30)          = {(theta > 0.30).mean():.3f}")
+print(f"P(0.24 < theta < 0.28)   = {((theta > 0.24) & (theta < 0.28)).mean():.3f}")
+print(f"94% HDI                  = {np.round(az.hdi(theta, prob=0.94), 4)}")
+```
+
+**Say the first line out loud as a sentence a manager would understand.** Then notice you cannot
+say anything of that form from a confidence interval — a frequentist 94% interval is a statement
+about the procedure, not about $\theta$.
+
+---
+
+# Step 5 — How much did the prior matter?
+
+The honest objection to Bayesian work is that the prior is arbitrary. Test how much it moves the
+answer.
+
+```{python}
+rows = []
+for a, b, label in [(2, 2, "Beta(2,2) — weak, centred 0.5"),
+                    (5, 15, "Beta(5,15) — informed, centred 0.25"),
+                    (20, 2, "Beta(20,2) — badly wrong, centred 0.91")]:
+    with pm.Model():
+        th = pm.Beta("theta", alpha=a, beta=b)
+        pm.Binomial("obs", n=N_WEEKS, p=th, observed=N_HIGH)
+        i2 = pm.sample(1000, tune=1000, chains=2, progressbar=False, random_seed=42)
+    s = az.summary(i2, ci_kind="hdi", ci_prob=0.94)
+    rows.append({"prior": label, "prior_mean": round(a/(a+b), 3),
+                 "posterior_mean": round(float(s["mean"].iloc[0]), 3)})
+print(pd.DataFrame(rows).to_string(index=False))
+```
+
+::: {.callout-important}
+## With enough data the prior stops mattering
+
+Three priors, including one centred on 0.91 — badly, deliberately wrong. All three posteriors land
+close together, because 277 observations dominate.
+
+**That is the answer to the arbitrariness objection**, and it comes with a condition attached:
+it holds *when you have enough data*. With 8 observations rather than 277, the third prior would
+still be visible in the answer.
+
+Which is exactly the situation Lecture 11 Part 2 is about.
+:::
+
+**Your turn:** re-run the badly-wrong prior against only the **first 10 weeks** of data and report
+how far the posterior moves.
+
+```{python}
+# ---- your turn: uncomment and fill in ----
+# n_small, k_small = 10, int((ca1.snap_days >= 5).head(10).sum())
+# with pm.Model():
+#     th = pm.Beta("theta", alpha=___, beta=___)      # <- the badly-wrong prior
+#     pm.Binomial("obs", n=n_small, p=th, observed=k_small)
+#     i3 = pm.sample(1000, tune=1000, chains=2, progressbar=False, random_seed=42)
+# print(az.summary(i3, ci_kind="hdi", ci_prob=0.94).round(3).to_string())
+```
+
+---
+
+# Before you leave
+
+> **Discuss (the prior):** Your Step 5 table says a deliberately wrong prior barely changed the
+> answer. Under what circumstances would you *not* be reassured by that, and what would you check?
+>
+> **Discuss (the check):** You verified $\hat{R}$, ESS and divergences before reading any result.
+> Name the equivalent check you have been doing all semester for a non-Bayesian model, and say
+> which is easier to skip.
+>
+> **Discuss (for Homework 6):** Part 1 asks you to run a prior predictive check and propose a
+> better prior than `Beta(2, 2)` for a rate you know is roughly a quarter. What `alpha` and `beta`
+> would you choose, and how would you defend the strength of it rather than just the centre?
+
+---
+
+*Solutions posted to Canvas after class.*

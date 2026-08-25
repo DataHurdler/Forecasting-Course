@@ -199,6 +199,17 @@ Give the per-series intercepts a hierarchical prior, written **non-centred**, as
 Sample with `pm.sample(1000, tune=1500, chains=4, target_accept=0.9)` and report the posterior
 mean, sd and 94% HDI for each coefficient — plus $\hat{R}$, ESS and divergences.
 
+::: {.callout-warning}
+## Ask ArviZ for the HDI explicitly
+
+`az.summary(idata)` reports an **89% equal-tailed interval** by default, not the HDI. For the
+highest-density interval this course uses, call
+`az.summary(idata, ci_kind="hdi", ci_prob=0.94)`, or `az.hdi(samples, prob=0.94)` on raw draws.
+
+An equal-tailed interval cuts 5.5% off each tail; an HDI is the *shortest* interval holding 94%
+of the mass. They coincide for a symmetric posterior and diverge for a skewed one.
+:::
+
 ```{python}
 # Build and sample Bayesian linear regression
 ```
