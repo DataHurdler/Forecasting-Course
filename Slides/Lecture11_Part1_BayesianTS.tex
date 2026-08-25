@@ -201,16 +201,16 @@
 
 % --- Slide: diagnostics failure --------------------------------------------------
 \begin{frame}{The First Fit Failed --- Here Is What That Looks Like}
-  Written the obvious way, with \texttt{pm.GaussianRandomWalk} and default settings, this model
-  samples badly. Lecture 10's checks caught it:
+  Written the obvious way, with \texttt{pm.GaussianRandomWalk}, this model samples badly ---
+  even at \texttt{target\_accept=0.95}. Lecture 10's checks caught it:
   \begin{center}
     {\small
     \begin{tabular}{lrrl}
       \toprule
       & \textbf{First attempt} & \textbf{After the fix} & \textbf{Want} \\
       \midrule
-      $\hat{R}$ & 1.030 & \textbf{1.000} & $< 1.01$ \\
-      ESS (bulk) & 157 & \textbf{2{,}500} & $> 400$ \\
+      $\hat{R}$ & 1.022 & \textbf{1.002} & $< 1.01$ \\
+      ESS (bulk) & 252 & \textbf{2{,}617} & $> 400$ \\
       Divergences & 0 & 0 & $0$ \\
       \bottomrule
     \end{tabular}
@@ -317,8 +317,8 @@
       \item \textbf{Fourier terms} encode seasonality in a few coefficients instead of 52. Same
             device as Prophet in Lecture 3 and the features you built in Homework 4.
 
-      \item \textbf{Check the sampler before the forecast.} Our first fit had $\hat{R}$ = 1.03
-            and ESS = 157 while returning a plausible-looking answer. Reparameterizing fixed it.
+      \item \textbf{Check the sampler before the forecast.} Our first fit had $\hat{R}$ = 1.02
+            and ESS = 252 while returning a plausible-looking answer. Reparameterizing fixed it.
 
       \item The point forecast beat seasonal naive by \textbf{4\%}. That is not the argument.
 

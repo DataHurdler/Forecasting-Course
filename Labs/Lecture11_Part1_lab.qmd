@@ -1,0 +1,300 @@
+---
+title: "Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+A structural model writes a series as parts you can name — a level that drifts, a seasonal shape,
+and noise — and puts a prior on each. The output is not a forecast line but a distribution for
+every future week.
+
+Today you will build one, hit a failure the diagnostics catch, fix it — and then find that the
+*correct* way to forecast produces a worse-calibrated interval than the shortcut.
+
+That last result is not a mistake in the lab. It is the model telling you something, and working
+out what takes the rest of the session.
+
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
+`data/processed/m5_weekly.csv`. Sampling takes about 20 seconds per fit.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pymc as pm
+import arviz as az
+import warnings, logging
+warnings.filterwarnings('ignore')
+logging.getLogger('pymc').setLevel(logging.ERROR)
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first.")
+
+weekly = pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
+ca1 = (weekly[(weekly.store_id == "CA_1") & (weekly.cat_id == "FOODS")]
+         .sort_values("week_start").reset_index(drop=True))
+
+N_TEST = 52
+train, test = ca1.iloc[:-N_TEST], ca1.iloc[-N_TEST:]
+y = train.units.values.astype(float)
+n = len(train)
+y_mu, y_sd = y.mean(), y.std()
+y_z = (y - y_mu) / y_sd          # standardize: the priors below assume unit scale
+
+K, P = 3, 52                     # 3 Fourier pairs, annual period on weekly data
+def fourier(t):
+    return np.column_stack([f(2*np.pi*k*t/P) for k in range(1, K+1) for f in (np.sin, np.cos)])
+t_all = np.arange(len(ca1))
+X_tr, X_te = fourier(t_all[:n]), fourier(t_all[n:])
+
+print(f"train {n} weeks, test {N_TEST} weeks | {2*K} Fourier coefficients standing in for 52")
+```
+
+---
+
+# Step 1 — Fit it the obvious way
+
+The model is a drifting level plus seasonality. PyMC has a distribution for a random walk, so the
+natural thing is to use it.
+
+```{python}
+with pm.Model() as centred:
+    sigma_level = pm.Exponential("sigma_level", 10.0)
+    level = pm.GaussianRandomWalk("level", sigma=sigma_level, shape=n)
+    beta  = pm.Normal("beta", 0, 0.5, shape=2*K)
+    sigma = pm.Exponential("sigma", 1.0)
+    pm.Normal("obs", mu=level + pm.math.dot(X_tr, beta), sigma=sigma, observed=y_z)
+    idata_c = pm.sample(1500, tune=2000, chains=4, progressbar=False,
+                        random_seed=42, target_accept=0.95)
+
+s_c = az.summary(idata_c, var_names=["sigma_level", "sigma", "beta"],
+                 ci_kind="hdi", ci_prob=0.94)
+print(f"R-hat        {s_c.r_hat.max():.3f}   (want < 1.01)")
+print(f"ESS (bulk)   {s_c.ess_bulk.min():.0f}     (want > 400)")
+print(f"divergences  {int(idata_c.sample_stats.diverging.sum())}")
+```
+
+**It did not converge.** No exception, a forecast is available, and the diagnostics are the only
+thing telling you not to use it. Note that `target_accept` is already at 0.95 — this is not fixed
+by asking the sampler to try harder.
+
+---
+
+# Step 2 — Reparameterize
+
+The problem is the *shape* of the posterior, not the model. Write the walk as a cumulative sum of
+standard Normal draws scaled by `sigma_level`, and the sampler gets a geometry it can navigate.
+
+```{python}
+with pm.Model() as model:
+    sigma_level = pm.Exponential("sigma_level", 10.0)
+    z = pm.Normal("z", 0, 1, shape=n)                              # standard normal
+    level = pm.Deterministic("level", pm.math.cumsum(z * sigma_level))
+    beta  = pm.Normal("beta", 0, 0.5, shape=2*K)
+    sigma = pm.Exponential("sigma", 1.0)
+    pm.Normal("obs", mu=level + pm.math.dot(X_tr, beta), sigma=sigma, observed=y_z)
+    idata = pm.sample(1500, tune=2000, chains=4, progressbar=False,
+                      random_seed=42, target_accept=0.95)
+
+s = az.summary(idata, var_names=["sigma_level", "sigma", "beta"], ci_kind="hdi", ci_prob=0.94)
+print(f"R-hat        {s.r_hat.max():.3f}   (want < 1.01)")
+print(f"ESS (bulk)   {s.ess_bulk.min():.0f}    (want > 400)")
+print(f"divergences  {int(idata.sample_stats.diverging.sum())}")
+```
+
+**Same model, same data, same priors.** `cumsum(z * sigma)` and `GaussianRandomWalk(sigma=sigma)`
+describe the identical distribution — only the coordinates the sampler explores have changed.
+
+Look at the components it recovered:
+
+```{python}
+lev = idata.posterior["level"].values.reshape(-1, n).mean(0) * y_sd + y_mu
+sea = (idata.posterior["beta"].values.reshape(-1, 2*K) @ X_tr.T).mean(0) * y_sd
+
+fig, ax = plt.subplots(2, 1, figsize=(10, 4.5), sharex=True)
+ax[0].plot(train.week_start, train.units, lw=.8, alpha=.5, label="observed")
+ax[0].plot(train.week_start, lev, lw=2, label="level")
+ax[0].legend(); ax[0].set_ylabel("units")
+ax[1].plot(train.week_start, sea, lw=1.5, color="darkgreen")
+ax[1].set_ylabel("seasonal"); ax[1].axhline(0, color="k", lw=.5)
+plt.tight_layout()
+```
+
+---
+
+# Step 3 — Forecast, two ways
+
+To forecast you need the level at each future week. There are two candidates, and one of them is
+theoretically right.
+
+**Held constant:** carry the last estimated level forward unchanged. Simple, and it asserts the
+level stops drifting the moment your data ends — which is not what the model says.
+
+**Propagated:** let the level keep random-walking forward, exactly as it did in-sample. This is
+what the fitted model actually implies.
+
+```{python}
+rng = np.random.default_rng(42)
+post = idata.posterior
+lev_last = post["level"].values[:, :, -1].ravel()
+sl       = post["sigma_level"].values.ravel()
+b        = post["beta"].values.reshape(-1, 2*K)
+sg       = post["sigma"].values.ravel()
+D = len(lev_last)
+actual = test.units.values
+
+def score(draws, label):
+    pred = draws.mean(0) * y_sd + y_mu
+    lo, hi = np.percentile(draws, [3, 97], axis=0) * y_sd + y_mu
+    return {"method": label,
+            "RMSE": round(float(np.sqrt(np.mean((actual - pred)**2)))),
+            "coverage_%": round(100*float(np.mean((actual >= lo) & (actual <= hi)))),
+            "mean_width": round(float(np.mean(hi - lo)))}
+
+# (a) level held constant at its last value  -- the tempting shortcut
+mu_a = lev_last[:, None] + b @ X_te.T
+draws_a = mu_a + rng.normal(0, 1, size=mu_a.shape) * sg[:, None]
+
+# (b) level keeps random-walking into the future -- what the model actually says
+steps = rng.normal(0, 1, size=(D, N_TEST)) * sl[:, None]
+mu_b = lev_last[:, None] + np.cumsum(steps, axis=1) + b @ X_te.T
+draws_b = mu_b + rng.normal(0, 1, size=mu_b.shape) * sg[:, None]
+
+print(pd.DataFrame([score(draws_a, "level held constant"),
+                    score(draws_b, "level propagated")]).to_string(index=False))
+```
+
+::: {.callout-important}
+## The theoretically correct choice calibrated worse. Work out why.
+
+The point forecasts barely differ. The **intervals** differ enormously — and not in the direction
+you would predict.
+
+Propagating the walk is the defensible choice: the level genuinely does keep drifting, and freezing
+it asserts a certainty the model does not have. Yet the propagated interval **over-covers**, while
+the frozen one lands close to its nominal 94%.
+
+Over-covering means too wide. Over 52 weeks the propagated level accumulates roughly
+$\sqrt{52}\,\sigma_{\text{level}}$ of drift, so if $\sigma_{\text{level}}$ is too large the
+interval inflates fast.
+
+**And there is good reason to think it is too large.** The random walk is the most flexible part of
+this model. Anything the Fourier terms fail to capture — a promotion, a holiday shift, an outlier —
+gets absorbed into the level, inflating $\sigma_{\text{level}}$ beyond genuine drift.
+
+So the frozen version is not right. It is **wrong in a way that happens to cancel** an
+overestimated drift on this series and this horizon. Rely on that and it will fail elsewhere.
+:::
+
+**Your turn:** check the size of the estimated drift against the noise it is competing with.
+
+```{python}
+# ---- your turn: uncomment and fill in ----
+# print(az.summary(idata, var_names=[___, ___],        # <- the two scale parameters
+#                  ci_kind="hdi", ci_prob=0.94).round(4).to_string())
+# print("\ndrift accumulated over 52 weeks, in standardized units:")
+# print(f"  {np.sqrt(52) * float(post['sigma_level'].values.mean()):.2f}")
+```
+
+---
+
+**Now split coverage by horizon**, which is where the difference actually shows.
+
+```{python}
+def by_horizon(draws, label):
+    lo, hi = np.percentile(draws, [3, 97], axis=0) * y_sd + y_mu
+    inside = (actual >= lo) & (actual <= hi)
+    segs = {"wk 1-13": slice(0,13), "wk 14-39": slice(13,39), "wk 40-52": slice(39,52)}
+    row = {"method": label}
+    for name, sl_ in segs.items():
+        row[name] = f"{100*inside[sl_].mean():.0f}% / {int((hi-lo)[sl_].mean()):,}"
+    return row
+
+print("coverage / mean width, by horizon (nominal 94%)")
+print(pd.DataFrame([by_horizon(draws_a, "level held constant"),
+                    by_horizon(draws_b, "level propagated")]).to_string(index=False))
+```
+
+**Read the widths across each row.** The frozen version's interval is essentially the same width
+at week 50 as at week 1 — it has no mechanism to widen. The propagated version's roughly doubles.
+
+That is the real distinction, and it is structural rather than a matter of which scored better
+here: **one of these models knows that forecasting further ahead is harder, and the other does
+not.** On this series, at this horizon, that ignorance happened not to cost anything. On a series
+with a genuinely drifting level it would.
+
+---
+
+# Step 4 — Calibrated is not the same as useful
+
+Take the propagated version — the one the model implies — and ask two separate questions of it.
+
+```{python}
+res = score(draws_b, "level propagated")
+print(f"coverage      {res['coverage_%']}%   against a nominal 94%")
+print(f"mean width    {res['mean_width']:,} units")
+print(f"              = {100*res['mean_width']/ca1.units.mean():.0f}% of average weekly units")
+print(f"RMSE          {res['RMSE']:,}")
+print(f"seasonal naive{np.sqrt(np.mean((actual - train.units.values[-52:])**2)):>7,.0f}")
+```
+
+**Question one: is it calibrated?** Compare coverage against 94%.
+
+**Question two: is it useful?** Compare the width against the size of the thing you are
+forecasting, and ask whether you would place an inventory order against it.
+
+**Your turn:** state, in one sentence each, your answer to both — and whether passing the first
+excuses failing the second.
+
+```{python}
+# ---- your turn: uncomment and answer in the strings ----
+# calibrated = "..."
+# useful     = "..."
+# print(calibrated); print(useful)
+```
+
+---
+
+# Before you leave
+
+> **Discuss (the two problems):** The convergence failure was caught by a diagnostic. The
+> over-wide interval was not — it needed a held-out set and a coverage calculation. What is the
+> structural difference between the two, and what habit catches the second kind?
+>
+> **Discuss (the payoff):** The point forecast beat seasonal naive by only a few percent. Given
+> that, what did fitting this model actually buy — and name a business question it can answer that
+> XGBoost from Homework 4 cannot.
+>
+> **Discuss (the fix):** The interval is honest and too wide to act on. Propose one change to the
+> *model* — not the forecasting code — that would narrow it, and say what you would be assuming
+> in exchange.
+
+---
+
+*Solutions posted to Canvas after class.*

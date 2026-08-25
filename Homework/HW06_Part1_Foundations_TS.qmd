@@ -204,14 +204,22 @@ train, test = ca1.iloc[:-N_TEST], ca1.iloc[-N_TEST:]
 
 ### Q4 — Forecast, and Whether to Trust It *(Suggested prompts: 2)*
 
-Forecast the held-out 52 weeks. **Propagate the level forward as a random walk** — do not carry
-the last level as a constant, or your intervals will not widen with horizon.
+Forecast the held-out 52 weeks **two ways** and compare.
+
+**(a) Propagated** — let the level keep random-walking forward, which is what the fitted model
+implies. **(b) Held constant** — carry the last level forward unchanged.
+
+Report coverage and mean interval width for each, and additionally **split coverage by horizon**
+(roughly weeks 1–13, 14–39, 40–52). The frozen version produces intervals of near-constant width;
+the propagated one widens with horizon. Which is better calibrated on this series is a question
+for your data, not for theory — answer it from your numbers.
 
 Report three things: RMSE, the seasonal-naive RMSE for comparison, and the **coverage** of your
 94% interval (the fraction of held-out weeks falling inside).
 
 ```{python}
-# Forecast with propagated level uncertainty; compute RMSE and coverage
+# Forecast both ways; compute RMSE, coverage and mean width for each
+# Then split coverage by horizon
 ```
 
 > **Your response:** Answer two separate questions and do not let one excuse the other.
