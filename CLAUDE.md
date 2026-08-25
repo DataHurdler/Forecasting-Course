@@ -185,10 +185,10 @@ template-maintenance gates that this course repo does not satisfy.
 | 8: CNN Architectures | `Lecture08_CNNs.tex` ✓ | `Lecture08_CNNs.qmd` ✓ | Convolution, pooling, LeNet→VGG→Inception→ResNet, residual connections, 1D CNN for time series. |
 | 9 Part 1: RNNs & LSTMs (Wk 9) | `Lecture09_Part1_RNN_LSTM.tex` ✓ | *(pending)* | Recurrence, BPTT, vanishing gradients, LSTM gates, cell state as additive path. Measured: RNN 805 beats LSTM 957 at all windows. |
 | 9 Part 2: Transformers (Wk 10) | `Lecture09_Part2_Transformers.tex` ✓ | *(pending)* | Scaled dot-product attention, multi-head, encoder block, positional encoding (measured: 895 with, 1,289 without). |
-| 10: Bayesian Statistics I — Foundations | `Lecture10_BayesianI.tex` ✓ | `Lecture10_BayesianI.qmd` ✓ | Frequentist vs Bayesian, Bayes' theorem, priors (Beta/Normal/Exponential), MCMC/NUTS, PyMC, prior predictive checks. |
+| 10: Bayesian Statistics I — Foundations | `Lecture10_BayesianFoundations.tex` ✓ | `Lecture10_BayesianFoundations.qmd` ✓ | Frequentist vs Bayesian, Bayes' theorem, priors (Beta/Normal/Exponential), MCMC/NUTS, PyMC, prior predictive checks. |
 | 11 Part 1: Bayesian TS (Wk 12) | `Lecture11_Part1_BayesianTS.tex` ✓ | *(pending)* | Structural decomposition, local level, Fourier seasonality. Measured: RMSE 1,587 vs naive 1,660; 94% interval 100% covered but ±30% wide. |
 | 11 Part 2: Hierarchical (Wk 13) | `Lecture11_Part2_Hierarchical.tex` ✓ | *(pending)* | Complete/no/partial pooling, non-centred parameterization. Measured: thin series shrink 11.5× more; 104 divergences → 0. |
-| 12: Bayesian Statistics III — Linear Regression | `Lecture12_BayesianIII.tex` ✓ | `Lecture12_BayesianIII.qmd` ✓ | Bayesian linear regression, posterior coefficient distributions, HDI, DAGs, scenario analysis, course method map. |
+| 12: Bayesian Statistics III — Linear Regression | `Lecture12_BayesianRegression.tex` ✓ | `Lecture12_BayesianRegression.qmd` ✓ | Bayesian linear regression, posterior coefficient distributions, HDI, DAGs, scenario analysis, course method map. |
 | 13: Synthesis *(not on syllabus)* | `Lecture13_Synthesis.tex` ✓ | *(pending)* | Course-wide scoreboard, the three lessons the measurements taught, method-choice guide, silent-failure catalogue. **Needs updating once the final-project / homework / lab decisions settle.** |
 
 ---
