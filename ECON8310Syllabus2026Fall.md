@@ -69,20 +69,6 @@ The textbook I chose has both an R version and a Python version, although the Py
 - *Forecasting: Principles and Practice, the Pythonic Way* (**FPP-Py**), available online at [https://otexts.com/fpppy/](https://otexts.com/fpppy/)
 - *Forecasting: Principles and Practice (3rd ed)* (**FPP3**, the R edition), available online at [https://otexts.com/fpp3/](https://otexts.com/fpp3/)
 
-There is one gap FPP cannot fill: it contains no tree-based methods and no regularization. For Lectures 4 through 6 we use a second free textbook:
-
-- *An Introduction to Statistical Learning with Applications in Python* (**ISLP**), free PDF at [https://www.statlearning.com/](https://www.statlearning.com/)
-
-ISLP is by four of the same statisticians behind the standard graduate reference in this area, it is written at exactly our level, and every chapter ends with a Python lab. Its Chapter 8 covers decision trees, bagging, random forests, and boosting together; its Chapter 6 covers regularization. That is Lectures 4 through 6 almost exactly.
-
-Neither book covers Bayesian methods. For Lectures 10 through 12 we use a third free textbook:
-
-- *Bayesian Modeling and Computation in Python* (**BMCP**), by Martin, Kumar and Lao, free online at [https://bayesiancomputationbook.com/](https://bayesiancomputationbook.com/)
-
-BMCP is written by PyMC core developers, and every example is PyMC and ArviZ code — the exact libraries we use. It is the closest thing to a purpose-built text for our last three lectures: Chapter 1 covers priors and prior predictive checks, Chapter 2 covers the MCMC diagnostics you will be asked to report, §4.5–4.6 covers pooling and hierarchical models, and §6.4.3 is *Bayesian Structural Time Series* by name.
-
-A note on level. BMCP is mathematically heavier than FPP in places, and **you are not responsible for the derivations**. Read the assigned sections for the ideas and the code, run the examples, and treat the rest as reference. The slides define what you are accountable for; BMCP shows you the same ideas in working PyMC.
-
 ### How the Two Editions Line Up
 Chapters 1 through 13 carry the **same numbers and titles** in both editions, so for the first two-thirds of the course you can read either one and we will be on the same page.
 
@@ -93,7 +79,21 @@ Two differences matter:
 
 This is the practical reason for the Python recommendation. Through Lecture 6 the choice of language is yours. From **Lecture 7 onward the readings exist only in Python**, and so does all of our course code.
 
-Two further free resources, both linked from Canvas:
+There is one gap FPP cannot fill: it contains no tree-based methods and no regularization. For Lectures 4 through 6 we use a second free textbook:
+
+- *An Introduction to Statistical Learning with Applications in Python* (**ISLP**), free PDF at [https://www.statlearning.com/](https://www.statlearning.com/)
+
+ISLP is by four of the same statisticians behind the standard graduate reference in this area, it is written at our level, and every chapter ends with a Python lab. Its Chapter 8 covers decision trees, bagging, random forests, and boosting together; its Chapter 6 covers regularization. That is Lectures 4 through 6 almost exactly.
+
+Neither book covers Bayesian methods. For Lectures 10 through 12 we use a third free textbook:
+
+- *Bayesian Modeling and Computation in Python* (**BMCP**), by Martin, Kumar and Lao, free online at [https://bayesiancomputationbook.com/](https://bayesiancomputationbook.com/)
+
+BMCP is written by PyMC core developers, and every example is PyMC and ArviZ code — the exact libraries we use. It is the closest thing to a purpose-built text for our last three lectures: Chapter 1 covers priors and prior predictive checks, Chapter 2 covers the MCMC diagnostics you will be asked to report, §4.5–4.6 covers pooling and hierarchical models, and §6.4.3 is *Bayesian Structural Time Series* by name.
+
+A note on level. BMCP is mathematically heavier than FPP in places, and **you are not responsible for the derivations**. Read the assigned sections for the ideas and the code, run the examples, and treat the rest as reference. The slides define what you are accountable for; BMCP shows you the same ideas in working PyMC.
+
+Two further free resources, both referenced in our materials:
 
 - **XGBoost, "Introduction to Boosted Trees"** — [https://xgboost.readthedocs.io/en/stable/tutorials/model.html](https://xgboost.readthedocs.io/en/stable/tutorials/model.html). Derives the regularized objective and the split-gain formula we cover in Lecture 5.
 - **Molnar, *Interpretable Machine Learning*** — [https://christophm.github.io/interpretable-ml-book/](https://christophm.github.io/interpretable-ml-book/). Ch. 9 (decision trees), Ch. 19 (partial dependence), Ch. 23 (permutation feature importance). Useful for Lectures 3 through 5.
@@ -181,14 +181,15 @@ A tentative weekly course schedule is at the end of this syllabus.
 Exceptions for any assignment should be communicated at least 24 hours ahead of the due time, unless it is an emergency situation.
 No late homework is otherwise accepted.
 
-All homework is submitted through the course repository, and is due **before class begins**
-on the date shown in the weekly schedule. A submission pushed after that time is late and will
-not be accepted.
+All homework is submitted through the course repository, and is due **before class begins** on the date shown in the weekly schedule.
+A submission pushed after that time is late and willnot be accepted.
 
+<!--
 ### Homework
 You must answer all homework questions.
 At least one question will be checked for credit, except for homework assignments that are graded for completion.
 If you really do not know how to proceed with a homework question, you should email me.
+-->
 
 There are 7 homework assignments, each worth 30 points, for a total of 210 points.
 Several assignments are submitted in parts across multiple weeks. **The parts of an assignment
@@ -209,11 +210,8 @@ Which lectures each assignment draws on:
 
 Due dates are in the **weekly schedule** at the end of this syllabus.
 
-### Pop Quizzes
-Throughout the semester, there are 3 pop quizzes, each is worth 30 points, for a total of 90 points.
-
 ### Final Project
-The final project is completed in **groups of 2–3 students** and is worth 100 points — a quarter of the course grade.
+The final project is completed in **groups of no more than 3 students** and is worth 100 points — a quarter of the course grade.
 Groups are formed by Week 4 and submitted to me for approval.
 
 **Dataset requirements.** Each group selects a real business dataset of its choosing. The dataset must:
@@ -233,8 +231,8 @@ Groups are formed by Week 4 and submitted to me for approval.
 |---|---|---|
 | Group formation | Week 4 (Sep. 17) | 5 |
 | Project proposal — 1–2 pages: dataset, business question, planned methods, preliminary EDA | Week 9 (Oct. 22) | 20 |
-| In-class presentation | Week 17 (Dec. 17) | 15 |
-| Final report | Dec. 18 | 60 |
+| In-class presentation | Week 17 (Dec. 17) | 25 |
+| Final report | Dec. 18 | 50 |
 
 **Final report format.** Submit as a rendered Quarto HTML file (`.qmd` + `.html`) through the course repository.
 The report should include all code, outputs, and written analysis in a single self-contained document.
@@ -252,21 +250,16 @@ The grading rubric will be distributed by Week 6.
 Students with full attendance will be awareded 10 extra points. There are time-sensitive extra point opportunities throughout the semester. Please pay attention to annoucements in-class or on Canvas.
 
 Your letter grade will be assigned as follows:
-- A+: 392 points or higher
-- A: 364-391 points
-- B+: 352-363 points
-- B: 324-351 points
-- C+: 312-323 points
-- C: 284-311 points
-- D: 244-283 points
-- F: 243 points or less
+- A: 360 points or higher
+- B: 320-359 points
+- C: 280-319 points
+- D: 240-279 points
+- F: 239 points or less
 
 ## A Note on Difficulty and Pacing
 This course covers a wide range of methods — from classical statistics to deep learning to Bayesian inference.
 Some weeks will be more familiar to you than others depending on your background.
-Students with a data science background may find Lectures 1–2 straightforward and Lectures 10–12 more challenging.
-Economics students may find the reverse.
-MBA students will find Lectures 1–3 most accessible and should expect to invest extra time in Lectures 7–12.
+Work with each other so you can complement each other.
 
 The methods build on each other. Falling behind in one week makes the next harder.
 Use office hours early and often.
@@ -278,7 +271,7 @@ Dates that affect this course specifically:
 
 - **Sep. 24, 2026** — no in-person meeting; Week 5 is delivered online (see the schedule below)
 - **Nov. 26, 2026** — Thanksgiving break, no class
-- **Dec. 17, 2026** — final project presentations, 5:30–7:30pm
+- **Dec. 17, 2026** — final project presentations
 - **Dec. 18, 2026** — final project report due
 
 Withdrawal deadlines and university closures are on the academic calendar linked above.
@@ -296,8 +289,8 @@ For more information, please contact ASC (Location: HK 104, Phone: 402.554.2872,
 
 ## Book Nook
 I love to read. Here are two books I have enjoyed reading:
-- _Beginners_ by Tom Vanderbilt
-- _Range_ by David Epstein
+- _When: The Scientific Secrets of Perfect Timing_ by Daniel Pink
+- _Range: Why Generalists Triumph in a Specialized World_ by David Epstein
 
 ## Disclaimer
 While this document is designed to be as accurate as possible, learning is a dynamic process and I reserve the right to change some details.
@@ -312,7 +305,7 @@ Everything in one place: what we cover, what to read, and what is due. Assignmen
 | Wk | Date | Lecture | Reading | Due / Notes |
 |---|---|---|---|---|
 | 1 | Aug 27 | 1 — Intro, Exponential Smoothing & Evaluation | FPP Ch. 1, Ch. 2, §5.1–5.10, Ch. 8 | |
-| 2 | Sep 3 | 2 — ARIMA, VAR & Multivariate | FPP Ch. 9, §10.1–10.3, §10.6, §12.3 | **HW 1 Pt 1**; roundtable with business professionals, 6–7pm |
+| 2 | Sep 3 | 2 — ARIMA, VAR & Multivariate | FPP Ch. 9, §10.1–10.3, §10.6, §12.3 | **HW 1 Pt 1**; panel with business professionals, 6–7pm |
 | 3 | Sep 10 | 3 — Generalized Additive Models | FPP §7.4, §7.7, §12.1–12.2 | **HW 1 Pt 2** |
 | 4 | Sep 17 | 4 — Decision Trees | ISLP §8.1 | **HW 2**; **project groups due** |
 | 5 | Sep 24 | 5 — Tree Ensembles: RF & Boosted Trees | ISLP §8.2; XGBoost *Introduction to Boosted Trees*; FPP §12.4 Py / §12.5 R for bagging | **Online, asynchronous — no in-person meeting.** Recorded lecture and self-paced lab on the course site; office hours as usual. Nothing due; use this week for HW 3 |
@@ -327,7 +320,7 @@ Everything in one place: what we cover, what to read, and what is due. Assignmen
 | 14 | Nov 26 | — | — | **Thanksgiving break, no class** |
 | 15 | Dec 3 | 12 — Bayesian III: Linear Regression | **BMCP §3.2–3.3**; FPP Ch. 7 as the frequentist benchmark | **HW 6 Pt 2** |
 | 16 | Dec 10 | Final thoughts; project work session | FPP Ch. 13 | **HW 7** |
-| 17 | Dec 17 | **Final project presentations, 5:30–7:30pm** | — | |
+| 17 | Dec 17 | **Final project presentations** | — | |
 | — | Dec 18 | | | **Final project report due** |
 
 From Lecture 7 onward the FPP readings exist **only in the Python edition**. Where the two
