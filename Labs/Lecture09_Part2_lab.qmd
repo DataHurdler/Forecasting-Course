@@ -1,0 +1,242 @@
+---
+title: "Lab 9 Part 2: Attention — and the Line You Cannot Forget"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Last week's recurrent models read the window one step at a time. Attention does not: every
+position looks at every other position at once, so week 3 reaches week 50 in a single operation
+rather than through forty-seven state updates.
+
+Today you build a Transformer encoder, then delete one line from it and watch it fall apart. That
+line is the one PyTorch does not add for you, and forgetting it is the most common way this
+architecture fails silently.
+
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+`data/processed/m5_weekly.csv`.
+
+::: {.callout-note}
+## This lab is slow
+
+Attention is $O(T^2)$ in sequence length, and we use a 52-week window. A single fit takes about
+70 seconds and Step 3 trains four of them. Start the cell, read while it runs.
+:::
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+import torch
+import torch.nn as nn
+import warnings
+warnings.filterwarnings('ignore')
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first.")
+
+weekly = (pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
+            .sort_values(["store_id", "cat_id", "week_start"]))
+CHANNELS, WINDOW = ["units", "snap_days", "event_days", "avg_price"], 52
+CUTOFF = np.datetime64("2015-05-17")
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+
+X, Y, D = [], [], []
+for _, g in weekly.groupby(["store_id", "cat_id"]):
+    arr, dates = g[CHANNELS].values.astype("float32"), g.week_start.values
+    for i in range(len(g) - WINDOW):
+        X.append(arr[i:i+WINDOW]); Y.append(arr[i+WINDOW, 0]); D.append(dates[i+WINDOW])
+X = np.stack(X); Y = np.array(Y, dtype="float32"); D = np.array(D)
+tr, te = D < CUTOFF, D >= CUTOFF
+mu, sd = X[tr].mean((0,1), keepdims=True), X[tr].std((0,1), keepdims=True) + 1e-8
+ym, ys = Y[tr].mean(), Y[tr].std()
+Xn, Yn = (X - mu)/sd, (Y - ym)/ys
+X_tr, y_tr, X_te = torch.tensor(Xn[tr]), torch.tensor(Yn[tr]), torch.tensor(Xn[te])
+print(f"{X.shape[0]:,} windows of {WINDOW} weeks — train {tr.sum():,}, test {te.sum():,}")
+```
+
+---
+
+# Step 1 — Positional encoding, before the model
+
+Attention computes a **weighted average** over positions. Averaging does not care about order:
+shuffle the input and every attention output is unchanged.
+
+So position has to be added to the input itself. The standard device is a set of sinusoids of
+different frequencies.
+
+```{python}
+def sinusoidal(seq_len, d_model):
+    pe = torch.zeros(seq_len, d_model)
+    pos = torch.arange(seq_len).unsqueeze(1).float()
+    div = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+    pe[:, 0::2] = torch.sin(pos * div)
+    pe[:, 1::2] = torch.cos(pos * div)
+    return pe.unsqueeze(0)
+
+pe = sinusoidal(WINDOW, 64)
+fig, ax = plt.subplots(figsize=(9, 3))
+im = ax.imshow(pe[0].T, aspect="auto", cmap="RdBu")
+ax.set_xlabel("week in window"); ax.set_ylabel("encoding dimension")
+plt.colorbar(im); plt.tight_layout()
+```
+
+**Read the picture.** Every column — every week — has a distinct pattern down the dimensions, so
+the model can tell positions apart. Nearby columns look similar, so it can also learn *relative*
+distance rather than only absolute index.
+
+---
+
+# Step 2 — Build the encoder
+
+```{python}
+class TransformerForecaster(nn.Module):
+    def __init__(self, n_channels=4, d_model=64, nhead=4, layers=2, use_pe=True):
+        super().__init__()
+        self.use_pe = use_pe
+        self.inp = nn.Linear(n_channels, d_model)
+        self.register_buffer("pe", sinusoidal(WINDOW, d_model))
+        enc_layer = nn.TransformerEncoderLayer(
+            d_model=d_model, nhead=nhead, dim_feedforward=128,
+            dropout=0.1, batch_first=True)
+        self.enc = nn.TransformerEncoder(enc_layer, num_layers=layers)
+        self.fc = nn.Linear(d_model, 1)
+
+    def forward(self, x):
+        h = self.inp(x)
+        if self.use_pe:
+            h = h + self.pe                 # <- the line in question
+        return self.fc(self.enc(h)[:, -1, :]).squeeze(-1)
+
+def train(use_pe, seed, epochs=30):
+    torch.manual_seed(seed)
+    model = TransformerForecaster(use_pe=use_pe)
+    opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    lossfn = nn.MSELoss()
+    loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(X_tr, y_tr), batch_size=128, shuffle=False)
+    for _ in range(epochs):
+        model.train()
+        for xb, yb in loader:
+            opt.zero_grad()
+            lossfn(model(xb), yb).backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            opt.step()
+    model.eval()
+    with torch.no_grad():
+        return rmse(Y[te], model(X_te).numpy() * ys + ym), sum(p.numel() for p in model.parameters())
+
+score, n_par = train(use_pe=True, seed=1)
+print(f"Transformer — {n_par:,} parameters, test RMSE {score:,.0f}")
+```
+
+**Note the parameter count** against last week's models: the RNN had 4,545 and won.
+
+---
+
+# Step 3 — Delete the line
+
+Same model, same data, same seeds — `use_pe=False` removes the single addition in `forward`.
+
+```{python}
+rows = []
+for use_pe in (True, False):
+    runs = [train(use_pe, s)[0] for s in (1, 2)]
+    rows.append({"positional encoding": "yes" if use_pe else "no",
+                 "mean": round(np.mean(runs)), "sd": round(np.std(runs)),
+                 "runs": [round(r) for r in runs]})
+print(pd.DataFrame(rows).to_string(index=False))
+```
+
+::: {.callout-important}
+## Nothing raised an exception
+
+The model without positional encoding trained happily, converged, and returned forecasts. It was
+simply working from an **unordered bag of 52 weeks** — it could not tell last week from a year
+ago.
+
+Compare the gap against the run-to-run spread in the `sd` column. This is not noise.
+
+`nn.TransformerEncoderLayer` gives you attention, residuals, layer norm and the feed-forward
+sublayer. It does **not** give you position. That is yours to add, and nothing checks that you did.
+:::
+
+**Your turn:** express the penalty as a percentage of the with-encoding RMSE.
+
+```{python}
+# ---- your turn: uncomment and fill in ----
+# df = pd.DataFrame(rows)
+# penalty = ___ - ___
+# print(f"cost of the missing line: {penalty:,.0f} RMSE "
+#       f"({100*penalty/df['mean'].iloc[0]:.0f}% worse)")
+```
+
+---
+
+# Step 4 — Where attention lands
+
+```{python}
+board = {
+    "LASSO, 46 features (HW4)": 744,
+    "XGBoost (HW4)": 781,
+    "Vanilla RNN (Lab 9 Pt 1)": 805,
+    "LSTM (Lab 9 Pt 1)": 998,
+    "Transformer (today)": round(np.mean([r for r in rows[0]["runs"]])),
+    "1D CNN (Lab 8)": 1032,
+    "Seasonal naive": 2152,
+}
+print(pd.Series(board).sort_values().to_string())
+```
+
+The Transformer beats the CNN and lands level with the LSTM, on roughly **fifteen times** the
+parameters of the RNN that beat both.
+
+**Every advantage attention has is an advantage at scale.** Parallel computation across positions
+matters when a sequence is thousands of steps and a corpus is billions of tokens. Direct
+long-range paths matter when the signal genuinely sits far back. Neither describes 5,900 windows
+of weekly retail demand.
+
+---
+
+# Before you leave
+
+> **Discuss (the missing line):** You have now met three failures that produce a plausible number
+> and no error — `KFold` on a time series, a forgotten `zero_grad()`, and a missing positional
+> encoding. What do the three have in common, and what practice would catch all of them?
+>
+> **Discuss (the architecture):** Describe a forecasting problem where you would expect the
+> Transformer to beat everything else here. Be specific about sequence length and data volume.
+>
+> **Discuss (for Homework 5):** Part 2 asks you to fit all three sequence models and explain the
+> ranking. You have now seen it. What the lab does *not* answer is whether that ranking would
+> survive on a different series — name one property of a series that would most likely flip it.
+
+---
+
+*Solutions posted to Canvas after class.*

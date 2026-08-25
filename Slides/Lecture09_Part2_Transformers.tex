@@ -265,7 +265,7 @@
       LASSO, 46 engineered features & \textbf{744} & 46 \\
       XGBoost & 781 & --- \\
       Vanilla RNN & \textbf{842} & 4{,}545 \\
-      \textbf{Transformer encoder}, 2 layers & \textbf{895} & 67{,}329 \\
+      \textbf{Transformer encoder}, 2 layers & \textbf{990} & 67{,}329 \\
       Random forest & 899 & --- \\
       LSTM & 987 & 17{,}985 \\
       1D CNN, best variant & 1{,}202 & 8{,}161 \\
@@ -276,8 +276,9 @@
   \end{center}
 
   \vspace{-0.05cm}
-  The Transformer beats the LSTM and the CNN. It loses to a vanilla RNN holding
-  \textbf{one-fifteenth} as many parameters, and to a 46-coefficient linear model.
+  The Transformer beats the CNN and \textbf{ties the LSTM} --- 990 against 998, a difference
+  smaller than the run-to-run spread. It loses to a vanilla RNN holding \textbf{one-fifteenth} as
+  many parameters, and to a 46-coefficient linear model.
 \end{frame}
 
 % --- Slide: why it didn't win -------------------------------------------------
@@ -305,15 +306,15 @@
     {\small
     \begin{tabular}{lr}
       \toprule
-      Transformer \textbf{with} positional encoding & \textbf{895} \\
-      Transformer \textbf{without} positional encoding & 1{,}289 \\
+      Transformer \textbf{with} positional encoding & \textbf{990} \\
+      Transformer \textbf{without} positional encoding & 1{,}282 \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
 
   \vspace{-0.05cm}
-  \textbf{394 RMSE} --- dropping it below even the 1D CNN. That gap is the price of permutation
+  \textbf{292 RMSE} --- dropping it below even the 1D CNN. That gap is the price of permutation
   invariance, and the reason the sinusoids exist.
 \end{frame}
 
