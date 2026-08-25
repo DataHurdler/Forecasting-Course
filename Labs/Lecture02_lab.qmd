@@ -1,0 +1,190 @@
+---
+title: "Lab 2: Stationarity, ARIMA, and Granger Causality"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Lecture 2 gave you a rule — **test for stationarity before you read an ACF** — and a caveat:
+**Granger causality is not structural causality.** In the next 35 minutes you will do both, on
+data where each one actually bites.
+
+The business question: you are forecasting weekly HOUSEHOLD demand at store CA_1, and you want
+to know whether watching the food aisle helps you predict it.
+
+**Time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `statsmodels`, and
+`data/processed/m5_weekly.csv`.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.stattools import adfuller, grangercausalitytests
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.arima.model import ARIMA
+import warnings
+warnings.filterwarnings('ignore')
+
+weekly = pd.read_csv("data/processed/m5_weekly.csv", parse_dates=["week_start"])
+
+def get_series(store, cat):
+    return (weekly[(weekly.store_id == store) & (weekly.cat_id == cat)]
+            .set_index("week_start")["units"].sort_index().astype(float))
+
+y = get_series("CA_1", "HOUSEHOLD")
+N_TEST = 52
+train, test = y.iloc[:-N_TEST], y.iloc[-N_TEST:]
+print(f"{len(y)} weeks — train {len(train)}, test {len(test)}")
+```
+
+---
+
+# Step 1 — Look, then test
+
+```{python}
+fig, ax = plt.subplots(figsize=(11, 3.2))
+ax.plot(y.index, y.values, lw=1.3)
+ax.set_title("CA_1 HOUSEHOLD — weekly units"); plt.tight_layout()
+```
+
+**Notice:** the level wanders. Your eye says non-stationary. Now make the test agree.
+
+```{python}
+def report_adf(series, label):
+    stat, p, lags, nobs, crit, _ = adfuller(series.dropna(), autolag="AIC")
+    print(f"{label:<28} ADF {stat:>7.2f}   p {p:>6.3f}   lags {lags:>2}   "
+          f"{'stationary' if p < 0.05 else 'UNIT ROOT'}")
+
+report_adf(y, "levels")
+```
+
+**Your turn:** difference the series and re-test. One line.
+
+```{python}
+dy = ___                                    # <- first difference, drop the NaN
+report_adf(dy, "first difference")
+```
+
+You should see the statistic move decisively. Write down both numbers — you will be asked to
+justify a choice of $d$ in the homework, and this is what a *clean* case looks like.
+
+---
+
+# Step 2 — Now you are allowed to read the ACF
+
+Lecture 2's rule: the ACF of a non-stationary series decays slowly no matter what the
+underlying process is. Run both and see it.
+
+```{python}
+fig, axes = plt.subplots(2, 2, figsize=(11, 5))
+plot_acf(y, lags=30, ax=axes[0,0]);  axes[0,0].set_title("ACF — levels (uninformative)")
+plot_pacf(y, lags=30, ax=axes[0,1]); axes[0,1].set_title("PACF — levels")
+plot_acf(dy, lags=30, ax=axes[1,0]);  axes[1,0].set_title("ACF — differenced")
+plot_pacf(dy, lags=30, ax=axes[1,1]); axes[1,1].set_title("PACF — differenced")
+plt.tight_layout()
+```
+
+**Compare the top row against the bottom.** The top ACF crawls down — that is the signature of
+an undifferenced series, and it tells you nothing about $p$ or $q$. The bottom row is
+interpretable.
+
+**Your turn:** using the bottom row and the four reference patterns from Lecture 2, propose a
+$(p, d, q)$. Say it out loud to the person next to you before you fit anything.
+
+---
+
+# Step 3 — Fit it
+
+```{python}
+order = (___, ___, ___)                     # <- your proposal from Step 2
+
+model = ARIMA(train, order=order).fit()
+print(model.summary().tables[0])
+
+fc = model.forecast(N_TEST)
+rmse = float(np.sqrt(np.mean((test.values - np.asarray(fc)) ** 2)))
+print(f"\n52-week RMSE: {rmse:,.0f}")
+```
+
+---
+
+# Step 4 — Break it: the horizon trap
+
+Now the same model, evaluated a different way.
+
+```{python}
+errs = []
+vals = y.values
+for i in range(104, len(vals) - 1):
+    m = ARIMA(vals[:i+1], order=order).fit()
+    errs.append(vals[i+1] - float(m.forecast(1)[0]))
+
+wf = float(np.sqrt(np.mean(np.array(errs) ** 2)))
+print(f"walk-forward 1-step RMSE : {wf:,.0f}   ({len(errs)} origins)")
+print(f"single-split 52-step RMSE: {rmse:,.0f}")
+```
+
+**Notice** how much smaller the walk-forward number is. It is tempting to quote it — it makes
+your model look better.
+
+**Do not.** They answer different questions. One-step-ahead, knowing everything up to last
+week, is a fundamentally easier problem than forecasting a year out from a fixed origin. If a
+planner is ordering inventory twelve months ahead, the 52-step number is the honest one.
+
+---
+
+# Step 5 — Granger causality, and the trap in it
+
+Does the food aisle help predict the household aisle?
+
+```{python}
+food = get_series("CA_1", "FOODS")
+
+pair = pd.concat([y.rename("household"), food.rename("food")], axis=1).diff().dropna()
+
+print("Does FOOD Granger-cause HOUSEHOLD?")
+_ = grangercausalitytests(pair[["household", "food"]], maxlag=4)
+```
+
+**Your turn:** run it in the other direction — swap the column order — and report both
+F-statistics.
+
+```{python}
+print("Does HOUSEHOLD Granger-cause FOOD?")
+_ = ___                                     # <- same call, columns swapped
+```
+
+---
+
+# Before you leave
+
+You should have found the relationship runs **both ways**, at least in part.
+
+> **Discuss:** Household goods do not cause groceries, and groceries do not cause household
+> goods. So what is generating a two-way predictive relationship between two aisles of the same
+> store?
+>
+> And the question that matters commercially: given what you found, is there anything a
+> planner is entitled to *do* with it? Name one legitimate use and one thing they must not
+> conclude.
+
+---
+
+*Solutions posted to Canvas after class.*

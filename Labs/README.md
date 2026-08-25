@@ -41,3 +41,22 @@ belongs in homework, not a lab.
   the session closes
 
 Start from `_TEMPLATE_lab.qmd`.
+
+## Series map — avoid collisions
+
+Labs run **before** the homework they precede, so a lab must not use the series the homework
+asks about. Keep this table current when adding a lab.
+
+| | Primary series | Contrast / second series |
+|---|---|---|
+| **Lab 1** (Week 1) | TX_1 HOUSEHOLD | TX_1 FOODS |
+| **HW1 Parts 1–2** (due Wks 2–3) | CA_1 FOODS | CA_3 FOODS |
+| **Lab 2** (Week 2) | CA_1 HOUSEHOLD | CA_1 FOODS *(Granger step only)* |
+
+Lab 1 and Lab 2 are deliberately built so the *answer differs* from the homework's:
+
+- **Lab 1**: TX_1 HOUSEHOLD shifts +15% in the test year, so seasonal naive carries a stale
+  level and loses. HW1's CA_1 FOODS is stable within 3%, so the benchmark wins. Same code,
+  opposite conclusion — that contrast is the lesson.
+- **Lab 2**: CA_1 HOUSEHOLD gives a clean ADF verdict at every lag order. HW1 deliberately
+  uses the messy series where the verdict flips, so students meet the clean case first.

@@ -6,8 +6,8 @@ ECON 8310 Business Forecasting
 - Thursday, 6-8:40pm, Mammel 115
 - A typical class is divided into three parts:
   - Review assignments or topics from the previous class
-  - Learn theories of new techniques
-  - Try new techniques on computer
+  - Learn theories of new techniques (lecture)
+  - Try new techniques on computer (lab)
 
 ## Instructor Contact Information
 - Zijun Luo, PhD
@@ -15,11 +15,10 @@ ECON 8310 Business Forecasting
 - [zluo@unomaha.edu](mailto:zluo@unomaha.edu)
 
 ## Office Hours
-- Designated hours: TBD
+- Designated hours: Tuesday, 1-3pm
 - Outside designated hours: Email me for appointments
 - Zoom possible but not encouraged
 
-I respond to email within 48 business hours.
 For questions about homework, please post to the Canvas discussion board so that all students benefit from the answer.
 For personal or grade-related matters, email me directly.
 
@@ -36,14 +35,21 @@ In the summer of 2022, I left academia and worked as a senior data scientist at 
 I returned to the University of Nebraska at Omaha as an assistant professor of economics in Fall 2025.
 You can learn more about my teaching, research, and hobbies on my personal website: [https://www.luozijun.com/](https://www.luozijun.com/).
 
-## 10-Minute In-Person Meeting
+## 20-Minute In-Person Meeting
+1. Go to [this link](https://docs.google.com/spreadsheets/d/1hAtn20hMbHiHCeosNgofzSXGSkyp6vmOUbZsiGwit8I/edit?usp=sharing)
+2. Pick a green slot that works for you and make it into a color other than red or green. This way, your classmates know someone has signed up for that spot
+3. Add the time to your calendar
+4. Email me after you have picked your spot and tell me what date and time you have picked
+5. In your email, include a short introduction of yourself, your goal for this semester, or anything you would like to let me know ahead of our meeting
+<!--
 Each student is required to sign up for a 10-minute meeting with me in the first two weeks (August 24 to September 7) of the term.
 Go to [this link](https://calendly.com/luozijun/fall-2026-10-minute-meeting) to select a time slot.
 It is anonymous and only I will see your name and time chosen.
 Please email me a one-paragraph biography before we meet.
+-->
 
 ## Course Goals
-(Course goals were written with help from ChatGPT.)<br>
+(Course goals were written with help from Claude.)<br>
 With your cooperation and dedication, by the end of the semester, you will be able to
 
 1. Apply exponential smoothing, ARIMA, and VAR models to univariate and multivariate business time series, and evaluate their forecast accuracy using walk-forward cross-validation.
@@ -59,7 +65,7 @@ Familiarity with basic statistics (regression, hypothesis testing) and introduct
 No prior knowledge of machine learning or time series analysis is required.
 
 ## Textbook
-The textbook I chose has both an R version and a Python version, although the Python version is newer and has two extra chapters. You are *highly encouraged* to use Python, but I understand that many basic forecasting tasks can be done in R, if that is the programming language you are already familiar with. When we get the more advanced techniques, i.e., neural networks, Python is the only way to go. 
+The textbook I chose has both an R version and a Python version, although the Python version is newer and has two extra chapters. You are *highly encouraged* to use Python, but I understand that many basic forecasting tasks can be done in R, if that is the programming language you are already familiar with. When we get to the more advanced techniques, i.e., neural networks, Python is the only way to go. 
 - *Forecasting: Principles and Practice, the Pythonic Way* (**FPP-Py**), available online at [https://otexts.com/fpppy/](https://otexts.com/fpppy/)
 - *Forecasting: Principles and Practice (3rd ed)* (**FPP3**, the R edition), available online at [https://otexts.com/fpp3/](https://otexts.com/fpp3/)
 

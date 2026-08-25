@@ -1,0 +1,212 @@
+---
+title: "Lab 1: Benchmarks and Exponential Smoothing"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Lecture 1 made a claim that sounded like housekeeping: **always beat a benchmark first**. In
+the next 35 minutes you are going to test that claim on a real Walmart series, and then watch
+it fail on a different one.
+
+The business question: you are forecasting weekly HOUSEHOLD-goods demand at store TX_1 to set
+inventory a year out. Which method should you actually ship?
+
+**Time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `statsmodels`, and
+`data/processed/m5_weekly.csv` (run `python scripts/prep_m5.py` if it is missing).
+
+---
+
+# Setup
+
+Nothing to fill in here — run it and move on.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.holtwinters import ExponentialSmoothing, SimpleExpSmoothing, Holt
+import warnings
+warnings.filterwarnings('ignore')
+
+weekly = pd.read_csv("data/processed/m5_weekly.csv", parse_dates=["week_start"])
+
+def get_series(store, cat):
+    return (weekly[(weekly.store_id == store) & (weekly.cat_id == cat)]
+            .set_index("week_start")["units"].sort_index().astype(float))
+
+y = get_series("TX_1", "HOUSEHOLD")
+
+N_TEST = 52
+train, test = y.iloc[:-N_TEST], y.iloc[-N_TEST:]
+print(f"{len(y)} weeks total — train {len(train)}, test {len(test)}")
+```
+
+---
+
+# Step 1 — Look at it first
+
+Never fit anything before you have seen the series.
+
+```{python}
+fig, ax = plt.subplots(figsize=(11, 3.5))
+ax.plot(train.index, train.values, label="train", lw=1.4)
+ax.plot(test.index, test.values, label="test (held out)", lw=1.4)
+ax.set_ylabel("units / week"); ax.set_title("TX_1 HOUSEHOLD")
+ax.legend(); plt.tight_layout()
+```
+
+**Notice:** the series roughly doubles over five years, and the level is still moving at the
+end. Hold that thought — it is the whole lab.
+
+---
+
+# Step 2 — Establish the benchmark
+
+Before any model, the thing to beat. **Seasonal naive** says: this week next year looks like
+this week last year.
+
+```{python}
+def rmse(actual, pred):
+    return float(np.sqrt(np.mean((np.asarray(actual) - np.asarray(pred)) ** 2)))
+
+def mae(actual, pred):
+    return float(np.mean(np.abs(np.asarray(actual) - np.asarray(pred))))
+
+seasonal_naive = y.shift(52).iloc[-N_TEST:].values
+
+results = {"Seasonal naive": (rmse(test, seasonal_naive), mae(test, seasonal_naive))}
+print(f"Seasonal naive  RMSE {results['Seasonal naive'][0]:,.0f}")
+```
+
+**Your turn:** before running anything else, write down a number — what RMSE do you think a
+proper exponential smoothing model will get? You will check it in Step 4.
+
+---
+
+# Step 3 — Fit the three models
+
+The structure is given. Fill in the three model calls using what Lecture 1 covered.
+
+```{python}
+# SES — level only.
+ses_fit = SimpleExpSmoothing(train).fit()
+results["SES"] = (rmse(test, ses_fit.forecast(N_TEST)),
+                  mae(test, ses_fit.forecast(N_TEST)))
+
+# Holt — level + trend. Fit it UNDAMPED first; we come back to damping in Step 5.
+holt_fit = ___                                     # <- you fill this in
+results["Holt"] = (rmse(test, holt_fit.forecast(N_TEST)),
+                   mae(test, holt_fit.forecast(N_TEST)))
+
+# Holt-Winters — level + trend + seasonality, additive, period 52.
+hw_fit = ___                                       # <- you fill this in
+results["Holt-Winters"] = (rmse(test, hw_fit.forecast(N_TEST)),
+                           mae(test, hw_fit.forecast(N_TEST)))
+```
+
+::: {.callout-note}
+## One constraint to respect
+
+Holt-Winters must estimate a seasonal index for each of the 52 weeks, and it needs **two full
+cycles** — 104 observations — to initialize. You have 225 training weeks, so you are fine here.
+You will not always be.
+:::
+
+---
+
+# Step 4 — Compare honestly
+
+```{python}
+tbl = (pd.DataFrame(results, index=["RMSE", "MAE"]).T
+         .sort_values("RMSE").round(0).astype(int))
+print(tbl.to_string())
+```
+
+**Discuss with the person next to you, before reading on:** did any model beat the benchmark?
+By how much? And was it the model you expected in Step 2?
+
+---
+
+# Step 5 — Break it, then fix it
+
+Look at where Holt's forecast goes.
+
+```{python}
+fig, ax = plt.subplots(figsize=(11, 3.5))
+ax.plot(test.index, test.values, label="actual", lw=1.6)
+ax.plot(test.index, ses_fit.forecast(N_TEST), label="SES", ls="--")
+ax.plot(test.index, holt_fit.forecast(N_TEST), label="Holt (undamped)", ls="--")
+ax.set_ylabel("units / week"); ax.legend(); plt.tight_layout()
+```
+
+Lecture 1 warned that undamped linear extrapolation gets unrealistic past about six periods.
+You are forecasting **52**.
+
+**Your turn:** refit Holt with a damped trend and add it to the table. One keyword argument.
+
+```{python}
+holt_damped = ___                                  # <- damped_trend=True
+results["Holt (damped)"] = (rmse(test, holt_damped.forecast(N_TEST)),
+                            mae(test, holt_damped.forecast(N_TEST)))
+
+print(pd.DataFrame(results, index=["RMSE", "MAE"]).T
+        .sort_values("RMSE").round(0).astype(int).to_string())
+print(f"\nestimated phi: {holt_damped.params['damping_trend']:.3f}")
+```
+
+Report the value of $\phi$. What does it mean that it came out below 1?
+
+---
+
+# Step 6 — Same store. Different aisle. Opposite answer.
+
+Change one word — `HOUSEHOLD` becomes `FOODS`. Same store, same code, same horizon.
+
+```{python}
+y2 = get_series("TX_1", "FOODS")
+train2, test2 = y2.iloc[:-N_TEST], y2.iloc[-N_TEST:]
+
+sn2 = y2.shift(52).iloc[-N_TEST:].values
+ses2 = SimpleExpSmoothing(train2).fit()
+
+print(f"TX_1 FOODS   seasonal naive RMSE {rmse(test2, sn2):,.0f}")
+print(f"TX_1 FOODS   SES            RMSE {rmse(test2, ses2.forecast(N_TEST)):,.0f}")
+```
+
+**Notice:** the ranking flips. On the household aisle an exponential smoother won comfortably.
+On the food aisle of the *same store*, the benchmark wins and SES is about 13% worse.
+
+The reason is visible in one number. For TX_1 HOUSEHOLD the test year sits about **15% above**
+the year before it, so seasonal naive carries a stale level forward and loses badly. For TX_1
+FOODS the level barely moves — about **1.5% down** — and last year is an excellent guess.
+
+So it is not the store, and it is not the method. It is whether the level moved.
+
+---
+
+# Before you leave
+
+> **Discuss:** You now have two series where the best method is different. You are responsible
+> for all 30 series in this dataset and you have to pick **one** approach to run in production
+> every month.
+>
+> What do you actually do — and what would you need to measure to decide? "Fit everything and
+> pick the winner per series" is an answer, but say what it costs you.
+
+---
+
+*Solutions posted to Canvas after class.*
