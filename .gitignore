@@ -74,3 +74,14 @@ Quarto/*_files/
 
 # stray 0-byte file from a shell redirect typo
 null
+
+# M5 raw download (~460 MB unzipped) — never commit. Rebuild with:
+#   curl -L -o m5.zip https://github.com/Nixtla/m5-forecasts/raw/main/datasets/m5.zip
+#   unzip m5.zip -d data/raw/
+#   python scripts/prep_m5.py
+data/raw/
+*.zip
+
+# Processed CSVs ARE tracked (small, and it means students can start without the
+# 48 MB download). Regenerate them with scripts/prep_m5.py.
+!data/processed/
