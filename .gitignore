@@ -85,3 +85,10 @@ data/raw/
 # Processed CSVs ARE tracked (small, and it means students can start without the
 # 48 MB download). Regenerate them with scripts/prep_m5.py.
 !data/processed/
+
+# Solution keys and their narration — NOT COMMITTED.
+# This repo serves GitHub Pages from docs/, which on a free account means it is
+# public. Committing solutions would publish them. They live on disk only; move
+# them to a private repo or Canvas if you want them version-controlled.
+Homework/solutions/
+Narration/*_solutions_script.md
