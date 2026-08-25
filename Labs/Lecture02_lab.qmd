@@ -154,21 +154,31 @@ planner is ordering inventory twelve months ahead, the 52-step number is the hon
 
 Does the food aisle help predict the household aisle?
 
+`grangercausalitytests` prints a wall of output — four lags times four test variants. Pull out
+the one number you asked for instead.
+
 ```{python}
 food = get_series("CA_1", "FOODS")
 
 pair = pd.concat([y.rename("household"), food.rename("food")], axis=1).diff().dropna()
 
-print("Does FOOD Granger-cause HOUSEHOLD?")
-_ = grangercausalitytests(pair[["household", "food"]], maxlag=4)
+def granger(effect, cause, lag=4):
+    """F-test for: do lags of `cause` help predict `effect`?"""
+    res = grangercausalitytests(pair[[effect, cause]], maxlag=lag)
+    F, p = res[lag][0]["ssr_ftest"][0], res[lag][0]["ssr_ftest"][1]
+    verdict = "significant" if p < 0.05 else "not significant"
+    print(f"{cause:>10} -> {effect:<10}  F = {F:5.2f}   p = {p:.4f}   {verdict}")
+
+granger("household", "food")
 ```
 
-**Your turn:** run it in the other direction — swap the column order — and report both
-F-statistics.
+Note the argument order: the **second** argument is the candidate cause. Getting this backwards
+is the single most common mistake with this function.
+
+**Your turn:** run the other direction and report both F-statistics.
 
 ```{python}
-print("Does HOUSEHOLD Granger-cause FOOD?")
-_ = ___                                     # <- same call, columns swapped
+___                                          # <- same helper, arguments swapped
 ```
 
 ---

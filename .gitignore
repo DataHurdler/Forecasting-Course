@@ -92,3 +92,6 @@ data/raw/
 # them to a private repo or Canvas if you want them version-controlled.
 Homework/solutions/
 Narration/*_solutions_script.md
+
+# local virtualenv
+.venv/
