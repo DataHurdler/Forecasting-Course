@@ -19,7 +19,7 @@ execute:
 
 # Overview
 
-This homework shifts from time series methods to machine learning approaches for forecasting. Decision trees and random forests reframe the problem as supervised learning: rather than modeling a single series through time, each store-week row becomes an independent training example, and lagged sales values carry the temporal information that would otherwise live inside a model like ARIMA or ETS. These methods require no stationarity assumptions and discover nonlinear interactions automatically — for example, the effect of a promotion may differ sharply between store types, and a tree will split on both features without any manual interaction term.
+This homework shifts from time series methods to machine learning approaches for forecasting. Decision trees and random forests reframe the problem as supervised learning: rather than modeling a single series through time, each store-category-week row becomes an independent training example, and lagged unit sales carry the temporal information that would otherwise live inside a model like ARIMA or ETS. These methods require no stationarity assumptions and discover nonlinear interactions automatically — for example, the effect of a SNAP benefit week may differ sharply between food and hobby categories, and a tree will split on both features without any manual interaction term.
 
 **Learning objectives.** By the end of this assignment you will be able to:
 
@@ -33,9 +33,9 @@ This homework shifts from time series methods to machine learning approaches for
 
 # Dataset and Feature Engineering
 
-Unlike ETS and ARIMA, which model one series at a time and require careful handling of seasonality and trend, tree-based models can use **all 30 stores simultaneously**. Each store-week is treated as an independent row in a flat table; the lag features (`Sales_lag1`, `Sales_lag4`, etc.) encode how that particular store was performing at various points in its recent past. The model learns general rules — patterns that hold across stores — rather than fitting a separate process to each one.
+Unlike ETS and ARIMA, which model one series at a time and require careful handling of seasonality and trend, tree-based models can use **all 30 series simultaneously**. The M5 extract holds 10 Walmart stores across 3 states, each with 3 product categories — 30 store-category series in all. Each store-category-week is a row in a flat table; the lag features encode how *that particular series* was performing recently. The model learns general rules that hold across series rather than fitting a separate process to each.
 
-The preprocessed file is located at `data/processed/rossmann_weekly.csv`. Run the starter code below to load the data, derive calendar features, and define the feature matrix and target vector that all subsequent questions use.
+The preprocessed file is `data/processed/m5_weekly.csv`. If it does not exist, run `python scripts/prep_m5.py` once from the repository root.
 
 ```{python}
 import pandas as pd
@@ -48,25 +48,52 @@ from sklearn.metrics import mean_squared_error
 import warnings
 warnings.filterwarnings('ignore')
 
+from pathlib import Path
+
+def data_path(name):
+    """Find the processed data file whether you render from the repo root or from
+    this file's own folder."""
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first."
+    )
+
 RANDOM_STATE = 42
 
-weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
-weekly["month"] = weekly["WeekStart"].dt.month
-weekly["week_of_year"] = weekly["WeekStart"].dt.isocalendar().week.astype(int)
-weekly["year"] = weekly["WeekStart"].dt.year
+weekly = pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
+weekly["month"] = weekly["week_start"].dt.month
+weekly["week_of_year"] = weekly["week_start"].dt.isocalendar().week.astype(int)
+weekly["year"] = weekly["week_start"].dt.year
 
-# Features and target
-FEATURES = [
-    "Sales_lag1", "Sales_lag4", "Sales_lag13", "Sales_lag26", "Sales_lag52",
-    "Promo", "StateHoliday", "SchoolHoliday", "StoreType", "Assortment",
-    "CompetitionDistance", "Promo2", "month", "week_of_year", "DaysOpen"
-]
-TARGET = "Sales"
+# store_id, cat_id and state_id are categorical. Trees in scikit-learn need numbers,
+# so one-hot encode them. This is why the feature count is larger than it first looks.
+df_enc = pd.get_dummies(weekly, columns=["store_id", "cat_id", "state_id"],
+                        prefix=["store", "cat", "state"])
 
-# Drop rows with missing lag features (first 52 weeks of each store)
-df = weekly.dropna(subset=FEATURES).copy()
-print(f"Modeling dataset: {len(df):,} store-week rows, {df['Store'].nunique()} stores")
+LAG_FEATURES = ["units_lag1", "units_lag2", "units_lag3", "units_lag4", "units_lag52"]
+FEATURES = (LAG_FEATURES
+            + ["avg_price", "snap_days", "event_days", "month", "week_of_year", "year"]
+            + [c for c in df_enc.columns if c.startswith(("store_", "cat_", "state_"))])
+TARGET = "units"
+
+# Drop rows with missing lag features (the first 52 weeks of each series)
+df = df_enc.dropna(subset=LAG_FEATURES).copy()
+print(f"Modeling dataset: {len(df):,} store-category-week rows, "
+      f"{weekly.groupby(['store_id','cat_id']).ngroups} series, {len(FEATURES)} features")
 ```
+
+**The features you have:**
+
+| Group | Columns | Notes |
+|-------|---------|-------|
+| Lags | `units_lag1` … `units_lag4`, `units_lag52` | recent history and the same week last year |
+| Drivers | `avg_price`, `snap_days`, `event_days` | SNAP days and calendar events per week |
+| Calendar | `month`, `week_of_year`, `year` | |
+| Identity | `store_*`, `cat_*`, `state_*` | one-hot; lets the model learn series-specific levels |
 
 ---
 
@@ -80,7 +107,7 @@ Paste the block below as the very first message in your Codex session before sen
 ```
 I am working on Homework 3 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
-Dataset: Rossmann Store Sales — weekly aggregated for 30 stores, at `data/processed/rossmann_weekly.csv`. Features include lag sales (lag1 through lag52), promotion flags, store attributes (StoreType, Assortment, CompetitionDistance), and calendar features.
+Dataset: M5/Walmart — weekly aggregated, 30 store-category series (10 stores across CA/TX/WI, 3 categories each), at `data/processed/m5_weekly.csv`. Columns: store_id, cat_id, state_id, week_start, units (target), avg_price, snap_days, event_days, and lagged units (units_lag1 through units_lag4, units_lag52).
 
 This homework covers Decision Trees and Random Forests for sales forecasting using scikit-learn. I will ask you questions one at a time. For each:
 1. Write clean, well-commented Python code that runs end-to-end
@@ -106,11 +133,15 @@ Submit this text as **`INITIAL_PROMPT.md`** in your submission folder.
 Time series data has a natural arrow of time: the past is used to predict the future. The starter code below defines a temporal cutoff. Using that cutoff, create `X_train`, `X_test`, `y_train`, and `y_test`. Print the number of rows in each split and the date range covered by each.
 
 ```{python}
-cutoff = pd.Timestamp("2015-01-01")
+cutoff = pd.Timestamp("2015-05-17")     # holds out the final ~53 weeks
 
 # Create train and test splits using the cutoff date
 # Print row counts and date ranges for each split
 ```
+
+As a sanity check before modeling, compute the **seasonal-naive benchmark** on the test set:
+predict each store-category-week using `units_lag52` (the same week last year). Every model in
+this assignment should beat it. Report its RMSE and carry the number forward to Q5.
 
 > **Your response:** Why must you use a temporal (not random) split for time series forecasting? What would go wrong with a random split?
 
@@ -139,7 +170,7 @@ The `FEATURES` and `TARGET` variables, and the train/test arrays from Q1, are al
 # (d) Re-fit with max_depth=10 and compare test RMSE
 ```
 
-> **Your response:** Look at the top split in the depth-3 tree. What feature does the tree split on first, and what does that tell you about what drives weekly sales?
+> **Your response:** Look at the top split in the depth-3 tree. What feature does it split on first, and at what threshold? What does that tell you about what drives weekly units — and why is that feature so dominant in a dataset that pools 30 different series?
 
 ---
 
@@ -149,11 +180,11 @@ The `FEATURES` and `TARGET` variables, and the train/test arrays from Q1, are al
 
 A Random Forest grows many decision trees on bootstrap samples of the data and averages their predictions. By training each tree on a different random subset of rows — and considering only a random subset of features at each split — the ensemble reduces the variance that makes individual deep trees unreliable. One by-product of bootstrap sampling is that roughly one-third of the training rows are left out of each tree: these out-of-bag (OOB) samples can be used to produce an internal validation score without touching the held-out test set.
 
-Fit a `RandomForestRegressor` with `n_estimators=200`, `max_features="sqrt"`, `oob_score=True`, and `random_state=42`.
+Fit a `RandomForestRegressor` with `n_estimators=200`, `max_features="sqrt"`, `oob_score=True`, `random_state=42`, and `n_jobs=-1` (uses all cores; the fit takes a few seconds).
 
 **(a)** The `oob_score_` attribute returns an R² value, not RMSE. Convert it to an approximate RMSE using the training target values, and report this OOB RMSE.
 
-**(b)** Report the test RMSE. Compare it to the depth-3 Decision Tree from Q2.
+**(b)** Report the test RMSE. Compare it to the depth-3 and depth-10 Decision Trees from Q2, and to the seasonal-naive benchmark from Q1.
 
 **(c)** Plot the MDI feature importances as a horizontal bar chart, sorted descending, showing all features.
 
@@ -174,18 +205,45 @@ Fit a `RandomForestRegressor` with `n_estimators=200`, `max_features="sqrt"`, `o
 
 MDI importance measures how much each feature reduces impurity across all trees in the forest. It is fast to compute because it is a by-product of training, but it has a known bias: features with many distinct numeric values tend to receive inflated importance scores simply because they offer the splitter more places to cut, not because they carry more information.
 
-Permutation importance avoids this bias by directly measuring how much model accuracy degrades when a single feature's values are randomly shuffled on the test set. A feature that matters a lot will cause a large increase in RMSE when shuffled; a feature that is redundant or spurious will cause little change.
+Permutation importance avoids this bias by directly measuring how much accuracy degrades when a single feature's values are randomly shuffled on the test set. A feature that matters will cause a large increase in RMSE when shuffled; a redundant or spurious one will cause almost none.
 
-Using the Random Forest fitted in Q3, compute permutation importance on the test set with `n_repeats=10` and `random_state=42`. Then produce a side-by-side comparison of the top-10 features under each method (MDI and permutation), using two horizontal bar charts in the same figure.
+**(a) Plant two controls.** Add two columns of pure noise to the modeling table — one continuous, one binary — and refit the forest with them included:
+
+```{python}
+rng = np.random.RandomState(RANDOM_STATE)
+df["noise_continuous"] = rng.rand(len(df))          # uniform on [0, 1)
+df["noise_binary"] = rng.randint(0, 2, len(df))     # 0 or 1
+
+FEATURES_WITH_NOISE = FEATURES + ["noise_continuous", "noise_binary"]
+
+# Refit the Random Forest (same settings as Q3) using FEATURES_WITH_NOISE
+```
+
+Neither column carries any information about `units` — you generated them from a random number
+generator. Any importance either one receives is an artifact of the method, not a finding.
+
+**(b)** Compute permutation importance on the test set with `n_repeats=10`, `random_state=42`,
+and `scoring="neg_root_mean_squared_error"` so the result is in units rather than R².
+
+**(c)** Build a comparison table for the two noise columns and three real features of your choice,
+showing MDI and permutation importance side by side. Then report **where `noise_continuous`
+ranks by MDI** out of all features, and where `noise_binary` ranks.
+
+**(d)** Produce the side-by-side bar charts: top-10 features by MDI, and top-10 by permutation
+importance, in one figure.
 
 ```{python}
 from sklearn.inspection import permutation_importance
 
-# Compute permutation importance on the test set (n_repeats=10, random_state=42)
-# Plot top-10 features by MDI and by permutation importance side by side
+# (b) permutation importance on the test set, scored in RMSE units
+# (c) comparison table for noise_continuous, noise_binary, and three real features
+#     plus the MDI rank of each noise column
+# (d) side-by-side top-10 bar charts
 ```
 
-> **Your response:** Do the two importance methods agree on the most important features? If they differ, which method would you trust more for this dataset and why?
+> **Your response:** Both noise columns are equally useless by construction. Did MDI treat them equally? Report both MDI values and both ranks, and explain the gap in terms of how many distinct values each column has.
+>
+> Then: did permutation importance treat them correctly? And state the practical rule — when is it safe to read an MDI ranking, and when must you compute permutation importance instead?
 
 ---
 
@@ -197,15 +255,16 @@ A single train/test split gives one estimate of generalization error. Walk-forwa
 
 The starter code below defines the sequence of cutoff dates. For each cutoff:
 
-1. Use all store-weeks with `WeekStart < cutoff` as the training set
-2. Use store-weeks with `cutoff <= WeekStart < cutoff + 13 weeks` as the forecast window
+1. Use all rows with `week_start < cutoff` as the training set
+2. Use rows with `cutoff <= week_start < cutoff + 13 weeks` as the forecast window
 3. Fit a `DecisionTreeRegressor(max_depth=5, random_state=42)` and a `RandomForestRegressor(n_estimators=100, random_state=42)` on the training set
 4. Compute RMSE for each model on the forecast window
 
-Report the mean RMSE across all CV rounds for each model, and plot the per-round RMSE for both models on a single figure.
+Report the mean RMSE across all CV rounds for each model, and plot the per-round RMSE for both models on a single figure. Add the seasonal-naive benchmark from Q1 as a horizontal reference line.
 
 ```{python}
-cutoffs = pd.date_range("2014-01-01", "2015-01-01", freq="13W")
+cutoffs = pd.date_range("2014-01-05", "2015-05-17", freq="13W")   # 6 rounds
+print(f"{len(cutoffs)} CV rounds:", [str(c.date()) for c in cutoffs])
 
 # Walk-forward CV loop over cutoffs
 # At each cutoff: train on all rows before cutoff, test on next 13 weeks
@@ -214,7 +273,7 @@ cutoffs = pd.date_range("2014-01-01", "2015-01-01", freq="13W")
 # Report mean RMSE and plot per-round RMSE
 ```
 
-> **Your response:** Does walk-forward CV change your conclusion about which model is better? Why might test-set RMSE and CV RMSE differ?
+> **Your response:** Does walk-forward CV change your conclusion about which model is better? Why might test-set RMSE and CV RMSE differ — and note that each CV round trains on *less* data than the final model did, so what does that imply about which estimate is more pessimistic?
 
 ---
 
@@ -224,13 +283,13 @@ cutoffs = pd.date_range("2014-01-01", "2015-01-01", freq="13W")
 
 No code required for this question.
 
-You are presenting to the Rossmann analytics team. They currently use a national average uplift model for promotions — every promoted store receives the same expected sales lift, regardless of store type, location, or competitive environment. Your Random Forest model includes promotion as one of many features and was trained on data from all 30 stores.
+You are presenting to a Walmart regional analytics team. They currently plan inventory with a single national uplift factor for SNAP weeks — every store receives the same expected lift, regardless of state, store, or product category. Your Random Forest was trained on all 30 store-category series and includes `snap_days` alongside store, state, and category identifiers.
 
-Write a short memo of 150–200 words addressing the following three points:
+Write a short memo of 150–200 words addressing three points:
 
-1. What does your model reveal about the value of promotions — specifically, is promotion consistently among the most important drivers of weekly sales, or does its importance vary?
-2. How could the model help Rossmann decide **which stores** to promote in a given week, rather than applying the same policy nationwide?
-3. Identify one meaningful limitation of this approach that the team should understand before relying on the model for promotion planning.
+1. What does your model say about the value of SNAP timing — is `snap_days` consistently among the most important drivers of weekly units, or does its importance depend on how you measure importance? Be specific about which measure you are quoting.
+2. How could the model help decide **which store-category combinations** to stock up for a given SNAP week, rather than applying one uplift nationwide?
+3. Identify one meaningful limitation the team should understand before relying on this model for inventory planning. The dominance of `units_lag1` is a reasonable place to start: what does a model that leans that heavily on last week's value do when next week is *not* like last week?
 
 > **Your response:**
 

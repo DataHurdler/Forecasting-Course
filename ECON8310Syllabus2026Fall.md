@@ -174,7 +174,7 @@ Submissions without a complete prompt log will receive a grade deduction.
 Using AI to write your interpretations defeats the purpose of the assignment and violates the spirit (though not the letter) of this policy.
 
 ## Course Evaluation
-A tentaive weekly course schedule is at the end of this syllabus.
+A tentative weekly course schedule is at the end of this syllabus.
 
 Exceptions for any assignment should be communicated at least 24 hours ahead of the due time, unless it is an emergency situation.
 No late homework is otherwise accepted.
@@ -299,7 +299,7 @@ While this document is designed to be as accurate as possible, learning is a dyn
 For example, if the class has trouble understanding a specific topic, I might take some extra time and go into more detail about it, which may result in cutting down time from other topics.
 <!-- Send me a cat photo for four extra points. -->
 
-## Tentaive Weekly Course Schedule
+## Tentative Weekly Course Schedule
 
 ### Week 1 (Aug. 27, 2026)
 - Lecture 1: Introduction, Exponential Smoothing & Forecast Evaluation

@@ -1,0 +1,296 @@
+---
+title: "Lab 6: Regularization — Breaking OLS, Then Rescuing It"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Lecture 6 claimed that ordinary least squares breaks when you have many predictors relative to
+observations — coefficient variance grows with $k$, correlated predictors produce wild offsetting
+estimates, and past $k > n$ there is no unique solution at all.
+
+Today you will break it on purpose, watch exactly how it fails, and then fix it with one line.
+
+Same series as Labs 4 and 5: daily units for CA_1 FOODS. But we now engineer the feature set an
+analyst would actually build — 28 consecutive lags, weekly and annual lags, rolling statistics,
+Fourier terms, day-of-week dummies — which is how you end up with more predictors than you meant
+to have.
+
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`, and
+`data/processed/m5_daily.csv`.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression, Lasso, Ridge
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import TimeSeriesSplit, cross_val_score
+import warnings
+warnings.filterwarnings('ignore')
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first."
+    )
+
+RANDOM_STATE = 42
+
+daily = pd.read_csv(data_path("m5_daily.csv"), parse_dates=["date"]).sort_values("date")
+u = daily.set_index("date")["units"]
+
+for L in list(range(1, 29)) + [35, 42, 49, 56, 364, 365, 366]:
+    daily[f"lag{L}"] = u.shift(L).values
+for W in (7, 14, 28, 91, 364):
+    daily[f"roll{W}_mean"] = u.shift(1).rolling(W).mean().values
+    daily[f"roll{W}_std"]  = u.shift(1).rolling(W).std().values
+
+daily["dow"] = daily["date"].dt.dayofweek
+daily["doy"] = daily["date"].dt.dayofyear
+for k in (1, 2, 3):
+    daily[f"sin{k}"] = np.sin(2*np.pi*k*daily.doy/365)
+    daily[f"cos{k}"] = np.cos(2*np.pi*k*daily.doy/365)
+daily = pd.concat([daily, pd.get_dummies(daily.dow, prefix="dow")], axis=1)
+
+FEATURES = ([c for c in daily.columns if c.startswith(("lag", "roll", "sin", "cos", "dow_"))]
+            + ["snap", "is_event", "doy", "avg_price"])
+
+df = daily.dropna(subset=[c for c in FEATURES if c.startswith(("lag", "roll"))]).copy()
+N_TEST = 365
+train, test = df.iloc[:-N_TEST], df.iloc[-N_TEST:]
+X_train, y_train = train[FEATURES].values.astype(float), train["units"].values
+X_test,  y_test  = test[FEATURES].values.astype(float),  test["units"].values
+
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+
+print(f"k = {len(FEATURES)} features, n_train = {len(X_train)}, n/k = {len(X_train)/len(FEATURES):.1f}")
+```
+
+Note how easily 62 predictors appeared. Nobody set out to build a 62-parameter model; it is what
+routine feature engineering produces.
+
+---
+
+# Step 1 — Break it
+
+With 1,210 training rows and 62 features, OLS is fine. Now shrink the training window and watch.
+
+```{python}
+rows = []
+for n in (1210, 400, 200, 120, 80):
+    sub = train.iloc[-n:]
+    sc = StandardScaler().fit(sub[FEATURES].values.astype(float))
+    Xs = sc.transform(sub[FEATURES].values.astype(float))
+    Xt = sc.transform(X_test)
+    y  = sub["units"].values
+
+    ols = LinearRegression().fit(Xs, y)
+    rid = Ridge(alpha=100).fit(Xs, y)
+
+    rows.append({"n": n, "n/k": round(n/len(FEATURES), 1),
+                 "OLS_max_coef": f"{np.abs(ols.coef_).max():,.0f}",
+                 "OLS_test_RMSE": f"{rmse(y_test, ols.predict(Xt)):,.0f}",
+                 "Ridge_test_RMSE": f"{rmse(y_test, rid.predict(Xt)):,.0f}"})
+
+print(pd.DataFrame(rows).to_string(index=False))
+```
+
+**Read that table across, then down.** As the training window shrinks, the largest OLS coefficient
+grows by four orders of magnitude and the test RMSE grows by five. Nothing about the *problem*
+changed — same features, same target, same test set. Only the ratio of observations to parameters.
+
+Ridge, with a one-line change, degrades gracefully across the entire range.
+
+That is Lecture 6's opening argument, and you just measured it.
+
+---
+
+# Step 2 — Two penalties, two behaviors
+
+Back to the full training set. Fit Ridge and LASSO at a comparable penalty and count what survives.
+
+```{python}
+sc = StandardScaler().fit(X_train)
+Xs, Xts = sc.transform(X_train), sc.transform(X_test)
+
+for name, model in [("OLS",   LinearRegression()),
+                    ("Ridge", Ridge(alpha=100)),
+                    ("LASSO", Lasso(alpha=20, max_iter=50000))]:
+    m = model.fit(Xs, y_train)
+    nz = int(np.sum(m.coef_ != 0))
+    print(f"  {name:<6} test RMSE {rmse(y_test, m.predict(Xts)):5,.0f}   non-zero coefficients {nz:3d}/{len(FEATURES)}")
+```
+
+Ridge keeps every coefficient and shrinks them. LASSO sets most of them to exactly zero. Neither
+is "better" — they encode different beliefs about how many predictors genuinely matter.
+
+---
+
+# Step 3 — The path, and the order features die in
+
+Lecture 6 argued that the **order** predictors leave is a more stable finding than any single
+coefficient table. Produce that ordering.
+
+```{python}
+alphas = np.logspace(-1, 3, 60)
+paths = []
+for a in alphas:
+    paths.append(Lasso(alpha=a, max_iter=50000).fit(Xs, y_train).coef_)
+paths = np.array(paths)
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.6))
+axes[0].plot(np.log10(alphas), paths, lw=0.8)
+axes[0].set_xlabel("log10(alpha)"); axes[0].set_ylabel("coefficient"); axes[0].set_title("regularization path")
+axes[1].plot(np.log10(alphas), (paths != 0).sum(1), marker=".", ms=3)
+axes[1].set_xlabel("log10(alpha)"); axes[1].set_ylabel("non-zero coefficients"); axes[1].set_title("model size")
+plt.tight_layout()
+```
+
+```{python}
+survivors, order = set(FEATURES), []
+for a, coefs in zip(alphas, paths):
+    nz = set(np.array(FEATURES)[coefs != 0])
+    for gone in survivors - nz:
+        order.append(gone)
+    survivors = nz
+
+print("the last 8 features standing, in reverse order of elimination:")
+for f in reversed(order[-8:]):
+    print(f"   {f}")
+```
+
+::: {.callout-note}
+## Look at what survived
+
+Read that list of survivors and find the pattern in the lag numbers before reading on.
+
+Almost all of them are **multiples of 7**. Nobody told the model this series has a weekly cycle,
+and there is no explicit "week" feature among the lags. Under increasing penalty the LASSO
+independently kept the lags that align with day-of-week and discarded the ones that do not.
+
+That is what makes the dropout ordering worth reporting: it recovered the structure of the series,
+not just a ranking of columns.
+:::
+
+---
+
+# Step 4 — Choosing alpha, and the one-standard-error rule
+
+```{python}
+tscv = TimeSeriesSplit(n_splits=5)
+grid = np.logspace(-1, 2.5, 30)
+
+means, ses = [], []
+for a in grid:
+    s = cross_val_score(make_pipeline(StandardScaler(), Lasso(alpha=a, max_iter=50000)),
+                        X_train, y_train, cv=tscv, scoring="neg_root_mean_squared_error")
+    means.append(-s.mean()); ses.append(s.std()/np.sqrt(len(s)))
+means, ses = np.array(means), np.array(ses)
+
+i_min = int(means.argmin())
+threshold = means[i_min] + ses[i_min]
+i_1se = int(np.where(means <= threshold)[0].max())
+
+for label, i in [("CV minimum", i_min), ("one-SE rule", i_1se)]:
+    m = make_pipeline(StandardScaler(), Lasso(alpha=grid[i], max_iter=50000)).fit(X_train, y_train)
+    print(f"  {label:<12} alpha {grid[i]:7.2f}   CV {means[i]:5,.0f}   "
+          f"test {rmse(y_test, m.predict(X_test)):5,.0f}   non-zero {int(np.sum(m[-1].coef_ != 0)):3d}")
+```
+
+**Your turn:** plot the CV curve with its one-standard-error band, and mark both chosen alphas.
+
+```{python}
+# ---- your turn: uncomment and fill in the blank ----
+# fig, ax = plt.subplots(figsize=(7, 3.4))
+# ax.plot(np.log10(grid), means)
+# ax.fill_between(np.log10(grid), means - ses, means + ses, alpha=0.2)
+# ax.axvline(np.log10(grid[i_min]), ls="--", label="CV minimum")
+# ax.axvline(np.log10(___), ls=":", label="one-SE")        # <- which index?
+# ax.set_xlabel("log10(alpha)"); ax.set_ylabel("CV RMSE"); ax.legend()
+# plt.tight_layout()
+```
+
+The one-SE rule roughly halves the number of surviving features. **Decide whether that trade is
+worth it here** — and say what you would need to know about how the model will be used before you
+could answer properly.
+
+---
+
+# Step 5 — Why your CV number looks worse than the truth
+
+The CV RMSE above is noticeably higher than the test RMSE. That is not a mistake, and the reason
+is sitting in Step 1.
+
+```{python}
+for i, (tr_idx, va_idx) in enumerate(tscv.split(X_train), 1):
+    m = make_pipeline(StandardScaler(), Lasso(alpha=20, max_iter=50000)).fit(X_train[tr_idx], y_train[tr_idx])
+    print(f"  fold {i}: train n={len(tr_idx):4d} (n/k={len(tr_idx)/len(FEATURES):4.1f})   "
+          f"val n={len(va_idx):3d}   RMSE {rmse(y_train[va_idx], m.predict(X_train[va_idx])):5,.0f}")
+```
+
+Fold 1 trains on about 200 rows — the same data-starved regime that wrecked OLS in Step 1. The
+final model trains on all 1,210. So walk-forward CV on an expanding window is **structurally
+pessimistic**: it averages in early folds that are trained on far less data than the model you
+actually ship.
+
+That is a reason to read the CV number as a conservative estimate, not a reason to abandon it —
+and emphatically not a reason to switch to random folds, which fix the pessimism by letting the
+model see the future.
+
+---
+
+# Before you leave
+
+Add today's best linear model to the scoreboard you have been building since Lab 4.
+
+```{python}
+best = make_pipeline(StandardScaler(), Lasso(alpha=grid[i_min], max_iter=50000)).fit(X_train, y_train)
+board = {
+    "Benchmark (same day last year)": rmse(y_test, test.units_lag365.values),
+    "Single tree (Lab 4)": 324,
+    "Random Forest (Lab 5)": 248,
+    "XGBoost (Lab 5)": 230,
+    "LASSO, 62 features (today)": rmse(y_test, best.predict(X_test)),
+}
+print(pd.Series(board).round(0).astype(int).sort_values(ascending=False).to_string())
+```
+
+> **Discuss:** The regularized linear model does **not** win here — the tree ensembles beat it on
+> this series. Give one property of daily store sales that favors trees over an additive linear
+> model, however many lags you give it.
+>
+> Then the counterpoint, which matters for Homework 4: on the *weekly, 30-series* panel the ranking
+> may not look the same. What is different about that problem that could change the answer?
+>
+> **And the one to argue about:** you have now fitted five model families to this one series. If
+> you had to hand exactly one of them to a store manager who will not be retrained, and who will
+> not retune anything for a year, which do you choose — and is it the one with the lowest RMSE?
+
+---
+
+*Solutions posted to Canvas after class.*

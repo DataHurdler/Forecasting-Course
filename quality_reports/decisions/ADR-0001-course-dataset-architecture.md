@@ -163,3 +163,85 @@ FRED still earns its place, for the complementary reason: it supplies a case whe
 Between them the two datasets cover both situations a student will meet.
 
 HW01 Part 2 Q4 is built on the M5 case and asks students to reason about precisely this.
+
+---
+
+## Correction 2 — 2026-08-25, after testing the FRED pairing
+
+The architecture table justifies FRED as the dataset that **"gives a case where the causal
+*direction* is defensible — unemployment moves retail spending, not the reverse."**
+
+That assertion was, like the M5 one corrected above, made from intuition. Measured on the
+cached series (`data/processed/fred_monthly.csv`, 1992-02 to 2026-06, 412 months, 4 lags,
+retail log-differenced and unemployment differenced):
+
+| Sample | unemployment → retail | retail → unemployment |
+|---|---|---|
+| Full, 1992–2026 | F = 18.22, p < 0.0001 | F = 12.80, p < 0.0001 |
+| Excluding Feb 2020 – Jun 2021 | F = 2.91, p = 0.021 | F = 6.74, p < 0.0001 |
+| Pre-COVID, 1992–2020 | **F = 1.85, p = 0.12 — not significant** | F = 9.67, p < 0.0001 |
+
+**The direction is not defensible in the way claimed.** The reverse direction — retail
+predicting unemployment — is the one that survives every sample cut, and the intuitive
+direction disappears entirely once COVID is removed. This is economically sensible in
+hindsight: retail sales are a coincident-to-leading indicator and unemployment is a lagging
+one. Spending falls first; layoffs follow.
+
+**Consumer sentiment was tested too and is worse for the purpose.** `UMCSENT` → `RSXFS` is
+insignificant at every lag and in every subsample (p = 0.14–0.66). The Lecture 2 slide named
+sentiment, so the slide was also promising an example that returns a null.
+
+### What changed as a result
+
+- FRED **keeps its place in L02**, but for a different and better reason: it is the only
+  pairing in the course where a Granger verdict **flips with the sample window**. That is a
+  lesson M5 cannot teach, because M5 contains no comparable shared shock.
+- The L02 slide now asks the `UNRATE` → `RSXFS` question (not sentiment) and states plainly
+  that the test fires both ways and that which direction looks stronger depends on whether
+  COVID is in the sample.
+- `scripts/prep_fred.py` caches `UNRATE`, `UMCSENT`, `RSXFS` to
+  `data/processed/fred_monthly.csv` from FRED's public CSV endpoint — no API key, and no
+  network needed during class.
+- Lab 2 gained **Step 6**, which runs the test on all three windows and makes the flip the
+  point of the exercise.
+
+**The pattern is now twice-observed and worth naming:** both times this ADR asserted what a
+causality test *would* show, it was wrong, and in both cases the measured answer made better
+teaching material than the assumed one. No further claim about what a test will show belongs
+in this document unless it has been run.
+
+---
+
+## Amendment — 2026-08-25: electricity source substituted
+
+The architecture table names the **Monash Forecasting Repository** as the source for the
+electricity supplement. Monash's Zenodo endpoints return **HTTP 403** to a scripted download,
+so the dataset cannot be fetched by a prep script the way FRED and M5 can. The `tsibbledata`
+`vic_elec` set (the FPP textbook's own) is reachable, but only as an R `.rda` binary, which
+would add `pyreadr` as a student dependency to read.
+
+**Substituted:** PJM Interconnection hourly metered load (PJME zone), 2002-01-01 to
+2018-08-03, via a public mirror of the PJM releases — plain CSV, no login, no extra
+dependency. Cached by `scripts/prep_electricity.py`.
+
+It satisfies the requirement the ADR actually stated, and exceeds it. Measured on the
+prepared file:
+
+| Cycle | Swing | Trough → peak |
+|---|---|---|
+| hour of day | 33.3% | 4am → 7pm |
+| day of week | 11.6% | Sunday → Tuesday |
+| day of year | 44.7% | late April → mid July |
+
+The annual cycle is **double-peaked** — ~37,000 MW in July (air conditioning), ~34,400 MW in
+January (heating), ~26,900 MW in the April trough. That shape is the pedagogical asset: a
+single harmonic must place its peak in summer *or* winter, and on the Lab 3 holdout
+(Aug 2017 – Aug 2018) forcing `yearly_seasonality=1` costs about 300 MW of RMSE against
+Prophet's default order of 10. Retail has nothing comparable, which is the original reason
+this supplement exists.
+
+**Sourcing caveat, recorded deliberately:** this is a community mirror, not a primary
+publisher, so the URL is less durable than FRED's. The prep script caches to
+`data/processed/`, so a broken upstream affects only a fresh setup, not a working checkout.
+If the mirror disappears, EIA-930 (`eia.gov`, official, reachable) is the fallback and covers
+2015 onward.

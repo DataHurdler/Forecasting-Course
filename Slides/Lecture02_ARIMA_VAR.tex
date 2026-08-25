@@ -374,18 +374,19 @@
   $F$-test of $H_0$: all $x$-lag coefficients are zero. Rejecting means $x_t$
   Granger-causes $y_t$.
 
-  \vspace{0.15cm}
-  \textbf{A concrete question.} Does consumer sentiment (\texttt{UMCSENT}) Granger-cause
-  retail sales (\texttt{RSXFS})? The null is that every sentiment lag is zero in the
-  retail equation. We will run exactly this in the lab.
+  \vspace{0.1cm}
+  \textbf{A concrete question.} Does unemployment (\texttt{UNRATE}) Granger-cause retail
+  sales (\texttt{RSXFS})? \textbf{We run exactly this in the lab} --- and the answer is
+  instructive: it fires \emph{both} ways, and which direction looks stronger depends on
+  whether COVID is in the sample.
 
   \vspace{0.15cm}
   \textbf{Granger causality is not structural causality.} It tests \emph{predictive
-  content}, not whether $x$ mechanically brings $y$ about --- a rooster reliably predicts
-  sunrise. Report it as ``predictive of,'' never ``causes.''
+  content}, not whether $x$ brings $y$ about --- a rooster reliably predicts sunrise.
+  Report it as ``predictive of,'' never ``causes.''
 
   \muted{\footnotesize\itshape Impulse response functions trace how a shock propagates
-  through the system over time.}
+  through the system.}
 \end{frame}
 
 % --- Slide: ARIMAX -----------------------------------------------------------

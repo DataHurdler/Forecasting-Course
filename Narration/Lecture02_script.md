@@ -2,7 +2,7 @@
 
 **ECON 8310: Business Forecasting · ARIMA, VAR & Multivariate Models**
 
-Deck: `Slides/Lecture02_ARIMA_VAR.pdf` (19 pages) · Measured runtime: **~27 minutes** (25–30 depending on pace)
+Deck: `Slides/Lecture02_ARIMA_VAR.pdf` (19 pages) · Measured runtime: **~30 minutes** (27–33 depending on pace)
 
 ---
 
@@ -471,19 +471,45 @@ Granger-causes $y$.
 
 **[pause]**
 
-Here's a concrete question we'll run in the lab: does consumer sentiment Granger-cause retail
-sales? The null is that every sentiment lag is zero in the retail equation.
+Here's a concrete question we run in the lab: does unemployment Granger-cause retail sales?
+The null is that every unemployment lag is zero in the retail equation.
 
-And notice we're using macroeconomic series here rather than store sales. That's deliberate,
-though not for the reason you might guess.
+And notice we're using macroeconomic series here rather than store sales. That's deliberate.
 
 Two Walmart stores in the same state absolutely *do* move together — you'll find a
 significant Granger test between them in the homework. The problem is that finding tells you
 almost nothing, because both stores are responding to the same regional promotions and the
 same weather. The test fires, and you still cannot say which one drives the other.
 
-Sentiment and retail spending give us the case where the direction is at least arguable.
-Between the two you get both situations you'll meet in practice.
+**[pause]**
+
+Now, I ran the unemployment question before writing this slide, and I want to tell you what
+came back, because it is better than the tidy answer I expected.
+
+On the full sample, 1992 to today, the test is significant — and unemployment looks like the
+stronger driver. Exactly the story everyone expects. People lose jobs, people stop spending.
+
+Then drop the COVID window and rerun. The intuitive direction weakens sharply. Restrict to
+before 2020 and it **disappears entirely** — not significant at any lag.
+
+Meanwhile the *reverse* direction — retail sales predicting unemployment — is rock solid in
+every single sample.
+
+**[pause]**
+
+Sit with that, because there are two lessons in it and both are worth more than the tidy
+answer would have been.
+
+The first is economic, and it's obvious in hindsight: retail sales are a coincident-to-leading
+indicator, and unemployment is a lagging one. Spending falls first. Layoffs follow. The data
+was telling us the sequence, and my intuition had it backwards.
+
+The second is methodological, and it's the one I want you to carry into your own work. On the
+full sample you would have reported a strong, intuitive, publishable finding. It was being
+driven by one enormous shared shock. One episode, in a thirty-four-year sample, flipping the
+headline result.
+
+You'll do all three windows yourself in the lab.
 
 **[pause]**
 
@@ -612,7 +638,7 @@ See you then.
 |---|---|---:|
 | Opening & stationarity | 1–8 | ~14 min |
 | ARIMA & SARIMA | 9–11 | ~6 min |
-| VAR, Granger, ARIMAX | 12–16 | ~13 min |
+| VAR, Granger, ARIMAX | 12–16 | ~15 min |
 | Close | 17–19 | ~3 min |
 
 If you need to compress, slide 9's four-step workflow survives trimming. Do **not** compress

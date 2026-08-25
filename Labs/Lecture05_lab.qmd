@@ -1,0 +1,271 @@
+---
+title: "Lab 5: Tree Ensembles — Averaging, Then Boosting"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+At the end of Lab 4 you built a Random Forest by accident. You drew twenty bootstrap samples, fitted
+a tree to each, averaged the predictions, and the RMSE fell from about 324 to 266 — with nothing
+tuned and no new information added.
+
+Today we do that properly, then find out what else the real algorithm does, then replace averaging
+with something better.
+
+Same series throughout: daily units for CA_1 FOODS. You have now fitted a GAM to it (Homework 2)
+and a single tree (Lab 4), so every number today lands on a scale you already know.
+
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`,
+`xgboost`, and `data/processed/m5_daily.csv`.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.inspection import permutation_importance
+import xgboost as xgb
+import warnings
+warnings.filterwarnings('ignore')
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first."
+    )
+
+RANDOM_STATE = 42
+
+daily = pd.read_csv(data_path("m5_daily.csv"), parse_dates=["date"])
+daily["dow"] = daily["date"].dt.dayofweek
+daily["doy"] = daily["date"].dt.dayofyear
+
+FEATURES = ["units_lag1", "units_lag7", "units_lag14", "units_lag28", "units_lag365",
+            "snap", "is_event", "dow", "doy", "avg_price"]
+
+df = daily.dropna(subset=FEATURES).copy()
+N_TEST = 365
+train, test = df.iloc[:-N_TEST], df.iloc[-N_TEST:]
+X_train, y_train = train[FEATURES].values, train["units"].values
+X_test,  y_test  = test[FEATURES].values,  test["units"].values
+
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+
+scoreboard = {
+    "Benchmark (same day last year)": rmse(y_test, test.units_lag365.values),
+    "Single tree (Lab 4)": 324,
+    "20 trees averaged by hand (Lab 4)": 266,
+}
+for k, v in scoreboard.items():
+    print(f"{k:<36} {v:>6,.0f}")
+```
+
+---
+
+# Step 1 — The real thing
+
+```{python}
+rf = RandomForestRegressor(n_estimators=300, random_state=RANDOM_STATE, n_jobs=-1)
+rf.fit(X_train, y_train)
+
+scoreboard["Random Forest (300 trees)"] = rmse(y_test, rf.predict(X_test))
+print(f"Random Forest: {scoreboard['Random Forest (300 trees)']:,.0f}")
+```
+
+Better than your hand-built version, and much better than one tree. Two differences account for
+it: more trees, and a second source of randomness we are about to meet.
+
+---
+
+# Step 2 — How many trees is enough?
+
+The usual worry about a big model is overfitting. Adding trees to a forest is the rare knob where
+that worry does not apply — but it does stop paying.
+
+```{python}
+counts = [5, 20, 50, 100, 300, 600]
+curve = []
+for n in counts:
+    r = RandomForestRegressor(n_estimators=n, random_state=RANDOM_STATE, n_jobs=-1).fit(X_train, y_train)
+    curve.append(rmse(y_test, r.predict(X_test)))
+
+for n, v in zip(counts, curve):
+    print(f"  n_estimators={n:<4} test RMSE {v:,.0f}")
+
+fig, ax = plt.subplots(figsize=(6, 3.2))
+ax.plot(counts, curve, marker="o")
+ax.set_xscale("log"); ax.set_xlabel("n_estimators (log scale)"); ax.set_ylabel("test RMSE")
+plt.tight_layout()
+```
+
+**Say what the curve does after about fifty trees**, and what that means for how you would spend a
+compute budget. More trees never *hurt* accuracy — but every one costs time to fit and to predict.
+
+---
+
+# Step 3 — The "random" in Random Forest
+
+Bagging alone gives every tree a different sample of *rows*. A Random Forest also gives each split
+a different random subset of *columns* — `max_features`. Lecture 5 argued this decorrelates the
+trees, so their errors cancel more completely when averaged.
+
+Test it.
+
+```{python}
+for mf in [None, 0.6, "sqrt", 0.2]:
+    r = RandomForestRegressor(n_estimators=300, max_features=mf,
+                              random_state=RANDOM_STATE, n_jobs=-1).fit(X_train, y_train)
+    label = "all features" if mf is None else str(mf)
+    print(f"  max_features={label:<13} test RMSE {rmse(y_test, r.predict(X_test)):,.0f}")
+```
+
+::: {.callout-warning}
+## The textbook rule does not win here, and you should know why
+
+`max_features="sqrt"` is the standard recommendation, and on this dataset it is **worse** than
+using every feature. That is not a bug — it is the rule meeting its own boundary condition.
+
+You have 10 features, and one of them (`dow`) carries most of the signal. `sqrt(10)` is about 3,
+so at any given split most trees are not even allowed to *look* at day-of-week. Decorrelation is
+only a bargain when you have enough redundant, correlated features that losing a few at each split
+costs you little.
+
+In Homework 3 you will run a forest on 27 features with no single dominant one. Check whether the
+ranking flips there. **The lesson is the condition, not the default.**
+:::
+
+---
+
+# Step 4 — Validation for free
+
+Each bootstrap sample leaves out about a third of the rows. Those out-of-bag rows never trained
+that tree, so they can score it — a validation estimate with no holdout set.
+
+```{python}
+rf_oob = RandomForestRegressor(n_estimators=300, oob_score=True,
+                               random_state=RANDOM_STATE, n_jobs=-1).fit(X_train, y_train)
+
+oob_rmse = rmse(y_train, rf_oob.oob_prediction_)
+print(f"OOB R²   : {rf_oob.oob_score_:.3f}")
+print(f"OOB RMSE : {oob_rmse:,.0f}")
+print(f"test RMSE: {rmse(y_test, rf_oob.predict(X_test)):,.0f}")
+```
+
+**Compare the two numbers and account for the gap.** The OOB estimate is computed on training-period
+rows scattered through 2012–2015; the test RMSE is a solid block of the final year. Which one would
+you quote to someone asking how the model will do next month, and why?
+
+---
+
+# Step 5 — Two importances, two different answers
+
+```{python}
+mdi = pd.Series(rf.feature_importances_, index=FEATURES)
+
+perm = permutation_importance(rf, X_test, y_test, n_repeats=10,
+                              random_state=RANDOM_STATE, n_jobs=-1,
+                              scoring="neg_root_mean_squared_error")
+perm_imp = pd.Series(perm.importances_mean, index=FEATURES)
+
+comp = pd.DataFrame({"MDI": mdi.round(3), "permutation_ΔRMSE": perm_imp.round(1)})
+comp["MDI_rank"] = comp.MDI.rank(ascending=False).astype(int)
+comp["perm_rank"] = comp["permutation_ΔRMSE"].rank(ascending=False).astype(int)
+print(comp.sort_values("MDI", ascending=False).to_string())
+```
+
+Permutation importance is in **units of RMSE**: shuffle that column on the test set, and this is
+how much worse the forecast gets. That is directly interpretable in a way MDI is not.
+
+**Find the disagreements.** Three are worth naming before you read on:
+
+- one lag that MDI ranks *above* `units_lag1`, while permutation ranks it far below
+- `snap`, which MDI places near the bottom and permutation places near the top
+- `avg_price`, which MDI gives a non-trivial score and permutation scores at essentially zero
+
+**Your turn:** plot the two rankings side by side as horizontal bar charts so the disagreements
+are visible at a glance.
+
+```{python}
+# ---- your turn: uncomment and fill in the two blanks ----
+# fig, axes = plt.subplots(1, 2, figsize=(11, 3.5))
+# mdi.sort_values().plot.barh(ax=axes[0], title="MDI (impurity)")
+# ___.sort_values().plot.barh(ax=axes[1], title="Permutation (ΔRMSE)")   # <- which Series?
+# plt.tight_layout()
+```
+
+---
+
+# Step 6 — Stop averaging. Start correcting.
+
+A forest builds many trees **in parallel** and averages them. Boosting builds them **in sequence**,
+each one fitted to what the previous ones got wrong.
+
+```{python}
+for lr, n in [(0.3, 100), (0.1, 100), (0.1, 300), (0.05, 1000)]:
+    m = xgb.XGBRegressor(n_estimators=n, learning_rate=lr, max_depth=4,
+                         subsample=0.8, colsample_bytree=0.8,
+                         random_state=RANDOM_STATE).fit(X_train, y_train)
+    print(f"  lr={lr:<5} n={n:<5} train {rmse(y_train, m.predict(X_train)):5,.0f}"
+          f"   test {rmse(y_test, m.predict(X_test)):5,.0f}")
+```
+
+```{python}
+best = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=4,
+                        subsample=0.8, colsample_bytree=0.8,
+                        random_state=RANDOM_STATE).fit(X_train, y_train)
+scoreboard["XGBoost (lr=0.1, 100 trees)"] = rmse(y_test, best.predict(X_test))
+
+print(pd.Series(scoreboard).round(0).astype(int).sort_values(ascending=False).to_string())
+```
+
+**Look at the `lr=0.3` row against the others.** Its training error is the lowest of the four and
+its test error is the worst. Adding trees to a *forest* was safe; adding correction steps that are
+each too large is not. That asymmetry is the practical difference between the two ensembles, and it
+is why boosting has a learning rate at all.
+
+---
+
+# Before you leave
+
+Your scoreboard should run from a benchmark near 625 down to roughly 230, across five models
+fitted to one series.
+
+> **Discuss (the ranking):** Boosting beat the forest here. Name one property of *this* dataset
+> that favors boosting, and one situation where you would still reach for the forest first —
+> thinking about tuning effort and about what happens when nobody retunes the model for a year.
+>
+> **Discuss (the importances):** You have two importance tables that disagree about `snap`. A
+> category manager asks whether SNAP timing matters for stocking. Which table do you show them,
+> what do you say, and what would you want to check before committing to an answer?
+>
+> **Discuss (the whole arc):** Across Labs 4 and 5 the RMSE fell from 324 to about 230 on the same
+> series with the same features. What was actually purchased with that improvement, and what was
+> given up along the way? Be specific about the thing you can no longer do that you could do in
+> Step 1 of Lab 4.
+
+---
+
+*Solutions posted to Canvas after class.*

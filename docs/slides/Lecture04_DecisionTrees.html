@@ -3662,6 +3662,34 @@ Department of Economics
 <p>At every node the algorithm is really asking: <em>“what is the single yes/no question that best separates high-sales months from low-sales months?”</em> — then repeating it within each group.</p>
 <p><span class="neutral smaller">For classification, replace variance with Gini impurity or entropy (information gain).</span></p>
 </section>
+<section id="greedy-is-not-optimal-and-that-matters" class="slide level2">
+<h2>Greedy Is Not Optimal — and That Matters</h2>
+<p>CART is <strong>exhaustive</strong> at each node: it really does try every feature and every threshold. But it is <strong>greedy</strong> across nodes — it never looks ahead.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Split at the root</th>
+<th style="text-align: center;">Variance removed now</th>
+<th style="text-align: center;">…plus what it enables</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>On price</td>
+<td style="text-align: center;"><strong>40%</strong></td>
+<td style="text-align: center;"><span class="math inline">\(+\)</span> 12% (total 52%)</td>
+</tr>
+<tr class="even">
+<td>On promotion</td>
+<td style="text-align: center;">38%</td>
+<td style="text-align: center;"><span class="math inline">\(+\)</span> 50% <strong>(total 88%)</strong></td>
+</tr>
+</tbody>
+</table>
+<p>CART takes the 40%. It has no way to see the 50% coming, because it evaluates one split at a time and commits.</p>
+<p>A fitted tree is therefore <strong>not the optimal tree</strong> — it is the result of a sequence of locally optimal decisions. Finding the genuinely optimal tree is computationally intractable for any realistic number of features, which is why nobody does it.</p>
+<p><span class="key-result">Two consequences: a tree can <strong>miss structure that is really there</strong>, and a small change in the data can send the whole greedy sequence down a different path — exactly the instability we turn to next.</span></p>
+</section>
 <section id="depth-controls-the-biasvariance-tradeoff" class="slide level2">
 <h2>Depth Controls the Bias–Variance Tradeoff</h2>
 <p>A <strong>depth-1 stump</strong> asks one question: high bias, low variance. A <strong>full tree</strong> with one observation per leaf memorizes the sample: zero bias, extreme variance.</p>
@@ -3697,6 +3725,35 @@ Department of Economics
 </table>
 <p><strong>Why trees are unstable:</strong> one changed observation can flip the split at the root, and every prediction below it changes with it.</p>
 <p>Tune <code>max_depth</code> and <code>min_samples_leaf</code> by <code>TimeSeriesSplit</code> cross-validation.</p>
+</section>
+<section id="two-ways-to-stop-a-tree-overfitting" class="slide level2">
+<h2>Two Ways to Stop a Tree Overfitting</h2>
+<p><code>max_depth</code> caps the tree in advance. Two other controls do the job better.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 44%">
+<col style="width: 56%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>min_samples_leaf</code></td>
+<td><strong>Stop early.</strong> At the default of 1, a leaf may hold a single observation and “predict” that one value. Set it to 5–10 and every prediction is an average over a real group.</td>
+</tr>
+<tr class="even">
+<td><code>ccp_alpha</code></td>
+<td><strong>Prune after.</strong> Grow the tree out fully, then charge a penalty <span class="math inline">\(\alpha\)</span> per leaf and cut back the branches that do not pay for themselves.</td>
+</tr>
+</tbody>
+</table>
+<p>Cost-complexity pruning minimizes</p>
+<p><span class="math display">\[\underbrace{\textstyle\sum_{\text{leaves}} \text{SSE}}_{\text{fit}} \;+\; \underbrace{\alpha \cdot |T|}_{\text{complexity}}, \qquad |T| = \text{number of leaves}\]</span></p>
+<p><span class="key-result"><strong>You have seen this before</strong> — it is the GAM smoothing penalty from Lecture 3, and it returns in Lecture 6 as Ridge and LASSO. Three model families, one idea, and <span class="math inline">\(\alpha\)</span> chosen the same way each time: by cross-validation.</span></p>
 </section>
 <section class="slide level2">
 
@@ -3761,30 +3818,30 @@ Department of Economics
 <table class="caption-top">
 <thead>
 <tr class="header">
-<th>Feature</th>
+<th>Feature (CA_1 FOODS, weekly)</th>
 <th>Importance</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Lag 12 (same month last year)</td>
-<td>0.41</td>
+<td><code>units_lag4</code></td>
+<td>0.62</td>
 </tr>
 <tr class="even">
-<td>Lag 1 (previous month)</td>
-<td>0.27</td>
+<td><code>units_lag52</code></td>
+<td>0.15</td>
 </tr>
 <tr class="odd">
-<td>Lag 2</td>
+<td><code>units_lag1</code></td>
 <td>0.13</td>
 </tr>
 <tr class="even">
-<td>December dummy</td>
-<td>0.10</td>
+<td><code>snap_days</code></td>
+<td>0.04</td>
 </tr>
 <tr class="odd">
-<td>Unemployment rate</td>
-<td>0.09</td>
+<td><code>avg_price</code></td>
+<td>0.04</td>
 </tr>
 </tbody>
 </table>

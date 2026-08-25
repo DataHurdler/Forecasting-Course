@@ -323,7 +323,7 @@ $x_t$ **Granger-causes** $y_t$ if past values of $x_t$ help predict $y_t$ *beyon
 
 **The test:** fit the $y$-equation with and without the $x$-lags, then run an $F$-test of $H_0$: all $x$-lag coefficients are zero. Rejecting means $x_t$ Granger-causes $y_t$.
 
-**A concrete question.** Does consumer sentiment (`UMCSENT`) Granger-cause retail sales (`RSXFS`)? The null is that every sentiment lag is zero in the retail equation. We will run exactly this in the lab.
+**A concrete question.** Does unemployment (`UNRATE`) Granger-cause retail sales (`RSXFS`)? **We run exactly this in the lab** --- and the answer is instructive: it fires *both* ways, and which direction looks stronger depends on whether COVID is in the sample.
 
 **Granger causality is not structural causality.** It tests *predictive content*, not whether $x$ mechanically brings $y$ about — a rooster reliably predicts sunrise. Report it as "predictive of," never "causes."
 

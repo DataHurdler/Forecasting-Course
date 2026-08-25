@@ -23,10 +23,13 @@ Lecture 2 gave you a rule — **test for stationarity before you read an ACF** �
 data where each one actually bites.
 
 The business question: you are forecasting weekly HOUSEHOLD demand at store CA_1, and you want
-to know whether watching the food aisle helps you predict it.
+to know whether watching the food aisle helps you predict it. Then, in Step 6, you run the same
+test on the macro question from the lecture slide — does unemployment predict retail sales? —
+and find that the answer depends on which years you include.
 
-**Time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `statsmodels`, and
-`data/processed/m5_weekly.csv`.
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `statsmodels`, and
+two prepared files: `data/processed/m5_weekly.csv` (`prep_m5.py`) and
+`data/processed/fred_monthly.csv` (`prep_fred.py`).
 
 ---
 
@@ -41,6 +44,8 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.arima.model import ARIMA
 import warnings
 warnings.filterwarnings('ignore')
+import io
+from contextlib import redirect_stdout
 
 from pathlib import Path
 
@@ -53,7 +58,8 @@ def data_path(name):
             return p
     raise FileNotFoundError(
         f"Could not find data/processed/{name}. "
-        "Run `python scripts/prep_m5.py` from the repository root first."
+        "Run the matching prep script from the repository root first: "
+        "`prep_m5.py` for m5_*.csv, `prep_fred.py` for fred_monthly.csv."
     )
 
 weekly = pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
@@ -89,10 +95,10 @@ def report_adf(series, label):
 report_adf(y, "levels")
 ```
 
-**Your turn:** difference the series and re-test. One line.
+Now difference it and re-test.
 
 ```{python}
-dy = ___                                    # <- first difference, drop the NaN
+dy = y.diff().dropna()
 report_adf(dy, "first difference")
 ```
 
@@ -127,7 +133,7 @@ $(p, d, q)$. Say it out loud to the person next to you before you fit anything.
 # Step 3 — Fit it
 
 ```{python}
-order = (___, ___, ___)                     # <- your proposal from Step 2
+order = (1, 1, 1)                           # <- REPLACE with your proposal from Step 2
 
 model = ARIMA(train, order=order).fit()
 print(model.summary().tables[0])
@@ -168,8 +174,8 @@ planner is ordering inventory twelve months ahead, the 52-step number is the hon
 
 Does the food aisle help predict the household aisle?
 
-`grangercausalitytests` prints a wall of output — four lags times four test variants. Pull out
-the one number you asked for instead.
+`grangercausalitytests` prints four test variants for every lag up to `maxlag` — a wall of
+output you did not ask for. The helper below silences it and pulls out the single F-test.
 
 ```{python}
 food = get_series("CA_1", "FOODS")
@@ -178,7 +184,8 @@ pair = pd.concat([y.rename("household"), food.rename("food")], axis=1).diff().dr
 
 def granger(effect, cause, lag=4):
     """F-test for: do lags of `cause` help predict `effect`?"""
-    res = grangercausalitytests(pair[[effect, cause]], maxlag=lag)
+    with redirect_stdout(io.StringIO()):        # statsmodels prints 4 variants per lag
+        res = grangercausalitytests(pair[[effect, cause]], maxlag=lag)
     F, p = res[lag][0]["ssr_ftest"][0], res[lag][0]["ssr_ftest"][1]
     verdict = "significant" if p < 0.05 else "not significant"
     print(f"{cause:>10} -> {effect:<10}  F = {F:5.2f}   p = {p:.4f}   {verdict}")
@@ -192,22 +199,90 @@ is the single most common mistake with this function.
 **Your turn:** run the other direction and report both F-statistics.
 
 ```{python}
-___                                          # <- same helper, arguments swapped
+# ---- your turn: uncomment, then swap the two arguments ----
+# granger(___, ___)
+```
+
+---
+
+# Step 6 — The same test on macro data, and why the sample matters
+
+Step 5 used two aisles of one store. Now the question from the lecture slide: **does
+unemployment Granger-cause retail sales?**
+
+Run `python scripts/prep_fred.py` once before class — it caches three FRED series to
+`data/processed/fred_monthly.csv`, so this step needs no network and no API key.
+
+```{python}
+fred = pd.read_csv(data_path("fred_monthly.csv"), parse_dates=["date"]).set_index("date")
+
+# Both series are already stationary transforms:
+#   retail_growth = monthly % change in retail sales (log-differenced)
+#   unrate_diff   = monthly change in the unemployment rate
+macro = fred[["retail_growth", "unrate_diff"]].dropna()
+
+def granger_macro(effect, cause, data, lag=4):
+    with redirect_stdout(io.StringIO()):
+        res = grangercausalitytests(data[[effect, cause]], maxlag=lag)
+    F, p = res[lag][0]["ssr_ftest"][0], res[lag][0]["ssr_ftest"][1]
+    print(f"  {cause:>12} -> {effect:<14} F = {F:6.2f}   p = {p:.4f}"
+          f"   {'significant' if p < 0.05 else 'NOT significant'}")
+
+print(f"Full sample: {macro.index.min():%Y-%m} to {macro.index.max():%Y-%m} ({len(macro)} months)")
+granger_macro("retail_growth", "unrate_diff", macro)
+granger_macro("unrate_diff", "retail_growth", macro)
+```
+
+Both directions are significant, and unemployment looks like the stronger driver. That matches
+the story everyone expects: people lose jobs, people stop spending.
+
+**Now drop the COVID window and run it again.**
+
+```{python}
+ex_covid = macro[(macro.index < "2020-02-01") | (macro.index > "2021-06-01")]
+
+print(f"Excluding Feb 2020 - Jun 2021 ({len(ex_covid)} months)")
+granger_macro("retail_growth", "unrate_diff", ex_covid)
+granger_macro("unrate_diff", "retail_growth", ex_covid)
+```
+
+**Your turn:** restrict the sample to everything *before* February 2020 and run both directions
+once more.
+
+```{python}
+# ---- your turn: uncomment and fill in the filter ----
+# pre_covid = macro[___]                     # <- rows with index < "2020-02-01"
+#
+# granger_macro("retail_growth", "unrate_diff", pre_covid)
+# granger_macro("unrate_diff", "retail_growth", pre_covid)
 ```
 
 ---
 
 # Before you leave
 
-You should have found the relationship runs **both ways**, at least in part.
+You should have found, in Step 5, that the relationship runs **both ways**, at least in part.
 
-> **Discuss:** Household goods do not cause groceries, and groceries do not cause household
-> goods. So what is generating a two-way predictive relationship between two aisles of the same
-> store?
+> **Discuss (Step 5):** Household goods do not cause groceries, and groceries do not cause
+> household goods. So what is generating a two-way predictive relationship between two aisles of
+> the same store?
 >
 > And the question that matters commercially: given what you found, is there anything a
 > planner is entitled to *do* with it? Name one legitimate use and one thing they must not
 > conclude.
+
+In Step 6 the intuitive direction — unemployment driving retail — is strong on the full sample,
+weak once COVID is removed, and gone entirely before 2020. The reverse direction survives every
+cut.
+
+> **Discuss (Step 6):** One analyst runs the full sample and reports that unemployment predicts
+> retail sales. Another runs 1992–2019 and reports it does not. Neither has made an error.
+>
+> What actually happened here — and what does it tell you about a Granger result computed on a
+> sample containing one enormous shared shock?
+>
+> Retail sales are a *coincident-to-leading* indicator and unemployment is a *lagging* one.
+> Does that help explain which direction survived?
 
 ---
 

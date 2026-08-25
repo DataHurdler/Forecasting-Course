@@ -1,0 +1,267 @@
+---
+title: "Lab 4: Decision Trees — Reading One, and Finding Where It Breaks"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Today the course changes character. Everything so far specified a structure and estimated it.
+A tree is handed a pile of features and finds the structure itself.
+
+We use **the same series you just forecast in Homework 2** — daily units for CA_1 FOODS. Same
+store, same aisle, same target. Last week you fitted a GAM to it. Today you fit a tree, and the
+comparison is the point: you will be able to say what each method bought you on identical data.
+
+By the end you will have done four things: read a fitted tree out loud, watched the
+bias–variance tradeoff happen in a table, discovered why a single tree is unstable, and found the
+one place trees reliably fail.
+
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`, and
+`data/processed/m5_daily.csv` (run `python scripts/prep_m5.py` if it is missing).
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeRegressor, export_text, plot_tree
+import warnings
+warnings.filterwarnings('ignore')
+
+from pathlib import Path
+
+def data_path(name):
+    """Find the processed data file whether you render from the repo root or from
+    this file's own folder."""
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first."
+    )
+
+RANDOM_STATE = 42
+
+daily = pd.read_csv(data_path("m5_daily.csv"), parse_dates=["date"])
+daily["dow"] = daily["date"].dt.dayofweek        # 0 = Monday
+daily["doy"] = daily["date"].dt.dayofyear
+
+FEATURES = ["units_lag1", "units_lag7", "units_lag14", "units_lag28", "units_lag365",
+            "snap", "is_event", "dow", "doy", "avg_price"]
+
+df = daily.dropna(subset=FEATURES).copy()
+
+N_TEST = 365
+train, test = df.iloc[:-N_TEST], df.iloc[-N_TEST:]
+X_train, y_train = train[FEATURES].values, train["units"].values
+X_test,  y_test  = test[FEATURES].values,  test["units"].values
+
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+
+print(f"{len(df)} usable days — train {len(train)}, test {len(test)}")
+print(f"benchmark (same day last year): RMSE {rmse(y_test, test.units_lag365.values):,.0f}")
+```
+
+**Notice what just happened to the data.** There is no date index in `X_train`. Every row is an
+independent example, and everything the model knows about time is sitting in the lag columns. That
+reframing — a time series becomes a flat table — is what lets every method from here to Lecture 9
+be applied to forecasting at all.
+
+---
+
+# Step 1 — Fit a tree and read it out loud
+
+Start deliberately shallow, because a depth-3 tree is small enough to read.
+
+```{python}
+tree3 = DecisionTreeRegressor(max_depth=3, random_state=RANDOM_STATE).fit(X_train, y_train)
+
+print(export_text(tree3, feature_names=FEATURES, decimals=0))
+print(f"\ntest RMSE: {rmse(y_test, tree3.predict(X_test)):,.0f}")
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(13, 5))
+plot_tree(tree3, feature_names=FEATURES, filled=True, rounded=True, fontsize=7, ax=ax)
+plt.tight_layout()
+```
+
+**Read the root split aloud to the person next to you**, in business language — not
+`dow <= 4.50` but what that *means* about this store.
+
+Then look at the importances:
+
+```{python}
+imp = pd.Series(tree3.feature_importances_, index=FEATURES).sort_values(ascending=False)
+print(imp[imp > 0].round(3).to_string())
+```
+
+::: {.callout-note}
+## Compare this with the lecture slide
+
+Lecture 4's importance table was computed on **weekly** CA_1 FOODS, and there the four-week lag
+dominated. Here, on **daily** data for the same store and aisle, something else wins outright.
+
+Same store. Same product. Different frequency, different answer. Say why before moving on.
+:::
+
+---
+
+# Step 2 — Watch the bias–variance tradeoff happen
+
+Lecture 4 drew this as a curve. Now produce it.
+
+```{python}
+rows = []
+for depth in [1, 2, 3, 5, 8, 12, None]:
+    t = DecisionTreeRegressor(max_depth=depth, random_state=RANDOM_STATE).fit(X_train, y_train)
+    rows.append({"depth": str(depth),
+                 "leaves": t.get_n_leaves(),
+                 "train_RMSE": round(rmse(y_train, t.predict(X_train))),
+                 "test_RMSE":  round(rmse(y_test,  t.predict(X_test)))})
+
+sweep = pd.DataFrame(rows)
+print(sweep.to_string(index=False))
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(7, 3.5))
+ax.plot(range(len(sweep)), sweep.train_RMSE, marker="o", label="train")
+ax.plot(range(len(sweep)), sweep.test_RMSE,  marker="o", label="test")
+ax.set_xticks(range(len(sweep))); ax.set_xticklabels(sweep.depth)
+ax.set_xlabel("max_depth"); ax.set_ylabel("RMSE"); ax.legend()
+plt.tight_layout()
+```
+
+**Two things to say out loud.** What does the training error do as depth increases, and what
+number does it reach at the end? And where does the *test* error bottom out?
+
+The gap between those two curves is overfitting, drawn to scale.
+
+---
+
+# Step 3 — Why one tree is not enough
+
+Lecture 4 claimed a tree is unstable: change the data slightly and the structure changes. Test it
+properly, using bootstrap resamples — draw a sample of the same size *with replacement*, refit,
+and repeat.
+
+```{python}
+rng = np.random.RandomState(RANDOM_STATE)
+roots, preds = {}, []
+
+for b in range(20):
+    idx = rng.choice(len(X_train), len(X_train), replace=True)
+    t = DecisionTreeRegressor(max_depth=5, random_state=RANDOM_STATE).fit(X_train[idx], y_train[idx])
+    root = [l.strip() for l in export_text(t, feature_names=FEATURES).split("\n")
+            if l.startswith("|---")][0]
+    roots[root] = roots.get(root, 0) + 1
+    preds.append(t.predict(X_test))
+
+P = np.array(preds)
+print("root splits across 20 bootstrap trees:")
+for k, v in sorted(roots.items(), key=lambda kv: -kv[1]):
+    print(f"  {v:2d} x  {k}")
+print(f"\nper-day spread of predictions across the 20 trees:")
+print(f"  average sd {P.std(0).mean():,.0f} units   worst day {P.std(0).max():,.0f} units")
+```
+
+The root may well be stable — one feature can be dominant enough that every resample finds it
+first. **That is not the same as the tree being stable.** Look at the spread of predictions: on a
+typical day the twenty trees disagree by a meaningful margin, and on the worst day they disagree
+enormously. All that disagreement lives *below* the root.
+
+Now the payoff, and it is one line:
+
+```{python}
+single = np.mean([rmse(y_test, p) for p in P])
+averaged = rmse(y_test, P.mean(0))
+
+print(f"average RMSE of a single bootstrap tree : {single:,.0f}")
+print(f"RMSE of the 20 trees averaged together  : {averaged:,.0f}")
+print(f"improvement: {100*(single-averaged)/single:.0f}%")
+```
+
+You just built a small Random Forest by hand. Nothing was tuned and no new information was added
+— the gain came entirely from averaging away the disagreement you measured above. That is next
+week's lecture in three lines.
+
+---
+
+# Step 4 — Where trees reliably fail
+
+A tree predicts the **mean of the training rows in a leaf**. So every prediction it can ever make
+is an average of values it has already seen.
+
+```{python}
+full = DecisionTreeRegressor(random_state=RANDOM_STATE).fit(X_train, y_train)
+p = full.predict(X_test)
+
+print(f"training target range : [{y_train.min():,.0f}, {y_train.max():,.0f}]")
+print(f"prediction range      : [{p.min():,.0f}, {p.max():,.0f}]")
+```
+
+The predictions cannot leave the training range — not "usually do not," *cannot*. Now watch what
+that does at the extremes.
+
+```{python}
+hi = y_test > np.percentile(y_test, 90)
+lo = y_test < np.percentile(y_test, 10)
+
+print(f"busiest 10% of test days  (n={hi.sum()}): actual {y_test[hi].mean():,.0f}"
+      f"   predicted {p[hi].mean():,.0f}   under by {y_test[hi].mean()-p[hi].mean():,.0f}")
+print(f"quietest 10% of test days (n={lo.sum()}): actual {y_test[lo].mean():,.0f}"
+      f"   predicted {p[lo].mean():,.0f}   over by  {p[lo].mean()-y_test[lo].mean():,.0f}")
+```
+
+**Your turn:** the two errors above point in opposite directions. Plot predicted against actual
+for the test set, add the 45-degree line, and see the shape this produces.
+
+```{python}
+# ---- your turn: uncomment and fill in the two blanks ----
+# fig, ax = plt.subplots(figsize=(4.5, 4.5))
+# ax.scatter(___, ___, s=6, alpha=0.4)          # <- actual on x, predicted on y
+# lims = [y_test.min(), y_test.max()]
+# ax.plot(lims, lims, "k--", lw=1)
+# ax.set_xlabel("actual units"); ax.set_ylabel("predicted units")
+# plt.tight_layout()
+```
+
+---
+
+# Before you leave
+
+You should have found that the tree systematically under-predicts the busiest days and
+over-predicts the quietest ones, and that averaging twenty unstable trees beat any one of them.
+
+> **Discuss (the failure):** A tree pulls its predictions toward the middle at both ends. Give the
+> mechanical reason — think about what a leaf prediction actually is.
+>
+> Then the operational version: this store is planning inventory. Which of those two errors costs
+> more, and does your answer change if the product is milk rather than canned goods?
+>
+> **Discuss (the comparison):** You forecast this exact series with a GAM last week. Which method
+> would you rather hand to a store manager, and what specifically would each one let you say that
+> the other would not?
+
+---
+
+*Solutions posted to Canvas after class.*

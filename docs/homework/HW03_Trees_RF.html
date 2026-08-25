@@ -2232,7 +2232,7 @@ vertical-align: -.125em;
 
 <section id="overview" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
-<p>This homework shifts from time series methods to machine learning approaches for forecasting. Decision trees and random forests reframe the problem as supervised learning: rather than modeling a single series through time, each store-week row becomes an independent training example, and lagged sales values carry the temporal information that would otherwise live inside a model like ARIMA or ETS. These methods require no stationarity assumptions and discover nonlinear interactions automatically — for example, the effect of a promotion may differ sharply between store types, and a tree will split on both features without any manual interaction term.</p>
+<p>This homework shifts from time series methods to machine learning approaches for forecasting. Decision trees and random forests reframe the problem as supervised learning: rather than modeling a single series through time, each store-category-week row becomes an independent training example, and lagged unit sales carry the temporal information that would otherwise live inside a model like ARIMA or ETS. These methods require no stationarity assumptions and discover nonlinear interactions automatically — for example, the effect of a SNAP benefit week may differ sharply between food and hobby categories, and a tree will split on both features without any manual interaction term.</p>
 <p><strong>Learning objectives.</strong> By the end of this assignment you will be able to:</p>
 <ul>
 <li>Engineer lag and calendar features to turn a time series problem into a supervised learning problem</li>
@@ -2245,9 +2245,9 @@ vertical-align: -.125em;
 </section>
 <section id="dataset-and-feature-engineering" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Dataset and Feature Engineering</h1>
-<p>Unlike ETS and ARIMA, which model one series at a time and require careful handling of seasonality and trend, tree-based models can use <strong>all 30 stores simultaneously</strong>. Each store-week is treated as an independent row in a flat table; the lag features (<code>Sales_lag1</code>, <code>Sales_lag4</code>, etc.) encode how that particular store was performing at various points in its recent past. The model learns general rules — patterns that hold across stores — rather than fitting a separate process to each one.</p>
-<p>The preprocessed file is located at <code>data/processed/rossmann_weekly.csv</code>. Run the starter code below to load the data, derive calendar features, and define the feature matrix and target vector that all subsequent questions use.</p>
-<div id="b10b1019" class="cell">
+<p>Unlike ETS and ARIMA, which model one series at a time and require careful handling of seasonality and trend, tree-based models can use <strong>all 30 series simultaneously</strong>. The M5 extract holds 10 Walmart stores across 3 states, each with 3 product categories — 30 store-category series in all. Each store-category-week is a row in a flat table; the lag features encode how <em>that particular series</em> was performing recently. The model learns general rules that hold across series rather than fitting a separate process to each.</p>
+<p>The preprocessed file is <code>data/processed/m5_weekly.csv</code>. If it does not exist, run <code>python scripts/prep_m5.py</code> once from the repository root.</p>
+<div id="71e96ef5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2258,25 +2258,83 @@ vertical-align: -.125em;
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">&#39;ignore&#39;</span>)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> pd.read_csv(<span class="st">&quot;data/processed/rossmann_weekly.csv&quot;</span>, parse_dates<span class="op">=</span>[<span class="st">&quot;WeekStart&quot;</span>])</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;month&quot;</span>] <span class="op">=</span> weekly[<span class="st">&quot;WeekStart&quot;</span>].dt.month</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;week_of_year&quot;</span>] <span class="op">=</span> weekly[<span class="st">&quot;WeekStart&quot;</span>].dt.isocalendar().week.astype(<span class="bu">int</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;year&quot;</span>] <span class="op">=</span> weekly[<span class="st">&quot;WeekStart&quot;</span>].dt.year</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Features and target</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>FEATURES <span class="op">=</span> [</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Sales_lag1&quot;</span>, <span class="st">&quot;Sales_lag4&quot;</span>, <span class="st">&quot;Sales_lag13&quot;</span>, <span class="st">&quot;Sales_lag26&quot;</span>, <span class="st">&quot;Sales_lag52&quot;</span>,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Promo&quot;</span>, <span class="st">&quot;StateHoliday&quot;</span>, <span class="st">&quot;SchoolHoliday&quot;</span>, <span class="st">&quot;StoreType&quot;</span>, <span class="st">&quot;Assortment&quot;</span>,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;CompetitionDistance&quot;</span>, <span class="st">&quot;Promo2&quot;</span>, <span class="st">&quot;month&quot;</span>, <span class="st">&quot;week_of_year&quot;</span>, <span class="st">&quot;DaysOpen&quot;</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>TARGET <span class="op">=</span> <span class="st">&quot;Sales&quot;</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop rows with missing lag features (first 52 weeks of each store)</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> weekly.dropna(subset<span class="op">=</span>FEATURES).copy()</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Modeling dataset: </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">:,}</span><span class="ss"> store-week rows, </span><span class="sc">{</span>df[<span class="st">&#39;Store&#39;</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> stores&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Find the processed data file whether you render from the repo root or from</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">    this file&#39;s own folder.&quot;&quot;&quot;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">&quot;data&quot;</span> <span class="op">/</span> <span class="st">&quot;processed&quot;</span> <span class="op">/</span> name</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. &quot;</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Run `python scripts/prep_m5.py` from the repository root first.&quot;</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> pd.read_csv(data_path(<span class="st">&quot;m5_weekly.csv&quot;</span>), parse_dates<span class="op">=</span>[<span class="st">&quot;week_start&quot;</span>])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;month&quot;</span>] <span class="op">=</span> weekly[<span class="st">&quot;week_start&quot;</span>].dt.month</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;week_of_year&quot;</span>] <span class="op">=</span> weekly[<span class="st">&quot;week_start&quot;</span>].dt.isocalendar().week.astype(<span class="bu">int</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;year&quot;</span>] <span class="op">=</span> weekly[<span class="st">&quot;week_start&quot;</span>].dt.year</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># store_id, cat_id and state_id are categorical. Trees in scikit-learn need numbers,</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># so one-hot encode them. This is why the feature count is larger than it first looks.</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>df_enc <span class="op">=</span> pd.get_dummies(weekly, columns<span class="op">=</span>[<span class="st">&quot;store_id&quot;</span>, <span class="st">&quot;cat_id&quot;</span>, <span class="st">&quot;state_id&quot;</span>],</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>                        prefix<span class="op">=</span>[<span class="st">&quot;store&quot;</span>, <span class="st">&quot;cat&quot;</span>, <span class="st">&quot;state&quot;</span>])</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>LAG_FEATURES <span class="op">=</span> [<span class="st">&quot;units_lag1&quot;</span>, <span class="st">&quot;units_lag2&quot;</span>, <span class="st">&quot;units_lag3&quot;</span>, <span class="st">&quot;units_lag4&quot;</span>, <span class="st">&quot;units_lag52&quot;</span>]</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>FEATURES <span class="op">=</span> (LAG_FEATURES</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> [<span class="st">&quot;avg_price&quot;</span>, <span class="st">&quot;snap_days&quot;</span>, <span class="st">&quot;event_days&quot;</span>, <span class="st">&quot;month&quot;</span>, <span class="st">&quot;week_of_year&quot;</span>, <span class="st">&quot;year&quot;</span>]</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> [c <span class="cf">for</span> c <span class="kw">in</span> df_enc.columns <span class="cf">if</span> c.startswith((<span class="st">&quot;store_&quot;</span>, <span class="st">&quot;cat_&quot;</span>, <span class="st">&quot;state_&quot;</span>))])</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>TARGET <span class="op">=</span> <span class="st">&quot;units&quot;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop rows with missing lag features (the first 52 weeks of each series)</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df_enc.dropna(subset<span class="op">=</span>LAG_FEATURES).copy()</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Modeling dataset: </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">:,}</span><span class="ss"> store-category-week rows, &quot;</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f&quot;</span><span class="sc">{</span>weekly<span class="sc">.</span>groupby([<span class="st">&#39;store_id&#39;</span>,<span class="st">&#39;cat_id&#39;</span>])<span class="sc">.</span>ngroups<span class="sc">}</span><span class="ss"> series, </span><span class="sc">{</span><span class="bu">len</span>(FEATURES)<span class="sc">}</span><span class="ss"> features&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Modeling dataset: 6,750 store-category-week rows, 30 series, 27 features</code></pre>
 </div>
+</div>
+<p><strong>The features you have:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 39%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Group</th>
+<th>Columns</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lags</td>
+<td><code>units_lag1</code> … <code>units_lag4</code>, <code>units_lag52</code></td>
+<td>recent history and the same week last year</td>
+</tr>
+<tr class="even">
+<td>Drivers</td>
+<td><code>avg_price</code>, <code>snap_days</code>, <code>event_days</code></td>
+<td>SNAP days and calendar events per week</td>
+</tr>
+<tr class="odd">
+<td>Calendar</td>
+<td><code>month</code>, <code>week_of_year</code>, <code>year</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Identity</td>
+<td><code>store_*</code>, <code>cat_*</code>, <code>state_*</code></td>
+<td>one-hot; lets the model learn series-specific levels</td>
+</tr>
+</tbody>
+</table>
 <hr>
 </section>
 <section id="initial-prompt-for-codex" class="level1" data-number="3">
@@ -2294,7 +2352,7 @@ Initial Prompt for Codex
 <p>Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
 <pre><code>I am working on Homework 3 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
-Dataset: Rossmann Store Sales — weekly aggregated for 30 stores, at `data/processed/rossmann_weekly.csv`. Features include lag sales (lag1 through lag52), promotion flags, store attributes (StoreType, Assortment, CompetitionDistance), and calendar features.
+Dataset: M5/Walmart — weekly aggregated, 30 store-category series (10 stores across CA/TX/WI, 3 categories each), at `data/processed/m5_weekly.csv`. Columns: store_id, cat_id, state_id, week_start, units (target), avg_price, snap_days, event_days, and lagged units (units_lag1 through units_lag4, units_lag52).
 
 This homework covers Decision Trees and Random Forests for sales forecasting using scikit-learn. I will ask you questions one at a time. For each:
 1. Write clean, well-commented Python code that runs end-to-end
@@ -2315,12 +2373,13 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <h2 data-number="4.1" class="anchored" data-anchor-id="q1-traintest-split"><span class="header-section-number">4.1</span> Q1 — Train/Test Split</h2>
 <p><em>(Suggested prompts: 1)</em></p>
 <p>Time series data has a natural arrow of time: the past is used to predict the future. The starter code below defines a temporal cutoff. Using that cutoff, create <code>X_train</code>, <code>X_test</code>, <code>y_train</code>, and <code>y_test</code>. Print the number of rows in each split and the date range covered by each.</p>
-<div id="7683f99c" class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cutoff <span class="op">=</span> pd.Timestamp(<span class="st">&quot;2015-01-01&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create train and test splits using the cutoff date</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print row counts and date ranges for each split</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="be75d6d0" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cutoff <span class="op">=</span> pd.Timestamp(<span class="st">&quot;2015-05-17&quot;</span>)     <span class="co"># holds out the final ~53 weeks</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create train and test splits using the cutoff date</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print row counts and date ranges for each split</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>As a sanity check before modeling, compute the <strong>seasonal-naive benchmark</strong> on the test set: predict each store-category-week using <code>units_lag52</code> (the same week last year). Every model in this assignment should beat it. Report its RMSE and carry the number forward to Q5.</p>
 <blockquote class="blockquote">
 <p><strong>Your response:</strong> Why must you use a temporal (not random) split for time series forecasting? What would go wrong with a random split?</p>
 </blockquote>
@@ -2335,14 +2394,14 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <p><strong>(c)</strong> Report test RMSE and the top 5 features by impurity-based importance. Present the importances as a horizontal bar chart, sorted descending.</p>
 <p><strong>(d)</strong> Re-fit with <code>max_depth=10</code>. How does test RMSE change? Does the deeper tree help or hurt on the test set?</p>
 <p>The <code>FEATURES</code> and <code>TARGET</code> variables, and the train/test arrays from Q1, are already defined.</p>
-<div id="61da4a28" class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Fit DecisionTreeRegressor with max_depth=3</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Visualize the tree with plot_tree</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (c) Report test RMSE and top 5 feature importances</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (d) Re-fit with max_depth=10 and compare test RMSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="6432afac" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Fit DecisionTreeRegressor with max_depth=3</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Visualize the tree with plot_tree</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (c) Report test RMSE and top 5 feature importances</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (d) Re-fit with max_depth=10 and compare test RMSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Look at the top split in the depth-3 tree. What feature does the tree split on first, and what does that tell you about what drives weekly sales?</p>
+<p><strong>Your response:</strong> Look at the top split in the depth-3 tree. What feature does it split on first, and at what threshold? What does that tell you about what drives weekly units — and why is that feature so dominant in a dataset that pools 30 different series?</p>
 </blockquote>
 <hr>
 </section>
@@ -2350,15 +2409,15 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <h2 data-number="4.3" class="anchored" data-anchor-id="q3-random-forest"><span class="header-section-number">4.3</span> Q3 — Random Forest</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>A Random Forest grows many decision trees on bootstrap samples of the data and averages their predictions. By training each tree on a different random subset of rows — and considering only a random subset of features at each split — the ensemble reduces the variance that makes individual deep trees unreliable. One by-product of bootstrap sampling is that roughly one-third of the training rows are left out of each tree: these out-of-bag (OOB) samples can be used to produce an internal validation score without touching the held-out test set.</p>
-<p>Fit a <code>RandomForestRegressor</code> with <code>n_estimators=200</code>, <code>max_features=&quot;sqrt&quot;</code>, <code>oob_score=True</code>, and <code>random_state=42</code>.</p>
+<p>Fit a <code>RandomForestRegressor</code> with <code>n_estimators=200</code>, <code>max_features=&quot;sqrt&quot;</code>, <code>oob_score=True</code>, <code>random_state=42</code>, and <code>n_jobs=-1</code> (uses all cores; the fit takes a few seconds).</p>
 <p><strong>(a)</strong> The <code>oob_score_</code> attribute returns an R² value, not RMSE. Convert it to an approximate RMSE using the training target values, and report this OOB RMSE.</p>
-<p><strong>(b)</strong> Report the test RMSE. Compare it to the depth-3 Decision Tree from Q2.</p>
+<p><strong>(b)</strong> Report the test RMSE. Compare it to the depth-3 and depth-10 Decision Trees from Q2, and to the seasonal-naive benchmark from Q1.</p>
 <p><strong>(c)</strong> Plot the MDI feature importances as a horizontal bar chart, sorted descending, showing all features.</p>
-<div id="8b078d85" class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit RandomForestRegressor with n_estimators=200, max_features=&quot;sqrt&quot;, oob_score=True</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Convert oob_score_ (R²) to OOB RMSE</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Compute and report test RMSE, compare to Q2</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (c) Plot MDI feature importances, sorted descending</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="4ae92f80" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit RandomForestRegressor with n_estimators=200, max_features=&quot;sqrt&quot;, oob_score=True</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Convert oob_score_ (R²) to OOB RMSE</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Compute and report test RMSE, compare to Q2</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (c) Plot MDI feature importances, sorted descending</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
 <p><strong>Your response:</strong> The Random Forest’s OOB RMSE is estimated without using a held-out test set. Explain in plain English how OOB estimation works and why it is a useful property.</p>
@@ -2369,16 +2428,32 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <h2 data-number="4.4" class="anchored" data-anchor-id="q4-mdi-vs-permutation-importance"><span class="header-section-number">4.4</span> Q4 — MDI vs Permutation Importance</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>MDI importance measures how much each feature reduces impurity across all trees in the forest. It is fast to compute because it is a by-product of training, but it has a known bias: features with many distinct numeric values tend to receive inflated importance scores simply because they offer the splitter more places to cut, not because they carry more information.</p>
-<p>Permutation importance avoids this bias by directly measuring how much model accuracy degrades when a single feature’s values are randomly shuffled on the test set. A feature that matters a lot will cause a large increase in RMSE when shuffled; a feature that is redundant or spurious will cause little change.</p>
-<p>Using the Random Forest fitted in Q3, compute permutation importance on the test set with <code>n_repeats=10</code> and <code>random_state=42</code>. Then produce a side-by-side comparison of the top-10 features under each method (MDI and permutation), using two horizontal bar charts in the same figure.</p>
-<div id="3c345bce" class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.inspection <span class="im">import</span> permutation_importance</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute permutation importance on the test set (n_repeats=10, random_state=42)</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot top-10 features by MDI and by permutation importance side by side</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Permutation importance avoids this bias by directly measuring how much accuracy degrades when a single feature’s values are randomly shuffled on the test set. A feature that matters will cause a large increase in RMSE when shuffled; a redundant or spurious one will cause almost none.</p>
+<p><strong>(a) Plant two controls.</strong> Add two columns of pure noise to the modeling table — one continuous, one binary — and refit the forest with them included:</p>
+<div id="41c541db" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;noise_continuous&quot;</span>] <span class="op">=</span> rng.rand(<span class="bu">len</span>(df))          <span class="co"># uniform on [0, 1)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;noise_binary&quot;</span>] <span class="op">=</span> rng.randint(<span class="dv">0</span>, <span class="dv">2</span>, <span class="bu">len</span>(df))     <span class="co"># 0 or 1</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>FEATURES_WITH_NOISE <span class="op">=</span> FEATURES <span class="op">+</span> [<span class="st">&quot;noise_continuous&quot;</span>, <span class="st">&quot;noise_binary&quot;</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit the Random Forest (same settings as Q3) using FEATURES_WITH_NOISE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Neither column carries any information about <code>units</code> — you generated them from a random number generator. Any importance either one receives is an artifact of the method, not a finding.</p>
+<p><strong>(b)</strong> Compute permutation importance on the test set with <code>n_repeats=10</code>, <code>random_state=42</code>, and <code>scoring=&quot;neg_root_mean_squared_error&quot;</code> so the result is in units rather than R².</p>
+<p><strong>(c)</strong> Build a comparison table for the two noise columns and three real features of your choice, showing MDI and permutation importance side by side. Then report <strong>where <code>noise_continuous</code> ranks by MDI</strong> out of all features, and where <code>noise_binary</code> ranks.</p>
+<p><strong>(d)</strong> Produce the side-by-side bar charts: top-10 features by MDI, and top-10 by permutation importance, in one figure.</p>
+<div id="a547f349" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.inspection <span class="im">import</span> permutation_importance</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) permutation importance on the test set, scored in RMSE units</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (c) comparison table for noise_continuous, noise_binary, and three real features</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     plus the MDI rank of each noise column</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># (d) side-by-side top-10 bar charts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Do the two importance methods agree on the most important features? If they differ, which method would you trust more for this dataset and why?</p>
+<p><strong>Your response:</strong> Both noise columns are equally useless by construction. Did MDI treat them equally? Report both MDI values and both ranks, and explain the gap in terms of how many distinct values each column has.</p>
+<p>Then: did permutation importance treat them correctly? And state the practical rule — when is it safe to read an MDI ranking, and when must you compute permutation importance instead?</p>
 </blockquote>
 <hr>
 </section>
@@ -2388,23 +2463,27 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <p>A single train/test split gives one estimate of generalization error. Walk-forward cross-validation produces multiple estimates by repeatedly expanding the training window and forecasting the next block of weeks. This is the supervised-learning analogue of the rolling-origin evaluation you used for ARIMA in Homework 1, and it guards against the possibility that the single test period happens to be unusually easy or hard to forecast.</p>
 <p>The starter code below defines the sequence of cutoff dates. For each cutoff:</p>
 <ol type="1">
-<li>Use all store-weeks with <code>WeekStart &lt; cutoff</code> as the training set</li>
-<li>Use store-weeks with <code>cutoff &lt;= WeekStart &lt; cutoff + 13 weeks</code> as the forecast window</li>
+<li>Use all rows with <code>week_start &lt; cutoff</code> as the training set</li>
+<li>Use rows with <code>cutoff &lt;= week_start &lt; cutoff + 13 weeks</code> as the forecast window</li>
 <li>Fit a <code>DecisionTreeRegressor(max_depth=5, random_state=42)</code> and a <code>RandomForestRegressor(n_estimators=100, random_state=42)</code> on the training set</li>
 <li>Compute RMSE for each model on the forecast window</li>
 </ol>
-<p>Report the mean RMSE across all CV rounds for each model, and plot the per-round RMSE for both models on a single figure.</p>
-<div id="367a489c" class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cutoffs <span class="op">=</span> pd.date_range(<span class="st">&quot;2014-01-01&quot;</span>, <span class="st">&quot;2015-01-01&quot;</span>, freq<span class="op">=</span><span class="st">&quot;13W&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Walk-forward CV loop over cutoffs</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># At each cutoff: train on all rows before cutoff, test on next 13 weeks</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit DecisionTreeRegressor(max_depth=5) and RandomForestRegressor(n_estimators=100)</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Collect per-round RMSE for each model</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Report mean RMSE and plot per-round RMSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Report the mean RMSE across all CV rounds for each model, and plot the per-round RMSE for both models on a single figure. Add the seasonal-naive benchmark from Q1 as a horizontal reference line.</p>
+<div id="e3f07b9c" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cutoffs <span class="op">=</span> pd.date_range(<span class="st">&quot;2014-01-05&quot;</span>, <span class="st">&quot;2015-05-17&quot;</span>, freq<span class="op">=</span><span class="st">&quot;13W&quot;</span>)   <span class="co"># 6 rounds</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(cutoffs)<span class="sc">}</span><span class="ss"> CV rounds:&quot;</span>, [<span class="bu">str</span>(c.date()) <span class="cf">for</span> c <span class="kw">in</span> cutoffs])</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Walk-forward CV loop over cutoffs</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># At each cutoff: train on all rows before cutoff, test on next 13 weeks</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit DecisionTreeRegressor(max_depth=5) and RandomForestRegressor(n_estimators=100)</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Collect per-round RMSE for each model</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Report mean RMSE and plot per-round RMSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>6 CV rounds: [&#39;2014-01-05&#39;, &#39;2014-04-06&#39;, &#39;2014-07-06&#39;, &#39;2014-10-05&#39;, &#39;2015-01-04&#39;, &#39;2015-04-05&#39;]</code></pre>
+</div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Does walk-forward CV change your conclusion about which model is better? Why might test-set RMSE and CV RMSE differ?</p>
+<p><strong>Your response:</strong> Does walk-forward CV change your conclusion about which model is better? Why might test-set RMSE and CV RMSE differ — and note that each CV round trains on <em>less</em> data than the final model did, so what does that imply about which estimate is more pessimistic?</p>
 </blockquote>
 <hr>
 </section>
@@ -2412,12 +2491,12 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <h2 data-number="4.6" class="anchored" data-anchor-id="q6-business-memo"><span class="header-section-number">4.6</span> Q6 — Business Memo</h2>
 <p><em>(Suggested prompts: 0 — write yourself)</em></p>
 <p>No code required for this question.</p>
-<p>You are presenting to the Rossmann analytics team. They currently use a national average uplift model for promotions — every promoted store receives the same expected sales lift, regardless of store type, location, or competitive environment. Your Random Forest model includes promotion as one of many features and was trained on data from all 30 stores.</p>
-<p>Write a short memo of 150–200 words addressing the following three points:</p>
+<p>You are presenting to a Walmart regional analytics team. They currently plan inventory with a single national uplift factor for SNAP weeks — every store receives the same expected lift, regardless of state, store, or product category. Your Random Forest was trained on all 30 store-category series and includes <code>snap_days</code> alongside store, state, and category identifiers.</p>
+<p>Write a short memo of 150–200 words addressing three points:</p>
 <ol type="1">
-<li>What does your model reveal about the value of promotions — specifically, is promotion consistently among the most important drivers of weekly sales, or does its importance vary?</li>
-<li>How could the model help Rossmann decide <strong>which stores</strong> to promote in a given week, rather than applying the same policy nationwide?</li>
-<li>Identify one meaningful limitation of this approach that the team should understand before relying on the model for promotion planning.</li>
+<li>What does your model say about the value of SNAP timing — is <code>snap_days</code> consistently among the most important drivers of weekly units, or does its importance depend on how you measure importance? Be specific about which measure you are quoting.</li>
+<li>How could the model help decide <strong>which store-category combinations</strong> to stock up for a given SNAP week, rather than applying one uplift nationwide?</li>
+<li>Identify one meaningful limitation the team should understand before relying on this model for inventory planning. The dominance of <code>units_lag1</code> is a reasonable place to start: what does a model that leans that heavily on last week’s value do when next week is <em>not</em> like last week?</li>
 </ol>
 <blockquote class="blockquote">
 <p><strong>Your response:</strong></p>

@@ -157,6 +157,37 @@
   or entropy (information gain).}
 \end{frame}
 
+% --- Slide: greedy is not optimal --------------------------------------------
+\begin{frame}{Greedy Is Not Optimal --- and That Matters}
+  CART is \textbf{exhaustive} at each node: it really does try every feature and every
+  threshold. But it is \textbf{greedy} across nodes --- it never looks ahead.
+  \begin{center}
+    {\small
+    \begin{tabular}{lcc}
+      \toprule
+      \textbf{Split at the root} & \textbf{Variance removed now} & \textbf{\ldots plus what it enables} \\
+      \midrule
+      On price     & \textbf{40\%} & $+$ 12\% \quad (total 52\%) \\
+      On promotion & 38\%          & $+$ 50\% \quad \textbf{(total 88\%)} \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \vspace{-0.1cm}
+  CART takes the 40\%. It has no way to see the 50\% coming, because it evaluates one split at
+  a time and commits.
+
+  \vspace{0.15cm}
+  So a fitted tree is \textbf{not the optimal tree} --- it is the result of a sequence of
+  locally optimal decisions, which is a different thing. Finding the genuinely optimal tree is
+  computationally intractable for any realistic number of features, which is why nobody does it.
+
+  \vspace{0.15cm}
+  Two consequences worth carrying forward. A tree can \textbf{miss structure that is really
+  there}. And a small change in the data can send the whole greedy sequence down a different
+  path --- which is exactly the instability we turn to next.
+\end{frame}
+
 % --- Slide: Bias-variance in trees -------------------------------------------
 \begin{frame}{Depth Controls the Bias--Variance Tradeoff}
   A \textbf{depth-1 stump} asks one question: high bias, low variance. A
@@ -183,6 +214,37 @@
   at the root, and every prediction below it changes with it.
   Tune \texttt{max\_depth} and \texttt{min\_samples\_leaf} by
   \texttt{TimeSeriesSplit} cross-validation.
+\end{frame}
+
+% --- Slide: pruning ----------------------------------------------------------
+\begin{frame}{Two Ways to Stop a Tree Overfitting}
+  \texttt{max\_depth} caps the tree in advance. Two other controls do the job better.
+  \begin{center}
+    {\small
+    \begin{tabular}{p{3.2cm}p{9.2cm}}
+      \toprule
+      \texttt{min\_samples\_leaf} & \textbf{Stop early.} At the default of 1, a leaf may hold a
+      single observation and ``predict'' that one value. Set it to 5--10 and every prediction is
+      an average over a real group. \\[3pt]
+      \texttt{ccp\_alpha} & \textbf{Prune after.} Grow the tree out fully, then charge a penalty
+      $\alpha$ per leaf and cut back the branches that do not pay for themselves. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \vspace{-0.1cm}
+  Cost-complexity pruning minimizes
+  \vspace{-0.2cm}
+  \[
+    \underbrace{\textstyle\sum_{\text{leaves}} \text{SSE}}_{\text{fit}}
+    \;+\; \underbrace{\alpha \cdot |T|}_{\text{complexity}},
+    \qquad |T| = \text{number of leaves}
+  \]
+  \vspace{-0.25cm}
+
+  \textbf{You have seen this before} --- it is the GAM smoothing penalty from Lecture 3, and it
+  returns in Lecture 6 as Ridge and LASSO. Three model families, one idea, and $\alpha$ chosen
+  the same way each time: by cross-validation.
 \end{frame}
 
 % =============================================================================
@@ -233,13 +295,13 @@
     {\small
     \begin{tabular}{lc}
       \toprule
-      \textbf{Feature} & \textbf{Importance} \\
+      \textbf{Feature (CA\_1 FOODS, weekly)} & \textbf{Importance} \\
       \midrule
-      Lag 12 (same month last year) & 0.41 \\
-      Lag 1 (previous month)        & 0.27 \\
-      Lag 2                         & 0.13 \\
-      December dummy                & 0.10 \\
-      Unemployment rate             & 0.09 \\
+      \texttt{units\_lag4}  & 0.62 \\
+      \texttt{units\_lag52} & 0.15 \\
+      \texttt{units\_lag1}  & 0.13 \\
+      \texttt{snap\_days}   & 0.04 \\
+      \texttt{avg\_price}   & 0.04 \\
       \bottomrule
     \end{tabular}
     }

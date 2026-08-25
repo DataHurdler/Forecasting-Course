@@ -1,0 +1,276 @@
+---
+title: "Lab 3: GAMs, Prophet, and Several Seasons at Once"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Lecture 3 made a claim: a GAM earns its keep when a series has **several cycles running at
+once**, because each one gets its own smooth term and you can still read the model.
+
+Retail sales cannot show you that — they have essentially one season. So today we leave M5 and
+use electricity demand, which has three large cycles simultaneously, and an annual shape that
+will break the first model we try.
+
+The business question: you are forecasting daily demand for a grid operator. Being wrong is
+expensive in both directions — under-forecast and you buy power at spot prices, over-forecast
+and you have paid to keep generation spinning for nothing.
+
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `prophet`, `pygam`,
+and `data/processed/electricity_daily.csv` + `electricity_hourly.csv` (run
+`python scripts/prep_electricity.py` once).
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import warnings, logging
+warnings.filterwarnings('ignore')
+logging.getLogger('cmdstanpy').setLevel(logging.ERROR)   # Prophet is chatty; silence it
+
+from pathlib import Path
+
+def data_path(name):
+    """Find the processed data file whether you render from the repo root or from
+    this file's own folder."""
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_electricity.py` from the repository root first."
+    )
+
+daily = pd.read_csv(data_path("electricity_daily.csv"), parse_dates=["date"])
+hourly = pd.read_csv(data_path("electricity_hourly.csv"), parse_dates=["datetime"])
+
+# Five and a half years is plenty of yearly cycles and keeps every fit under a second.
+daily = daily[daily.date >= "2013-01-01"].reset_index(drop=True)
+
+SPLIT = "2017-08-01"
+train, test = daily[daily.date < SPLIT], daily[daily.date >= SPLIT]
+
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+mae  = lambda a, b: float(np.mean(np.abs(np.asarray(a) - np.asarray(b))))
+results = {}
+
+print(f"{len(daily)} days — train {len(train)}, test {len(test)}")
+print(f"test window: {test.date.min():%Y-%m-%d} to {test.date.max():%Y-%m-%d}")
+```
+
+---
+
+# Step 1 — Three cycles, one series
+
+Before any model, look at the three periodicities separately.
+
+```{python}
+fig, axes = plt.subplots(1, 3, figsize=(12, 3.2))
+
+hourly.groupby("hour").mw.mean().plot(ax=axes[0], marker="o", ms=3)
+axes[0].set_title("hour of day"); axes[0].set_xlabel("hour")
+
+daily.groupby("dow").mw_mean.mean().plot(ax=axes[1], marker="o", ms=4)
+axes[1].set_title("day of week (0=Mon)"); axes[1].set_xlabel("")
+
+daily.groupby("doy").mw_mean.mean().rolling(7, center=True).mean().plot(ax=axes[2])
+axes[2].set_title("day of year (7d smoothed)"); axes[2].set_xlabel("")
+
+for a in axes: a.set_ylabel("MW")
+plt.tight_layout()
+```
+
+```{python}
+for label, g in [("hour of day", hourly.groupby("hour").mw.mean()),
+                 ("day of week", daily.groupby("dow").mw_mean.mean()),
+                 ("day of year", daily.groupby("doy").mw_mean.mean())]:
+    swing = 100 * (g.max() - g.min()) / g.mean()
+    print(f"{label:<14} swing {swing:5.1f}%   min {g.idxmin():>3}   max {g.idxmax():>3}")
+```
+
+**Notice:** all three cycles are large — none is a rounding error you could ignore. This is the
+situation Lecture 3 said GAMs are for.
+
+---
+
+# Step 2 — The annual cycle has *two* peaks
+
+Look again at the third panel. It does not look like a wave.
+
+```{python}
+doy = daily.groupby("doy").mw_mean.mean()
+print(f"January  (days 1-31)    {doy.loc[1:31].mean():,.0f} MW   <- heating")
+print(f"April    (days 95-115)  {doy.loc[95:115].mean():,.0f} MW   <- mild, nothing running")
+print(f"July     (days 180-200) {doy.loc[180:200].mean():,.0f} MW   <- air conditioning")
+```
+
+Two peaks and two troughs per year, because heating and cooling are *both* electricity demand
+and they happen at opposite ends of the calendar.
+
+Now the consequence. Fit the annual shape with a single sine wave, then with two.
+
+```{python}
+t = np.arange(len(doy))
+one = np.c_[np.ones_like(t), np.sin(2*np.pi*t/365), np.cos(2*np.pi*t/365)]
+two = np.c_[one,             np.sin(4*np.pi*t/365), np.cos(4*np.pi*t/365)]
+
+for label, X in [("one harmonic", one), ("two harmonics", two)]:
+    beta, *_ = np.linalg.lstsq(X, doy.values, rcond=None)
+    print(f"{label:<15} in-sample RMSE {rmse(doy.values, X @ beta):,.0f} MW")
+```
+
+**This is the whole argument for a flexible term.** One harmonic can put its peak in summer or
+in winter — not both. Adding the second harmonic (a cycle that repeats *twice* a year) cuts the
+error by roughly a factor of three.
+
+Prophet's `yearly_seasonality` is exactly this idea with more terms: a Fourier series of order
+10 by default, so 10 sine/cosine pairs. A `pyGAM` spline gets there differently — by bending
+freely — but solves the same problem.
+
+---
+
+# Step 3 — Prophet, and an honest benchmark
+
+Prophet wants two columns named `ds` and `y`. That is most of the API.
+
+```{python}
+from prophet import Prophet
+
+# Benchmark first, always: same day last year (364 days keeps the weekday aligned).
+lookup = daily.set_index("date").mw_mean
+sn = [lookup.get(t - pd.Timedelta(days=364), np.nan) for t in test.date]
+results["Seasonal naive (364d)"] = (rmse(test.mw_mean, sn), mae(test.mw_mean, sn))
+
+m = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False)
+m.fit(train.rename(columns={"date": "ds", "mw_mean": "y"})[["ds", "y"]])
+
+fc = m.predict(test.rename(columns={"date": "ds"})[["ds"]])
+results["Prophet"] = (rmse(test.mw_mean, fc.yhat), mae(test.mw_mean, fc.yhat))
+
+for k, (r, a) in results.items():
+    print(f"{k:<24} RMSE {r:7,.0f}   MAE {a:7,.0f}")
+```
+
+We turned `daily_seasonality` off deliberately — the data is one row per day, so there is no
+within-day variation left to model. Leave it on and Prophet will happily fit noise.
+
+---
+
+# Step 4 — The components plot
+
+This is the payoff, and the reason Prophet gets used by people who will be questioned about
+their forecast.
+
+```{python}
+m.plot_components(fc);
+```
+
+Three panels, one per additive term, each on the scale of the original series. The trend, the
+weekly cycle, the yearly cycle — separately readable.
+
+**Notice** the yearly panel reproduces the double peak from Step 2. Nobody told Prophet about
+heating and cooling; the Fourier series had enough terms to find the shape.
+
+---
+
+# Step 5 — How much did the extra harmonics buy?
+
+Step 2 argued this in-sample. Test it properly, on the holdout.
+
+`yearly_seasonality` accepts an integer — the Fourier order — instead of `True`.
+
+**Your turn:** fit a Prophet with the yearly order forced to **1** (a single harmonic) and add
+it to the results table.
+
+```{python}
+# ---- your turn: uncomment and fill in the order ----
+# m1 = Prophet(yearly_seasonality=___, weekly_seasonality=True, daily_seasonality=False)
+# m1.fit(train.rename(columns={"date": "ds", "mw_mean": "y"})[["ds", "y"]])
+#
+# fc1 = m1.predict(test.rename(columns={"date": "ds"})[["ds"]])
+# results["Prophet (yearly order=1)"] = (rmse(test.mw_mean, fc1.yhat),
+#                                        mae(test.mw_mean, fc1.yhat))
+#
+# print(f"single harmonic RMSE {rmse(test.mw_mean, fc1.yhat):,.0f}")
+```
+
+Report both numbers. Does the holdout agree with what Step 2 predicted in-sample?
+
+---
+
+# Step 6 — pyGAM, and reading the smooth directly
+
+Prophet is a GAM with the time-series decisions made for you. `pyGAM` makes you state the terms,
+which is more work and more control.
+
+```{python}
+from pygam import LinearGAM, s, f
+
+# s(0) = cyclic spline on day-of-year (basis="cp" makes Dec 31 join Jan 1)
+# f(1) = day-of-week as a categorical factor
+X_tr, X_te = train[["doy", "dow"]].values, test[["doy", "dow"]].values
+
+gam = LinearGAM(s(0, n_splines=20, basis="cp") + f(1)).fit(X_tr, train.mw_mean.values)
+results["pyGAM (doy + dow)"] = (rmse(test.mw_mean, gam.predict(X_te)),
+                                mae(test.mw_mean, gam.predict(X_te)))
+
+print(f"effective degrees of freedom: {gam.statistics_['edof']:.1f}")
+print(pd.DataFrame(results, index=["RMSE", "MAE"]).T
+        .sort_values("RMSE").round(0).astype(int).to_string())
+```
+
+Now the partial dependence — the GAM equivalent of the components plot.
+
+```{python}
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.2))
+for i, (ax, name) in enumerate(zip(axes, ["day of year", "day of week"])):
+    XX = gam.generate_X_grid(term=i)
+    pdep, ci = gam.partial_dependence(term=i, X=XX, width=0.95)
+    ax.plot(XX[:, i], pdep)
+    ax.plot(XX[:, i], ci, c="grey", ls="--", lw=0.8)
+    ax.set_title(name); ax.set_ylabel("effect on MW")
+plt.tight_layout()
+```
+
+**Read the left panel and say what it means in words**, the way you would to a grid operator.
+The confidence band widens where the data is thin — say that too.
+
+---
+
+# Before you leave
+
+You should have found that every method beat the seasonal-naive benchmark, and that the single
+harmonic was the worst of the three models.
+
+> **Discuss:** `pyGAM` was given only day-of-year and day-of-week. Prophet was given a trend, a
+> weekly cycle, *and* a yearly cycle with ten harmonics. Yet on this holdout the simpler model
+> was competitive.
+>
+> Give one reason a more flexible model can lose on a held-out year, and name the thing you
+> would check before concluding that pyGAM is genuinely the better choice here.
+>
+> And the operational question: your forecast is for a grid operator who must buy generation in
+> advance. Under-forecasting and over-forecasting cost different amounts. Which of these models
+> would you actually ship, and what would you need to know first?
+
+---
+
+*Solutions posted to Canvas after class.*

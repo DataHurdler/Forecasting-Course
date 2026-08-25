@@ -113,7 +113,8 @@ proper exponential smoothing model will get? You will check it in Step 4.
 
 # Step 3 — Fit the three models
 
-The structure is given. Fill in the three model calls using what Lecture 1 covered.
+All three calls come straight from Lecture 1. Run this, then **predict the ordering before you
+look at Step 4** — write your guess down.
 
 ```{python}
 # SES — level only.
@@ -121,13 +122,14 @@ ses_fit = SimpleExpSmoothing(train).fit()
 results["SES"] = (rmse(test, ses_fit.forecast(N_TEST)),
                   mae(test, ses_fit.forecast(N_TEST)))
 
-# Holt — level + trend. Fit it UNDAMPED first; we come back to damping in Step 5.
-holt_fit = ___                                     # <- you fill this in
+# Holt — level + trend. Undamped for now; we come back to damping in Step 5.
+holt_fit = Holt(train).fit()
 results["Holt"] = (rmse(test, holt_fit.forecast(N_TEST)),
                    mae(test, holt_fit.forecast(N_TEST)))
 
 # Holt-Winters — level + trend + seasonality, additive, period 52.
-hw_fit = ___                                       # <- you fill this in
+hw_fit = ExponentialSmoothing(train, trend="add",
+                              seasonal="add", seasonal_periods=52).fit()
 results["Holt-Winters"] = (rmse(test, hw_fit.forecast(N_TEST)),
                            mae(test, hw_fit.forecast(N_TEST)))
 ```
@@ -173,13 +175,15 @@ You are forecasting **52**.
 **Your turn:** refit Holt with a damped trend and add it to the table. One keyword argument.
 
 ```{python}
-holt_damped = ___                                  # <- damped_trend=True
-results["Holt (damped)"] = (rmse(test, holt_damped.forecast(N_TEST)),
-                            mae(test, holt_damped.forecast(N_TEST)))
-
-print(pd.DataFrame(results, index=["RMSE", "MAE"]).T
-        .sort_values("RMSE").round(0).astype(int).to_string())
-print(f"\nestimated phi: {holt_damped.params['damping_trend']:.3f}")
+# ---- your turn: uncomment and fill in the one keyword argument ----
+# holt_damped = Holt(train, ___).fit()             # <- damped_trend=True
+#
+# results["Holt (damped)"] = (rmse(test, holt_damped.forecast(N_TEST)),
+#                             mae(test, holt_damped.forecast(N_TEST)))
+#
+# print(pd.DataFrame(results, index=["RMSE", "MAE"]).T
+#         .sort_values("RMSE").round(0).astype(int).to_string())
+# print(f"estimated phi: {holt_damped.params['damping_trend']:.3f}")
 ```
 
 Report the value of $\phi$. What does it mean that it came out below 1?

@@ -199,8 +199,12 @@ electricity demand (L03 multiple seasonality), and Favorita (Week 16 shock cameo
 Do not restructure HW02–HW07 before that migration.
 
 **Status:** All 8 assignments written (Spring 2026).
-**Dataset:** Rossmann Store Sales (Kaggle) — 30 stores, weekly aggregated.
-**Data prep:** Run `python scripts/prep_rossmann.py` once to generate `data/processed/rossmann_weekly.csv` and `data/processed/rossmann_daily.csv`.
+**Dataset:** M5 / Walmart is the spine (HW01 migrated; HW02–HW07 still reference Rossmann and
+**cannot render** — the Rossmann CSVs no longer exist. See ADR-0001).
+**Data prep:** Run each once from the repo root:
+`python scripts/prep_m5.py` → `data/processed/m5_weekly.csv`, `m5_daily.csv`
+`python scripts/prep_fred.py` → `fred_monthly.csv` (L02 Granger; no API key)
+`python scripts/prep_electricity.py` → `electricity_daily.csv`, `electricity_hourly.csv` (L03 GAMs)
 **Format:** Quarto `.qmd` (students render to HTML). Each assignment includes an initial Codex prompt and per-question prompt budgets.
 **Student repo:** https://github.com/DataHurdler/Forecasting-Env (Codex workflows, submission structure, validation script).
 
@@ -208,9 +212,9 @@ Do not restructure HW02–HW07 before that migration.
 |----|------|----------|---------|---------------|-----------|
 | 1a | `HW01_Part1_ETS.qmd` ✓ | L01 | Weekly, Store 1 | 4 | ETS (SES/Holt/HW), held-out RMSE/MAE |
 | 1b | `HW01_Part2_ARIMA_VAR.qmd` ✓ | L02 | Weekly, Store 1 + Store 2 | 8 | ARIMA walk-forward CV, VAR, Granger causality, method comparison |
-| 2 | `HW02_GAMs.qmd` ✓ | L03 | Daily, Store 1 | 10 | Prophet components + regressors, pyGAM splines, model comparison |
-| 3 | `HW03_Trees_RF.qmd` ✓ | L04 + L05 | Weekly, 30 stores | 12 | Decision tree visualization, RF + OOB error, MDI vs permutation importance, walk-forward CV |
-| 4 | `HW04_XGBoost_Regularization.qmd` ✓ | L06 | Weekly, 30 stores | 12 | XGBoost tuning, LASSO regularization path, Elastic Net vs Ridge, cross-model CV comparison |
+| 2 | `HW02_GAMs.qmd` ✓ | L03 | **M5 daily, CA_1 FOODS** | 10 | Prophet components + SNAP/event regressors, pyGAM cyclic spline, seasonal-naive benchmark |
+| 3 | `HW03_Trees_RF.qmd` ✓ | L04 + L05 | **M5 weekly, 30 series** | 12 | Tree visualization, RF + OOB, MDI vs permutation with planted noise controls, walk-forward CV |
+| 4 | `HW04_XGBoost_Regularization.qmd` ✓ | L06 | **M5 weekly, 46 engineered features** | 12 | XGBoost tuning incl. `reg_lambda`, LASSO path, per-mix alpha tuning, cross-model CV |
 | 5 | `HW05_DeepLearning.qmd` ✓ | L07 + L08 + L09 | Weekly, 30 stores (window=26/52) | 15 | PyTorch Dataset/DataLoader, FFN, 1D CNN, LSTM, Transformer + positional encoding, full course comparison |
 | 6 | `HW06_Bayesian_TS_Hierarchical.qmd` ✓ | L10 + L11 | Weekly, Store 1 + 30 stores | 15 | Beta-Binomial prior predictive, Bayesian TS (Fourier), hierarchical partial pooling, shrinkage plot |
 | 7 | `HW07_Bayesian_Regression.qmd` ✓ | L12 | Weekly, 30 stores | 15 | DAG construction, OLS benchmark, Bayesian regression, ROPE analysis, conditional simulation |

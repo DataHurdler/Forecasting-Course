@@ -127,6 +127,23 @@ At every node the algorithm is really asking: *"what is the single yes/no questi
 
 ---
 
+## Greedy Is Not Optimal --- and That Matters
+
+CART is **exhaustive** at each node: it really does try every feature and every threshold. But it is **greedy** across nodes --- it never looks ahead.
+
+| Split at the root | Variance removed now | ...plus what it enables |
+|-------------------|:--------------------:|:-----------------------:|
+| On price | **40%** | $+$ 12%  (total 52%) |
+| On promotion | 38% | $+$ 50%  **(total 88%)** |
+
+CART takes the 40%. It has no way to see the 50% coming, because it evaluates one split at a time and commits.
+
+A fitted tree is therefore **not the optimal tree** --- it is the result of a sequence of locally optimal decisions. Finding the genuinely optimal tree is computationally intractable for any realistic number of features, which is why nobody does it.
+
+[Two consequences: a tree can **miss structure that is really there**, and a small change in the data can send the whole greedy sequence down a different path --- exactly the instability we turn to next.]{.key-result}
+
+---
+
 ## Depth Controls the Bias--Variance Tradeoff
 
 A **depth-1 stump** asks one question: high bias, low variance. A **full tree** with one observation per leaf memorizes the sample: zero bias, extreme variance.
@@ -140,6 +157,23 @@ A **depth-1 stump** asks one question: high bias, low variance. A **full tree** 
 **Why trees are unstable:** one changed observation can flip the split at the root, and every prediction below it changes with it.
 
 Tune `max_depth` and `min_samples_leaf` by `TimeSeriesSplit` cross-validation.
+
+---
+
+## Two Ways to Stop a Tree Overfitting
+
+`max_depth` caps the tree in advance. Two other controls do the job better.
+
+| Parameter | What it does |
+|-----------|--------------|
+| `min_samples_leaf` | **Stop early.** At the default of 1, a leaf may hold a single observation and "predict" that one value. Set it to 5--10 and every prediction is an average over a real group. |
+| `ccp_alpha` | **Prune after.** Grow the tree out fully, then charge a penalty $\alpha$ per leaf and cut back the branches that do not pay for themselves. |
+
+Cost-complexity pruning minimizes
+
+$$\underbrace{\textstyle\sum_{\text{leaves}} \text{SSE}}_{\text{fit}} \;+\; \underbrace{\alpha \cdot |T|}_{\text{complexity}}, \qquad |T| = \text{number of leaves}$$
+
+[**You have seen this before** --- it is the GAM smoothing penalty from Lecture 3, and it returns in Lecture 6 as Ridge and LASSO. Three model families, one idea, and $\alpha$ chosen the same way each time: by cross-validation.]{.key-result}
 
 ---
 
@@ -188,13 +222,13 @@ Impurity-Based Feature Importance
 For each feature $j$, sum the total reduction in variance across all splits where $j$ was used, weighted by the fraction of observations in each node. Normalize so the importances sum to 1.
 :::
 
-| Feature | Importance |
-|---------|-----------|
-| Lag 12 (same month last year) | 0.41 |
-| Lag 1 (previous month) | 0.27 |
-| Lag 2 | 0.13 |
-| December dummy | 0.10 |
-| Unemployment rate | 0.09 |
+| Feature (CA_1 FOODS, weekly) | Importance |
+|------------------------------|-----------|
+| `units_lag4` | 0.62 |
+| `units_lag52` | 0.15 |
+| `units_lag1` | 0.13 |
+| `snap_days` | 0.04 |
+| `avg_price` | 0.04 |
 
 This tells you which variables the tree found most useful for splitting — a fast way to screen predictors.
 

@@ -2231,12 +2231,12 @@ vertical-align: -.125em;
 
 <section id="overview" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
-<p>Generalized Additive Models (GAMs) extend linear regression by replacing straight-line effects with flexible smooth functions — one per predictor — that are then added together to produce a forecast. This structure preserves interpretability (you can inspect each component individually) while capturing nonlinear patterns that fixed-slope models miss. Prophet, developed at Meta, applies exactly this idea to time series by decomposing a signal into trend, seasonality, and user-defined regressor effects. This assignment applies both Prophet and pyGAM to daily retail sales data and benchmarks them against the ARIMA/ETS baselines from Homework 1.</p>
+<p>Generalized Additive Models (GAMs) extend linear regression by replacing straight-line effects with flexible smooth functions — one per predictor — that are then added together to produce a forecast. This structure preserves interpretability (you can inspect each component individually) while capturing nonlinear patterns that fixed-slope models miss. Prophet, developed at Meta, applies exactly this idea to time series by decomposing a signal into trend, seasonality, and user-defined regressor effects. This assignment applies both Prophet and pyGAM to daily Walmart sales and benchmarks them against a seasonal-naive baseline and against your ARIMA/ETS results from Homework 1.</p>
 <p><strong>Learning objectives.</strong> By the end of this assignment you will be able to:</p>
 <ul>
 <li>Decompose a time series into trend, weekly seasonality, yearly seasonality, and external regressors using Prophet</li>
 <li>Interpret Prophet component plots and connect them to concrete business decisions</li>
-<li>Fit a pyGAM with spline terms for calendar features and linear terms for promotional indicators</li>
+<li>Fit a pyGAM with a cyclic spline for the annual cycle, a factor term for day of week, and linear terms for binary demand drivers</li>
 <li>Compare GAM-family models against ARIMA/ETS on a common holdout set using RMSE</li>
 </ul>
 <hr>
@@ -2244,20 +2244,93 @@ vertical-align: -.125em;
 <section id="dataset" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Dataset</h1>
 <p>This homework switches from weekly to <strong>daily</strong> data. Prophet and pyGAM both benefit from finer time granularity: daily data expose intra-week patterns that are averaged away in weekly aggregates, and Prophet’s changepoint detection is more reliable with a denser observation grid.</p>
-<p>The preprocessed file is located at <code>data/processed/rossmann_daily.csv</code>. Run the cell below to confirm the data loaded correctly before proceeding.</p>
-<div id="4c924ee7" class="cell">
+<p>You will work with <strong>store CA_1, FOODS category</strong> — 1,941 daily observations from the M5/Walmart data. Note that this is the same store and category you used in Homework 1 Part 1, but at daily rather than weekly frequency, so you can compare directly against what you already fitted.</p>
+<p>The preprocessed file is <code>data/processed/m5_daily.csv</code>. If it does not exist, run <code>python scripts/prep_m5.py</code> once from the repository root.</p>
+<div id="1f92db02" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, l, f</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings, logging</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">&#39;ignore&#39;</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Load daily Store 1 data</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> pd.read_csv(<span class="st">&quot;data/processed/rossmann_daily.csv&quot;</span>, parse_dates<span class="op">=</span>[<span class="st">&quot;Date&quot;</span>])</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Store 1 daily: </span><span class="sc">{</span><span class="bu">len</span>(daily)<span class="sc">}</span><span class="ss"> observations from </span><span class="sc">{</span>daily[<span class="st">&#39;Date&#39;</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>daily[<span class="st">&#39;Date&#39;</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(daily[[<span class="st">&quot;Date&quot;</span>,<span class="st">&quot;Sales&quot;</span>,<span class="st">&quot;Promo&quot;</span>,<span class="st">&quot;StateHoliday&quot;</span>,<span class="st">&quot;SchoolHoliday&quot;</span>]].head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">&#39;cmdstanpy&#39;</span>).setLevel(logging.ERROR)   <span class="co"># Prophet is chatty</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Find the processed data file whether you render from the repo root or from</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">    this file&#39;s own folder.&quot;&quot;&quot;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">&quot;data&quot;</span> <span class="op">/</span> <span class="st">&quot;processed&quot;</span> <span class="op">/</span> name</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. &quot;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Run `python scripts/prep_m5.py` from the repository root first.&quot;</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> pd.read_csv(data_path(<span class="st">&quot;m5_daily.csv&quot;</span>), parse_dates<span class="op">=</span>[<span class="st">&quot;date&quot;</span>])</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;CA_1 FOODS daily: </span><span class="sc">{</span><span class="bu">len</span>(daily)<span class="sc">}</span><span class="ss"> observations from &quot;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f&quot;</span><span class="sc">{</span>daily[<span class="st">&#39;date&#39;</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>daily[<span class="st">&#39;date&#39;</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(daily[[<span class="st">&quot;date&quot;</span>, <span class="st">&quot;units&quot;</span>, <span class="st">&quot;snap&quot;</span>, <span class="st">&quot;is_event&quot;</span>, <span class="st">&quot;avg_price&quot;</span>]].head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CA_1 FOODS daily: 1941 observations from 2011-01-29 to 2016-05-22
+        date  units  snap  is_event  avg_price
+0 2011-01-29   3239     0         0    3.14922
+1 2011-01-30   3137     0         0    3.14922
+2 2011-01-31   2008     0         0    3.14922
+3 2011-02-01   2258     1         0    3.14922
+4 2011-02-02   2032     1         0    3.14922</code></pre>
+</div>
+</div>
+<p><strong>The columns you will use:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>date</code></td>
+<td>Calendar date</td>
+</tr>
+<tr class="even">
+<td><code>units</code></td>
+<td>Units sold that day — the target</td>
+</tr>
+<tr class="odd">
+<td><code>snap</code></td>
+<td>1 if SNAP benefits were disbursable in California that day (~33% of days)</td>
+</tr>
+<tr class="even">
+<td><code>is_event</code></td>
+<td>1 if a calendar event fell on that day (holiday, sporting event, religious date)</td>
+</tr>
+<tr class="odd">
+<td><code>avg_price</code></td>
+<td>Average sell price across the category that day</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+One data quirk to find before you model
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Run <code>daily[daily.units == 0]</code> before you fit anything. There are exactly five such days, and they are not missing data — they are real zeros with a real cause. Identify the cause, and decide (and state in Q1) whether you leave them in, drop them, or handle them another way. Whatever you choose, Prophet will do something with them, so choose deliberately.</p>
+</div>
 </div>
 <hr>
 </section>
@@ -2276,7 +2349,7 @@ Initial Prompt for Codex
 <p>Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
 <pre><code>I am working on Homework 2 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
-Dataset: Rossmann Store Sales — daily data for Store 1, available at `data/processed/rossmann_daily.csv`. Columns: Date, Sales, Customers, Promo, Open, StateHoliday, SchoolHoliday, StoreType, Assortment, CompetitionDistance, Promo2.
+Dataset: M5/Walmart — daily data for store CA_1, FOODS category, at `data/processed/m5_daily.csv`. Columns: date, store_id, cat_id, units (target), avg_price, snap (1 if SNAP benefits disbursable that day), is_event (1 if a calendar event), wday, month, year, and lagged units (units_lag1, units_lag7, units_lag14, units_lag28, units_lag365).
 
 This homework covers Generalized Additive Models (GAMs) using Prophet and pyGAM in Python. I will ask you questions one at a time. For each:
 1. Write clean, well-commented Python code that runs end-to-end
@@ -2308,44 +2381,65 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 <li>Forecast plot with uncertainty bands (use Prophet’s built-in <code>plot()</code> method)</li>
 <li>Component decomposition plot showing trend, weekly seasonality, and yearly seasonality (use <code>plot_components()</code>)</li>
 </ol>
-<div id="8fcd9ac8" class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prophet requires columns named &#39;ds&#39; (date) and &#39;y&#39; (target)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>prophet_df <span class="op">=</span> daily[[<span class="st">&quot;Date&quot;</span>, <span class="st">&quot;Sales&quot;</span>]].rename(columns<span class="op">=</span>{<span class="st">&quot;Date&quot;</span>: <span class="st">&quot;ds&quot;</span>, <span class="st">&quot;Sales&quot;</span>: <span class="st">&quot;y&quot;</span>})</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>train_prophet <span class="op">=</span> prophet_df.iloc[:<span class="dv">700</span>]</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>test_prophet  <span class="op">=</span> prophet_df.iloc[<span class="dv">700</span>:]</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit Prophet, forecast over the test period, and plot results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="62d5fb0d" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prophet requires columns named &#39;ds&#39; (date) and &#39;y&#39; (target)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>prophet_df <span class="op">=</span> daily[[<span class="st">&quot;date&quot;</span>, <span class="st">&quot;units&quot;</span>]].rename(columns<span class="op">=</span>{<span class="st">&quot;date&quot;</span>: <span class="st">&quot;ds&quot;</span>, <span class="st">&quot;units&quot;</span>: <span class="st">&quot;y&quot;</span>})</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">365</span>                       <span class="co"># hold out the final year</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>train_prophet <span class="op">=</span> prophet_df.iloc[:<span class="op">-</span>N_TEST]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>test_prophet  <span class="op">=</span> prophet_df.iloc[<span class="op">-</span>N_TEST:]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;train </span><span class="sc">{</span><span class="bu">len</span>(train_prophet)<span class="sc">}</span><span class="ss"> days, test </span><span class="sc">{</span><span class="bu">len</span>(test_prophet)<span class="sc">}</span><span class="ss"> days &quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f&quot;(</span><span class="sc">{</span>test_prophet<span class="sc">.</span>ds<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>test_prophet<span class="sc">.</span>ds<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">)&quot;</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit Prophet, forecast over the test period, and plot results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train 1576 days, test 365 days (2015-05-24 to 2016-05-22)</code></pre>
+</div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Describe what the component plots reveal. When is weekly sales highest? Is there a clear annual pattern? What business decisions could you make from these components?</p>
+<p><strong>Your response:</strong> Describe what the component plots reveal. Which day of the week is busiest? Is there a clear annual pattern, and does it have one peak or more than one? What business decisions could a store manager make from these components? State what you did about the five zero days and why.</p>
 </blockquote>
 <hr>
 </section>
 <section id="q2-prophet-adding-regressors" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="q2-prophet-adding-regressors"><span class="header-section-number">4.2</span> Q2 — Prophet: Adding Regressors</h2>
 <p><em>(Suggested prompts: 2)</em></p>
-<p>External regressors allow Prophet to attribute part of the sales signal to known business drivers rather than absorbing them into the trend or seasonality components. The starter code below prepares a dataframe that includes <code>Promo</code> and <code>SchoolHoliday</code> alongside the required <code>ds</code> and <code>y</code> columns.</p>
-<p><strong>(a)</strong> Add <code>Promo</code> and <code>SchoolHoliday</code> as additional regressors using <code>add_regressor()</code>, then re-fit the model on the same 700-day training set. Compute RMSE on the test set for this model and for the baseline model from Q1. Present both values in a small summary table.</p>
-<p><strong>(b)</strong> Extract the regressor coefficients from the fitted model. Report the estimated sales lift (in units of <code>y</code>) attributable to a promotion day. Provide a brief interpretation of the magnitude: is this a large or small effect relative to typical daily sales?</p>
-<div id="2aca9615" class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add regressor columns to the dataframe before fitting</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>prophet_reg_df <span class="op">=</span> daily[[<span class="st">&quot;Date&quot;</span>, <span class="st">&quot;Sales&quot;</span>, <span class="st">&quot;Promo&quot;</span>, <span class="st">&quot;SchoolHoliday&quot;</span>]].rename(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">&quot;Date&quot;</span>: <span class="st">&quot;ds&quot;</span>, <span class="st">&quot;Sales&quot;</span>: <span class="st">&quot;y&quot;</span>}</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit Prophet with Promo and SchoolHoliday as additional regressors</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare RMSE with and without regressors</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and report regressor coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>External regressors allow Prophet to attribute part of the sales signal to known business drivers rather than absorbing them into the trend or seasonality components. The starter code below prepares a dataframe that includes <code>snap</code> and <code>is_event</code> alongside the required <code>ds</code> and <code>y</code> columns.</p>
+<p><strong>(a)</strong> Add <code>snap</code> and <code>is_event</code> as additional regressors using <code>add_regressor()</code>, then re-fit on the same training set. Compute test RMSE for this model and for the baseline from Q1. Present both in a small summary table.</p>
+<p><strong>(b)</strong> Extract the regressor coefficients using <code>prophet.utilities.regressor_coefficients()</code>. Report the estimated lift (in units) attributable to a SNAP day, and the effect of an event day. Interpret both magnitudes relative to average daily sales — is each large or small?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why SNAP is the interesting one
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>SNAP (the Supplemental Nutrition Assistance Program) benefits are disbursed on fixed calendar days that vary by state. California’s schedule puts them on roughly the first ten days of each month. This is a <strong>known, published, future-dated schedule</strong> — you always know next year’s SNAP days in advance. That is what makes it usable as a forecasting regressor, and it is the property you should look for when someone proposes a predictor.</p>
+</div>
+</div>
+<div id="1108e11e" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add regressor columns to the dataframe before fitting</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>prophet_reg_df <span class="op">=</span> daily[[<span class="st">&quot;date&quot;</span>, <span class="st">&quot;units&quot;</span>, <span class="st">&quot;snap&quot;</span>, <span class="st">&quot;is_event&quot;</span>]].rename(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">&quot;date&quot;</span>: <span class="st">&quot;ds&quot;</span>, <span class="st">&quot;units&quot;</span>: <span class="st">&quot;y&quot;</span>}</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit Prophet with snap and is_event as additional regressors</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare RMSE with and without regressors</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and report regressor coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Is the promotion effect large enough to be actionable? How would you use this estimate in a business planning meeting?</p>
+<p><strong>Your response:</strong> Is the SNAP effect large enough to be actionable? Name one concrete operational decision — staffing, ordering, or promotion timing — that this number would change, and say what you would need to check before acting on it.</p>
 </blockquote>
 <hr>
 </section>
 <section id="q3-pygam" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="q3-pygam"><span class="header-section-number">4.3</span> Q3 — pyGAM</h2>
 <p><em>(Suggested prompts: 2)</em></p>
-<p>pyGAM fits an additive model directly on a feature matrix rather than on a time index, which makes it easy to include calendar-derived features and binary indicators side by side. The starter code below derives <code>day_of_year</code> and <code>day_of_week</code> from the <code>Date</code> column and constructs training and test arrays.</p>
+<p>pyGAM fits an additive model directly on a feature matrix rather than on a time index, which makes it easy to include calendar-derived features and binary indicators side by side. The starter code below derives <code>day_of_year</code> and <code>day_of_week</code> from the <code>date</code> column and constructs training and test arrays.</p>
 <p>Fit a <code>LinearGAM</code> with the following four terms:</p>
 <table class="caption-top table">
 <colgroup>
@@ -2364,48 +2458,49 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>s(0)</code></td>
-<td><code>day_of_year</code> (1–365)</td>
-<td>Smooth spline</td>
-<td>Captures annual seasonality</td>
+<td><code>s(0, basis=&quot;cp&quot;)</code></td>
+<td><code>day_of_year</code> (1–366)</td>
+<td>Cyclic spline</td>
+<td>Annual cycle, with Dec 31 joined to Jan 1</td>
 </tr>
 <tr class="even">
-<td><code>s(1)</code></td>
+<td><code>f(1)</code></td>
 <td><code>day_of_week</code> (0–6)</td>
-<td>Smooth spline</td>
-<td>Captures within-week pattern</td>
+<td>Factor</td>
+<td>Within-week pattern</td>
 </tr>
 <tr class="odd">
 <td><code>l(2)</code></td>
-<td><code>Promo</code></td>
+<td><code>snap</code></td>
 <td>Linear</td>
-<td>Promotional sales lift</td>
+<td>SNAP benefit-day lift</td>
 </tr>
 <tr class="even">
 <td><code>l(3)</code></td>
-<td><code>SchoolHoliday</code></td>
+<td><code>is_event</code></td>
 <td>Linear</td>
-<td>School holiday effect</td>
+<td>Calendar event effect</td>
 </tr>
 </tbody>
 </table>
+<p>Two of those choices are deliberate and you should be able to defend them. <strong><code>basis=&quot;cp&quot;</code></strong> makes the spline <em>cyclic</em>, so the fitted curve meets itself at the year boundary instead of being free to jump between December 31 and January 1. And <strong><code>f(1)</code> rather than <code>s(1)</code></strong>: day of week takes seven discrete values with no meaningful “between,” so a factor term is the honest choice — a smooth spline would interpolate a fractional Wednesday-and-a-half.</p>
 <p>After fitting, compute test RMSE. Then plot the partial dependence curves for <code>day_of_year</code> and <code>day_of_week</code> using the model’s <code>plot_partial_dependence()</code> method or by calling <code>partial_dependence()</code> manually.</p>
-<div id="3cda128d" class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, l</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">&quot;day_of_year&quot;</span>] <span class="op">=</span> daily[<span class="st">&quot;Date&quot;</span>].dt.dayofyear</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">&quot;day_of_week&quot;</span>] <span class="op">=</span> daily[<span class="st">&quot;Date&quot;</span>].dt.dayofweek</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> [<span class="st">&quot;day_of_year&quot;</span>, <span class="st">&quot;day_of_week&quot;</span>, <span class="st">&quot;Promo&quot;</span>, <span class="st">&quot;SchoolHoliday&quot;</span>]</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> daily.iloc[:<span class="dv">700</span>][features].values</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> daily.iloc[:<span class="dv">700</span>][<span class="st">&quot;Sales&quot;</span>].values</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>X_test  <span class="op">=</span> daily.iloc[<span class="dv">700</span>:][features].values</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>y_test  <span class="op">=</span> daily.iloc[<span class="dv">700</span>:][<span class="st">&quot;Sales&quot;</span>].values</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit LinearGAM, compute test RMSE, plot partial dependence for day_of_year and day_of_week</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="c75f6c04" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, l, f</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">&quot;day_of_year&quot;</span>] <span class="op">=</span> daily[<span class="st">&quot;date&quot;</span>].dt.dayofyear</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">&quot;day_of_week&quot;</span>] <span class="op">=</span> daily[<span class="st">&quot;date&quot;</span>].dt.dayofweek</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> [<span class="st">&quot;day_of_year&quot;</span>, <span class="st">&quot;day_of_week&quot;</span>, <span class="st">&quot;snap&quot;</span>, <span class="st">&quot;is_event&quot;</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> daily.iloc[:<span class="op">-</span>N_TEST][features].values</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> daily.iloc[:<span class="op">-</span>N_TEST][<span class="st">&quot;units&quot;</span>].values</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>X_test  <span class="op">=</span> daily.iloc[<span class="op">-</span>N_TEST:][features].values</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>y_test  <span class="op">=</span> daily.iloc[<span class="op">-</span>N_TEST:][<span class="st">&quot;units&quot;</span>].values</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit LinearGAM, compute test RMSE, plot partial dependence for day_of_year and day_of_week</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Look at the partial dependence plot for <code>day_of_week</code>. Which day has the highest predicted sales (all else equal)? Does this match what you saw in the Prophet weekly component?</p>
+<p><strong>Your response:</strong> Look at the partial dependence plot for <code>day_of_week</code>. Which day has the highest predicted sales, all else equal? Does that match the Prophet weekly component from Q1? Then look at the confidence band on the <code>day_of_year</code> curve and say where it is widest — and explain why it is widest there.</p>
 </blockquote>
 <hr>
 </section>
@@ -2414,6 +2509,11 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>Collect the test-set RMSE values from Q1, Q2, and Q3 into the summary table below. Fill in the best RMSE you recorded from Homework 1 in the final row.</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 44%">
+<col style="width: 28%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Model</th>
@@ -2423,35 +2523,54 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
+<td>Seasonal naive (364 days back)</td>
+<td></td>
+<td>the benchmark every model must beat</td>
+</tr>
+<tr class="even">
 <td>Prophet (no regressors)</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Prophet (with regressors)</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>pyGAM</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Best HW1 model (ARIMA or ETS)</td>
 <td><em>from HW1</em></td>
-<td></td>
+<td>note that HW1 was <strong>weekly</strong>, not daily</td>
 </tr>
 </tbody>
 </table>
-<p>Then produce a single figure showing actual sales versus predicted sales for all three models trained in this homework over the test period. Use distinct colors and a legend.</p>
-<div id="229d12f0" class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Collect RMSE values from Q1, Q2, Q3 into the summary table above</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot actual vs predicted for the test period for Prophet (both variants) and pyGAM</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a single figure with distinct colors and a legend</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Compute the seasonal-naive benchmark yourself: predict each test day using the value 364 days earlier (364 rather than 365 keeps the day of week aligned). A model that cannot beat this is not earning its complexity.</p>
+<p>Then produce a single figure showing actual versus predicted for the three fitted models over the test period, with distinct colors and a legend.</p>
+<div id="81b71b12" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the seasonal-naive benchmark, then collect RMSE values from Q1, Q2, Q3</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot actual vs predicted for the test period for Prophet (both variants) and pyGAM</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a single figure with distinct colors and a legend</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Comparing against Homework 1 honestly
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Your HW1 models were fitted on <strong>weekly</strong> data and this homework is <strong>daily</strong>. RMSE on weekly units and RMSE on daily units are not the same quantity and must not be put side by side as if they were. If you want a genuine comparison, say explicitly what you would have to do to make it one — you do not have to carry it out.</p>
+</div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Which model gives the best holdout RMSE? Which model is most interpretable to a non-technical manager? Would you recommend a different model for different use cases (e.g., short-term ops planning vs annual budget)?</p>
+<p><strong>Your response:</strong> Which model gives the best holdout RMSE, and by how much over the benchmark? Which is most interpretable to a non-technical manager? Would you recommend different models for different uses — next-week staffing versus an annual budget — and why?</p>
 </blockquote>
 <hr>
 </section>
@@ -2459,7 +2578,7 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 <h2 data-number="4.5" class="anchored" data-anchor-id="q5-reflection"><span class="header-section-number">4.5</span> Q5 — Reflection</h2>
 <p><em>(Suggested prompts: 0 — write yourself)</em></p>
 <p>No code required for this question. Write 150–200 words in response to the following scenario.</p>
-<p>You are presenting to a retail operations team that currently uses a simple 4-week moving average to forecast store-level sales. Explain why a GAM-based approach (Prophet or pyGAM) would be an upgrade over their current method. In your answer, identify at least two specific insights from your component plots that you would highlight for this audience. Close by disclosing at least one meaningful limitation of GAMs that the team should understand before adopting the approach.</p>
+<p>You are presenting to a Walmart regional operations team that currently forecasts store-level demand with a simple 4-week moving average. Explain why a GAM-based approach (Prophet or pyGAM) would be an upgrade. Identify at least two specific insights from your component plots that you would put in front of this audience — one of them should be the SNAP effect, stated as a number with its operational implication. Close by disclosing at least one meaningful limitation of GAMs the team should understand before adopting the approach.</p>
 <blockquote class="blockquote">
 <p><strong>Your response:</strong></p>
 </blockquote>
