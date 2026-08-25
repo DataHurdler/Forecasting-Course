@@ -76,6 +76,29 @@ A time series $\{y_t\}$ is **weakly stationary** if:
 
 ---
 
+## Why the Rule Exists: Spurious Regression
+
+Differencing is not bookkeeping. Skip it and the statistics actively lie to you.
+
+<div style="text-align:center">
+<svg viewBox="0 0 380 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;height:auto" role="img" aria-label="Two independent random walks that appear to trend together">
+<line x1="10" y1="145" x2="360" y2="145" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="10" y1="12" x2="10" y2="145" stroke="currentColor" stroke-opacity=".55"/>
+<polyline points="10.0,136.9 18.4,129.3 26.8,131.5 35.2,125.1 43.6,112.6 52.0,105.6 60.4,86.3 68.8,93.1 77.2,89.7 85.6,94.5 94.0,100.2 102.4,99.5 110.8,94.5 119.2,87.4 127.6,79.3 136.0,52.9 144.4,41.0 152.8,55.3 161.2,50.5 169.6,54.5 178.0,57.3 186.4,40.7 194.8,40.5 203.2,58.6 211.6,52.6 220.0,53.0 228.4,62.9 236.8,70.0 245.2,74.0 253.6,71.6 262.0,73.5 270.4,70.1 278.8,47.9 287.2,53.7 295.6,59.6 304.0,59.6 312.4,45.3 320.8,50.2 329.2,32.2 337.6,43.5" fill="none" stroke="#D71920" stroke-width="2"/>
+<polyline points="10.0,132.6 18.4,149.5 26.8,155.7 35.2,152.8 43.6,135.1 52.0,132.9 60.4,148.5 68.8,143.1 77.2,153.7 85.6,138.6 94.0,139.2 102.4,118.2 110.8,117.5 119.2,126.3 127.6,139.8 136.0,141.6 144.4,134.8 152.8,120.0 161.2,115.1 169.6,120.9 178.0,113.4 186.4,126.6 194.8,119.2 203.2,125.1 211.6,107.1 220.0,94.4 228.4,88.4 236.8,97.2 245.2,89.3 253.6,83.3 262.0,87.0 270.4,91.5 278.8,75.9 287.2,78.1 295.6,71.3 304.0,54.4 312.4,68.1 320.8,47.0 329.2,34.1 337.6,38.9" fill="none" stroke="currentColor" stroke-width="2"/>
+<text x="352" y="38" font-size="11" fill="#D71920">x</text>
+<text x="352" y="72" font-size="11" fill="currentColor">y</text>
+</svg>
+</div>
+
+Two independent random walks — **no shared cause, no relationship at all**. Their *changes* correlate at −0.13, which is the truth. But their *levels* correlate at +0.62, and that is what OLS sees.
+
+::: {.warningbox}
+@GrangerNewbold1974 showed this rejects "no relationship" about **three-quarters** of the time at the 5% level. The regression is not finding a relationship — it is finding that both series wander. **Difference first.**
+:::
+
+---
+
 ## ACF and PACF: Model Identification
 
 The **autocorrelation function**, $\rho_k = \mathrm{Corr}(y_t, y_{t-k})$, measures how $y_t$ relates to its own past. The **partial** autocorrelation measures the same thing while controlling for the lags in between — which is what separates a direct effect from one inherited through intermediate lags.
@@ -90,6 +113,109 @@ Read them together and they identify the model:
 | RW / I(1) | Decays slowly | Big spike at lag 1 |
 
 **Always unit-root test and difference *before* reading either plot.** The ACF of a non-stationary series decays slowly no matter what the underlying process is, so it tells you nothing about $p$ or $q$ — only that you have not differenced yet.
+
+---
+
+## What Those Patterns Actually Look Like
+
+<div style="text-align:center">
+<svg viewBox="0 0 360 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:760px;height:auto" role="img" aria-label="ACF and PACF patterns for AR(1) and MA(1) processes">
+<g transform="translate(15,22)">
+<text x="75.0" y="-6" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">AR(1): ACF tails off</text>
+<line x1="0" y1="19.2" x2="150" y2="19.2" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"/>
+<line x1="0" y1="44.8" x2="150" y2="44.8" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"/>
+<line x1="0" y1="32.0" x2="150" y2="32.0" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="0" y1="4" x2="0" y2="60" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="14" y1="32.0" x2="14" y2="6.5" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="14" cy="6.5" r="2.2" fill="#D71920"/>
+<line x1="29" y1="32.0" x2="29" y2="14.1" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="29" cy="14.1" r="2.2" fill="#D71920"/>
+<line x1="44" y1="32.0" x2="44" y2="19.5" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="44" cy="19.5" r="2.2" fill="#D71920"/>
+<line x1="59" y1="32.0" x2="59" y2="23.2" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="59" cy="23.2" r="2.2" fill="#D71920"/>
+<line x1="74" y1="32.0" x2="74" y2="25.8" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="74" cy="25.8" r="2.2" fill="#D71920"/>
+<line x1="89" y1="32.0" x2="89" y2="27.6" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="89" cy="27.6" r="2.2" fill="#D71920"/>
+<line x1="104" y1="32.0" x2="104" y2="28.9" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="104" cy="28.9" r="2.2" fill="#D71920"/>
+<line x1="119" y1="32.0" x2="119" y2="29.9" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="119" cy="29.9" r="2.2" fill="#D71920"/>
+</g>
+<g transform="translate(195,22)">
+<text x="75.0" y="-6" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">AR(1): PACF cuts off at 1</text>
+<line x1="0" y1="19.2" x2="150" y2="19.2" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"/>
+<line x1="0" y1="44.8" x2="150" y2="44.8" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"/>
+<line x1="0" y1="32.0" x2="150" y2="32.0" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="0" y1="4" x2="0" y2="60" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="14" y1="32.0" x2="14" y2="6.5" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="14" cy="6.5" r="2.2" fill="#D71920"/>
+<line x1="29" y1="32.0" x2="29" y2="30.4" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="29" cy="30.4" r="2.2" fill="#D71920"/>
+<line x1="44" y1="32.0" x2="44" y2="33.0" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="44" cy="33.0" r="2.2" fill="#D71920"/>
+<line x1="59" y1="32.0" x2="59" y2="30.7" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="59" cy="30.7" r="2.2" fill="#D71920"/>
+<line x1="74" y1="32.0" x2="74" y2="32.8" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="74" cy="32.8" r="2.2" fill="#D71920"/>
+<line x1="89" y1="32.0" x2="89" y2="30.7" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="89" cy="30.7" r="2.2" fill="#D71920"/>
+<line x1="104" y1="32.0" x2="104" y2="31.5" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="104" cy="31.5" r="2.2" fill="#D71920"/>
+<line x1="119" y1="32.0" x2="119" y2="33.0" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="119" cy="33.0" r="2.2" fill="#D71920"/>
+</g>
+<g transform="translate(15,130)">
+<text x="75.0" y="-6" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">MA(1): ACF cuts off at 1</text>
+<line x1="0" y1="19.2" x2="150" y2="19.2" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"/>
+<line x1="0" y1="44.8" x2="150" y2="44.8" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"/>
+<line x1="0" y1="32.0" x2="150" y2="32.0" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="0" y1="4" x2="0" y2="60" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="14" y1="32.0" x2="14" y2="7.6" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="14" cy="7.6" r="2.2" fill="#D71920"/>
+<line x1="29" y1="32.0" x2="29" y2="30.7" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="29" cy="30.7" r="2.2" fill="#D71920"/>
+<line x1="44" y1="32.0" x2="44" y2="32.8" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="44" cy="32.8" r="2.2" fill="#D71920"/>
+<line x1="59" y1="32.0" x2="59" y2="30.4" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="59" cy="30.4" r="2.2" fill="#D71920"/>
+<line x1="74" y1="32.0" x2="74" y2="31.5" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="74" cy="31.5" r="2.2" fill="#D71920"/>
+<line x1="89" y1="32.0" x2="89" y2="33.0" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="89" cy="33.0" r="2.2" fill="#D71920"/>
+<line x1="104" y1="32.0" x2="104" y2="31.2" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="104" cy="31.2" r="2.2" fill="#D71920"/>
+<line x1="119" y1="32.0" x2="119" y2="31.5" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="119" cy="31.5" r="2.2" fill="#D71920"/>
+</g>
+<g transform="translate(195,130)">
+<text x="75.0" y="-6" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">MA(1): PACF tails off</text>
+<line x1="0" y1="19.2" x2="150" y2="19.2" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"/>
+<line x1="0" y1="44.8" x2="150" y2="44.8" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"/>
+<line x1="0" y1="32.0" x2="150" y2="32.0" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="0" y1="4" x2="0" y2="60" stroke="currentColor" stroke-opacity=".55"/>
+<line x1="14" y1="32.0" x2="14" y2="7.6" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="14" cy="7.6" r="2.2" fill="#D71920"/>
+<line x1="29" y1="32.0" x2="29" y2="46.6" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="29" cy="46.6" r="2.2" fill="#D71920"/>
+<line x1="44" y1="32.0" x2="44" y2="22.6" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="44" cy="22.6" r="2.2" fill="#D71920"/>
+<line x1="59" y1="32.0" x2="59" y2="38.0" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="59" cy="38.0" r="2.2" fill="#D71920"/>
+<line x1="74" y1="32.0" x2="74" y2="28.1" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="74" cy="28.1" r="2.2" fill="#D71920"/>
+<line x1="89" y1="32.0" x2="89" y2="34.6" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="89" cy="34.6" r="2.2" fill="#D71920"/>
+<line x1="104" y1="32.0" x2="104" y2="30.4" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="104" cy="30.4" r="2.2" fill="#D71920"/>
+<line x1="119" y1="32.0" x2="119" y2="33.0" stroke="#D71920" stroke-width="2.4"/>
+<circle cx="119" cy="33.0" r="2.2" fill="#D71920"/>
+</g>
+</svg>
+</div>
+
+Read the pair, never one alone. The [sharp cut-off]{.positive} tells you the order; the *slow decay* tells you which side it belongs on. Dashed lines are the significance bands — spikes inside them are noise, not signal.
 
 ---
 
