@@ -1,0 +1,318 @@
+% =============================================================================
+% Lecture 11, Part 2: Hierarchical Models and Partial Pooling
+% ECON 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+\title[Hierarchical Models]{Hierarchical Models and Partial Pooling}
+\subtitle{ECON 8310: Business Forecasting --- Lecture 11, Part 2}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Thirty Series, Two Bad Options}
+% =============================================================================
+
+\sectionslide{Thirty Series, Two Bad Options}{%
+  You have done this the wrong way twice already.
+  Here is the third way.}
+
+% --- Slide: the problem -----------------------------------------------------
+\begin{frame}{The Question}
+  A concrete one, and you have met it before. \textbf{Does demand rise in weeks when SNAP
+  benefits are disbursed, and by how much --- for each of our thirty store-category series?}
+
+  \vspace{0.15cm}
+  Homework 3's memo asked you to decide which store-categories to stock up for a SNAP week rather
+  than applying one national uplift. That question assumed the per-series differences are real.
+  Today we check.
+
+  \vspace{0.15cm}
+  The complication is that the series are not equally informative. Some have years of history;
+  in the real world some are new stores, new products, or recently re-categorized, with only a
+  handful of usable weeks.
+
+  \begin{keybox}
+    \textbf{The setup for today.} We keep all thirty series, but deliberately thin every third
+    one down to \textbf{8 weeks} of data. Twenty series are data-rich; ten are data-poor. That
+    imbalance is the whole point.
+  \end{keybox}
+\end{frame}
+
+% --- Slide: two bad options -------------------------------------------------
+\begin{frame}{Complete Pooling and No Pooling}
+  There are two obvious approaches, and each fails in a different direction.
+  \begin{center}
+    {\small
+    \begin{tabular}{p{3.0cm}p{4.4cm}p{4.9cm}}
+      \toprule
+      & \textbf{What it does} & \textbf{How it fails} \\
+      \midrule
+      \textbf{Complete pooling} & One SNAP effect for all thirty series. \newline
+      \texttt{b = pm.Normal("b", 0, 1)} & Denies that stores differ at all. A genuinely
+      different store is averaged away. \\[3pt]
+      \textbf{No pooling} & A separate effect per series, estimated independently. \newline
+      \texttt{shape=30} & A series with 8 weeks gets an estimate built from 8 weeks. Mostly
+      noise, reported as a finding. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  \textbf{You have used both already without naming them.} Homework 3's random forest pooled all
+  thirty series into one model with store dummies --- close to complete pooling. Homework 1
+  fitted ARIMA to one series at a time --- no pooling.
+
+  \vspace{0.1cm}
+  Neither is obviously right, and the choice has always been made by convenience. Partial pooling
+  makes it a modelling decision instead, and lets the data settle it.
+\end{frame}
+
+% =============================================================================
+\section{Partial Pooling}
+% =============================================================================
+
+\sectionslide{Partial Pooling}{%
+  Let each series have its own effect --- drawn from a shared distribution
+  the data also estimates.}
+
+% --- Slide: the hierarchy ---------------------------------------------------
+\begin{frame}{The Hierarchy Is One Extra Line}
+  Give each series its own effect $b_j$, but say where those effects come from:
+  \[
+    b_j \sim \mathcal{N}(\mu_b,\ \sigma_b), \qquad j = 1, \ldots, 30
+  \]
+  \vspace{-0.25cm}
+
+  $\mu_b$ is the typical SNAP effect across the business, and $\sigma_b$ is \textbf{how much
+  stores genuinely differ}. Crucially, both are estimated from the data rather than assumed.
+
+  \begin{center}
+    {\small
+    \begin{tabular}{p{3.1cm}p{9.2cm}}
+      \toprule
+      $\sigma_b \rightarrow 0$ & The model concludes stores do not differ, and reproduces
+      complete pooling. \\[3pt]
+      $\sigma_b$ large & The model concludes they differ a lot, and approaches no pooling. \\[3pt]
+      In between & Each $b_j$ is pulled toward $\mu_b$ --- \emph{how far} depending on how much
+      data that series has. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  \textbf{That last row is the whole idea.} A series with 277 weeks barely moves; a series with 8
+  weeks moves a long way, because its own estimate carries little information. Nobody chose those
+  weights --- they fall out of the model.
+\end{frame}
+
+% --- Slide: shrinkage intuition ---------------------------------------------
+\begin{frame}{Why This Is the Right Answer, Not a Compromise}
+  Partial pooling sounds like splitting the difference between two bad options. It is better than
+  that, and the reason is worth stating.
+
+  \vspace{0.15cm}
+  When a series has 8 observations, its unpooled estimate is mostly sampling noise. The
+  hierarchy's pull toward $\mu_b$ is not a fudge --- it is the correct response to a noisy
+  measurement. You already believe this in another form: it is why you would not conclude a coin
+  is biased after three flips.
+
+  \begin{keybox}
+    \textbf{This is regularization again, for the sixth time.} A hierarchical prior shrinks
+    per-group estimates toward a common value exactly as Ridge shrinks coefficients toward zero
+    --- and here the shrinkage strength $\sigma_b$ is \emph{estimated} rather than tuned by
+    cross-validation.
+  \end{keybox}
+
+  \vspace{0.1cm}
+  \muted{\footnotesize\itshape GAM smoothing penalty (L3) $\rightarrow$ tree pruning (L4)
+  $\rightarrow$ \texttt{reg\_lambda} (L5) $\rightarrow$ Ridge and LASSO (L6) $\rightarrow$ weight
+  decay (L7) $\rightarrow$ hierarchical priors (today).}
+\end{frame}
+
+% =============================================================================
+\section{Fitting It, and the Trap
+}
+% =============================================================================
+
+\sectionslide{Fitting It, and the Trap}{%
+  The obvious code does not work, and the reason
+  is geometry rather than statistics.}
+
+% --- Slide: PyMC ------------------------------------------------------------
+\begin{frame}{The Model in PyMC}
+  \begin{examplebox}{Non-centred hierarchical model}
+    {\tiny\linespread{1.05}\selectfont
+    \texttt{with pm.Model() as model:}\\
+    \texttt{\ \ mu\_b = pm.Normal("mu\_b", 0, 0.5)\ \ \ \ \ \ \ \# typical SNAP effect}\\
+    \texttt{\ \ sd\_b = pm.HalfNormal("sd\_b", 0.25)\ \ \ \ \ \# how much stores differ}\\
+    \texttt{\ \ z\ \ \ \ = pm.Normal("z", 0, 1, shape=J)\ \ \ \ \# non-centred}\\
+    \texttt{\ \ b\ \ \ \ = pm.Deterministic("b", mu\_b + z * sd\_b)}\\[2pt]
+    \texttt{\ \ a = pm.Normal("a", y.mean(), 1, shape=J)\ \ \# per-series level}\\
+    \texttt{\ \ s = pm.Exponential("s", 1.0)}\\[2pt]
+    \texttt{\ \ pm.Normal("obs", mu=a[idx] + b[idx]*snap, sigma=s, observed=y)}
+    }
+  \end{examplebox}
+  \texttt{idx} maps each row to its series, so \texttt{b[idx]} picks out the right effect for
+  every observation. That indexing pattern is how every hierarchical model in PyMC is written.
+
+  \vspace{0.15cm}
+  \textbf{Note what is \emph{not} here.} No decision about how much to pool, no weighting scheme,
+  no threshold for ``enough data.'' Those all come out of estimating $\sigma_b$.
+\end{frame}
+
+% --- Slide: the funnel ------------------------------------------------------
+\begin{frame}{The Trap: Write It the Obvious Way and It Breaks}
+  The natural way to write the hierarchy is \texttt{b = pm.Normal("b", mu\_b, sd\_b, shape=J)}
+  --- the \emph{centred} form, which reads exactly like the equation. On our data it produces:
+  \begin{center}
+    {\small
+    \begin{tabular}{lrrl}
+      \toprule
+      & \textbf{Centred} & \textbf{Non-centred} & \textbf{Want} \\
+      \midrule
+      Divergences & \textbf{104} & \textbf{0} & 0 \\
+      $\hat{R}$ & 1.030 & 1.000 & $< 1.01$ \\
+      ESS (bulk) & --- & 3{,}846 & $> 400$ \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.05cm}
+  \textbf{Why:} when $\sigma_b$ is small, the $b_j$ must crowd into a narrow band, and the
+  posterior takes on a funnel shape --- wide where $\sigma_b$ is large, pinched where it is
+  small. A sampler tuned for the wide part cannot navigate the neck, and reports divergences.
+
+  \vspace{0.1cm}
+  The non-centred form samples a standard Normal $z$ and \emph{builds} $b_j = \mu_b + z_j
+  \sigma_b$ afterwards. Same model, same answer, geometry the sampler can walk.
+
+  \vspace{0.05cm}
+  \muted{\footnotesize\itshape This is BMCP §4.6.1, \emph{Posterior Geometry Matters}, and it is
+  the single most common failure in applied hierarchical modelling.}
+\end{frame}
+
+% =============================================================================
+\section{Reading the Result}
+% =============================================================================
+
+\sectionslide{Reading the Result}{%
+  Shrinkage, measured --- and a business conclusion
+  that reverses the obvious one.}
+
+% --- Slide: the measurement -------------------------------------------------
+\begin{frame}{Shrinkage, Measured}
+  Fit both models. Compare each series' estimated SNAP effect before and after pooling.
+  \begin{center}
+    {\small
+    \begin{tabular}{lrrr}
+      \toprule
+      \textbf{Series group} & \textbf{Unpooled spread} & \textbf{After pooling} & \textbf{Mean move} \\
+      \midrule
+      \textbf{Thin} --- 8 weeks (10 series) & 0.106 & 0.000 & \textbf{0.110} \\
+      \textbf{Full} --- 277 weeks (20 series) & 0.012 & 0.001 & 0.010 \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.05cm}
+  \textbf{The data-poor series moved 11.5 times further toward the group mean than the data-rich
+  ones.} Nobody told the model which series were thin. It inferred that from how much each series
+  had to say.
+
+  \vspace{0.15cm}
+  Look also at the unpooled column. The thin series appear to vary nine times more than the full
+  series ($0.106$ against $0.012$). They are the \emph{same kind} of store-category --- that extra
+  spread is not business variation, it is what 8 observations look like.
+
+  \vspace{0.1cm}
+  \textbf{The hierarchy did not average away a real signal. It removed a fake one.}
+\end{frame}
+
+% --- Slide: the business answer ---------------------------------------------
+\begin{frame}{What the Model Actually Concluded}
+  The estimated hierarchy: $\mu_b = 0.011$, $\sigma_b = 0.007$.
+
+  \vspace{0.1cm}
+  In words: the typical SNAP-week uplift is about \textbf{1\%} on log units, and the genuine
+  spread across store-categories is smaller than that again. The model has concluded the thirty
+  series are, for this purpose, \textbf{nearly the same}.
+
+  \begin{warningbox}
+    \textbf{That reverses the natural business instinct.} An analyst reading the unpooled fit
+    would report SNAP uplifts ranging from roughly $-2\%$ to $+35\%$, and might well build a
+    store-specific stocking policy on it. Almost all of that range was noise from the thin
+    series.
+  \end{warningbox}
+
+  \vspace{0.1cm}
+  \textbf{So the honest recommendation is the boring one:} apply a common uplift, and do not
+  differentiate by store-category until more data justifies it. That is a real finding, it is
+  worth money, and no point-estimate procedure would have told you.
+
+  \vspace{0.1cm}
+  \muted{\footnotesize\itshape Weekly aggregation is part of the story --- the daily SNAP effect
+  in Homework 2 was larger, because most weeks contain some SNAP days.}
+\end{frame}
+
+% =============================================================================
+\section{Key Takeaways}
+% =============================================================================
+
+\sectionslide{Key Takeaways}{%
+  What hierarchy buys, and what it costs.}
+
+\begin{frame}{Lecture 11 Part 2: Key Takeaways}
+  \begin{keybox}
+    {\footnotesize
+    \begin{enumerate}\itemsep2pt
+      \item \textbf{Complete pooling} denies groups differ; \textbf{no pooling} lets a group with
+            8 observations report noise as a finding. You have used both without naming them.
+
+      \item \textbf{Partial pooling} gives each group its own parameter drawn from a shared
+            distribution, and estimates how much groups genuinely differ.
+
+      \item \textbf{Shrinkage is automatic and proportionate.} Our thin series moved
+            \textbf{11.5$\times$} further toward the group mean than data-rich ones, with nobody
+            specifying that.
+
+      \item This is \textbf{regularization for the sixth time} --- and the only version where the
+            shrinkage strength is estimated rather than tuned.
+
+      \item \textbf{Write it non-centred.} The obvious form gave 104 divergences; the
+            reparameterized form gave zero. Same model, different geometry.
+
+      \item The business conclusion \textbf{reversed the obvious one}: apparent store-level
+            differences were mostly noise, and a common uplift is the defensible policy.
+    \end{enumerate}
+    }
+  \end{keybox}
+  \muted{\itshape Next: Bayesian linear regression --- coefficients as distributions, and what
+  you can ask them.}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+\end{document}

@@ -1,0 +1,424 @@
+% =============================================================================
+% Lecture 09, Part 1: RNNs and LSTMs
+% ECON 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+% ---- Lecture metadata --------------------------------------------------------
+\title[RNNs \& LSTMs]{RNNs and LSTMs}
+\subtitle{ECON 8310: Business Forecasting --- Lecture 9, Part 1}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---- Outline ----------------------------------------------------------------
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Where the Last Two Lectures Ran Out}
+% =============================================================================
+
+\sectionslide{Where the Last Two Lectures Ran Out}{%
+  Two architectures, two different ways of failing to see time.}
+
+% --- Slide: the gap ----------------------------------------------------------
+\begin{frame}{Two Architectures That Cannot See Time}
+  Lecture 7 gave you a feedforward network. It treats each row independently --- everything it
+  knows about \emph{when} something happened, you encoded by hand as a lag column. Shuffle the
+  features and the model is unchanged.
+
+  \vspace{0.15cm}
+  Lecture 8 gave you a 1D CNN, which does see local shape. But its \textbf{receptive field} is
+  fixed by architecture: stacked width-5 and width-3 filters reach about seven weeks back, and no
+  reasonable stack of small filters reaches an annual lag. Worse, pooling deliberately discarded
+  \emph{where} in the window each pattern occurred --- and we measured that costing about 230 RMSE.
+
+  \begin{keybox}
+    Both architectures share one assumption: the input is a \textbf{fixed-size block} to be
+    processed all at once. Neither has any notion of reading a sequence \emph{in order} and
+    carrying something forward.
+  \end{keybox}
+
+  \vspace{0.1cm}
+  That is the gap today closes.
+\end{frame}
+
+% --- Slide: the recurrent idea -----------------------------------------------
+\begin{frame}{The Recurrent Idea: Carry State Forward}
+  A recurrent network reads the sequence one step at a time and maintains a \textbf{hidden state}
+  $\mathbf{h}_t$ --- a running summary of everything seen so far.
+
+  \vspace{0.15cm}
+  At each step it does two things: update the summary using the new input \emph{and} the previous
+  summary, then optionally emit an output. The same weights are used at every step, which is
+  weight sharing again --- along time rather than along space.
+
+  \vspace{0.15cm}
+  \textbf{The consequence worth sitting with.} There is no fixed window. In principle
+  $\mathbf{h}_t$ encodes the entire history $x_1, \ldots, x_t$, so the architecture imposes no
+  limit on how far back the model can look.
+
+  \vspace{0.15cm}
+  \textbf{In principle.} Most of this lecture is about the gap between that promise and what a
+  recurrent network actually delivers --- and about the architecture built to close it.
+\end{frame}
+
+% =============================================================================
+\section{The Vanilla RNN}
+% =============================================================================
+
+\sectionslide{The Vanilla RNN}{%
+  One equation, applied over and over --- and the reason
+  that is both the whole idea and the whole problem.}
+
+% --- Slide: RNN mechanics ----------------------------------------------------
+\begin{frame}{Vanilla RNN: One Equation, Repeated}
+  \begin{definitionbox}{The recurrence}
+    \[
+      \mathbf{h}_t = \tanh\!\left(\mathbf{W}_h \mathbf{h}_{t-1} + \mathbf{W}_x \mathbf{x}_t + \mathbf{b}\right),
+      \qquad
+      \hat{y}_t = \mathbf{W}_y \mathbf{h}_t + \mathbf{b}_y
+    \]
+    $\mathbf{W}_h$, $\mathbf{W}_x$, $\mathbf{W}_y$ are the \emph{same} matrices at every step.
+  \end{definitionbox}
+
+  Read the first equation in words: the new summary is a squashed mix of the old summary and the
+  new observation. That is the entire model.
+
+  \vspace{0.15cm}
+  Because the weights are shared across steps, a 26-week window costs no more parameters than a
+  5-week one --- and the same network handles sequences of different lengths without modification.
+  Our RNN below holds about \textbf{4{,}500 parameters}, against 22{,}657 for the small
+  feedforward network in Lecture 7.
+
+  \vspace{0.1cm}
+  For forecasting we usually want one number, not a sequence, so we take the \textbf{final}
+  hidden state $\mathbf{h}_T$ --- the summary after reading the whole window --- and put one
+  linear layer on top of it.
+\end{frame}
+
+% --- Slide: BPTT -------------------------------------------------------------
+\begin{frame}{Training It: Backpropagation Through Time}
+  Training an RNN is ordinary backpropagation applied to an unusual graph. \textbf{Unroll} the
+  recurrence across the window and it becomes a 26-layer feedforward network --- one layer per
+  time step --- in which every layer shares the same weights.
+
+  \vspace{0.15cm}
+  Gradients then flow backward from the loss at step $T$ all the way to step 1. Because
+  $\mathbf{W}_h$ appears at every step, its gradient is a \emph{sum} of contributions from all 26
+  positions.
+
+  \begin{warningbox}
+    \textbf{This is where it breaks.} Propagating a gradient back through $k$ steps multiplies by
+    roughly $\mathbf{W}_h$ $k$ times. If the relevant factor is below 1, the gradient shrinks
+    \emph{exponentially}; above 1, it explodes. Either way, long-range signal does not survive
+    the trip.
+  \end{warningbox}
+
+  \vspace{0.1cm}
+  Exploding gradients have an easy fix --- \texttt{clip\_grad\_norm\_} caps the size of the
+  update, and we use it. Vanishing gradients do not, which is what the next section is for.
+\end{frame}
+
+% --- Slide: vanishing gradients ----------------------------------------------
+\begin{frame}{Why a Vanilla RNN Forgets \parencite{Bengio1994}}
+  Put numbers on it. Suppose each backward step multiplies the gradient by a factor of $0.7$ ---
+  an unremarkable value for a $\tanh$ network.
+
+  \vspace{0.1cm}
+  \begin{center}
+    {\small
+    \begin{tabular}{rrl}
+      \toprule
+      \textbf{Steps back} & \textbf{Gradient factor} & \textbf{Meaning} \\
+      \midrule
+      1  & $0.70$        & full signal \\
+      5  & $0.17$        & weakened but usable \\
+      10 & $0.028$       & barely present \\
+      26 & $0.000\,002$  & gone \\
+      52 & $\approx 10^{-9}$ & the annual lag, invisible \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.1cm}
+  \textbf{The promise from two slides ago fails in practice.} A vanilla RNN \emph{can} in
+  principle encode arbitrarily long history, but the gradient that would teach it to do so has
+  vanished long before it reaches back that far. In practice these networks learn dependencies of
+  roughly ten steps.
+
+  \vspace{0.1cm}
+  \textbf{Bengio and colleagues} proved this is not an optimization bug to be tuned away --- it
+  is inherent to the architecture. Which is why the fix had to be a different architecture.
+\end{frame}
+
+% =============================================================================
+\section{LSTM: Long Short-Term Memory}
+% =============================================================================
+
+\sectionslide{LSTM: Long Short-Term Memory}{%
+  Add a memory that information passes through rather than
+  being recomputed at every step.}
+
+% --- Slide: LSTM gates -------------------------------------------------------
+\begin{frame}{LSTM: A Cell State and Three Gates \parencite{Hochreiter1997}}
+  An LSTM carries \textbf{two} things forward: a \textbf{cell state} $\mathbf{c}_t$, which is the
+  long-term memory, and a \textbf{hidden state} $\mathbf{h}_t$, which is what the rest of the
+  network sees. Three gates control the traffic between them.
+  \begin{center}
+    {\small
+    \begin{tabular}{p{2.3cm}p{10.2cm}}
+      \toprule
+      \textbf{Forget gate} & $\mathbf{f}_t = \sigma(\mathbf{W}_f[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_f)$ --- what fraction of the old memory to keep \\[3pt]
+      \textbf{Input gate} & $\mathbf{i}_t = \sigma(\mathbf{W}_i[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_i)$ --- how much of the new candidate to write \\[3pt]
+      \textbf{Output gate} & $\mathbf{o}_t = \sigma(\mathbf{W}_o[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_o)$ --- how much of memory to expose \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.1cm}
+  The memory update itself is the line that matters:
+  \[
+    \mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} \;+\; \mathbf{i}_t \odot \tilde{\mathbf{c}}_t,
+    \qquad
+    \mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t)
+  \]
+  \vspace{-0.3cm}
+
+  Each gate is a sigmoid, so it outputs between 0 and 1 --- a soft switch the network learns.
+\end{frame}
+
+% --- Slide: gates in business terms -------------------------------------------
+\begin{frame}{What the Gates Are Doing, in Plain Terms}
+  The equations are compact but the behaviour is intuitive. Take a store forecasting demand week
+  by week.
+
+  \vspace{0.1cm}
+  \begin{center}
+    {\small
+    \begin{tabular}{p{2.4cm}p{10.1cm}}
+      \toprule
+      \textbf{Forget} & ``The promotion that ran three months ago no longer explains anything ---
+      drop it.'' The gate closes toward 0 and that part of memory decays away. \\[3pt]
+      \textbf{Input} & ``This week is Thanksgiving and the spike is enormous --- record it.'' The
+      gate opens toward 1 and the event is written into the cell. \\[3pt]
+      \textbf{Output} & ``I am holding a memory of last December, but this week is April --- do
+      not act on it yet.'' Information stays in $\mathbf{c}_t$ without contaminating the current
+      prediction. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.1cm}
+  \textbf{The output gate is the one people skip, and it is the subtle one.} It separates
+  \emph{what the model remembers} from \emph{what the model uses right now}. A vanilla RNN cannot
+  make that distinction --- its single hidden state has to serve both jobs at once, so anything
+  it stores is immediately in play.
+\end{frame}
+
+% --- Slide: why it fixes the gradient -----------------------------------------
+\begin{frame}{Why the Cell State Fixes the Gradient}
+  Look again at the memory update, and specifically at the operation in the middle:
+  \[
+    \mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t
+  \]
+  \vspace{-0.3cm}
+
+  The old memory enters \textbf{additively}, and it is not passed through a weight matrix or a
+  $\tanh$ on the way. When the forget gate is near 1, $\mathbf{c}_t \approx \mathbf{c}_{t-1}$
+  plus whatever is new --- and the gradient flows backward through that addition essentially
+  undiminished.
+
+  \vspace{0.15cm}
+  Compare with the vanilla RNN, where every backward step multiplies by $\mathbf{W}_h$ and the
+  $\tanh$ derivative. Repeated multiplication shrinks; repeated addition does not.
+
+  \begin{keybox}
+    \textbf{You have seen this fix before.} It is the ResNet skip connection from Lecture 8 ---
+    $\mathbf{y} = \mathcal{F}(\mathbf{x}) + \mathbf{x}$ --- solving the same problem in the same
+    way. Give the gradient an additive path home and depth stops destroying it.
+  \end{keybox}
+
+  LSTM (1997) predates ResNet (2015) by eighteen years --- the idea was rediscovered for depth
+  after being invented for time.
+\end{frame}
+
+% =============================================================================
+\section{In PyTorch, and Does It Work}
+% =============================================================================
+
+\sectionslide{In PyTorch, and Does It Work}{%
+  Four lines of model code, and an honest measurement against
+  everything else this course has fitted.}
+
+% --- Slide: PyTorch ----------------------------------------------------------
+\begin{frame}{LSTM for Forecasting in PyTorch}
+  \begin{examplebox}{Window in, one forecast out}
+    {\tiny\linespread{1.2}\selectfont
+    \texttt{class LSTMForecaster(nn.Module):}\\
+    \texttt{\ \ def \_\_init\_\_(self, n\_features, hidden=64, layers=1):}\\
+    \texttt{\ \ \ \ super().\_\_init\_\_()}\\
+    \texttt{\ \ \ \ self.lstm = nn.LSTM(n\_features, hidden, num\_layers=layers,}\\
+    \texttt{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ batch\_first=True)}\\
+    \texttt{\ \ \ \ self.fc = nn.Linear(hidden, 1)}\\[3pt]
+    \texttt{\ \ def forward(self, x):\ \ \ \ \ \ \# x: (batch, seq\_len, n\_features)}\\
+    \texttt{\ \ \ \ out, (h, c) = self.lstm(x)}\\
+    \texttt{\ \ \ \ return self.fc(out[:, -1, :]).squeeze(-1)}
+    }
+  \end{examplebox}
+  \texttt{batch\_first=True} gives shape \texttt{(batch, seq\_len, features)} --- the
+  \emph{opposite} of \texttt{Conv1d}. \texttt{out[:, -1, :]} is the state after the last step.
+  Lecture 7's rules still hold, plus \texttt{clip\_grad\_norm\_(..., 1.0)}.
+\end{frame}
+
+% --- Slide: results ----------------------------------------------------------
+\begin{frame}{Does It Work? The Scoreboard So Far}
+  Same weekly panel, same 26-week windows, same test block as Homework 4.
+  \begin{center}
+    {\small
+    \begin{tabular}{lrr}
+      \toprule
+      \textbf{Model} & \textbf{Test RMSE} & \textbf{Parameters} \\
+      \midrule
+      LASSO, 46 engineered features & \textbf{744} & 46 \\
+      XGBoost, 46 engineered features & 781 & --- \\
+      \textbf{Vanilla RNN}, 4 raw channels & \textbf{805} & 4{,}545 \\
+      Random forest & 899 & --- \\
+      \textbf{LSTM}, 4 raw channels & 957 & 17{,}985 \\
+      1D CNN, best variant & 1{,}202 & 8{,}161 \\
+      Seasonal naive & 2{,}152 & 0 \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.05cm}
+  \textbf{Recurrence beats convolution decisively} --- and it did so on \emph{four raw channels}
+  with no lag engineering at all, against 46 hand-built features for LASSO. That is the case for
+  reading a sequence in order, in one line.
+
+  \vspace{0.1cm}
+  \textbf{And the LSTM lost to the vanilla RNN.} That is not a typo, and it is the most useful
+  result on this slide.
+\end{frame}
+
+% --- Slide: why LSTM lost ----------------------------------------------------
+\begin{frame}{Why the More Sophisticated Model Lost}
+  The result holds at more than one window length, so it is not a fluke of one setting:
+  \begin{center}
+    {\small
+    \begin{tabular}{lrrl}
+      \toprule
+      \textbf{Window} & \textbf{Vanilla RNN} & \textbf{LSTM} & \\
+      \midrule
+      13 weeks & \textbf{835} & 1{,}026 & RNN wins \\
+      26 weeks & \textbf{805} & \ \ 957 & RNN wins \\
+      52 weeks & \textbf{787} & 1{,}001 & RNN wins \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.15cm}
+  \textbf{An LSTM solves a problem this data does not have.} Gating preserves information across
+  \emph{long} dependency chains. Weekly demand is dominated by the recent past, which a vanilla
+  RNN carries perfectly well --- and the gap \emph{widens} at 52 weeks rather than closing.
+
+  \vspace{0.05cm}
+  The gates buy nothing here, and are not free: \textbf{17{,}985 parameters against 4{,}545}.
+
+  \begin{keybox}
+    LSTMs were built for \textbf{sequence modelling} --- language, speech, long dependency chains
+    --- not for short forecasting windows. Fit the architecture to the problem, rather than
+    reaching for the more advanced one.
+  \end{keybox}
+\end{frame}
+
+% =============================================================================
+\section{Key Takeaways}
+% =============================================================================
+
+\sectionslide{Key Takeaways}{%
+  What recurrence buys, what it costs, and what is still missing.}
+
+% --- Slide: comparison -------------------------------------------------------
+\begin{frame}{RNN and LSTM in Context}
+  \begin{center}
+    {\small
+    \begin{tabular}{llll}
+      \toprule
+      \textbf{Architecture} & \textbf{Sees order?} & \textbf{Effective memory} & \textbf{Cost} \\
+      \midrule
+      FFN on lags & no & whatever you engineered & cheap \\
+      1D CNN & local only & receptive field ($\sim$7 steps) & cheap \\
+      Vanilla RNN & yes & $\sim$10--30 steps in practice & cheap \\
+      LSTM & yes & hundreds of steps & 4$\times$ an RNN \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.15cm}
+  An LSTM holds roughly \textbf{four times} the parameters of a vanilla RNN at the same hidden
+  size --- each of the three gates plus the candidate needs its own weight matrix. That is the
+  price of the memory, and on a short window you pay it for nothing.
+
+  \vspace{0.15cm}
+  \textbf{What is still missing.} An LSTM reads strictly left to right, one step at a time, so
+  it cannot be parallelized across the sequence, and everything it knows about step 3 must
+  survive being squeezed through every state between 3 and $T$. Part 2 removes both constraints.
+\end{frame}
+
+% --- Slide: takeaways --------------------------------------------------------
+\begin{frame}{Lecture 9 Part 1: Key Takeaways}
+  \begin{keybox}
+    {\footnotesize
+    \begin{enumerate}\itemsep2pt
+      \item A \textbf{recurrent network} reads a sequence in order and carries a hidden state.
+            Weights are shared across time, so window length costs no parameters.
+
+      \item Training is \textbf{backpropagation through time}: unroll the recurrence and it is a
+            deep network whose layers share weights. Repeated multiplication shrinks the
+            gradient exponentially --- at 52 steps, around $10^{-9}$.
+
+      \item An \textbf{LSTM} adds a cell state updated \textbf{additively}. Addition preserves
+            gradients where multiplication destroys them --- the ResNet fix, eighteen years
+            earlier.
+
+      \item Three gates: \textbf{forget} what is stale, \textbf{input} what is new,
+            \textbf{output} what is relevant now.
+
+      \item On our panel both recurrent models \textbf{beat every CNN variant} on four raw
+            channels --- and both still lose to a 46-coefficient LASSO.
+
+      \item The \textbf{LSTM lost to the vanilla RNN}, at two window lengths. Gating solves
+            long-range forgetting; a 26-week window does not suffer from it, so the gates only
+            bought four times the parameters. \textbf{Fit the architecture to the problem.}
+    \end{enumerate}
+    }
+  \end{keybox}
+  \muted{\itshape Next week: attention and Transformers --- reading the whole sequence at once.}
+\end{frame}
+
+% --- References ---------------------------------------------------------------
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+\end{document}

@@ -75,6 +75,14 @@ There is one gap FPP cannot fill: it contains no tree-based methods and no regul
 
 ISLP is by four of the same statisticians behind the standard graduate reference in this area, it is written at exactly our level, and every chapter ends with a Python lab. Its Chapter 8 covers decision trees, bagging, random forests, and boosting together; its Chapter 6 covers regularization. That is Lectures 4 through 6 almost exactly.
 
+Neither book covers Bayesian methods. For Lectures 10 through 12 we use a third free textbook:
+
+- *Bayesian Modeling and Computation in Python* (**BMCP**), by Martin, Kumar and Lao, free online at [https://bayesiancomputationbook.com/](https://bayesiancomputationbook.com/)
+
+BMCP is written by PyMC core developers, and every example is PyMC and ArviZ code — the exact libraries we use. It is the closest thing to a purpose-built text for our last three lectures: Chapter 1 covers priors and prior predictive checks, Chapter 2 covers the MCMC diagnostics you will be asked to report, §4.5–4.6 covers pooling and hierarchical models, and §6.4.3 is *Bayesian Structural Time Series* by name.
+
+A note on level. BMCP is mathematically heavier than FPP in places, and **you are not responsible for the derivations**. Read the assigned sections for the ideas and the code, run the examples, and treat the rest as reference. The slides define what you are accountable for; BMCP shows you the same ideas in working PyMC.
+
 ### How the Two Editions Line Up
 Chapters 1 through 13 carry the **same numbers and titles** in both editions, so for the first two-thirds of the course you can read either one and we will be on the same page.
 
@@ -96,10 +104,11 @@ This is the practical reason for the Python recommendation. Through Lecture 6 th
 | 6 | Regularization & Model Selection | §7.5 | Same | **ISLP Ch. 6** |
 | 7 | Introduction to Neural Networks | §14.1–14.2, §14.4–14.5, §14.7 | *Not covered* | |
 | 8 | CNN Architectures | §14.3 | *Not covered* | |
-| 9 | RNNs, LSTMs & Transformers | §14.3, §14.6; Ch. 15 | *Not covered* | |
-| 10 | Bayesian Statistics I | §5.5, §5.9 | Same | |
-| 11 | Bayesian Statistics II | — | — | |
-| 12 | Bayesian Statistics III | Ch. 7 (review) | Same | |
+| 9 (Pt 1) | RNNs & LSTMs | §14.3, §14.6 | *Not covered* | |
+| 9 (Pt 2) | Attention & Transformers | Ch. 15 | *Not covered* | |
+| 10 | Bayesian Statistics I | §5.5, §5.9 (framing only) | Same | **BMCP Ch. 1; Ch. 2** |
+| 11 | Bayesian Statistics II | — | — | **BMCP §6.2, §6.4; §4.5–4.6** |
+| 12 | Bayesian Statistics III | Ch. 7 (review) | Same | **BMCP §3.2–3.3** |
 
 Two further free resources, both linked from Canvas:
 
@@ -114,7 +123,9 @@ The textbook is our anchor, not our boundary. Several topics we cover have no FP
     FPP §12.4 (§12.5 in the R edition) is still worth reading for Lecture 5. It covers *bagging* — averaging forecasts across bootstrapped versions of a series — which is the ensembling idea random forests rest on. It is the idea only: FPP bags ETS models fitted to resampled series, not trees, and there is no feature subsampling. Read it for the intuition about why averaging many noisy models helps.
 
 - **Regularization (Lecture 6).** FPP has no Ridge, LASSO, or Elastic Net; ISLP Ch. 6 covers all three. FPP §7.5 *Selecting predictors* is genuinely useful here, because Lecture 6 opens with exactly that material — adjusted R², AIC, AICc, BIC, and best-subset or stepwise search — before showing why shrinkage replaces it. Read §7.5 as the classical answer we are about to improve on.
-- **All Bayesian methods (Lectures 10–12).** FPP is written from a frequentist perspective throughout. Its sections on distributional forecasts and prediction intervals (§5.5, §5.9) are useful framing for why we want full predictive distributions, but the book does no Bayesian inference.
+- **All Bayesian methods (Lectures 10–12).** FPP is written from a frequentist perspective throughout. Its sections on distributional forecasts and prediction intervals (§5.5, §5.9) are useful framing for why we want full predictive distributions, but the book does no Bayesian inference. **BMCP is the text for these three weeks**, and unlike Lectures 4–6 it is not a supplement — it is the primary reading.
+
+    One topic stays slide-only: the **DAGs** in Lecture 12. BMCP does not cover causal graphs. If you want to go further, Richard McElreath's *Statistical Rethinking* lecture series is free on YouTube and is the standard treatment.
 - **The Diebold-Mariano test (Lecture 1) and Granger causality (Lecture 2).**
 - **The internals of neural architectures (Lectures 7–9).** FPP-Py Ch. 14 is written at the level of *which model to use and how to call it* through the `neuralforecast` library. We go a layer deeper — backpropagation, convolution arithmetic, LSTM gates, scaled dot-product attention — and write our models directly in PyTorch.
 
@@ -354,17 +365,17 @@ For example, if the class has trouble understanding a specific topic, I might ta
 ### Week 11 (Nov. 5, 2026)
 - Assignment 5 (Part 2) due before class
 - Lecture 10: Bayesian Statistics I — Foundations
-- Reading: FPP §5.5, §5.9; slides for Bayesian foundations
+- Reading: **BMCP Ch. 1** (Bayesian inference, priors, prior predictive checks) and **Ch. 2** (MCMC diagnostics). FPP §5.5, §5.9 for framing.
 
 ### Week 12 (Nov. 12, 2026)
 - Assignment 5 (Part 3) due before class
 - Lecture 11: Bayesian Statistics II — Time Series & Hierarchical Models
-- Reading: slides only — see the note on "hierarchical" above
+- Reading: **BMCP §6.2 and §6.4** (time series as regression; state space and Bayesian structural time series)
 
 ### Week 13 (Nov. 19, 2026)
 - Assignment 6 (Part 1) due before class
 - Lecture 11 (cont.): Bayesian Statistics II — Time Series & Hierarchical Models
-- Reading: slides only
+- Reading: **BMCP §4.5–4.6** (pooling, multilevel and hierarchical models)
 
 ### Week 14 (Nov. 26, 2026)
 Thanksgiving break. No class.
@@ -372,7 +383,7 @@ Thanksgiving break. No class.
 ### Week 15 (Dec. 3, 2026)
 - Assignment 6 (Part 2) due before class
 - Lecture 12: Bayesian Statistics III — Bayesian Linear Regression
-- Reading: FPP Ch. 7 (review, as the frequentist benchmark)
+- Reading: **BMCP §3.2–3.3** (linear and multiple regression, counterfactuals). FPP Ch. 7 as the frequentist benchmark.
 
 ### Week 16 (Dec. 10, 2026)
 - Assignment 7 due before class

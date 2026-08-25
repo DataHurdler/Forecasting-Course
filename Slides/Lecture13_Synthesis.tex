@@ -1,0 +1,344 @@
+% =============================================================================
+% Lecture 13: Synthesis — What Twelve Weeks of Forecasting Taught Us
+% ECON 8310: Business Forecasting
+% University of Nebraska at Omaha
+% =============================================================================
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\input{header}
+
+\title[Synthesis]{Synthesis: What the Results Taught Us}
+\subtitle{ECON 8310: Business Forecasting --- Lecture 13}
+\author{Department of Economics}
+\institute{University of Nebraska at Omaha}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Lecture Outline}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{What We Built}
+% =============================================================================
+
+\sectionslide{What We Built}{%
+  Twelve weeks, four families of method, and one dataset
+  carried through all of them.}
+
+% --- Slide: the arc -----------------------------------------------------------
+\begin{frame}{The Arc of the Course}
+  \begin{center}
+    {\small
+    \begin{tabular}{p{2.3cm}p{3.0cm}p{7.0cm}}
+      \toprule
+      \textbf{Part} & \textbf{Lectures} & \textbf{The central idea} \\
+      \midrule
+      Time series & 1--3 & Specify a structure --- level, trend, season --- and estimate it. \\[3pt]
+      Trees & 4--6 & Stop specifying. Hand an algorithm features and let it find the structure. \\[3pt]
+      Deep learning & 7--9 & Let the \emph{architecture} encode what kind of structure to expect. \\[3pt]
+      Bayesian & 10--12 & Change the deliverable: return a distribution, not a number. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.1cm}
+  Read down that last column and the course is not really four toolkits. It is four answers to a
+  single question: \textbf{where does the knowledge in a forecast come from?}
+
+  \vspace{0.1cm}
+  From you, in the model structure. From the data, via a search procedure. From the
+  architecture's assumptions. Or from a prior, stated openly and updated. \textbf{That framing is
+  what survives when the libraries change.}
+\end{frame}
+
+% --- Slide: the scoreboard ------------------------------------------------------
+\begin{frame}{The Scoreboard}
+  Every model in this course, on the M5 weekly panel --- same 30 series, same held-out block.
+  \begin{center}
+    {\small
+    \begin{tabular}{lrl}
+      \toprule
+      \textbf{Model} & \textbf{Test RMSE} & \textbf{Where} \\
+      \midrule
+      LASSO, 46 engineered features & \textbf{744} & Homework 4 \\
+      XGBoost, tuned & 781 & Homework 4 \\
+      Vanilla RNN, 4 raw channels & 805 & Lecture 9 Part 1 \\
+      Transformer encoder & 895 & Lecture 9 Part 2 \\
+      Random forest & 899 & Homework 3 \\
+      LSTM & 957 & Lecture 9 Part 1 \\
+      1D CNN, best variant & 1{,}202 & Lecture 8 \\
+      \midrule
+      Seasonal naive & 2{,}152 & every week \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.05cm}
+  \textbf{The ordering is not the one anyone predicts in Week 1.} A 46-coefficient linear model
+  is at the top; the architecture that reshaped natural language processing is in the middle;
+  the two most-hyped deep learning models are near the bottom.
+\end{frame}
+
+% =============================================================================
+\section{What the Results Taught}
+% =============================================================================
+
+\sectionslide{What the Results Taught}{%
+  Three lessons that came out of measurements,
+  not out of anyone's opinion.}
+
+% --- Slide: benchmarks ----------------------------------------------------------
+\begin{frame}{Lesson 1: The Benchmark Is a Real Competitor}
+  In Homework 1 the seasonal-naive benchmark \textbf{beat every exponential smoothing and ARIMA
+  model} you fitted. That was not a trick question --- it is what the data supports at that
+  horizon.
+
+  \vspace{0.15cm}
+  Across the whole course the benchmark was beaten, but rarely by the margin the effort implied.
+  The Bayesian structural model beat it by \textbf{4\%}. The GAMs in Homework 2 beat it by
+  \textbf{12\%}. The best model on the weekly panel beat it by 65\% --- after 46 engineered
+  features and a cross-validated penalty.
+
+  \begin{keybox}
+    \textbf{Compute the benchmark first, every time.} It costs one line, it is often close, and
+    it is the only number that tells you whether the rest of the work was worth doing.
+  \end{keybox}
+
+  \vspace{0.1cm}
+  This is also the cheapest professional habit you can carry out of this course. A forecast
+  presented without a benchmark is a number no one can evaluate --- including you.
+\end{frame}
+
+% --- Slide: sophistication -----------------------------------------------------
+\begin{frame}{Lesson 2: More Sophisticated Did Not Mean Better}
+  Four times this course, the more advanced method lost --- and each time for a reason we could
+  name.
+  \begin{center}
+    {\small
+    \begin{tabular}{p{3.6cm}p{8.7cm}}
+      \toprule
+      \textbf{LSTM lost to a plain RNN} & At three window lengths. Gating fixes long-range
+      forgetting; a 26-week window does not suffer from it. Four times the parameters, no gain. \\[3pt]
+      \textbf{Transformer lost to an RNN} & With 15$\times$ the parameters. Its advantages are
+      advantages \emph{at scale}, and 5{,}940 windows is not scale. \\[3pt]
+      \textbf{CNNs lost to LASSO} & A seven-week receptive field cannot see an annual lag. \\[3pt]
+      \textbf{Tuning made XGBoost worse} & Nine fits, and the defaults were three RMSE better. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  \textbf{None of these means the losing method is bad} --- each solves a problem this data does
+  not have. LSTMs earn their gates on long dependency chains; Transformers earn their parameters
+  on large corpora.
+
+  \vspace{0.05cm}
+  \textbf{Match the method to the structure of the problem}, not to the recency of the paper.
+\end{frame}
+
+% --- Slide: the recurring idea ---------------------------------------------------
+\begin{frame}{Lesson 3: One Idea Appeared Six Times}
+  \begin{center}
+    {\small
+    \begin{tabular}{p{2.0cm}p{4.0cm}p{6.3cm}}
+      \toprule
+      \textbf{Lecture} & \textbf{Name it went by} & \textbf{What it penalized} \\
+      \midrule
+      3 & GAM smoothing penalty & Wiggliness of a spline \\
+      4 & Cost-complexity pruning & Number of leaves \\
+      5 & \texttt{reg\_lambda}, \texttt{gamma} & Leaf weights, leaf count \\
+      6 & Ridge, LASSO, Elastic Net & Coefficient size \\
+      7 & Weight decay, dropout & Network weights \\
+      11 & Hierarchical prior & Distance from the group mean \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  Six model families that look nothing alike, one bargain underneath: \textbf{fit against
+  complexity, with a single parameter setting the exchange rate.}
+
+  \vspace{0.15cm}
+  Five of those six tune that parameter by cross-validation. The sixth --- the hierarchical prior
+  --- \textbf{estimates it}, which is the cleanest version of the idea in the course.
+
+  \vspace{0.1cm}
+  \textbf{This is what to remember when the tools change.} The libraries in this course will be
+  replaced. The trade between fit and complexity will not.
+\end{frame}
+
+% =============================================================================
+\section{Choosing a Method}
+% =============================================================================
+
+\sectionslide{Choosing a Method}{%
+  A decision guide built from what we measured.}
+
+% --- Slide: decision guide --------------------------------------------------------
+\begin{frame}{Which Method, When}
+  \begin{center}
+    {\small
+    \begin{tabular}{p{4.6cm}p{7.7cm}}
+      \toprule
+      \textbf{If your situation is\ldots} & \textbf{start here} \\
+      \midrule
+      One series, clear seasonality, short history & ETS or ARIMA --- and check the benchmark \\[1pt]
+      Several seasonal cycles at once & GAM or Prophet \\[1pt]
+      Many engineered features, tabular & \textbf{Regularized regression first}, then XGBoost \\[1pt]
+      Many parallel series, shared drivers & Gradient boosting with series identifiers \\[1pt]
+      Genuinely long dependencies, lots of data & Recurrent or attention architectures \\[1pt]
+      Few observations per group & Hierarchical Bayesian --- partial pooling \\[1pt]
+      The decision needs a probability & Bayesian, for the predictive distribution \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  ``Regularized regression first'' is not a concession --- it won our largest comparison and its
+  coefficients can be read aloud. And the last row is the only one where the \emph{question}
+  changes rather than the accuracy.
+\end{frame}
+
+% =============================================================================
+\section{Doing It Honestly}
+% =============================================================================
+
+\sectionslide{Doing It Honestly}{%
+  The errors in this field do not announce themselves.}
+
+% --- Slide: silent errors ----------------------------------------------------------
+\begin{frame}{The Errors That Fail Silently}
+  Every one of these produces a confident, plausible, wrong answer with no error message.
+  \begin{center}
+    {\small
+    \begin{tabular}{p{3.5cm}p{8.8cm}}
+      \toprule
+      \texttt{KFold} on a time series & Random folds put the future in training. CV error looks
+      excellent; the forecast fails. \\[2pt]
+      Scaling outside the fold & Validation statistics leak into training. Smaller effect, same
+      class of error. \\[2pt]
+      Rolling features unshifted & A window including the current week leaks the target into its
+      own predictor. \\[2pt]
+      Reading MDI importance & Pure noise ranked \textbf{17th of 29} in Homework 3 --- above a
+      real feature --- purely for having many distinct values. \\[2pt]
+      Ignoring $\hat{R}$ and divergences & Our first two Bayesian fits returned reasonable-looking
+      forecasts while failing convergence. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \textbf{The common thread:} the failure mode is not a crash, it is a number that looks fine ---
+  which is why the discipline is procedural. Benchmark first, split by time, check the
+  diagnostic, plant a control.
+\end{frame}
+
+% --- Slide: what to report ---------------------------------------------------------
+\begin{frame}{What a Defensible Forecast Report Contains}
+  \begin{center}
+    {\small
+    \begin{tabular}{p{3.4cm}p{8.9cm}}
+      \toprule
+      \textbf{A benchmark} & Computed, not cited. Every model measured against it. \\[2pt]
+      \textbf{A time-aware split} & Walk-forward or a held-out final block, never random. \\[2pt]
+      \textbf{More than one evaluation} & A single test split can flatter. Homework 4 ranked
+      models the same way twice, which is why that ranking is believable. \\[2pt]
+      \textbf{The result that went against you} & Including tuning that did not help, and the
+      model you expected to win. \\[2pt]
+      \textbf{An interpretation} & In the units of the business, not of the loss function. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  \textbf{The fourth row is the one that distinguishes professional work.} A report where every
+  result confirms the author's expectation is not a report anyone should act on.
+
+  \vspace{0.1cm}
+  You have practised this all semester: the assignments were built so the obvious answer is
+  frequently the wrong one, and the credit was for noticing.
+\end{frame}
+
+% =============================================================================
+\section{Where to Go Next}
+% =============================================================================
+
+\sectionslide{Where to Go Next}{%
+  What we left out, and what to read.}
+
+% --- Slide: not covered ------------------------------------------------------------
+\begin{frame}{What This Course Did Not Cover}
+  \begin{center}
+    {\small
+    \begin{tabular}{p{4.0cm}p{8.3cm}}
+      \toprule
+      \textbf{Hierarchical reconciliation} & Making store forecasts add up to regional totals.
+      Different from Lecture 11's hierarchy. FPP Ch. 11. \\[2pt]
+      \textbf{Intermittent demand} & Series that are mostly zeros --- Croston's method and its
+      relatives. Common in spare parts and slow-moving SKUs. \\[2pt]
+      \textbf{Structural breaks} & When the future stops resembling the past. Every method here
+      fails together, and detecting it early is its own field. \\[2pt]
+      \textbf{Causal inference} & DAGs told us confounders exist. Estimating causal effects
+      credibly is a separate course. \\[2pt]
+      \textbf{Foundation models} & Pretrained forecasters applied zero-shot. Moving quickly ---
+      FPP-Py Ch. 15 is a starting point. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  \textbf{The third row is the one most likely to matter in your career.} Every model in this
+  course assumes the future resembles the past. When that stops being true, the model does not
+  tell you --- and the benchmark fails at the same moment.
+\end{frame}
+
+% --- Slide: closing ------------------------------------------------------------------
+\begin{frame}{Closing}
+  \begin{keybox}
+    {\footnotesize
+    \begin{enumerate}\itemsep2pt
+      \item \textbf{Compute the benchmark first.} It is often close, and it is the only number
+            that says whether your work was worth doing.
+
+      \item \textbf{Match the method to the problem}, not to the paper's publication date. The
+            most advanced model on our data finished sixth.
+
+      \item \textbf{One idea recurs}: fit against complexity, with a parameter setting the rate.
+            You have now seen it six times under six names.
+
+      \item \textbf{Split by time, always.} The leakage errors in this field do not crash --- they
+            return a better-looking number.
+
+      \item \textbf{Report what went against you.} It is the part that makes the rest credible.
+
+      \item \textbf{Know what your forecast is for.} A point estimate and a predictive
+            distribution answer different questions, and only one of them supports a decision
+            under uncertainty.
+    \end{enumerate}
+    }
+  \end{keybox}
+
+  \vspace{0.05cm}
+  \muted{\itshape The libraries will change. The habits are the transferable part.}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+\end{document}

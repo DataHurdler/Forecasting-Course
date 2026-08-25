@@ -32,224 +32,213 @@
 % =============================================================================
 
 \sectionslide{Bayesian Linear Regression}{%
-  OLS gives a single coefficient estimate.
-  Bayesian regression gives a full distribution over every coefficient,
-  quantifying exactly how uncertain we are about each effect.}
+  The same regression you already know ---
+  returning a distribution for every coefficient.}
 
-% --- Slide: OLS vs Bayesian regression ---------------------------------------
+% --- Slide: OLS vs Bayesian ---------------------------------------------------
 \begin{frame}{OLS vs.\ Bayesian Regression: What Changes?}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{OLS (Lectures 2 and 8):}
-      \[
-        \hat{\boldsymbol{\beta}} = (\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}
-      \]
-      \begin{itemize}\footnotesize
-        \item Single point estimate $\hat{\boldsymbol{\beta}}$
-        \item Standard errors derived from asymptotic theory
-        \item Confidence intervals rely on large-sample normality
-        \item Regularization (Ridge, LASSO) is an ad-hoc fix
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \textbf{Bayesian regression:}
-      \[
-        p(\boldsymbol{\beta} \mid \mathbf{y}) \propto p(\mathbf{y} \mid \boldsymbol{\beta}) \cdot p(\boldsymbol{\beta})
-      \]
-      \begin{itemize}\footnotesize
-        \item Full posterior distribution for each $\beta_j$
-        \item Credible intervals are exact probability statements
-        \item Regularization = informative prior
-              (Normal $\equiv$ Ridge; Laplace $\equiv$ LASSO)
-        \item Works even with small samples
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \vspace{0.1cm}
+  You have fitted linear models since Lecture 2, and regularized them in Lecture 6. OLS solves
+  for a single best coefficient vector:
+  \[
+    \hat{\boldsymbol{\beta}} = (\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}
+  \]
+  \vspace{-0.25cm}
+
+  One number per predictor, with a standard error resting on large-sample theory. The Bayesian
+  version replaces that with the update rule from Lecture 10:
+  \[
+    p(\boldsymbol{\beta} \mid \mathbf{y}) \;\propto\; p(\mathbf{y} \mid \boldsymbol{\beta}) \cdot p(\boldsymbol{\beta})
+  \]
+  \vspace{-0.25cm}
+
   \begin{keybox}
-    \small Bayesian regression answers questions OLS cannot:
-    ``What is the probability that advertising elasticity exceeds 0.5?''
-    or ``Did price sensitivity increase or decrease?''
+    \textbf{Every coefficient comes back as a distribution.} Not an estimate plus an error bar
+    computed from an asymptotic formula --- a full posterior you can ask questions of directly.
   \end{keybox}
+
+  And one thing you know reappears: \textbf{regularization is a prior}. A Normal prior on $\beta$
+  is Ridge; a Laplace prior is LASSO. Lecture 6's penalty is, here, a statement of belief.
 \end{frame}
 
-% --- Slide: Bayesian regression in PyMC ------------------------------------
+% --- Slide: PyMC ---------------------------------------------------------------
 \begin{frame}{Bayesian Linear Regression in PyMC}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{examplebox}{Retail Sales Regression}
-        {\scriptsize
-        \texttt{with pm.Model() as blr:}\\
-        \texttt{  intercept = pm.Normal('intercept',}\\
-        \texttt{    mu=y.mean(), sigma=y.std())}\\
-        \texttt{  beta = pm.Normal('beta',}\\
-        \texttt{    mu=0, sigma=1, shape=X.shape[1])}\\
-        \texttt{  sigma = pm.HalfNormal('sigma', y.std())}\\[1pt]
-        \texttt{  mu = intercept + X @ beta}\\[1pt]
-        \texttt{  pm.Normal('y\_obs', mu, sigma, observed=y)}\\[1pt]
-        \texttt{  trace = pm.sample(2000)}\\[1pt]
-        \texttt{pm.plot\_posterior(trace, var\_names=['beta'])}
-        }
-      \end{examplebox}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \textbf{Standardize predictors first:}
-      \begin{itemize}\footnotesize
-        \item Center and scale: \texttt{X\_std = (X - X.mean()) / X.std()}
-        \item With standardized inputs, $\mathcal{N}(0,1)$ priors are
-              weakly informative
-        \item Coefficients = ``effect of 1-SD increase in $x_j$ on $y$''
-      \end{itemize}
-      \vspace{0.1cm}
-      \begin{keybox}
-        \small A Normal prior on $\beta$ is equivalent to Ridge
-        regularization. A Laplace prior is equivalent to LASSO.
-        Bayesian inference subsumes regularization.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  \begin{examplebox}{Log units on log price, SNAP and events}
+    {\tiny\linespread{1.05}\selectfont
+    \texttt{with pm.Model() as model:}\\
+    \texttt{\ \ a\ \ \ \ \ \ = pm.Normal("a", y.mean(), 1)}\\
+    \texttt{\ \ b\_price = pm.Normal("b\_price", 0, 1)\ \ \ \ \ \# weakly informative}\\
+    \texttt{\ \ b\_snap\ = pm.Normal("b\_snap",\ 0, 1)}\\
+    \texttt{\ \ b\_event = pm.Normal("b\_event", 0, 1)}\\
+    \texttt{\ \ sigma\ \ \ = pm.Exponential("sigma", 1.0)}\\[2pt]
+    \texttt{\ \ mu = a + b\_price*lp + b\_snap*snap + b\_event*event}\\
+    \texttt{\ \ pm.Normal("obs", mu=mu, sigma=sigma, observed=y)}\\[2pt]
+    \texttt{\ \ idata = pm.sample(1000, tune=1500, chains=4)}
+    }
+  \end{examplebox}
+  Standardize the predictors first, so \texttt{Normal(0, 1)} means the same thing for each.
+
+  \vspace{0.1cm}
+  With units and price both in logs, \texttt{b\_price} is an \textbf{elasticity} --- the percent
+  change in demand per percent change in price. A quantity a category manager already uses.
 \end{frame}
 
 % =============================================================================
-\section{Interpreting Posterior Coefficient Distributions}
+\section{Reading the Posterior}
 % =============================================================================
 
-\sectionslide{Interpreting Posterior Coefficient Distributions}{%
-  Credible intervals, probability of direction, and
-  conditional effect analysis.}
+\sectionslide{Reading the Posterior}{%
+  Three questions you can ask a distribution
+  that you cannot ask a point estimate.}
 
-% --- Slide: Reading posterior plots -----------------------------------------
-\begin{frame}{Reading Posterior Distributions}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{For each $\beta_j$, the posterior gives:}
-      \begin{description}\footnotesize
-        \item[Posterior mean] Best single estimate
-        \item[Posterior median] More robust if distribution is skewed
-        \item[HDI] Highest Density Interval: shortest interval
-              containing $X$\% of the probability mass
-        \item[Prob.\ of direction] $P(\beta_j > 0)$ or $P(\beta_j < 0)$ ---
-              more natural than a $p$-value
-        \item[ROPE] Region Of Practical Equivalence: fraction of the
-              posterior in $|\beta_j| < \delta$ (``negligible effect'').
-              High ROPE mass = statistically present but practically irrelevant.
-      \end{description}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{examplebox}{Business Example}
-        \small Posterior for advertising elasticity $\beta_{\text{ads}}$:
-        \begin{itemize}\footnotesize
-          \item Posterior mean: 0.32
-          \item 94\% HDI: [0.18, 0.47]
-          \item $P(\beta_{\text{ads}} > 0) = 0.998$
-        \end{itemize}
-        \textbf{Interpretation:} ``99.8\% probability of a positive
-        effect. A 10\% increase in ads raises sales by 3.2\%
-        (credible range: 1.8\%--4.7\%).''
-      \end{examplebox}
-    \end{column}
-  \end{columns}
+% --- Slide: reading a coefficient ------------------------------------------------
+\begin{frame}{Reading a Posterior Coefficient}
+  Fitted on the weekly panel, controlling for series and trend:
+  \begin{center}
+    {\small
+    \begin{tabular}{lrrl}
+      \toprule
+      \textbf{Coefficient} & \textbf{Mean} & \textbf{94\% HDI} & \textbf{Reading} \\
+      \midrule
+      \texttt{b\_price} & $-0.127$ & $[-0.150,\ -0.100]$ & Inelastic, and clearly negative \\
+      \texttt{b\_trend} & $\phantom{-}0.169$ & $[\phantom{-}0.164,\ \phantom{-}0.173]$ & Demand grows over the sample \\
+      \texttt{b\_snap} & $\phantom{-}0.026$ & $[\phantom{-}0.023,\ \phantom{-}0.030]$ & About a 2.6\% SNAP-week lift \\
+      \texttt{b\_event} & $-0.002$ & $[-0.005,\ \phantom{-}0.002]$ & \textbf{Spans zero} \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.05cm}
+  The \textbf{HDI} --- highest density interval --- is the shortest interval containing 94\% of
+  the posterior. Unlike a confidence interval it says what everyone wants it to say: there is a
+  94\% probability the coefficient lies in there.
+
+  \vspace{0.15cm}
+  \textbf{The last row is the useful one.} \texttt{b\_event}'s interval spans zero, so the data
+  do not establish a direction. That is a more honest report than ``not significant,'' because it
+  also shows the effect is \emph{small} --- at most about half a percent either way.
+\end{frame}
+
+% --- Slide: probability questions ---------------------------------------------------
+\begin{frame}{Asking the Posterior a Direct Question}
+  The posterior is a set of samples, so any question about $\beta$ is answered by counting.
+
+  \begin{examplebox}{One line each}
+    {\scriptsize\linespread{1.05}\selectfont
+    \texttt{b = idata.posterior["b\_price"].values.ravel()}\\[2pt]
+    \texttt{(b < 0).mean()\ \ \ \ \ \ \ \ \ \ \# P(demand falls when price rises)}\\
+    \texttt{(b < -0.5).mean()\ \ \ \ \ \ \ \# P(elasticity beyond -0.5)}\\
+    \texttt{((b > -0.2) \& (b < 0)).mean()\ \ \# P(inelastic but negative)}
+    }
+  \end{examplebox}
+
+  On our fit, $P(\text{elasticity} < 0) = \mathbf{1.00}$ --- every posterior sample is negative,
+  so the direction is not in doubt. But $P(\text{elasticity} < -0.5) \approx 0$: the effect is
+  real and it is \emph{small}.
+
+  \begin{keybox}
+    \textbf{Two different findings, and a p-value conflates them.} ``Statistically significant''
+    reports only the first. The business needs the second.
+  \end{keybox}
+
+  \muted{\footnotesize\itshape Asking how much posterior mass falls in a range of negligible
+  values is called a \textbf{ROPE} --- region of practical equivalence.}
 \end{frame}
 
 % =============================================================================
-\section{Directed Acyclic Graphs and Causal Structure}
+\section{Causal Structure and DAGs}
 % =============================================================================
 
-\sectionslide{DAGs and Causal Structure}{%
-  A Directed Acyclic Graph makes the assumed causal structure explicit,
-  helping decide which variables to include in a model.}
+\sectionslide{Causal Structure and DAGs}{%
+  Which coefficients mean what you think they mean.}
 
-% --- Slide: DAGs -------------------------------------------------------------
-\begin{frame}{Directed Acyclic Graphs (DAGs)}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      A \textbf{DAG} is a graph where:
-      \begin{itemize}\footnotesize
-        \item \textbf{Nodes} = variables
-        \item \textbf{Directed arrows} = causal relationships ($A \to B$: $A$ causes $B$)
-        \item \textbf{Acyclic} = no variable causes itself
-      \end{itemize}
-      \vspace{0.05cm}
-      \textbf{How to build:} For each variable pair, ask ``Could $A$ directly cause $B$?''
-      Draw an arrow if yes; direction = causation, not correlation.
+% --- Slide: DAGs ----------------------------------------------------------------
+\begin{frame}{Directed Acyclic Graphs}
+  A \textbf{DAG} is a picture of what you believe causes what: \textbf{nodes} are variables,
+  \textbf{arrows} run from cause to effect, and \textbf{acyclic} means nothing causes itself.
 
-      \vspace{0.05cm}
-      \textbf{Why use DAGs?}
-      \begin{itemize}\footnotesize
-        \item Makes causal structure explicit before modeling
-        \item Identifies \textbf{confounders} (must control for)
-        \item Identifies \textbf{colliders} (must NOT control for)
-        \item Clarifies which coefficients are causal vs.\ associational
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{examplebox}{Retail Sales DAG}
-        \footnotesize
-        \begin{itemize}\footnotesize
-          \item Advertising $\to$ Sales
-          \item Price $\to$ Sales
-          \item Season $\to$ Advertising
-          \item Season $\to$ Sales
-        \end{itemize}
-        \textbf{Season is a confounder:}
-        omitting it causes the advertising coefficient
-        to absorb seasonal variation --- biased upward.
-      \end{examplebox}
-    \end{column}
-  \end{columns}
+  \vspace{0.15cm}
+  It is drawn before the model, from domain knowledge, and its purpose is to tell you
+  \emph{which variables belong in the regression}.
+
+  \begin{center}
+    {\small
+    \begin{tabular}{p{2.6cm}p{9.6cm}}
+      \toprule
+      \textbf{Confounder} & Causes both your predictor and your outcome. \textbf{Must} be
+      controlled for, or its influence is absorbed into your coefficient. \\[3pt]
+      \textbf{Collider} & Is caused by both. Controlling for it \textbf{creates} a spurious
+      association that was not there. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  \textbf{That second row is why ``add every control you have'' is bad advice.} Which variables
+  to include is a question about causal structure, and no amount of model fit will answer it.
+
+  \vspace{0.1cm}
+  \muted{\footnotesize\itshape Whether a given DAG is right is a substantive question about your
+  business, not a statistical one. This course uses DAGs to reason about what a coefficient
+  means --- estimating causal effects credibly is a separate subject.}
 \end{frame}
 
-% =============================================================================
-\section{Conditional Analysis and Group-Specific Models}
-% =============================================================================
+% --- Slide: confounding measured --------------------------------------------------
+\begin{frame}{Confounding, Measured}
+  Our panel has thirty store-category series. Categories differ in \emph{both} typical price and
+  typical volume --- so series identity is an arrow into price \emph{and} into units. A textbook
+  confounder.
 
-\sectionslide{Conditional Analysis and Group-Specific Models}{%
-  Use posterior samples to ask conditional questions:
-  what happens to the forecast if this variable changes?}
+  \vspace{0.1cm}
+  Fit the same elasticity twice:
+  \begin{center}
+    {\small
+    \begin{tabular}{lrr}
+      \toprule
+      \textbf{Model} & \textbf{Elasticity} & \textbf{94\% HDI} \\
+      \midrule
+      Price, SNAP, events only & $-0.687$ & $[-0.700,\ -0.676]$ \\
+      \ \ $+$ series effects and trend & $\mathbf{-0.127}$ & $[-0.150,\ -0.100]$ \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
 
-% --- Slide: Posterior predictive for scenarios --------------------------------
+  \vspace{-0.05cm}
+  \textbf{The uncontrolled estimate is more than five times too large.} It is not noisier --- its
+  interval is actually \emph{narrower}. It is confidently, precisely wrong.
+
+  \begin{warningbox}
+    A tight credible interval says the model is sure. It says nothing about whether the model is
+    answering your question. Bayesian machinery does not protect you from omitting a confounder
+    --- only the DAG does.
+  \end{warningbox}
+\end{frame}
+
+% --- Slide: scenario analysis ------------------------------------------------------
 \begin{frame}{Scenario Analysis with Posterior Samples}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \small\textbf{Procedure:}
-      \begin{enumerate}\footnotesize
-        \item Draw $S$ posterior samples $\boldsymbol{\beta}^{(1)}, \ldots, \boldsymbol{\beta}^{(S)}$
-        \item For scenario $\mathbf{x}^*$, compute
-              $\hat{y}^{(s)} = \mathbf{x}^{*\top}\boldsymbol{\beta}^{(s)}$
-        \item The distribution of $\hat{y}^{(s)}$ is the
-              \textbf{posterior predictive distribution}
-      \end{enumerate}
-      \vspace{0.1cm}
-      \begin{examplebox}{``What if we raise price by 5\%?''}
-        {\scriptsize
-        \texttt{x\_new = x\_base.copy()}\\
-        \texttt{x\_new['price'] *= 1.05}\\
-        \texttt{b = trace.posterior['beta'].values}\\
-        \texttt{y\_draws = b @ x\_new}\\
-        \texttt{print(f"E[sales]: \{y\_draws.mean():.0f\}")}\\
-        \texttt{print(f"95\% CI: \{np.percentile(y\_draws,[2.5,97.5])\}")}
-        }
-      \end{examplebox}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \textbf{Group-specific models:}
-      \begin{itemize}\footnotesize
-        \item Hierarchical structure (L11) gives
-              \textbf{store-specific} posteriors
-        \item Scenario effects differ by store:
-              high-elasticity vs.\ low-elasticity
-        \item Posterior uncertainty reveals which
-              stores drive total revenue risk
-      \end{itemize}
-      \vspace{0.1cm}
-      \begin{keybox}
-        \small \textbf{Decision analysis:}
-        choose the action (price, promo, budget)
-        that maximizes expected profit given
-        the full posterior over outcomes.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  Because the posterior is samples, you can push a business scenario through it and get a
+  \textbf{distribution of outcomes} rather than a single projected number.
+
+  \begin{examplebox}{What if we raise price 5\%?}
+    {\scriptsize\linespread{1.05}\selectfont
+    \texttt{b = idata.posterior["b\_price"].values.ravel()}\\
+    \texttt{pct\_change = 100 * (np.exp(b * np.log(1.05)) - 1)}\\[2pt]
+    \texttt{pct\_change.mean(), np.percentile(pct\_change, [3, 97])}
+    }
+  \end{examplebox}
+
+  With an elasticity near $-0.127$, a 5\% price rise implies roughly a \textbf{0.6\% fall in
+  units} --- and returns the whole distribution of that fall, so you can report the pessimistic
+  end too.
+
+  \vspace{0.1cm}
+  \textbf{Then the decision follows.} Revenue rises if the volume loss is smaller than the price
+  gain, and you can compute that probability directly.
+
+  \muted{\footnotesize\itshape Valid only to the extent the DAG is --- this is a causal claim
+  about intervening on price.}
 \end{frame}
 
 % =============================================================================
