@@ -1,0 +1,99 @@
+---
+title: "Lab N: [Topic]"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+*(2–3 sentences. The technique from today's lecture, and the concrete question we are
+pointing it at. Name the business decision, not just the model.)*
+
+**Time:** ~35 minutes · **You will need:** *(packages, data files)*
+
+---
+
+# Setup
+
+*(Fully written — students should never spend lab time on imports or data loading.)*
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# load the course dataset here
+```
+
+---
+
+# Step 1 — [Look at the data]
+
+*(Always start with a plot. Students should see the series before modelling it.)*
+
+```{python}
+# fully written
+```
+
+**Notice:** *(the one feature of the plot that motivates today's method)*
+
+---
+
+# Step 2 — [Fit the thing]
+
+*(Scaffolded: the structure is given, the student fills the interesting line.)*
+
+```{python}
+# model = SomeModel(
+#     ___,          # <- you fill this in
+# ).fit(train)
+```
+
+**Your turn:** *(one specific instruction, not an open-ended task)*
+
+---
+
+# Step 3 — [Evaluate it honestly]
+
+*(Walk-forward, never a random split. This repeats every lab on purpose.)*
+
+```{python}
+# scaffolded
+```
+
+**Compare:** *(against the benchmark, or against last week's method on the same series)*
+
+---
+
+# Step 4 — [Break it]
+
+*(Optional but strongly encouraged: change one thing so the model fails, and see the failure.
+Students remember the failure far longer than the success.)*
+
+```{python}
+# what happens if you ___?
+```
+
+---
+
+# Before you leave
+
+*(One question with no code answer. Something to say out loud.)*
+
+> **Discuss:** …
+
+---
+
+*Solutions posted to Canvas after class.*

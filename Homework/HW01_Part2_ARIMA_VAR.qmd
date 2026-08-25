@@ -1,0 +1,162 @@
+---
+title: "Homework 1, Part 2: ARIMA, VAR & Method Comparison"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Overview
+
+This is **Part 2** of Homework 1, due before class in Week 3. It assumes you have submitted Part 1 (exponential smoothing) and that you have your Part 1 accuracy table available — Q5 asks you to compare against it.
+
+Part 2 covers ARIMA-based models and their multivariate extension, Vector Autoregression. Where exponential smoothing summarizes the past through a smoothed level, ARIMA models the correlation structure of the series directly, and VAR lets two series inform each other.
+
+**Learning objectives.** By the end of Part 2 you will be able to:
+
+- Diagnose stationarity with the Augmented Dickey-Fuller test and difference a series appropriately
+- Identify a plausible ARIMA($p,d,q$) order from ACF and PACF plots
+- Evaluate a model with walk-forward cross-validation rather than a single train/test split
+- Fit a VAR, run a Granger causality test, and state what the result does and does not license you to claim
+
+---
+
+# Dataset and Split
+
+Same weekly Rossmann panel as Part 1, and **the same train/test split**, so your Part 2 numbers are directly comparable to Part 1.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.api import VAR
+from statsmodels.tsa.stattools import adfuller, grangercausalitytests
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+import warnings
+warnings.filterwarnings('ignore')
+
+weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
+store1 = weekly[weekly["Store"] == 1].set_index("WeekStart")["Sales"]
+
+N_TEST = 26                                   # identical to Part 1
+train, test = store1.iloc[:-N_TEST], store1.iloc[-N_TEST:]
+print(f"train: {len(train)} weeks   test: {len(test)} weeks")
+```
+
+---
+
+# Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Start a **new** Codex session for Part 2 and paste the block below as the very first message. It does **not** count against your Part 2 budget.
+
+```
+I am working on Homework 1, Part 2 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
+
+Dataset: Rossmann Store Sales (preprocessed weekly), at `data/processed/rossmann_weekly.csv`. Columns include Store (1-30), WeekStart, Sales, Customers, Promo, StoreType, Assortment, CompetitionDistance, and lag features. Each store has roughly 134 weekly observations covering January 2013 to July 2015.
+
+Part 2 covers ARIMA, walk-forward cross-validation, VAR, and Granger causality using Python and statsmodels. I already completed exponential smoothing in Part 1 and will compare against those results. The train/test split is fixed: the final 26 weeks are the test set. For each question:
+1. Write clean, well-commented Python code that runs end-to-end
+2. Interpret outputs in plain English for a business audience
+3. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget for Part 2 is 8 (this context prompt is excluded). I will label each question before asking.
+
+Confirm by responding with: HW01P2_CONTEXT_ACK
+```
+
+Submit this text as **`INITIAL_PROMPT.md`** in your Part 2 submission folder.
+:::
+
+---
+
+# Questions
+
+## Q3 — ARIMA
+
+*(Suggested prompts: 3)*
+
+Work through the following steps for the Store 1 series.
+
+**(a)** Run the Augmented Dickey-Fuller test. Report the test statistic, p-value, and your conclusion about stationarity. If differencing is needed, apply it and re-test.
+
+**(b)** Plot the ACF and PACF of the (possibly differenced) series. Based on the plots, propose an ARIMA($p, d, q$) order and explain your reasoning.
+
+**(c)** Fit your chosen ARIMA model on `train`. Report the AIC and compute the forecast RMSE on `test`.
+
+**(d)** Implement walk-forward cross-validation: use an expanding window with a minimum training length of 52 weeks, re-fit your ARIMA at each step, and produce a 1-step-ahead forecast. Report the mean RMSE across all steps.
+
+```{python}
+# (a) ADF test
+
+# (b) ACF and PACF plots
+
+# (c) Fit ARIMA on train, report AIC, compute RMSE on test
+
+# (d) Walk-forward CV with expanding window (min 52 weeks), 1-step-ahead forecasts
+```
+
+> **Your response:** Compare the ARIMA walk-forward RMSE to the best exponential smoothing model from Part 1. Which method would you recommend for a weekly store-level sales forecast and why? Consider accuracy, interpretability, and operational constraints. Note also whether the walk-forward RMSE differs much from the single-split RMSE in (c) — and if it does, which number you would trust.
+
+---
+
+## Q4 — VAR and Granger Causality
+
+*(Suggested prompts: 3)*
+
+This question extends the analysis to two stores simultaneously.
+
+**(a)** Test whether Store 2 Sales Granger-causes Store 1 Sales at lag 4 using `grangercausalitytests`. Report the F-statistic and p-value for that lag.
+
+**(b)** Align the two series on a common date index. Fit a VAR(4) on the training portion of both stores using `statsmodels.tsa.api.VAR`. Forecast the next 4 weeks. Plot actual versus forecast for Store 1 only.
+
+```{python}
+store2 = weekly[weekly["Store"] == 2].set_index("WeekStart")["Sales"]
+
+# (a) Granger causality test: does Store 2 Sales Granger-cause Store 1 Sales at lag 4?
+
+# (b) Align series, fit VAR(4) on the training window, forecast 4 weeks, plot Store 1
+```
+
+> **Your response:** In your own words, what does Granger causality actually mean — and what does it *not* mean? Then interpret **your own result**: state whether you found evidence of Granger causality at lag 4, and explain what that finding implies operationally for Rossmann. If you found it, does it mean Store 2 *causes* Store 1's sales? If you did not, does that establish the two stores are independent? Address both directions, whichever way your test came out.
+
+---
+
+## Q5 — Method Comparison
+
+*(Suggested prompts: 0 — write yourself)*
+
+No code required for this question. Write your answer directly below in 150–200 words.
+
+You are a demand planner at Rossmann responsible for producing 52-week store-level sales forecasts, updated monthly. Drawing on your results from Part 1 and from Q3–Q4, answer the following:
+
+Which of the methods from this homework (SES, Holt, Holt-Winters, ARIMA, VAR) would you recommend for **production use** at scale, and which would you retain as a **benchmark**? Justify your choice based on forecast accuracy, the operational realities of running 30+ stores, the cost of model maintenance, and interpretability to non-technical stakeholders.
+
+> **Your response:** *(150–200 words)*
+
+---
+
+# Submission Checklist
+
+Before submitting Part 2, confirm each item below.
+
+- [ ] All code cells run without errors from top to bottom (Kernel → Restart & Run All)
+- [ ] Written responses are completed in your own words — AI-generated prose is not accepted for written sections
+- [ ] `INITIAL_PROMPT.md` is saved in your Part 2 submission folder
+- [ ] `PROMPT_LOG.jsonl` is complete with **8 or fewer** entries (one entry per Codex prompt sent)
+- [ ] One git commit per Codex prompt used, following the format: `hw01p2 prompt <id>: <one-line summary>`
+- [ ] `REPORT.md` included with a final business recommendation (3–5 sentences) addressed to a non-technical manager, drawing on **both** parts of Homework 1

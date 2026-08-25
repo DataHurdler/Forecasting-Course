@@ -126,6 +126,8 @@ Installation instructions and a test script are provided in the course repositor
 
 ## Course Materials
 All lecture slides (PDF and interactive HTML), homework assignments, and data files are distributed through the course website and Canvas.
+
+The course runs on one main dataset, with three others introduced where that one cannot demonstrate something. **`ECON8310_Datasets.md`** explains what each dataset is, where to download it, and why it is in the course. Read it before Homework 1.
 The textbooks above are free online.
 There is nothing you need to buy for this course.
 
@@ -179,13 +181,16 @@ You must answer all homework questions.
 At least one question will be checked for credit, except for homework assignments that are graded for completion.
 If you really do not know how to proceed with a homework question, you should email me.
 
-There are 7 homework assignments, each is worth 20 points, for a total of 140 points.
-Several assignments are submitted in parts across multiple weeks; see the weekly schedule below for each due date.
+There are 7 homework assignments, each worth 20 points, for a total of 140 points.
+Several assignments are submitted in parts across multiple weeks. **The parts of an assignment
+split that assignment's 20 points between them** — they are not 20 points each. Each part has its
+own Codex context prompt and its own prompt budget. See the weekly schedule below for due dates.
 Each assignment is a Quarto (`.qmd`) document rendered to HTML and submitted through the course repository, together with your `PROMPT_LOG.jsonl` and a short `REPORT.md` containing your business recommendation.
 
 | Assignment | Topics | Lectures | Due |
 |---|---|---|---|
-| 1 | Exponential smoothing, ARIMA, VAR | 1–2 | Part 1: Week 2 · Part 2: Week 3 |
+| 1 (Part 1) | Exponential smoothing | 1 | Week 2 |
+| 1 (Part 2) | ARIMA, VAR, method comparison | 2 | Week 3 |
 | 2 | Generalized Additive Models, Prophet | 3 | Week 4 |
 | 3 | Decision trees, random forests | 4–5 | Week 6 |
 | 4 | Boosted trees, regularization | 6 | Week 7 |

@@ -13,7 +13,7 @@
 - **Single source of truth** -- Beamer `.tex` is authoritative; Quarto `.qmd` derives from it
 - **Quality gates** -- nothing ships below 80/100
 - **[LEARN] tags** -- when corrected, save `[LEARN:category] wrong → right` to MEMORY.md
-- **Python-first** -- lab scripts use Python (statsmodels, scikit-learn, matplotlib); `random_state=42`
+- **Python-first** -- labs and analysis use Python (statsmodels, scikit-learn, matplotlib); `random_state=42`
 
 ---
 
@@ -27,6 +27,8 @@ bsad8310-forecasting/
 ├── Figures/                     # Figures and images
 ├── Preambles/header.tex         # LaTeX headers
 ├── Slides/                      # Beamer .tex files (LectureNN_Title.tex)
+├── Labs/                        # In-class hands-on exercises (LectureNN_lab.qmd)
+├── Narration/                   # Recording scripts (LectureNN_script.md)
 ├── Quarto/                      # RevealJS .qmd files + theme
 ├── docs/                        # GitHub Pages (auto-generated)
 ├── scripts/                     # Utility scripts + Python notebooks
@@ -53,8 +55,8 @@ TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
 # Quality score
 python scripts/quality_score.py Quarto/LectureNN_Title.qmd
 
-# Run Python lab script (must run end-to-end without interaction)
-python scripts/LectureNN_lab.py
+# Render an in-class lab (must run end-to-end without interaction)
+quarto render Labs/LectureNN_lab.qmd
 ```
 
 ---
@@ -190,6 +192,12 @@ template-maintenance gates that this course repo does not satisfy.
 
 ## Homework Assignments
 
+**Dataset decision pending migration:** see
+[`quality_reports/decisions/ADR-0001-course-dataset-architecture.md`](quality_reports/decisions/ADR-0001-course-dataset-architecture.md).
+The spine moves from Rossmann to **M5/Walmart**, supplemented by FRED (L02 VAR/Granger),
+electricity demand (L03 multiple seasonality), and Favorita (Week 16 shock cameo + project seed).
+Do not restructure HW02–HW07 before that migration.
+
 **Status:** All 8 assignments written (Spring 2026).
 **Dataset:** Rossmann Store Sales (Kaggle) — 30 stores, weekly aggregated.
 **Data prep:** Run `python scripts/prep_rossmann.py` once to generate `data/processed/rossmann_weekly.csv` and `data/processed/rossmann_daily.csv`.
@@ -198,7 +206,8 @@ template-maintenance gates that this course repo does not satisfy.
 
 | HW | File | Lectures | Dataset | Prompt Budget | Key Tasks |
 |----|------|----------|---------|---------------|-----------|
-| 1 | `HW01_ETS_ARIMA.qmd` ✓ | L01 + L02 | Weekly, Store 1 + Store 2 | 12 | ETS (SES/Holt/HW), ARIMA walk-forward CV, VAR, Granger causality |
+| 1a | `HW01_Part1_ETS.qmd` ✓ | L01 | Weekly, Store 1 | 4 | ETS (SES/Holt/HW), held-out RMSE/MAE |
+| 1b | `HW01_Part2_ARIMA_VAR.qmd` ✓ | L02 | Weekly, Store 1 + Store 2 | 8 | ARIMA walk-forward CV, VAR, Granger causality, method comparison |
 | 2 | `HW02_GAMs.qmd` ✓ | L03 | Daily, Store 1 | 10 | Prophet components + regressors, pyGAM splines, model comparison |
 | 3 | `HW03_Trees_RF.qmd` ✓ | L04 + L05 | Weekly, 30 stores | 12 | Decision tree visualization, RF + OOB error, MDI vs permutation importance, walk-forward CV |
 | 4 | `HW04_XGBoost_Regularization.qmd` ✓ | L06 | Weekly, 30 stores | 12 | XGBoost tuning, LASSO regularization path, Elastic Net vs Ridge, cross-model CV comparison |

@@ -1,0 +1,153 @@
+---
+title: "Homework 1, Part 1: Exponential Smoothing"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Overview
+
+Homework 1 comes in two parts. **Part 1 (this document)** covers exponential smoothing and is due before class in Week 2 — it uses only material from Lecture 1. **Part 2** covers ARIMA, VAR, and method comparison, and is due before class in Week 3, after Lecture 2.
+
+Each part has its own Codex context prompt, its own prompt budget, and its own submission. Do not start Part 2 until Part 1 is submitted.
+
+Exponential smoothing is a workhorse of operational forecasting in retail and supply chain: interpretable, cheap to fit, and hard to beat at scale. Working through real store-level sales data, you will see how the choice of smoothing model and the rigor of evaluation translate directly into business decisions.
+
+**Learning objectives.** By the end of Part 1 you will be able to:
+
+- Read a retail time series plot for trend, seasonality, and business-driven irregularity
+- Apply Simple Exponential Smoothing, Holt's linear trend model, and Holt-Winters to seasonal weekly data
+- Interpret the smoothing parameter $\alpha$ in business terms
+- Compare competing models on a held-out test set using RMSE and MAE
+
+---
+
+# Dataset
+
+This homework uses the **Rossmann Store Sales** dataset, a widely studied retail forecasting benchmark from a Kaggle competition. The data contain weekly sales for 30 Rossmann drug stores in Germany covering **January 2013 through July 2015** — roughly 134 weeks per store — preprocessed into a consistent weekly panel. Each row is one store-week and includes sales volume, customer count, promotional indicators, competition information, and pre-computed lag features used in later homeworks.
+
+The preprocessed file is at `data/processed/rossmann_weekly.csv`. If it does not exist, run `python scripts/prep_rossmann.py` once first.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+import warnings
+warnings.filterwarnings('ignore')
+
+weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
+
+# Focus on Store 1 for univariate models
+store1 = weekly[weekly["Store"] == 1].set_index("WeekStart")["Sales"]
+print(f"Store 1: {len(store1)} weekly observations "
+      f"from {store1.index.min().date()} to {store1.index.max().date()}")
+```
+
+---
+
+# Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does **not** count against your prompt budget.
+
+```
+I am working on Homework 1, Part 1 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
+
+Dataset: Rossmann Store Sales (preprocessed weekly), at `data/processed/rossmann_weekly.csv`. Columns include Store (1-30), WeekStart, Sales, Customers, Promo, StoreType, Assortment, CompetitionDistance, and lag features (Sales_lag1 through Sales_lag52). Each store has roughly 134 weekly observations covering January 2013 to July 2015.
+
+Part 1 covers exponential smoothing only (SES, Holt, Holt-Winters) using Python and statsmodels. ARIMA and VAR come in Part 2 — do not introduce them here. I will ask you questions one at a time. For each:
+1. Write clean, well-commented Python code that runs end-to-end
+2. Interpret outputs in plain English for a business audience
+3. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget for Part 1 is 4 (this context prompt is excluded). I will label each question before asking.
+
+Confirm by responding with: HW01P1_CONTEXT_ACK
+```
+
+Submit this text as **`INITIAL_PROMPT.md`** in your Part 1 submission folder.
+:::
+
+---
+
+# Questions
+
+## Q1 — Exploratory Plot
+
+*(Suggested prompts: 1)*
+
+Plot Store 1 weekly sales over the full observation window. After examining the plot, answer the written questions below.
+
+```{python}
+# Plot Store 1 weekly sales over time
+```
+
+> **Your response:** Describe what you see in the plot. Mention trend, any seasonal pattern, and a plausible business explanation. What business factors (promotions, holidays, store events) might explain the peaks and troughs you observe?
+
+---
+
+## Q2 — Exponential Smoothing Models
+
+*(Suggested prompts: 2)*
+
+Split the Store 1 series into a training set and a held-out test set of the final 26 weeks. Fit the three models below on the training set, forecast over the test period, and compute RMSE and MAE for each.
+
+- **Simple Exponential Smoothing (SES)**
+- **Holt's linear trend model**
+- **Holt-Winters (additive seasonality, period = 52)**
+
+Present your accuracy results in a summary table.
+
+::: {.callout-note}
+## Why the test set is 26 weeks and not larger
+
+Holt-Winters has to estimate a seasonal index for each of the 52 weeks in a year, and it needs **at least two complete cycles** — $2m = 104$ observations — before it can initialize them. This is the same $2m$ rule stated in Lecture 1.
+
+Store 1 has about 134 weekly observations. Holding out 26 leaves roughly 108 for training, which clears the 104 threshold with a little room. Hold out much more and Holt-Winters will refuse to fit at all. The assertion below makes that constraint explicit rather than letting it fail deep inside statsmodels.
+:::
+
+```{python}
+N_TEST = 26                                   # final 26 weeks held out
+train, test = store1.iloc[:-N_TEST], store1.iloc[-N_TEST:]
+
+SEASONAL_PERIOD = 52
+assert len(train) >= 2 * SEASONAL_PERIOD, (
+    f"Training set has {len(train)} weeks but Holt-Winters with period "
+    f"{SEASONAL_PERIOD} needs at least {2 * SEASONAL_PERIOD}. "
+    f"Reduce N_TEST."
+)
+print(f"train: {len(train)} weeks   test: {len(test)} weeks")
+
+# Fit SES, Holt, and Holt-Winters models; compute RMSE and MAE for each
+```
+
+> **Your response:** Which model performs best on the test set and why? What does the estimated smoothing parameter $\alpha$ tell you about how quickly Store 1 sales respond to recent observations? Is a high or low $\alpha$ appropriate for this series, and what does that imply for how a demand planner should use it?
+
+---
+
+# Submission Checklist
+
+Before submitting Part 1, confirm each item below.
+
+- [ ] All code cells run without errors from top to bottom (Kernel → Restart & Run All)
+- [ ] Written responses are completed in your own words — AI-generated prose is not accepted for written sections
+- [ ] `INITIAL_PROMPT.md` is saved in your Part 1 submission folder
+- [ ] `PROMPT_LOG.jsonl` is complete with **4 or fewer** entries (one entry per Codex prompt sent)
+- [ ] One git commit per Codex prompt used, following the format: `hw01p1 prompt <id>: <one-line summary>`
+
+*Part 2 is due before class in Week 3 and carries its own prompt budget. The business recommendation `REPORT.md` is submitted with Part 2, once you have results from all five questions.*
