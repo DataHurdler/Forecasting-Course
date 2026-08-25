@@ -37,66 +37,43 @@
 
 % --- Slide: Why regularize ---------------------------------------------------
 \begin{frame}{Why Regularize?}
-  OLS minimizes $\sum_{i}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2$.
-  A weekly model with lags, calendar dummies, promotions, and macro series can
-  easily carry $k = 60$ predictors on $n = 150$ observations --- OLS will fit
-  that sample beautifully and forecast badly.
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{What goes wrong:}
-      \begin{itemize}\small\itemsep0pt
-        \item Variance of $\hat{\boldsymbol{\beta}}$ grows with $k$
-        \item Correlated predictors give unstable, wildly large
-              coefficients with opposing signs
-        \item When $k > n$ there is no unique solution at all
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \small \textbf{Regularization:} add a penalty on coefficient size,
-        \[
-          \underbrace{\textstyle\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}}
-          + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}
-        \]
-        Accept a little bias to buy a large reduction in variance.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  OLS minimizes $\sum_{i}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2$. A weekly model with lags,
+  calendar dummies, promotions, and macro series can easily carry $k = 60$ predictors on
+  $n = 150$ observations --- OLS will fit that sample beautifully and forecast badly.
+
+  \vspace{0.15cm}
+  Three things go wrong at once. The variance of $\hat{\boldsymbol{\beta}}$ grows with $k$.
+  Correlated predictors produce unstable, wildly large coefficients with opposing signs. And
+  once $k > n$ there is no unique solution at all.
+  \textbf{Regularization} adds a penalty on coefficient size:
+  \[
+    \underbrace{\textstyle\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}}
+    + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}
+  \]
+  \vspace{-0.2cm}
+  You accept a little bias to buy a large reduction in variance --- and for a forecast, that
+  trade is almost always worth making.
 \end{frame}
 
 % --- Slide: Subset selection -------------------------------------------------
 \begin{frame}{Subset Selection: The Classical Answer}
-  Before shrinkage, the standard approach was to \emph{count} predictors
-  rather than shrink them \parencite{Guyon2003}.
-  \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \textbf{Best subset:}
-      \begin{itemize}\footnotesize\itemsep0pt
-        \item Fit all $2^k$ models, pick the best
-        \item Exact --- hopeless past $k \approx 30$
-      \end{itemize}
-      \vspace{0.1cm}
-      \textbf{Stepwise:}
-      \begin{itemize}\footnotesize\itemsep0pt
-        \item Forward: add the best predictor, repeat
-        \item Backward: start full, drop the weakest, repeat
-        \item Greedy --- can miss the best combination
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.46\textwidth}
-      \textbf{Chosen by:} adjusted $R^2$, AIC, AICc, BIC, or CV.
+  Before shrinkage, the standard approach was to \emph{count} predictors rather than shrink
+  them \parencite{Guyon2003}.
 
-      \vspace{0.1cm}
-      \begin{warningbox}
-        \footnotesize Subset selection is \textbf{discrete} --- in or out.
-        Small data changes flip predictors in and out, so the selected
-        model is itself high-variance.
-      \end{warningbox}
-    \end{column}
-  \end{columns}
-  \muted{\footnotesize This is the approach in \emph{FPP} \S7.5. Shrinkage
-  replaces the in-or-out decision with a continuous dial --- more stable,
-  and easier to tune.}
+  \vspace{0.15cm}
+  \textbf{Best subset} fits all $2^k$ models and picks the winner --- exact, and
+  computationally hopeless past $k \approx 30$. \textbf{Stepwise} adds the strongest predictor
+  or drops the weakest, one at a time; it is greedy, and can miss the best combination
+  entirely. Either way the choice is made by adjusted $R^2$, AIC, AICc, BIC, or CV.
+  \begin{warningbox}
+    Subset selection is \textbf{discrete} --- a predictor is in or out. Small changes in the
+    data flip predictors in and out, so the \emph{selected model} is itself high-variance.
+    You have not removed the instability; you have moved it somewhere harder to see.
+  \end{warningbox}
+
+  \vspace{0.1cm}
+  \muted{\footnotesize This is the approach in \emph{FPP} \S7.5. Shrinkage replaces the
+  in-or-out decision with a continuous dial --- more stable, and easier to tune.}
 \end{frame}
 
 % =============================================================================
@@ -116,30 +93,19 @@
         \; + \; \lambda \sum_{j=1}^{k} \beta_j^2
     \]
   \end{definitionbox}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Behavior:}
-      \begin{itemize}\small\itemsep0pt
-        \item Shrinks all coefficients, none exactly to zero
-        \item $\lambda = 0$ is OLS; $\lambda \to \infty$ sends all
-              $\beta_j \to 0$
-        \item Handles correlated predictors gracefully --- splits the
-              coefficient between them
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \small \textbf{Use when} you believe most predictors carry
-        a little signal and you want to keep them all.
-      \end{keybox}
-      \vspace{0.1cm}
-      \begin{warningbox}
-        \footnotesize \textbf{Standardize first.} The penalty is not
-        scale-invariant --- dollars and thousands of dollars are penalized
-        differently.
-      \end{warningbox}
-    \end{column}
-  \end{columns}
+  Ridge shrinks every coefficient toward zero but sets none exactly to zero. At $\lambda = 0$
+  you have OLS; as $\lambda \to \infty$ all $\beta_j \to 0$. Its particular strength is
+  correlated predictors: rather than letting two collinear variables fight for the same
+  coefficient, it splits the effect between them.
+
+  \vspace{0.15cm}
+  \textbf{Use it when} you believe most predictors carry a little signal and you want to keep
+  them all.
+
+  \vspace{0.15cm}
+  \textbf{Standardize first.} The penalty is not scale-invariant --- a predictor measured in
+  dollars is penalized differently from the same predictor in thousands of dollars. Get this
+  wrong and the units decide which variables survive.
 \end{frame}
 
 % --- Slide: LASSO ------------------------------------------------------------
@@ -152,60 +118,48 @@
         \; + \; \lambda \sum_{j=1}^{k} |\beta_j|
     \]
   \end{definitionbox}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Behavior:}
-      \begin{itemize}\small\itemsep0pt
-        \item Sets some coefficients \textbf{exactly} to zero
-        \item Selection and estimation in one step
-        \item Yields a sparse, readable model --- valuable when you
-              must explain the forecast
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \small \textbf{Use when} you believe only a handful of predictors
-        genuinely matter and you want the model to tell you which.
-      \end{keybox}
-      \vspace{0.1cm}
-      \begin{warningbox}
-        \footnotesize Among correlated predictors LASSO keeps \emph{one}
-        arbitrarily and zeros the rest. Do not read the survivor as
-        ``the important one.''
-      \end{warningbox}
-    \end{column}
-  \end{columns}
+  Swap the squared penalty for an absolute one and the behavior changes qualitatively. LASSO
+  sets some coefficients \textbf{exactly} to zero, performing selection and estimation in a
+  single step, and leaving a sparse model you can actually read aloud to a stakeholder.
+
+  \vspace{0.15cm}
+  \textbf{Use it when} you believe only a handful of predictors genuinely matter and you want
+  the model to tell you which.
+
+  \vspace{0.15cm}
+  \textbf{But be careful what you conclude.} Among a group of highly correlated predictors,
+  LASSO keeps \emph{one} more or less arbitrarily and zeros the rest. The survivor is not
+  ``the important one'' --- it is the one that happened to win a coin toss between
+  near-identical variables.
 \end{frame}
 
 % --- Slide: Why LASSO zeros out ----------------------------------------------
 \begin{frame}{Why LASSO Zeros Out and Ridge Does Not}
-  Both solve ``minimize squared error subject to a budget on coefficient size.''
-  The shape of the budget is what differs.
+  Both solve ``minimize squared error subject to a budget on coefficient size.'' The
+  \emph{shape} of the budget is the whole difference.
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Ridge:} budget $\sum_j \beta_j^2 \le t$ --- a \textbf{circle}.
+      \textbf{Ridge:} $\sum_j \beta_j^2 \le t$ --- a \textbf{circle}
       \begin{itemize}\small\itemsep0pt
-        \item Smooth boundary with no corners
-        \item The contours of the squared-error surface almost never
-              touch it on an axis
-        \item So coefficients get small, but not zero
+        \item Smooth boundary, no corners
+        \item Error contours almost never touch it on an axis
+        \item So coefficients get small, never zero
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \textbf{LASSO:} budget $\sum_j |\beta_j| \le t$ --- a \textbf{diamond}.
+      \textbf{LASSO:} $\sum_j |\beta_j| \le t$ --- a \textbf{diamond}
       \begin{itemize}\small\itemsep0pt
         \item Corners sit exactly on the axes
-        \item Contours are very likely to first touch a corner
-        \item Touching a corner means $\beta_j = 0$ for that predictor
+        \item Contours are likely to hit a corner first
+        \item A corner means $\beta_j = 0$ exactly
       \end{itemize}
     \end{column}
   \end{columns}
-  \begin{keybox}
-    \small The sparsity of LASSO is a geometric accident of the $\ell_1$ ball
-    having corners --- not a statistical test of significance. A zeroed
-    coefficient means ``not worth its budget here,'' not ``proven irrelevant.''
-    See \textcite{James2021} \S6.2 for the full picture.
-  \end{keybox}
+
+  \vspace{0.2cm}
+  So the sparsity of LASSO is a geometric accident of the $\ell_1$ ball having corners --- not
+  a statistical test of significance. A zeroed coefficient means ``not worth its budget
+  here,'' not ``proven irrelevant.'' See \textcite{James2021} \S6.2.
 \end{frame}
 
 % --- Slide: Elastic Net ------------------------------------------------------
@@ -216,26 +170,17 @@
       \; + \; \lambda \left[ \alpha \sum_j |\beta_j|
       + (1-\alpha) \sum_j \beta_j^2 \right]
     \]
-    $\lambda$ sets the total penalty; $\alpha \in [0,1]$ sets the mix
-    ($\alpha=1$ is LASSO, $\alpha=0$ is Ridge).
+    $\lambda$ sets the total penalty; $\alpha \in [0,1]$ sets the mix ($\alpha=1$ is LASSO,
+    $\alpha=0$ is Ridge).
   \end{definitionbox}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Why the mix helps:}
-      \begin{itemize}\small\itemsep0pt
-        \item Keeps LASSO's ability to zero out predictors
-        \item Adds Ridge's \textbf{grouping effect}: correlated predictors
-              enter or leave together rather than one arbitrarily surviving
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \small \textbf{Forecasting default.} Lagged predictors are correlated
-        almost by construction --- $y_{t-1}$ and $y_{t-2}$ move together.
-        Elastic Net is usually the safer starting point over pure LASSO.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  The mix keeps LASSO's ability to zero out predictors while adding Ridge's \textbf{grouping
+  effect}: correlated predictors now enter or leave together instead of one surviving
+  arbitrarily.
+
+  \vspace{0.15cm}
+  \textbf{This is usually the right default for forecasting.} Lagged predictors are correlated
+  almost by construction --- $y_{t-1}$ and $y_{t-2}$ move together --- which is precisely the
+  situation where pure LASSO picks a winner at random and pure Ridge refuses to simplify.
 \end{frame}
 
 % =============================================================================
@@ -248,61 +193,40 @@
 
 % --- Slide: Regularization path ----------------------------------------------
 \begin{frame}{The Regularization Path}
-  Fit the model across a grid of $\lambda$ values and trace each coefficient.
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Reading the path, left to right:}
-      \begin{itemize}\small\itemsep0pt
-        \item At small $\lambda$: coefficients near their OLS values, model
-              is dense and unstable
-        \item As $\lambda$ grows: coefficients shrink; under LASSO they drop
-              to zero one by one
-        \item At large $\lambda$: only the most robust predictors survive
-        \item At $\lambda \to \infty$: intercept-only, the mean forecast
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \small The \textbf{order} in which predictors leave is informative:
-        the last survivors are the ones that hold up under the most pressure.
-        Report this ordering --- it is far more stable than a single
-        model's coefficient table.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  Fit the model across a grid of $\lambda$ values and trace each coefficient as it moves.
+
+  \vspace{0.15cm}
+  Read the path left to right. At small $\lambda$ the coefficients sit near their OLS values
+  and the model is dense and unstable. As $\lambda$ grows they shrink, and under LASSO they
+  drop to zero one at a time. At large $\lambda$ only the most robust predictors survive, and
+  in the limit you are left with the intercept --- the mean forecast.
+  \vspace{0.15cm}
+  \textbf{The order in which predictors leave is the useful output.} The last survivors are
+  the ones that hold up under the most pressure. Report that ordering rather than a single
+  model's coefficient table --- far more stable across resamples, and far more honest about
+  what the data can support.
 \end{frame}
 
 % --- Slide: Choosing lambda --------------------------------------------------
 \begin{frame}{Choosing $\lambda$ by Cross-Validation}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Procedure:}
-      \begin{enumerate}\small\itemsep0pt
-        \item Define a grid of $\lambda$, usually log-spaced
-        \item For each $\lambda$, run walk-forward CV and record mean
-              validation RMSE
-        \item Pick the $\lambda$ minimizing CV error
-        \item Refit on all training data at that $\lambda$
-      \end{enumerate}
-      \vspace{0.1cm}
-      \textbf{The one-standard-error rule:} choose the largest $\lambda$
-      whose CV error is within one standard error of the minimum ---
-      a simpler model at essentially the same accuracy.
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{warningbox}
-        \small \textbf{Never use \texttt{KFold} here.} Random folds put future
-        observations in the training set and past ones in validation. The CV
-        error will look excellent and the forecast will fail
-        \parencite{Bergmeir2018}.
-      \end{warningbox}
-      \vspace{0.1cm}
-      \begin{keybox}
-        \small Use \texttt{TimeSeriesSplit}, exactly as in Lecture 1's
-        walk-forward evaluation.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  $\lambda$ is not estimated from the model --- it is tuned, and how you tune it decides
+  whether the model generalizes.
+  \begin{enumerate}\small\itemsep0pt
+    \item Define a grid of $\lambda$, usually log-spaced
+    \item For each $\lambda$, run walk-forward CV and record the mean validation RMSE
+    \item Pick the $\lambda$ minimizing CV error, then refit on all training data
+  \end{enumerate}
+
+  \vspace{0.1cm}
+  \textbf{The one-standard-error rule} is worth knowing: rather than the outright minimum,
+  take the \emph{largest} $\lambda$ whose CV error is within one standard error of it. You
+  give up almost no accuracy and get a simpler, more stable model.
+  \begin{warningbox}
+    \textbf{Never use \texttt{KFold} here.} Random folds put future observations in the
+    training set and past ones in validation. The CV error will look excellent and the
+    forecast will fail \parencite{Bergmeir2018}. Use \texttt{TimeSeriesSplit}, exactly as in
+    Lecture 1's walk-forward evaluation.
+  \end{warningbox}
 \end{frame}
 
 % =============================================================================
@@ -314,38 +238,26 @@
 
 % --- Slide: Python -----------------------------------------------------------
 \begin{frame}{Regularization in Python}
-  \begin{columns}[T]
-    \begin{column}{0.54\textwidth}
-      \begin{examplebox}{Code Template}
-        {\scriptsize
-        \texttt{from sklearn.linear\_model import ElasticNetCV}\\
-        \texttt{from sklearn.pipeline import make\_pipeline}\\
-        \texttt{from sklearn.preprocessing import StandardScaler}\\
-        \texttt{from sklearn.model\_selection import TimeSeriesSplit}\\[2pt]
-        \texttt{model = make\_pipeline(}\\
-        \texttt{  StandardScaler(),}\\
-        \texttt{  ElasticNetCV(}\\
-        \texttt{    l1\_ratio=[.1, .5, .7, .9, .95, 1],}\\
-        \texttt{    cv=TimeSeriesSplit(n\_splits=5),}\\
-        \texttt{    random\_state=42))}\\[2pt]
-        \texttt{model.fit(X\_train, y\_train)}
-        }
-      \end{examplebox}
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \textbf{Notes:}
-      \begin{itemize}\footnotesize\itemsep0pt
-        \item \texttt{make\_pipeline} keeps scaling \emph{inside} each CV
-              fold --- scaling on the full sample leaks information
-        \item \texttt{l1\_ratio} is $\alpha$: the Ridge/LASSO mix
-        \item \texttt{...CV} variants tune $\lambda$; plain
-              \texttt{Ridge}/\texttt{Lasso} take it fixed
-        \item \texttt{lasso\_path()} returns the full path
-      \end{itemize}
-      \muted{\footnotesize \texttt{sklearn} calls the penalty
-      \texttt{alpha}, not \texttt{lambda}.}
-    \end{column}
-  \end{columns}
+  \begin{examplebox}{Code Template}
+    {\scriptsize
+    \texttt{from sklearn.linear\_model import ElasticNetCV}\\
+    \texttt{from sklearn.pipeline import make\_pipeline}\\
+    \texttt{from sklearn.preprocessing import StandardScaler}\\
+    \texttt{from sklearn.model\_selection import TimeSeriesSplit}\\[2pt]
+    \texttt{model = make\_pipeline(StandardScaler(),}\\
+    \texttt{\ \ ElasticNetCV(l1\_ratio=[.1,.5,.7,.9,.95,1],}\\
+    \texttt{\ \ \ cv=TimeSeriesSplit(5), random\_state=42)).fit(X\_tr, y\_tr)}
+    }
+  \end{examplebox}
+  \texttt{make\_pipeline} is the part that matters: it keeps standardization \emph{inside}
+  each CV fold. Scale on the full sample and you have leaked the validation set into
+  training, and your CV error is optimistic.
+
+  \texttt{l1\_ratio} is $\alpha$, the Ridge/LASSO mix; the \texttt{...CV} variants tune
+  $\lambda$ for you.
+
+  \muted{\footnotesize \texttt{sklearn} calls the penalty \texttt{alpha}, not
+  \texttt{lambda}.}
 \end{frame}
 
 % =============================================================================
@@ -372,13 +284,12 @@
     \end{tabular}
     }
   \end{center}
-  \begin{keybox}
-    \small \textbf{Connection to Lecture 5.} Trees and shrinkage solve the same
-    problem in different geometries. XGBoost's \texttt{reg\_lambda} is
-    literally a Ridge penalty on leaf weights, and its \texttt{gamma} penalizes
-    leaf count the way LASSO penalizes nonzero coefficients. Regularization is
-    not a linear-model topic --- it is how every flexible model is kept honest.
-  \end{keybox}
+  \vspace{0.15cm}
+  \textbf{Connection to Lecture 5.} Trees and shrinkage solve the same problem in different
+  geometries. XGBoost's \texttt{reg\_lambda} is literally a Ridge penalty on leaf weights,
+  and its \texttt{gamma} penalizes leaf count the way LASSO penalizes nonzero coefficients.
+  Regularization is not a linear-model topic --- it is how every flexible model is kept
+  honest.
 \end{frame}
 
 % --- Slide: Key takeaways ---------------------------------------------------

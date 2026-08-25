@@ -41,28 +41,15 @@ Feature engineering gives us more predictors than we can safely estimate. Someth
 
 ## Why Regularize?
 
-OLS minimizes $\sum_{i}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2$.
+OLS minimizes $\sum_{i}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2$. A weekly model with lags, calendar dummies, promotions, and macro series can easily carry $k = 60$ predictors on $n = 150$ observations — OLS will fit that sample beautifully and forecast badly.
 
-A weekly model with lags, calendar dummies, promotions, and macro series can easily carry $k = 60$ predictors on $n = 150$ observations — OLS will fit that sample beautifully and forecast badly.
+Three things go wrong at once. The variance of $\hat{\boldsymbol{\beta}}$ grows with $k$. Correlated predictors produce unstable, wildly large coefficients with opposing signs. And once $k > n$ there is no unique solution at all.
 
-:::: {.columns}
-::: {.column width="52%"}
-**What goes wrong:**
-
-- Variance of $\hat{\boldsymbol{\beta}}$ grows with $k$
-- Correlated predictors give unstable, wildly large coefficients with opposing signs
-- When $k > n$ there is no unique solution at all
-:::
-::: {.column width="44%"}
-::: {.keybox}
-**Regularization:** add a penalty on coefficient size,
+**Regularization** adds a penalty on coefficient size:
 
 $$\underbrace{\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}$$
 
-Accept a little bias to buy a large reduction in variance.
-:::
-:::
-::::
+You accept a little bias to buy a large reduction in variance — and for a forecast, that trade is almost always worth making.
 
 ---
 
@@ -70,35 +57,13 @@ Accept a little bias to buy a large reduction in variance.
 
 Before shrinkage, the standard approach was to *count* predictors rather than shrink them [@Guyon2003].
 
-:::: {.columns}
-::: {.column width="50%"}
-**Best subset:**
-
-- Fit all $2^k$ models, pick the best
-- Exact — hopeless past $k \approx 30$
-
-**Stepwise:**
-
-- Forward: add the best predictor, repeat
-- Backward: start full, drop the weakest, repeat
-- Greedy — can miss the best combination
-:::
-::: {.column width="46%"}
-**Chosen by:** adjusted $R^2$, AIC, AICc, BIC, or CV.
+**Best subset** fits all $2^k$ models and picks the winner — exact, and computationally hopeless past $k \approx 30$. **Stepwise** adds the strongest predictor or drops the weakest, one at a time; it is greedy, and can miss the best combination entirely. Either way the choice is made by adjusted $R^2$, AIC, AICc, BIC, or CV.
 
 ::: {.warningbox}
-Subset selection is **discrete** — in or out. Small data changes flip predictors in and out, so the selected model is itself high-variance.
+Subset selection is **discrete** — a predictor is in or out. Small changes in the data flip predictors in and out, so the *selected model* is itself high-variance. You have not removed the instability; you have moved it somewhere harder to see.
 :::
-:::
-::::
 
 [This is the approach in *FPP* §7.5. Shrinkage replaces the in-or-out decision with a continuous dial — more stable, and easier to tune.]{.neutral .smaller}
-
----
-
-# Shrinkage Methods
-
-Keep every predictor, but pull its coefficient toward zero.
 
 ---
 
@@ -111,24 +76,11 @@ Ridge [@HoerlKennard1970]
 $$\hat{\boldsymbol{\beta}}^{\text{ridge}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{k} \beta_j^2$$
 :::
 
-:::: {.columns}
-::: {.column width="52%"}
-**Behavior:**
+Ridge shrinks every coefficient toward zero but sets none exactly to zero. At $\lambda = 0$ you have OLS; as $\lambda \to \infty$ all $\beta_j \to 0$. Its particular strength is correlated predictors: rather than letting two collinear variables fight for the same coefficient, it splits the effect between them.
 
-- Shrinks all coefficients, none exactly to zero
-- $\lambda = 0$ is OLS; $\lambda \to \infty$ sends all $\beta_j \to 0$
-- Handles correlated predictors gracefully — splits the coefficient between them
-:::
-::: {.column width="44%"}
-::: {.keybox}
-**Use when** you believe most predictors carry a little signal and you want to keep them all.
-:::
+**Use it when** you believe most predictors carry a little signal and you want to keep them all.
 
-::: {.warningbox}
-**Standardize first.** The penalty is not scale-invariant — dollars and thousands of dollars are penalized differently.
-:::
-:::
-::::
+**Standardize first.** The penalty is not scale-invariant — a predictor measured in dollars is penalized differently from the same predictor in thousands of dollars. Get this wrong and the units decide which variables survive.
 
 ---
 
@@ -141,51 +93,36 @@ LASSO [@Tibshirani1996]
 $$\hat{\boldsymbol{\beta}}^{\text{lasso}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{k} |\beta_j|$$
 :::
 
-:::: {.columns}
-::: {.column width="52%"}
-**Behavior:**
+Swap the squared penalty for an absolute one and the behavior changes qualitatively. LASSO sets some coefficients **exactly** to zero, performing selection and estimation in a single step, and leaving a sparse model you can actually read aloud to a stakeholder.
 
-- Sets some coefficients **exactly** to zero
-- Selection and estimation in one step
-- Yields a sparse, readable model — valuable when you must explain the forecast
-:::
-::: {.column width="44%"}
-::: {.keybox}
-**Use when** you believe only a handful of predictors genuinely matter and you want the model to tell you which.
-:::
+**Use it when** you believe only a handful of predictors genuinely matter and you want the model to tell you which.
 
-::: {.warningbox}
-Among correlated predictors LASSO keeps *one* arbitrarily and zeros the rest. Do not read the survivor as "the important one."
-:::
-:::
-::::
+**But be careful what you conclude.** Among a group of highly correlated predictors, LASSO keeps *one* more or less arbitrarily and zeros the rest. The survivor is not "the important one" — it is the one that happened to win a coin toss between near-identical variables.
 
 ---
 
 ## Why LASSO Zeros Out and Ridge Does Not
 
-Both solve "minimize squared error subject to a budget on coefficient size." The shape of the budget is what differs.
+Both solve "minimize squared error subject to a budget on coefficient size." The *shape* of the budget is the whole difference.
 
 :::: {.columns}
 ::: {.column width="48%"}
-**Ridge:** budget $\sum_j \beta_j^2 \le t$ — a **circle**.
+**Ridge:** $\sum_j \beta_j^2 \le t$ — a **circle**
 
-- Smooth boundary with no corners
-- The contours of the squared-error surface almost never touch it on an axis
-- So coefficients get small, but not zero
+- Smooth boundary, no corners
+- Error contours almost never touch it on an axis
+- So coefficients get small, never zero
 :::
 ::: {.column width="48%"}
-**LASSO:** budget $\sum_j |\beta_j| \le t$ — a **diamond**.
+**LASSO:** $\sum_j |\beta_j| \le t$ — a **diamond**
 
 - Corners sit exactly on the axes
-- Contours are very likely to first touch a corner
-- Touching a corner means $\beta_j = 0$ for that predictor
+- Contours are likely to hit a corner first
+- A corner means $\beta_j = 0$ exactly
 :::
 ::::
 
-::: {.keybox}
-The sparsity of LASSO is a geometric accident of the $\ell_1$ ball having corners — not a statistical test of significance. A zeroed coefficient means "not worth its budget here," not "proven irrelevant." See @James2021 §6.2.
-:::
+So the sparsity of LASSO is a geometric accident of the $\ell_1$ ball having corners — not a statistical test of significance. A zeroed coefficient means "not worth its budget here," not "proven irrelevant." See @James2021 §6.2.
 
 ---
 
@@ -200,86 +137,40 @@ $$\sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2 + \lambda \left[ \alph
 $\lambda$ sets the total penalty; $\alpha \in [0,1]$ sets the mix ($\alpha=1$ is LASSO, $\alpha=0$ is Ridge).
 :::
 
-:::: {.columns}
-::: {.column width="52%"}
-**Why the mix helps:**
+The mix keeps LASSO's ability to zero out predictors while adding Ridge's **grouping effect**: correlated predictors now enter or leave together instead of one surviving arbitrarily.
 
-- Keeps LASSO's ability to zero out predictors
-- Adds Ridge's **grouping effect**: correlated predictors enter or leave together rather than one arbitrarily surviving
-:::
-::: {.column width="44%"}
-::: {.keybox}
-**Forecasting default.** Lagged predictors are correlated almost by construction — $y_{t-1}$ and $y_{t-2}$ move together. Elastic Net is usually safer than pure LASSO.
-:::
-:::
-::::
-
----
-
-# Choosing the Penalty
-
-$\lambda$ is not estimated from the model. It is tuned — and how you tune it decides whether the model generalizes.
+**This is usually the right default for forecasting.** Lagged predictors are correlated almost by construction — $y_{t-1}$ and $y_{t-2}$ move together — which is precisely the situation where pure LASSO picks a winner at random and pure Ridge refuses to simplify.
 
 ---
 
 ## The Regularization Path
 
-Fit the model across a grid of $\lambda$ values and trace each coefficient.
+Fit the model across a grid of $\lambda$ values and trace each coefficient as it moves.
 
-:::: {.columns}
-::: {.column width="52%"}
-**Reading the path, left to right:**
+Read the path left to right. At small $\lambda$ the coefficients sit near their OLS values and the model is dense and unstable. As $\lambda$ grows they shrink, and under LASSO they drop to zero one at a time. At large $\lambda$ only the most robust predictors survive, and in the limit you are left with the intercept — the mean forecast.
 
-- At small $\lambda$: coefficients near their OLS values, model is dense and unstable
-- As $\lambda$ grows: coefficients shrink; under LASSO they drop to zero one by one
-- At large $\lambda$: only the most robust predictors survive
-- At $\lambda \to \infty$: intercept-only, the mean forecast
-:::
-::: {.column width="44%"}
-::: {.keybox}
-The **order** in which predictors leave is informative: the last survivors are the ones that hold up under the most pressure. Report this ordering — it is far more stable than a single model's coefficient table.
-:::
-:::
-::::
+**The order in which predictors leave is the useful output.** The last survivors are the ones that hold up under the most pressure. Report that ordering rather than a single model's coefficient table — far more stable across resamples, and far more honest about what the data can support.
 
 ---
 
 ## Choosing $\lambda$ by Cross-Validation
 
-:::: {.columns}
-::: {.column width="52%"}
-**Procedure:**
+$\lambda$ is not estimated from the model — it is tuned, and how you tune it decides whether the model generalizes.
 
 1. Define a grid of $\lambda$, usually log-spaced
-2. For each $\lambda$, run walk-forward CV and record mean validation RMSE
-3. Pick the $\lambda$ minimizing CV error
-4. Refit on all training data at that $\lambda$
+2. For each $\lambda$, run walk-forward CV and record the mean validation RMSE
+3. Pick the $\lambda$ minimizing CV error, then refit on all training data
 
-**The one-standard-error rule:** choose the largest $\lambda$ whose CV error is within one standard error of the minimum — a simpler model at essentially the same accuracy.
-:::
-::: {.column width="44%"}
+**The one-standard-error rule** is worth knowing: rather than the outright minimum, take the *largest* $\lambda$ whose CV error is within one standard error of it. You give up almost no accuracy and get a simpler, more stable model.
+
 ::: {.warningbox}
-**Never use `KFold` here.** Random folds put future observations in the training set and past ones in validation. The CV error will look excellent and the forecast will fail [@Bergmeir2018].
+**Never use `KFold` here.** Random folds put future observations in the training set and past ones in validation. The CV error will look excellent and the forecast will fail [@Bergmeir2018]. Use `TimeSeriesSplit`, exactly as in Lecture 1's walk-forward evaluation.
 :::
-
-::: {.keybox}
-Use `TimeSeriesSplit`, exactly as in Lecture 1's walk-forward evaluation.
-:::
-:::
-::::
-
----
-
-# In Practice
-
-Standardize, tune on a time-aware split, and read the path.
 
 ---
 
 ## Regularization in Python
 
-:::: {.columns}
-::: {.column width="54%"}
 ::: {.examplebox}
 ::: {.examplebox-title}
 Code Template
@@ -292,28 +183,17 @@ from sklearn.model_selection import TimeSeriesSplit
 
 model = make_pipeline(
     StandardScaler(),
-    ElasticNetCV(
-        l1_ratio=[.1, .5, .7, .9, .95, 1],
-        cv=TimeSeriesSplit(n_splits=5),
-        random_state=42
-    )
-)
-
-model.fit(X_train, y_train)
+    ElasticNetCV(l1_ratio=[.1, .5, .7, .9, .95, 1],
+                 cv=TimeSeriesSplit(5), random_state=42)
+).fit(X_train, y_train)
 ```
 :::
-:::
-::: {.column width="42%"}
-**Notes:**
 
-- `make_pipeline` keeps scaling *inside* each CV fold — scaling on the full sample leaks information
-- `l1_ratio` is $\alpha$: the Ridge/LASSO mix
-- `...CV` variants tune $\lambda$; plain `Ridge`/`Lasso` take it fixed
-- `lasso_path()` returns the full path
+`make_pipeline` is the part that matters: it keeps standardization *inside* each CV fold. Scale on the full sample and you have leaked the validation set into training, and your CV error is optimistic.
+
+`l1_ratio` is $\alpha$, the Ridge/LASSO mix; the `...CV` variants tune $\lambda$ for you.
 
 [`sklearn` calls the penalty `alpha`, not `lambda`.]{.neutral .smaller}
-:::
-::::
 
 ---
 
@@ -333,9 +213,7 @@ Shrinkage is the linear-model counterpart to what trees do by pruning.
 | LASSO | $\ell_1$ | yes | Few predictors truly matter |
 | Elastic Net | both | yes | Many *correlated* predictors |
 
-::: {.keybox}
 **Connection to Lecture 5.** Trees and shrinkage solve the same problem in different geometries. XGBoost's `reg_lambda` is literally a Ridge penalty on leaf weights, and its `gamma` penalizes leaf count the way LASSO penalizes nonzero coefficients. Regularization is not a linear-model topic — it is how every flexible model is kept honest.
-:::
 
 ---
 

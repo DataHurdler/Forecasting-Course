@@ -43,24 +43,18 @@ Averaging many imperfect models can outperform any single model.
 
 ## The Wisdom of Crowds
 
-A single expert can be wrong. But average many independent estimates and errors tend to cancel out.
+A single expert can be wrong. Average many *independent* estimates and the errors tend to cancel.
 
 ::: {.examplebox}
 ::: {.examplebox-title}
 Classic Example: Guessing the Ox's Weight
 :::
-At a 1907 county fair, 800 people guessed the weight of an ox. No individual was very accurate. But the **average of all 800 guesses** was within 1 pound of the true weight.
+At a 1907 county fair, 800 people guessed the weight of an ox. No individual was very accurate — but the **average of all 800 guesses** came within one pound of the true weight.
 :::
 
-**The same principle applies to models:**
+The same principle transfers directly to models. A single decision tree is unstable and noisy — that was Lecture 4's closing complaint. Train many trees on different versions of the data and average them, and the noise largely cancels while the signal survives.
 
-- A single decision tree is unstable and noisy (high variance)
-- Average many trees trained on different versions of the data and the noise cancels out
-- The combined forecast is far more stable than any individual tree
-
-::: {.keybox}
-**Ensembles work because:** independent errors tend to cancel. The more independent (uncorrelated) the individual predictions, the more variance is reduced by averaging.
-:::
+**Ensembles work because independent errors cancel.** And that word is doing real work: the *more independent* the individual predictions, the more variance averaging removes. Hold onto it — the entire difference between bagging and random forests turns on it.
 
 ---
 
@@ -76,57 +70,32 @@ Train many trees on bootstrap samples; average their predictions.
 
 **Bagging solution [@Breiman1996]:**
 
-1. Draw $B$ **bootstrap samples** from the training data (sample with replacement, same size as original)
-2. Fit one deep decision tree on each bootstrap sample
-3. **Average** all $B$ predictions:
+1. Draw $B$ **bootstrap samples** (with replacement, same size as the original)
+2. Fit one deep decision tree on each
+3. **Average** all $B$ predictions: $\hat{y}_{\text{bag}} = \tfrac{1}{B}\sum_{b=1}^{B} \hat{f}^{(b)}(\mathbf{x})$
 
-$$\hat{y}_{\text{bag}} = \frac{1}{B}\sum_{b=1}^{B} \hat{f}^{(b)}(\mathbf{x})$$
+**Why it works.** The variance of the averaged forecast is
 
-:::: {.columns}
-::: {.column width="52%"}
-**Why does this work?**
+$$\mathrm{Var}(\bar{f}) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2,$$
 
-$$\text{Var}(\bar{f}) = \rho\sigma^2 + \frac{1-\rho}{B}\sigma^2$$
+where $\rho$ is the pairwise correlation between tree predictions. The second term shrinks as $B$ grows — so more trees never hurts. But the first term does not move at all.
 
-where $\rho$ = pairwise prediction correlation. As $B \to \infty$, variance $\to \rho\sigma^2$.
-:::
-::: {.column width="44%"}
-::: {.keybox}
-**Key insight:** more trees always helps (never hurts). The variance floor is $\rho\sigma^2$ — determined by how correlated the trees are, not by the number of trees.
-:::
-:::
-::::
+**That leaves a floor at $\rho\sigma^2$**, set by how alike the trees are rather than by how many you grow. Averaging a thousand nearly identical trees buys you almost nothing, and that is the problem the next section solves.
 
 ---
 
 ## Out-of-Bag (OOB) Error: Free Cross-Validation
 
-Each bootstrap sample uses about **63%** of the training observations. The **out-of-bag (OOB)** observations are those *not* in a given bootstrap sample.
+Each bootstrap sample draws $n$ observations *with replacement*, so it contains about **63%** of the distinct training points. The remaining 37% are **out-of-bag** for that tree — a free test set, different for every tree:
 
-:::: {.columns}
-::: {.column width="52%"}
-**OOB error estimate:**
+1. For each observation $i$, collect predictions only from the trees where $i$ was out-of-bag
+2. Average them to get $\hat{y}_i^{\text{OOB}}$
+3. Compute the RMSE across all observations
 
-1. For each observation $i$, collect predictions from all trees where $i$ was NOT in the bootstrap sample (~37% of all trees)
-2. Average those predictions → $\hat{y}_i^{\text{OOB}}$
-3. Compute RMSE across all observations: OOB RMSE ≈ 5-fold CV RMSE
-:::
-::: {.column width="44%"}
-::: {.keybox}
-OOB error is essentially **free cross-validation**. No need to set aside a separate validation set or run CV.
+Every one of those predictions came from a tree that never saw the observation — so the OOB RMSE is an honest out-of-sample estimate, and it lands close to 5-fold CV without refitting anything. In `sklearn` it is one argument: `RandomForestRegressor(oob_score=True)`.
 
-```python
-RandomForestRegressor(oob_score=True)
-```
-:::
-:::
-::::
-
-::: {.examplebox}
-::: {.examplebox-title}
-Practical Tip
-:::
-With large datasets, OOB error is very close to 5-fold CV. With small datasets (< 1000 obs.), use CV — OOB may be noisy.
+::: {.warningbox}
+Below about 1,000 observations the OOB estimate gets noisy, because each observation is out-of-bag for too few trees. On a weekly business series — a few hundred rows — use proper walk-forward CV instead.
 :::
 
 ---
@@ -139,46 +108,31 @@ Restrict each split to a random subset of features so trees are less alike.
 
 ## The Problem Bagging Does Not Fully Solve
 
-Recall: $\text{Var}(\bar{f}) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2$
-
-Even with many trees, the variance floor is $\rho\sigma^2$ — determined by how *correlated* the trees are.
+Recall the variance of the averaged forecast: $\mathrm{Var}(\bar{f}) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2$. More trees shrink the second term to nothing. The first term never moves.
 
 ::: {.warningbox}
-**The correlation problem:** if one feature strongly dominates (e.g., last year's sales always gives the best first split), then almost all trees use that feature at the root. The trees end up highly correlated ($\rho$ stays large), and bagging provides little variance reduction.
+**The correlation problem.** If one feature dominates — and in forecasting it always does, because last year's value is the best single predictor — then nearly every tree splits on it at the root. The trees end up near-identical, $\rho$ stays large, and bagging buys you very little.
 :::
 
-**Random Forest solution [@Breiman2001]:** at each split, randomly sample only $m < p$ features and find the best split *among those $m$* only.
+**The Random Forest fix [@Breiman2001]** is almost absurdly simple: at each split, consider only a random subset of $m < p$ features, and take the best split among *those*.
 
-::: {.keybox}
-Random feature subsampling **forces diversity** among trees: the dominant feature cannot always be chosen, so trees take different paths ⟹ lower $\rho$ ⟹ lower ensemble variance.
-:::
+Sometimes the dominant feature is not in the candidate set, so the tree is forced to find its second-best story. Across hundreds of trees that produces genuinely different structures — $\rho$ falls, and the floor falls with it. You deliberately make each individual tree *worse* in order to make the ensemble better.
 
 ---
 
 ## Random Forest Hyperparameters
 
 | Parameter | sklearn name | Default | Effect |
-|-----------|-------------|---------|--------|
-| Number of trees | `n_estimators` | 100 | More = lower variance; plateau after ~500 |
+|-----------|--------------|---------|--------|
+| Number of trees | `n_estimators` | 100 | More = lower variance; plateaus ~500 |
 | Max features/split | `max_features` | `'sqrt'` | Lower = more decorrelated |
-| Max depth | `max_depth` | None | None = full tree; limit to reduce memory |
+| Max depth | `max_depth` | None | Limit only to reduce memory |
 | Min samples/leaf | `min_samples_leaf` | 1 | Higher = smoother predictions |
-| OOB score | `oob_score` | False | Set True for free CV error |
+| OOB score | `oob_score` | False | `True` gives a free CV estimate |
 
-:::: {.columns}
-::: {.column width="52%"}
-**Recommended starting point:**
+**Start with** `n_estimators=500`, `max_features='sqrt'`, `min_samples_leaf=5`, `oob_score=True`. Note how few genuinely need tuning — `max_features` is the dial controlling $\rho$, and the rest is close to fire-and-forget. That is most of why random forests make a good default.
 
-- `n_estimators=500`, `max_features='sqrt'`
-- `min_samples_leaf=5` for smooth time series predictions
-- `oob_score=True` to monitor without separate CV
-:::
-::: {.column width="44%"}
-::: {.warningbox}
-Set `random_state=42` for reproducibility. Random forests use randomness in both bootstrap sampling and feature selection.
-:::
-:::
-::::
+[Set `random_state=42`: a forest is random twice over, in the bootstrap samples and in the feature subsets.]{.neutral .smaller}
 
 ---
 
@@ -194,39 +148,24 @@ Which predictors matter most? RF gives a data-driven answer.
 ::: {.definitionbox-title}
 Mean Decrease in Impurity (MDI)
 :::
-For each feature $j$: average the total reduction in node impurity (variance for regression) across all splits on feature $j$, weighted by the fraction of observations in each node. Normalize to sum to 1.
+For each feature $j$, average the total reduction in node impurity across every split on $j$, weighted by the fraction of observations reaching that node. Normalize to sum to 1.
 :::
 
-:::: {.columns}
-::: {.column width="52%"}
-**Example: retail sales RF**
+| Feature (CA_1 FOODS, weekly) | Importance |
+|------------------------------|-----------|
+| `units_lag4` | 0.45 |
+| `units_lag1` | 0.18 |
+| `units_lag52` | 0.11 |
+| `snap_days` | 0.08 |
+| `units_lag2` | 0.04 |
+| `avg_price` | 0.04 |
 
-| Feature | Importance |
-|---------|-----------|
-| Lag 12 (same month last year) | 0.38 |
-| Lag 1 (previous month) | 0.24 |
-| Rolling mean (12m) | 0.15 |
-| Lag 2 | 0.10 |
-| December dummy | 0.08 |
-| Unemployment rate | 0.05 |
-:::
-::: {.column width="44%"}
-::: {.keybox}
-RF importance aggregates across **hundreds of trees**. It is more stable than a single tree's importance.
-:::
-
-::: {.warningbox}
-MDI can be biased toward high-cardinality features. Use **permutation importance** (`inspection.permutation_importance`) for a less biased measure on the test set.
-:::
-:::
-::::
+Read it as a screening device, not an explanation. **MDI is biased** toward features with many split points. `permutation_importance` — shuffle a column, see how much accuracy falls — is the honest alternative.
 
 ---
 
 ## Random Forest in Python
 
-:::: {.columns}
-::: {.column width="52%"}
 ::: {.examplebox}
 ::: {.examplebox-title}
 sklearn Code Template
@@ -234,35 +173,23 @@ sklearn Code Template
 ```python
 from sklearn.ensemble import RandomForestRegressor
 
-rf = RandomForestRegressor(
-    n_estimators=500,
-    max_features='sqrt',
-    min_samples_leaf=5,
-    oob_score=True,
-    random_state=42
-)
-rf.fit(X_train, y_train)
-
-# OOB error (free CV)
-print(f"OOB R²: {rf.oob_score_:.3f}")
-
-# Feature importance
+rf = RandomForestRegressor(n_estimators=500, max_features='sqrt',
+                           min_samples_leaf=5, oob_score=True,
+                           random_state=42).fit(X_tr, y_tr)
+print(rf.oob_score_)
 importances = rf.feature_importances_
 ```
 :::
-:::
-::: {.column width="44%"}
-**Typical performance on RSXFS:**
 
-| Model | Test RMSE |
-|-------|----------|
-| Seasonal naïve | ~3,800 |
-| Single deep tree | ~2,900 |
-| Random Forest | ~1,800 |
+| Model (CA_1 FOODS, 52-week test) | Test RMSE |
+|----------------------------------|-----------|
+| Seasonal naïve | 1,660 |
+| Single deep tree | 1,415 |
+| **Random Forest** | **1,020** |
 
-[RF reduces RMSE by ~35–40% vs. a single tree on this dataset.]{.neutral .smaller}
-:::
-::::
+The forest cuts RMSE roughly **28%** against a single deep tree, and is the first method in this course to beat the seasonal naive benchmark on this series.
+
+[What changed is not a better model of the series but a richer feature set — lags, price, and SNAP days are information ETS and ARIMA never had.]{.neutral .smaller}
 
 ---
 
@@ -279,32 +206,21 @@ Instead of averaging independent trees, fit each new tree to the errors of all p
 **Bagging (Random Forest):**
 
 - Trees built **in parallel**, independently
-- Each tree tries to predict $y$ directly
-- Average reduces variance
-- Adding more trees does not reduce bias
+- Each tree predicts $y$ directly
+- Averaging reduces *variance*
+- More trees never reduces bias
 :::
 ::: {.column width="48%"}
 **Boosting:**
 
 - Trees built **sequentially**
-- Each tree fits the *errors* of the previous ensemble
-- Adding more trees reduces both bias AND variance (carefully)
-- Risk: can overfit if trees are too deep or too many
+- Each fits the *errors* of the ensemble so far
+- Reduces *bias* as well as variance
+- Will overfit if trees are too deep or too many
 :::
 ::::
 
-::: {.examplebox}
-::: {.examplebox-title}
-Analogy: Correcting a Forecast Iteratively
-:::
-Forecast 1: "Sales will be \$50,000." &emsp; Actual: \$60,000. &emsp; Error: +\$10,000.
-
-Forecast 2: "The first model was short by \$10,000."
-
-Combined prediction: \$50,000 + \$10,000 = **\$60,000**.
-
-Each stage corrects the remaining error from all previous stages.
-:::
+**The intuition.** Forecast 1 says \$50,000; actual is \$60,000, so the error is +\$10,000. Forecast 2 does not predict sales at all — it predicts *that error*, and says "the first model was short by \$10,000." Add them: \$60,000. Each stage corrects what remains, which is why boosting can fix a systematic bias that averaging never touches.
 
 ---
 
@@ -312,35 +228,20 @@ Each stage corrects the remaining error from all previous stages.
 
 ::: {.definitionbox}
 ::: {.definitionbox-title}
-Gradient Boosting (for squared-error loss)
+Gradient Boosting (squared-error loss)
 :::
 Initialize $F_0(\mathbf{x}) = \bar{y}$. For $b = 1, \ldots, B$:
 
 1. Compute residuals: $r_i^{(b)} = y_i - F_{b-1}(\mathbf{x}_i)$
-2. Fit a **shallow tree** $T_b$ to the residuals $\{(\mathbf{x}_i, r_i^{(b)})\}$
+2. Fit a shallow tree $T_b$ to $\{(\mathbf{x}_i, r_i^{(b)})\}$
 3. Update: $F_b = F_{b-1} + \eta\, T_b$
 
 Final prediction: $\hat{y} = F_B(\mathbf{x})$
 :::
 
-:::: {.columns}
-::: {.column width="52%"}
-**The learning rate $\eta$:**
+The trees are deliberately **shallow** — depth 3 to 6 — because each one only has to capture a small piece of the remaining error. The ensemble converges slowly and on purpose.
 
-- Small $\eta$ (0.01–0.1): each tree makes a tiny step — requires many trees but more robust
-- Large $\eta$ (> 0.3): fast but risky — can overshoot
-- **Rule:** smaller $\eta$ + more trees + early stopping typically wins
-:::
-::: {.column width="44%"}
-::: {.keybox}
-Trees are **shallow** (depth 3–6). Each corrects a small fraction of the total error. The ensemble slowly converges to a good prediction.
-:::
-
-::: {.warningbox}
-Always use **early stopping** on a validation set. Without it, boosting will overfit.
-:::
-:::
-::::
+**The learning rate $\eta$ is the main dial.** Small values (0.01–0.1) take a tiny step per tree: slower, needs more trees, far more robust. Large values ($> 0.3$) move fast and risk overshooting. The reliable recipe is a small $\eta$, many trees, and **early stopping** — without which boosting will happily fit your noise.
 
 ---
 
@@ -350,35 +251,15 @@ Three improvements over vanilla boosting: second-order optimization, explicit re
 
 ---
 
-## XGBoost: Three Advances
+## XGBoost: Three Advances [@Chen2016]
 
-::: {.interpretation}
-*XGBoost dominated Kaggle competitions from 2014–2018. It consistently outperforms vanilla gradient boosting on tabular data [@Chen2016].*
-:::
+1. **Newton step (second-order optimization).** Uses the gradient *and* the curvature of the loss to choose each tree's direction, so it converges in fewer trees than first-order boosting.
+2. **Explicit regularization.** Penalizes the number of leaves ($\gamma$) and the magnitude of leaf weights ($\lambda$) directly in the objective — so overfitting is controlled by the loss function rather than only by early stopping.
+3. **Column subsampling.** Borrowed straight from random forests: sample features per tree and per split, decorrelating the ensemble.
 
-:::: {.columns}
-::: {.column width="56%"}
-1. **Newton step (2nd-order optimization):** Uses the gradient *and* curvature (Hessian) of the loss function. Converges faster than first-order boosting.
+Notice that the second advance is *exactly* the Ridge and LASSO idea from next week, applied to leaf weights instead of regression coefficients. `reg_lambda` is an $\ell_2$ penalty; `gamma` penalizes complexity the way $\ell_1$ does.
 
-2. **Explicit regularization:** Penalizes the number of leaves ($\gamma$) and the magnitude of leaf weights ($\lambda$) directly in the objective. Guards against overfitting without relying on early stopping alone.
-
-3. **Column subsampling:** Like Random Forests, randomly samples features per tree and per split. Reduces correlation and improves generalization.
-:::
-::: {.column width="40%"}
-::: {.keybox}
-Newton step ⟹ more precise gradient direction.
-
-Regularization ⟹ guards against overfitting.
-
-Together: XGBoost outperforms vanilla GBM on most benchmarks.
-:::
-
-**Other popular options:**
-
-- `LightGBM` — faster on large datasets
-- `CatBoost` — handles categorical features natively
-:::
-::::
+[XGBoost dominated Kaggle tabular competitions from 2014–2018. `LightGBM` is faster on large data; `CatBoost` handles categoricals natively.]{.neutral .smaller}
 
 ---
 
@@ -401,43 +282,23 @@ Together: XGBoost outperforms vanilla GBM on most benchmarks.
 
 ## XGBoost in Python
 
-:::: {.columns}
-::: {.column width="52%"}
 ::: {.examplebox}
 ::: {.examplebox-title}
 Code Template
 :::
 ```python
-import xgboost as xgb
-
-model = xgb.XGBRegressor(
-    n_estimators=1000,
-    learning_rate=0.05,
-    max_depth=4,
-    subsample=0.8,
-    colsample_bytree=0.8,
-    early_stopping_rounds=50,
-    random_state=42
-)
-
-model.fit(
-    X_train, y_train,
-    eval_set=[(X_val, y_val)],
-    verbose=False
-)
+model = xgb.XGBRegressor(n_estimators=1000, learning_rate=0.05,
+                         max_depth=4, subsample=0.8, colsample_bytree=0.8,
+                         early_stopping_rounds=50, random_state=42)
+model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
 ```
 :::
-:::
-::: {.column width="44%"}
-**Cross-validation for time series:**
 
-- Use `TimeSeriesSplit` with the sklearn API
-- Reserve last 20% of data as final test set
-- `early_stopping_rounds=50`: stops training when validation RMSE does not improve for 50 consecutive rounds
+`eval_set` is what makes `early_stopping_rounds` work: XGBoost watches validation RMSE and halts when it stops improving, which is how you get away with setting `n_estimators` far higher than you need.
 
-[Typical RSXFS result: XGBoost RMSE ≈ 1,500–1,700 (vs. RF ≈ 1,800)]{.neutral .smaller}
-:::
-::::
+**The validation set must respect time.** Build it with `TimeSeriesSplit` and hold out the final stretch as a true test set.
+
+[On macOS `xgboost` also needs OpenMP: `brew install libomp`, or the import fails.]{.neutral .smaller}
 
 ---
 
@@ -449,29 +310,16 @@ Bagging reduces variance; boosting reduces bias. Together they cover most of wha
 
 ## Tree Methods: Which One When
 
-| Method | Training | Interpretable | Tuning | Typical accuracy |
-|--------|----------|--------------|--------|-----------------|
+| Method | Training | Interpretable | Tuning | Accuracy |
+|--------|----------|--------------|--------|----------|
 | Decision Tree | Single tree | High | Low | Baseline |
 | Random Forest | Parallel ($B$ trees) | Medium | Low | Good |
 | XGBoost | Sequential ($B$ trees) | Low | Higher | Best |
 
-:::: {.columns}
-::: {.column width="48%"}
-**Random Forest strengths:**
+**Random Forest is the better default**: robust, almost no tuning, OOB error for free. **Move to XGBoost** when you can afford to tune and need the last few points — and budget for that tuning, because an untuned XGBoost often loses to a default forest.
 
-- Robust — hard to overfit badly
-- Minimal tuning; good out-of-the-box
-- OOB error gives free cross-validation
-:::
-::: {.column width="48%"}
-**Shared limitation:**
-
-- Neither can extrapolate beyond the training range — a hard constraint for trending series
-:::
-::::
-
-::: {.keybox}
-**Practical order:** start with a Random Forest — it is hard to make catastrophically wrong. Move to XGBoost when you have the time to tune and need the last few points of accuracy.
+::: {.warningbox}
+Neither can **extrapolate** beyond the training range. A tree predicts the mean of a leaf, and no leaf contains values it never saw. On a trending series, both will flatten out exactly when you need them to keep climbing.
 :::
 
 ---

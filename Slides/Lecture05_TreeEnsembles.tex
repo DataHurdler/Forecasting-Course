@@ -252,36 +252,34 @@
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textbf{Bagging (Random Forest):}
-      \begin{itemize}\small
+      \begin{itemize}\small\itemsep0pt
         \item Trees built \textbf{in parallel}, independently
-        \item Each tree tries to predict $y$ directly
-        \item Average reduces variance
-        \item Adding more trees does not reduce bias
+        \item Each tree predicts $y$ directly
+        \item Averaging reduces \emph{variance}
+        \item More trees never reduces bias
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
       \textbf{Boosting:}
-      \begin{itemize}\small
+      \begin{itemize}\small\itemsep0pt
         \item Trees built \textbf{sequentially}
-        \item Each tree fits the \emph{errors} of the previous ensemble
-        \item Adding more trees reduces both bias AND variance (carefully)
-        \item Risk: can overfit if trees are too deep or too many
+        \item Each fits the \emph{errors} of the ensemble so far
+        \item Reduces \emph{bias} as well as variance
+        \item Will overfit if trees are too deep or too many
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.1cm}
-  \begin{examplebox}{Analogy: Correcting a Forecast Iteratively}
-    \small
-    Forecast 1: ``Sales will be \$50,000.'' \quad Actual: \$60,000. \quad Error: $+$\$10,000.\\[2pt]
-    Forecast 2: ``The first model was short by \$10,000.''\\
-    Combined prediction: \$50,000 $+$ \$10,000 $=$ \textbf{\$60,000}.\\[2pt]
-    Each stage corrects the remaining error from all previous stages.
-  \end{examplebox}
+
+  \vspace{0.2cm}
+  \textbf{The intuition.} Forecast 1 says \$50,000; actual is \$60,000, so the error is
+  $+$\$10,000. Forecast 2 does not predict sales at all --- it predicts \emph{that error},
+  and says ``the first model was short by \$10,000.'' Add them: \$60,000. Each stage corrects
+  what remains, which is why boosting can fix a systematic bias that averaging never touches.
 \end{frame}
 
 % --- Slide: Boosting algorithm -----------------------------------------------
 \begin{frame}{The Gradient Boosting Algorithm}
-  \begin{definitionbox}{Gradient Boosting (for squared-error loss)}
+  \begin{definitionbox}{Gradient Boosting (squared-error loss)}
     {\footnotesize
     Initialize $F_0(\mathbf{x}) = \bar{y}$. For $b = 1, \ldots, B$:
     \begin{enumerate}\itemsep0pt\topsep0pt
@@ -292,28 +290,15 @@
     Final prediction: $\hat{y} = F_B(\mathbf{x})$
     }
   \end{definitionbox}
-  \vspace{-0.2cm}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{The learning rate $\eta$:}
-      \begin{itemize}\footnotesize\itemsep0pt
-        \item Small $\eta$ (0.01--0.1): tiny step per tree ---
-              requires more trees but more robust
-        \item Large $\eta$ ($> 0.3$): fast but risks overshooting
-        \item \textbf{Rule:} smaller $\eta$ + more trees + early stopping
-              typically wins
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \footnotesize Trees are \textbf{shallow} (depth 3--6).
-        Each corrects a small fraction of the total error.
-        The ensemble slowly converges.\\[2pt]
-        \textbf{Warning:} always use \textbf{early stopping} ---
-        without it, boosting will overfit.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  The trees are deliberately \textbf{shallow} --- depth 3 to 6 --- because each one only has
+  to capture a small piece of the remaining error. The ensemble converges slowly and on
+  purpose.
+
+  \vspace{0.15cm}
+  \textbf{The learning rate $\eta$ is the main dial.} Small values (0.01--0.1) take a tiny
+  step per tree: slower, needs more trees, far more robust. Large values ($> 0.3$) move fast
+  and risk overshooting. The reliable recipe is a small $\eta$, many trees, and
+  \textbf{early stopping} --- without which boosting will happily fit your noise.
 \end{frame}
 
 % =============================================================================
@@ -326,38 +311,25 @@
 
 % --- Slide: XGBoost innovations -----------------------------------------------
 \begin{frame}{XGBoost: Three Advances \parencite{Chen2016}}
-  \begin{columns}[T]
-    \begin{column}{0.56\textwidth}
-      \begin{enumerate}
-        \item \textbf{Newton step (2nd-order optimization):}
-              Uses the gradient \emph{and} curvature (Hessian)
-              of the loss function to compute more precise tree-fitting directions.
-              Converges faster than first-order boosting.
+  \begin{enumerate}\itemsep2pt
+    \item \textbf{Newton step (second-order optimization).} Uses the gradient \emph{and} the
+          curvature of the loss to choose each tree's direction, so it converges in fewer
+          trees than first-order boosting.
+    \item \textbf{Explicit regularization.} Penalizes the number of leaves ($\gamma$) and the
+          magnitude of leaf weights ($\lambda$) directly in the objective --- so overfitting
+          is controlled by the loss function rather than only by early stopping.
+    \item \textbf{Column subsampling.} Borrowed straight from random forests: sample features
+          per tree and per split, decorrelating the ensemble.
+  \end{enumerate}
 
-        \item \textbf{Explicit regularization:}
-              Penalizes the number of leaves ($\gamma$) and the magnitude
-              of leaf weights ($\lambda$) directly in the objective.
-              Guards against overfitting without relying on early stopping alone.
+  \vspace{0.15cm}
+  Notice that the second advance is \emph{exactly} the Ridge and LASSO idea from next week,
+  applied to leaf weights instead of regression coefficients. \texttt{reg\_lambda} is an
+  $\ell_2$ penalty; \texttt{gamma} penalizes complexity the way $\ell_1$ does.
 
-        \item \textbf{Column subsampling:}
-              Like Random Forests, randomly samples features per tree and per split.
-              Reduces correlation and improves generalization.
-      \end{enumerate}
-    \end{column}
-    \begin{column}{0.40\textwidth}
-      \begin{keybox}
-        XGBoost dominated Kaggle competitions from 2014--2018.
-        It consistently outperforms vanilla gradient boosting
-        on tabular data.
-      \end{keybox}
-      \vspace{0.2cm}
-      \textbf{Other popular options:}
-      \begin{itemize}\small
-        \item \texttt{LightGBM} --- faster on large datasets
-        \item \texttt{CatBoost} --- handles categorical features natively
-      \end{itemize}
-    \end{column}
-  \end{columns}
+  \vspace{0.15cm}
+  \muted{\small XGBoost dominated Kaggle tabular competitions from 2014--2018.
+  \texttt{LightGBM} is faster on large data; \texttt{CatBoost} handles categoricals natively.}
 \end{frame}
 
 % --- Slide: XGBoost key hyperparameters --------------------------------------
@@ -388,36 +360,23 @@
 
 % --- Slide: XGBoost Python ---------------------------------------------------
 \begin{frame}{XGBoost in Python}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{examplebox}{Code Template}
-        {\scriptsize
-        \texttt{model = xgb.XGBRegressor(}\\
-        \texttt{  n\_estimators=1000,}\\
-        \texttt{  learning\_rate=0.05,}\\
-        \texttt{  max\_depth=4,}\\
-        \texttt{  subsample=0.8,}\\
-        \texttt{  colsample\_bytree=0.8,}\\
-        \texttt{  early\_stopping\_rounds=50,}\\
-        \texttt{  random\_state=42)}\\
-        \texttt{model.fit(}\\
-        \texttt{  X\_train, y\_train,}\\
-        \texttt{  eval\_set=[(X\_val, y\_val)],}\\
-        \texttt{  verbose=False)}
-        }
-      \end{examplebox}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \textbf{Cross-validation for time series:}
-      \begin{itemize}\footnotesize\itemsep0pt
-        \item Use \texttt{TimeSeriesSplit} with the sklearn API
-        \item Reserve last 20\% as final test set
-        \item \texttt{early\_stopping\_rounds=50}: stops if val.\ RMSE stalls for 50 rounds
-      \end{itemize}
-      \muted{\footnotesize Typical RSXFS result:
-      XGBoost RMSE $\approx$ 1,500--1,700 (vs.\ RF $\approx$ 1,800).}
-    \end{column}
-  \end{columns}
+  \begin{examplebox}{Code Template}
+    {\scriptsize
+    \texttt{model = xgb.XGBRegressor(n\_estimators=1000, learning\_rate=0.05,}\\
+    \texttt{\ \ max\_depth=4, subsample=0.8, colsample\_bytree=0.8,}\\
+    \texttt{\ \ early\_stopping\_rounds=50, random\_state=42)}\\
+    \texttt{model.fit(X\_train, y\_train, eval\_set=[(X\_val, y\_val)], verbose=False)}
+    }
+  \end{examplebox}
+  \texttt{eval\_set} is what makes \texttt{early\_stopping\_rounds} work: XGBoost watches
+  validation RMSE and halts when it stops improving, which is how you get away with setting
+  \texttt{n\_estimators} far higher than you need.
+
+  \textbf{The validation set must respect time.} Build it with \texttt{TimeSeriesSplit} and
+  hold out the final stretch as a true test set.
+
+  \muted{\footnotesize On macOS \texttt{xgboost} also needs OpenMP:
+  \texttt{brew install libomp}, or the import fails.}
 \end{frame}
 
 % =============================================================================
@@ -434,7 +393,7 @@
     {\small
     \begin{tabular}{lllll}
       \toprule
-      \textbf{Method} & \textbf{Training} & \textbf{Interpretable} & \textbf{Tuning} & \textbf{Typical accuracy} \\
+      \textbf{Method} & \textbf{Training} & \textbf{Interpretable} & \textbf{Tuning} & \textbf{Accuracy} \\
       \midrule
       Decision Tree & Single tree & High & Low & Baseline \\
       Random Forest & Parallel ($B$ trees) & Medium & Low & Good \\
@@ -443,30 +402,15 @@
     \end{tabular}
     }
   \end{center}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Random Forest strengths:}
-      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
-      \begin{itemize}\small\itemsep0pt
-        \item Robust --- hard to overfit badly
-        \item Minimal tuning; good out-of-the-box
-        \item OOB error gives free cross-validation
-      \end{itemize}}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{Shared limitation:}
-      {\setbeamertemplate{itemize item}{\negc{$\times$}}
-      \begin{itemize}\small\itemsep0pt
-        \item Neither can extrapolate beyond the training range ---
-              a hard constraint for trending series
-      \end{itemize}}
-    \end{column}
-  \end{columns}
-  \begin{keybox}
-    \small \textbf{Practical order:} start with a Random Forest --- it is hard to make
-    catastrophically wrong. Move to XGBoost when you have the time to tune and
-    need the last few points of accuracy.
-  \end{keybox}
+
+  \textbf{Random Forest is the better default}: robust, almost no tuning, OOB error for free.
+  \textbf{Move to XGBoost} when you can afford to tune and need the last few points --- and
+  budget for that tuning, because an untuned XGBoost often loses to a default forest.
+  \begin{warningbox}
+    Neither can \textbf{extrapolate} beyond the training range. A tree predicts the mean of a
+    leaf, and no leaf contains values it never saw. On a trending series, both will flatten
+    out exactly when you need them to keep climbing.
+  \end{warningbox}
 \end{frame}
 
 % --- Slide: Key takeaways ---------------------------------------------------

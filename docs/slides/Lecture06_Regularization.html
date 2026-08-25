@@ -1106,55 +1106,20 @@ Department of Economics
 </section>
 <section id="why-regularize" class="slide level2">
 <h2>Why Regularize?</h2>
-<p>OLS minimizes <span class="math inline">\(\sum_{i}(y_i - \mathbf{x}_i&#39;\boldsymbol{\beta})^2\)</span>.</p>
-<p>A weekly model with lags, calendar dummies, promotions, and macro series can easily carry <span class="math inline">\(k = 60\)</span> predictors on <span class="math inline">\(n = 150\)</span> observations — OLS will fit that sample beautifully and forecast badly.</p>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>What goes wrong:</strong></p>
-<ul>
-<li>Variance of <span class="math inline">\(\hat{\boldsymbol{\beta}}\)</span> grows with <span class="math inline">\(k\)</span></li>
-<li>Correlated predictors give unstable, wildly large coefficients with opposing signs</li>
-<li>When <span class="math inline">\(k &gt; n\)</span> there is no unique solution at all</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="keybox">
-<p><strong>Regularization:</strong> add a penalty on coefficient size,</p>
+<p>OLS minimizes <span class="math inline">\(\sum_{i}(y_i - \mathbf{x}_i&#39;\boldsymbol{\beta})^2\)</span>. A weekly model with lags, calendar dummies, promotions, and macro series can easily carry <span class="math inline">\(k = 60\)</span> predictors on <span class="math inline">\(n = 150\)</span> observations — OLS will fit that sample beautifully and forecast badly.</p>
+<p>Three things go wrong at once. The variance of <span class="math inline">\(\hat{\boldsymbol{\beta}}\)</span> grows with <span class="math inline">\(k\)</span>. Correlated predictors produce unstable, wildly large coefficients with opposing signs. And once <span class="math inline">\(k &gt; n\)</span> there is no unique solution at all.</p>
+<p><strong>Regularization</strong> adds a penalty on coefficient size:</p>
 <p><span class="math display">\[\underbrace{\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}\]</span></p>
-<p>Accept a little bias to buy a large reduction in variance.</p>
-</div>
-</div></div>
+<p>You accept a little bias to buy a large reduction in variance — and for a forecast, that trade is almost always worth making.</p>
 </section>
 <section id="subset-selection-the-classical-answer" class="slide level2">
 <h2>Subset Selection: The Classical Answer</h2>
 <p>Before shrinkage, the standard approach was to <em>count</em> predictors rather than shrink them <span class="citation" data-cites="Guyon2003">(<a href="#/references" role="doc-biblioref" onclick>Guyon and Elisseeff 2003</a>)</span>.</p>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>Best subset:</strong></p>
-<ul>
-<li>Fit all <span class="math inline">\(2^k\)</span> models, pick the best</li>
-<li>Exact — hopeless past <span class="math inline">\(k \approx 30\)</span></li>
-</ul>
-<p><strong>Stepwise:</strong></p>
-<ul>
-<li>Forward: add the best predictor, repeat</li>
-<li>Backward: start full, drop the weakest, repeat</li>
-<li>Greedy — can miss the best combination</li>
-</ul>
-</div><div class="column" style="width:46%;">
-<p><strong>Chosen by:</strong> adjusted <span class="math inline">\(R^2\)</span>, AIC, AICc, BIC, or CV.</p>
+<p><strong>Best subset</strong> fits all <span class="math inline">\(2^k\)</span> models and picks the winner — exact, and computationally hopeless past <span class="math inline">\(k \approx 30\)</span>. <strong>Stepwise</strong> adds the strongest predictor or drops the weakest, one at a time; it is greedy, and can miss the best combination entirely. Either way the choice is made by adjusted <span class="math inline">\(R^2\)</span>, AIC, AICc, BIC, or CV.</p>
 <div class="warningbox">
-<p>Subset selection is <strong>discrete</strong> — in or out. Small data changes flip predictors in and out, so the selected model is itself high-variance.</p>
+<p>Subset selection is <strong>discrete</strong> — a predictor is in or out. Small changes in the data flip predictors in and out, so the <em>selected model</em> is itself high-variance. You have not removed the instability; you have moved it somewhere harder to see.</p>
 </div>
-</div></div>
 <p><span class="neutral smaller">This is the approach in <em>FPP</em> §7.5. Shrinkage replaces the in-or-out decision with a continuous dial — more stable, and easier to tune.</span></p>
-</section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="shrinkage-methods" class="title-slide slide level1 center">
-<h1>Shrinkage Methods</h1>
-<p>Keep every predictor, but pull its coefficient toward zero.</p>
 </section>
 <section id="ridge-regression-ell_2" class="slide level2">
 <h2>Ridge Regression (<span class="math inline">\(\ell_2\)</span>)</h2>
@@ -1164,22 +1129,9 @@ Department of Economics
 </div>
 <p><span class="math display">\[\hat{\boldsymbol{\beta}}^{\text{ridge}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i&#39;\boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{k} \beta_j^2\]</span></p>
 </div>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Behavior:</strong></p>
-<ul>
-<li>Shrinks all coefficients, none exactly to zero</li>
-<li><span class="math inline">\(\lambda = 0\)</span> is OLS; <span class="math inline">\(\lambda \to \infty\)</span> sends all <span class="math inline">\(\beta_j \to 0\)</span></li>
-<li>Handles correlated predictors gracefully — splits the coefficient between them</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="keybox">
-<p><strong>Use when</strong> you believe most predictors carry a little signal and you want to keep them all.</p>
-</div>
-<div class="warningbox">
-<p><strong>Standardize first.</strong> The penalty is not scale-invariant — dollars and thousands of dollars are penalized differently.</p>
-</div>
-</div></div>
+<p>Ridge shrinks every coefficient toward zero but sets none exactly to zero. At <span class="math inline">\(\lambda = 0\)</span> you have OLS; as <span class="math inline">\(\lambda \to \infty\)</span> all <span class="math inline">\(\beta_j \to 0\)</span>. Its particular strength is correlated predictors: rather than letting two collinear variables fight for the same coefficient, it splits the effect between them.</p>
+<p><strong>Use it when</strong> you believe most predictors carry a little signal and you want to keep them all.</p>
+<p><strong>Standardize first.</strong> The penalty is not scale-invariant — a predictor measured in dollars is penalized differently from the same predictor in thousands of dollars. Get this wrong and the units decide which variables survive.</p>
 </section>
 <section id="lasso-ell_1" class="slide level2">
 <h2>LASSO (<span class="math inline">\(\ell_1\)</span>)</h2>
@@ -1189,45 +1141,30 @@ Department of Economics
 </div>
 <p><span class="math display">\[\hat{\boldsymbol{\beta}}^{\text{lasso}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i&#39;\boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{k} |\beta_j|\]</span></p>
 </div>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Behavior:</strong></p>
-<ul>
-<li>Sets some coefficients <strong>exactly</strong> to zero</li>
-<li>Selection and estimation in one step</li>
-<li>Yields a sparse, readable model — valuable when you must explain the forecast</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="keybox">
-<p><strong>Use when</strong> you believe only a handful of predictors genuinely matter and you want the model to tell you which.</p>
-</div>
-<div class="warningbox">
-<p>Among correlated predictors LASSO keeps <em>one</em> arbitrarily and zeros the rest. Do not read the survivor as “the important one.”</p>
-</div>
-</div></div>
+<p>Swap the squared penalty for an absolute one and the behavior changes qualitatively. LASSO sets some coefficients <strong>exactly</strong> to zero, performing selection and estimation in a single step, and leaving a sparse model you can actually read aloud to a stakeholder.</p>
+<p><strong>Use it when</strong> you believe only a handful of predictors genuinely matter and you want the model to tell you which.</p>
+<p><strong>But be careful what you conclude.</strong> Among a group of highly correlated predictors, LASSO keeps <em>one</em> more or less arbitrarily and zeros the rest. The survivor is not “the important one” — it is the one that happened to win a coin toss between near-identical variables.</p>
 </section>
 <section id="why-lasso-zeros-out-and-ridge-does-not" class="slide level2">
 <h2>Why LASSO Zeros Out and Ridge Does Not</h2>
-<p>Both solve “minimize squared error subject to a budget on coefficient size.” The shape of the budget is what differs.</p>
+<p>Both solve “minimize squared error subject to a budget on coefficient size.” The <em>shape</em> of the budget is the whole difference.</p>
 <div class="columns">
 <div class="column" style="width:48%;">
-<p><strong>Ridge:</strong> budget <span class="math inline">\(\sum_j \beta_j^2 \le t\)</span> — a <strong>circle</strong>.</p>
+<p><strong>Ridge:</strong> <span class="math inline">\(\sum_j \beta_j^2 \le t\)</span> — a <strong>circle</strong></p>
 <ul>
-<li>Smooth boundary with no corners</li>
-<li>The contours of the squared-error surface almost never touch it on an axis</li>
-<li>So coefficients get small, but not zero</li>
+<li>Smooth boundary, no corners</li>
+<li>Error contours almost never touch it on an axis</li>
+<li>So coefficients get small, never zero</li>
 </ul>
 </div><div class="column" style="width:48%;">
-<p><strong>LASSO:</strong> budget <span class="math inline">\(\sum_j |\beta_j| \le t\)</span> — a <strong>diamond</strong>.</p>
+<p><strong>LASSO:</strong> <span class="math inline">\(\sum_j |\beta_j| \le t\)</span> — a <strong>diamond</strong></p>
 <ul>
 <li>Corners sit exactly on the axes</li>
-<li>Contours are very likely to first touch a corner</li>
-<li>Touching a corner means <span class="math inline">\(\beta_j = 0\)</span> for that predictor</li>
+<li>Contours are likely to hit a corner first</li>
+<li>A corner means <span class="math inline">\(\beta_j = 0\)</span> exactly</li>
 </ul>
 </div></div>
-<div class="keybox">
-<p>The sparsity of LASSO is a geometric accident of the <span class="math inline">\(\ell_1\)</span> ball having corners — not a statistical test of significance. A zeroed coefficient means “not worth its budget here,” not “proven irrelevant.” See <span class="citation" data-cites="James2021">James et al. (<a href="#/references" role="doc-biblioref" onclick>2023</a>)</span> §6.2.</p>
-</div>
+<p>So the sparsity of LASSO is a geometric accident of the <span class="math inline">\(\ell_1\)</span> ball having corners — not a statistical test of significance. A zeroed coefficient means “not worth its budget here,” not “proven irrelevant.” See <span class="citation" data-cites="James2021">James et al. (<a href="#/references" role="doc-biblioref" onclick>2023</a>)</span> §6.2.</p>
 </section>
 <section id="elastic-net-both-penalties-at-once" class="slide level2">
 <h2>Elastic Net: Both Penalties at Once</h2>
@@ -1238,78 +1175,30 @@ Department of Economics
 <p><span class="math display">\[\sum_{i=1}^{n}(y_i - \mathbf{x}_i&#39;\boldsymbol{\beta})^2 + \lambda \left[ \alpha \sum_j |\beta_j| + (1-\alpha) \sum_j \beta_j^2 \right]\]</span></p>
 <p><span class="math inline">\(\lambda\)</span> sets the total penalty; <span class="math inline">\(\alpha \in [0,1]\)</span> sets the mix (<span class="math inline">\(\alpha=1\)</span> is LASSO, <span class="math inline">\(\alpha=0\)</span> is Ridge).</p>
 </div>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Why the mix helps:</strong></p>
-<ul>
-<li>Keeps LASSO’s ability to zero out predictors</li>
-<li>Adds Ridge’s <strong>grouping effect</strong>: correlated predictors enter or leave together rather than one arbitrarily surviving</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="keybox">
-<p><strong>Forecasting default.</strong> Lagged predictors are correlated almost by construction — <span class="math inline">\(y_{t-1}\)</span> and <span class="math inline">\(y_{t-2}\)</span> move together. Elastic Net is usually safer than pure LASSO.</p>
-</div>
-</div></div>
-</section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="choosing-the-penalty" class="title-slide slide level1 center">
-<h1>Choosing the Penalty</h1>
-<p><span class="math inline">\(\lambda\)</span> is not estimated from the model. It is tuned — and how you tune it decides whether the model generalizes.</p>
+<p>The mix keeps LASSO’s ability to zero out predictors while adding Ridge’s <strong>grouping effect</strong>: correlated predictors now enter or leave together instead of one surviving arbitrarily.</p>
+<p><strong>This is usually the right default for forecasting.</strong> Lagged predictors are correlated almost by construction — <span class="math inline">\(y_{t-1}\)</span> and <span class="math inline">\(y_{t-2}\)</span> move together — which is precisely the situation where pure LASSO picks a winner at random and pure Ridge refuses to simplify.</p>
 </section>
 <section id="the-regularization-path" class="slide level2">
 <h2>The Regularization Path</h2>
-<p>Fit the model across a grid of <span class="math inline">\(\lambda\)</span> values and trace each coefficient.</p>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Reading the path, left to right:</strong></p>
-<ul>
-<li>At small <span class="math inline">\(\lambda\)</span>: coefficients near their OLS values, model is dense and unstable</li>
-<li>As <span class="math inline">\(\lambda\)</span> grows: coefficients shrink; under LASSO they drop to zero one by one</li>
-<li>At large <span class="math inline">\(\lambda\)</span>: only the most robust predictors survive</li>
-<li>At <span class="math inline">\(\lambda \to \infty\)</span>: intercept-only, the mean forecast</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="keybox">
-<p>The <strong>order</strong> in which predictors leave is informative: the last survivors are the ones that hold up under the most pressure. Report this ordering — it is far more stable than a single model’s coefficient table.</p>
-</div>
-</div></div>
+<p>Fit the model across a grid of <span class="math inline">\(\lambda\)</span> values and trace each coefficient as it moves.</p>
+<p>Read the path left to right. At small <span class="math inline">\(\lambda\)</span> the coefficients sit near their OLS values and the model is dense and unstable. As <span class="math inline">\(\lambda\)</span> grows they shrink, and under LASSO they drop to zero one at a time. At large <span class="math inline">\(\lambda\)</span> only the most robust predictors survive, and in the limit you are left with the intercept — the mean forecast.</p>
+<p><strong>The order in which predictors leave is the useful output.</strong> The last survivors are the ones that hold up under the most pressure. Report that ordering rather than a single model’s coefficient table — far more stable across resamples, and far more honest about what the data can support.</p>
 </section>
 <section id="choosing-lambda-by-cross-validation" class="slide level2">
 <h2>Choosing <span class="math inline">\(\lambda\)</span> by Cross-Validation</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Procedure:</strong></p>
+<p><span class="math inline">\(\lambda\)</span> is not estimated from the model — it is tuned, and how you tune it decides whether the model generalizes.</p>
 <ol type="1">
 <li>Define a grid of <span class="math inline">\(\lambda\)</span>, usually log-spaced</li>
-<li>For each <span class="math inline">\(\lambda\)</span>, run walk-forward CV and record mean validation RMSE</li>
-<li>Pick the <span class="math inline">\(\lambda\)</span> minimizing CV error</li>
-<li>Refit on all training data at that <span class="math inline">\(\lambda\)</span></li>
+<li>For each <span class="math inline">\(\lambda\)</span>, run walk-forward CV and record the mean validation RMSE</li>
+<li>Pick the <span class="math inline">\(\lambda\)</span> minimizing CV error, then refit on all training data</li>
 </ol>
-<p><strong>The one-standard-error rule:</strong> choose the largest <span class="math inline">\(\lambda\)</span> whose CV error is within one standard error of the minimum — a simpler model at essentially the same accuracy.</p>
-</div><div class="column" style="width:44%;">
+<p><strong>The one-standard-error rule</strong> is worth knowing: rather than the outright minimum, take the <em>largest</em> <span class="math inline">\(\lambda\)</span> whose CV error is within one standard error of it. You give up almost no accuracy and get a simpler, more stable model.</p>
 <div class="warningbox">
-<p><strong>Never use <code>KFold</code> here.</strong> Random folds put future observations in the training set and past ones in validation. The CV error will look excellent and the forecast will fail <span class="citation" data-cites="Bergmeir2018">(<a href="#/references" role="doc-biblioref" onclick>Bergmeir et al. 2018</a>)</span>.</p>
+<p><strong>Never use <code>KFold</code> here.</strong> Random folds put future observations in the training set and past ones in validation. The CV error will look excellent and the forecast will fail <span class="citation" data-cites="Bergmeir2018">(<a href="#/references" role="doc-biblioref" onclick>Bergmeir et al. 2018</a>)</span>. Use <code>TimeSeriesSplit</code>, exactly as in Lecture 1’s walk-forward evaluation.</p>
 </div>
-<div class="keybox">
-<p>Use <code>TimeSeriesSplit</code>, exactly as in Lecture 1’s walk-forward evaluation.</p>
-</div>
-</div></div>
-</section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="in-practice" class="title-slide slide level1 center">
-<h1>In Practice</h1>
-<p>Standardize, tune on a time-aware split, and read the path.</p>
 </section>
 <section id="regularization-in-python" class="slide level2">
 <h2>Regularization in Python</h2>
-<div class="columns">
-<div class="column" style="width:54%;">
 <div class="examplebox">
 <div class="examplebox-title">
 <p>Code Template</p>
@@ -1321,25 +1210,13 @@ Department of Economics
 <span id="cb1-5"><a href></a></span>
 <span id="cb1-6"><a href></a>model <span class="op">=</span> make_pipeline(</span>
 <span id="cb1-7"><a href></a>    StandardScaler(),</span>
-<span id="cb1-8"><a href></a>    ElasticNetCV(</span>
-<span id="cb1-9"><a href></a>        l1_ratio<span class="op">=</span>[<span class="fl">.1</span>, <span class="fl">.5</span>, <span class="fl">.7</span>, <span class="fl">.9</span>, <span class="fl">.95</span>, <span class="dv">1</span>],</span>
-<span id="cb1-10"><a href></a>        cv<span class="op">=</span>TimeSeriesSplit(n_splits<span class="op">=</span><span class="dv">5</span>),</span>
-<span id="cb1-11"><a href></a>        random_state<span class="op">=</span><span class="dv">42</span></span>
-<span id="cb1-12"><a href></a>    )</span>
-<span id="cb1-13"><a href></a>)</span>
-<span id="cb1-14"><a href></a></span>
-<span id="cb1-15"><a href></a>model.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href></a>    ElasticNetCV(l1_ratio<span class="op">=</span>[<span class="fl">.1</span>, <span class="fl">.5</span>, <span class="fl">.7</span>, <span class="fl">.9</span>, <span class="fl">.95</span>, <span class="dv">1</span>],</span>
+<span id="cb1-9"><a href></a>                 cv<span class="op">=</span>TimeSeriesSplit(<span class="dv">5</span>), random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-10"><a href></a>).fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><div class="column" style="width:42%;">
-<p><strong>Notes:</strong></p>
-<ul>
-<li><code>make_pipeline</code> keeps scaling <em>inside</em> each CV fold — scaling on the full sample leaks information</li>
-<li><code>l1_ratio</code> is <span class="math inline">\(\alpha\)</span>: the Ridge/LASSO mix</li>
-<li><code>...CV</code> variants tune <span class="math inline">\(\lambda\)</span>; plain <code>Ridge</code>/<code>Lasso</code> take it fixed</li>
-<li><code>lasso_path()</code> returns the full path</li>
-</ul>
+<p><code>make_pipeline</code> is the part that matters: it keeps standardization <em>inside</em> each CV fold. Scale on the full sample and you have leaked the validation set into training, and your CV error is optimistic.</p>
+<p><code>l1_ratio</code> is <span class="math inline">\(\alpha\)</span>, the Ridge/LASSO mix; the <code>...CV</code> variants tune <span class="math inline">\(\lambda\)</span> for you.</p>
 <p><span class="neutral smaller"><code>sklearn</code> calls the penalty <code>alpha</code>, not <code>lambda</code>.</span></p>
-</div></div>
 </section>
 <section class="slide level2">
 
@@ -1393,9 +1270,7 @@ Department of Economics
 </tr>
 </tbody>
 </table>
-<div class="keybox">
 <p><strong>Connection to Lecture 5.</strong> Trees and shrinkage solve the same problem in different geometries. XGBoost’s <code>reg_lambda</code> is literally a Ridge penalty on leaf weights, and its <code>gamma</code> penalizes leaf count the way LASSO penalizes nonzero coefficients. Regularization is not a linear-model topic — it is how every flexible model is kept honest.</p>
-</div>
 </section>
 <section id="lecture-6-key-takeaways" class="slide level2">
 <h2>Lecture 6: Key Takeaways</h2>
