@@ -190,8 +190,9 @@ A tentative weekly course schedule is at the end of this syllabus.
 Exceptions for any assignment should be communicated at least 24 hours ahead of the due time, unless it is an emergency situation.
 No late homework is otherwise accepted.
 
-All homework assignments are collected in the beginning of the class. 
-If you are late to class, your homework is considered late and will not be accepted.
+All homework is submitted through the course repository, and is due **before class begins**
+on the date shown in the weekly schedule. A submission pushed after that time is late and will
+not be accepted.
 
 ### Homework
 You must answer all homework questions.
@@ -280,14 +281,14 @@ Use office hours early and often.
 ## Important Dates
 See the [UNO Academic Calendar](https://www.unomaha.edu/registrar/academic-calendar.php) for all important dates.
 
-<!--
-- August 4, 2026: Last day to withdraw and receive a 100% refund
-- March 15-22, 2026: Spring break (no class)
-- April 3, 2026: Last day to withdraw with a grade of "W"
-- April 27-May 1, 2026: Prep week
-- **May 5, 2026 (Tuesday), 9:30am-11:30am: Final exam**
-- **May 7, 2026 (Thursday), 10:00am-12:00pm: Final exam** 
--->
+Dates that affect this course specifically:
+
+- **Sep. 24, 2026** — no in-person meeting; Week 5 is delivered online (see the schedule below)
+- **Nov. 26, 2026** — Thanksgiving break, no class
+- **Dec. 17, 2026** — final project presentations, 5:30–7:30pm
+- **Dec. 18, 2026** — final project report due
+
+Withdrawal deadlines and university closures are on the academic calendar linked above.
 
 <!--
 ## CBA Business Core Three-Attempt Rule
@@ -333,7 +334,11 @@ For example, if the class has trouble understanding a specific topic, I might ta
 - Lecture 4: Decision Trees
 - Reading: ISLP §8.1
 
-### Week 5 (Sep. 24, 2026)
+### Week 5 (Sep. 24, 2026) — **online, asynchronous**
+- **No in-person meeting.** The lecture is posted as a recording and the lab is self-paced; both
+  are on the course site. Office hours run as usual.
+- Nothing is due this week, and Assignment 3 is due the following week — so this is the week to
+  work on it.
 - Lecture 5: Tree Ensembles — Random Forests & Boosted Trees
 - Reading: ISLP §8.2; XGBoost "Introduction to Boosted Trees"; FPP §12.4 Python ed. / §12.5 R ed. for the bagging intuition
 

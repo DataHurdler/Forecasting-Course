@@ -218,6 +218,9 @@ Do not restructure HW02–HW07 before that migration.
 | 2 | `HW02_GAMs.qmd` ✓ | L03 | **M5 daily, CA_1 FOODS** | 10 | Prophet components + SNAP/event regressors, pyGAM cyclic spline, seasonal-naive benchmark |
 | 3 | `HW03_Trees_RF.qmd` ✓ | L04 + L05 | **M5 weekly, 30 series** | 12 | Tree visualization, RF + OOB, MDI vs permutation with planted noise controls, walk-forward CV |
 | 4 | `HW04_XGBoost_Regularization.qmd` ✓ | L06 | **M5 weekly, 46 engineered features** | 12 | XGBoost tuning incl. `reg_lambda`, LASSO path, per-mix alpha tuning, cross-model CV |
-| 5 | `HW05_DeepLearning.qmd` ✓ | L07 + L08 + L09 | Weekly, 30 stores (window=26/52) | 15 | PyTorch Dataset/DataLoader, FFN, 1D CNN, LSTM, Transformer + positional encoding, full course comparison |
-| 6 | `HW06_Bayesian_TS_Hierarchical.qmd` ✓ | L10 + L11 | Weekly, Store 1 + 30 stores | 15 | Beta-Binomial prior predictive, Bayesian TS (Fourier), hierarchical partial pooling, shrinkage plot |
+| 5a | `HW05_Part1_FFN_CNN.qmd` ✓ | L07 + L08 | M5 weekly, window 26 | 9 | Windowing Dataset, FFN, 1D CNN, receptive-field experiment |
+| 5b | `HW05_Part2_Sequence.qmd` ✓ | L09 | M5 weekly, window 52 | 10 | Vanilla RNN, LSTM, Transformer + positional-encoding ablation |
+| 5c | `HW05_Part3_Comparison.qmd` ✓ | L07–L09 | M5 weekly | 3 | Five-architecture comparison, full-course table, reflection |
+| 6a | `HW06_Part1_Foundations_TS.qmd` ✓ | L10 + L11 Pt 1 | M5 weekly, CA_1 FOODS | 10 | Beta-Binomial + prior predictive, structural TS, calibration vs usefulness |
+| 6b | `HW06_Part2_Hierarchical.qmd` ✓ | L11 Pt 2 | M5 weekly, 30 series | 8 | Pooled/unpooled/hierarchical, deliberate divergence reproduction, shrinkage |
 | 7 | `HW07_Bayesian_Regression.qmd` ✓ | L12 | Weekly, 30 stores | 15 | DAG construction, OLS benchmark, Bayesian regression, ROPE analysis, conditional simulation |

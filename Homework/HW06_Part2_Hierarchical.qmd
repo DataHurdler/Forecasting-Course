@@ -1,0 +1,236 @@
+---
+title: "Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+author: "Your Name"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+> **Due Week 15.** Covers Lecture 11 Part 2 (pooling and hierarchical models).
+
+---
+
+## Overview
+
+Part 1 fitted one series. Now you have thirty, and they are not equally informative — which is
+the situation partial pooling exists for.
+
+You will fit the same quantity three ways, measure how far each series moves when the hierarchy
+is added, and arrive at a business recommendation that may not be the one you expect.
+
+---
+
+## Dataset and Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pymc as pm
+import arviz as az
+import warnings, logging
+warnings.filterwarnings('ignore')
+logging.getLogger('pymc').setLevel(logging.ERROR)
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first."
+    )
+
+RANDOM_STATE = 42
+
+weekly = (pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
+            .sort_values(["store_id", "cat_id", "week_start"]))
+weekly["series"] = weekly.store_id + "_" + weekly.cat_id
+
+# A "high-SNAP" week is one with 5 or more SNAP benefit days
+weekly["hi_snap"] = (weekly.snap_days >= 5).astype(int)
+
+# One series for the single-series work
+ca1 = weekly[weekly.series == "CA_1_FOODS"].reset_index(drop=True)
+
+print(f"{weekly.series.nunique()} series | CA_1 FOODS: {len(ca1)} weeks | "
+      f"high-SNAP: {ca1.hi_snap.sum()} of {len(ca1)} ({100*ca1.hi_snap.mean():.0f}%)")
+```
+
+::: {.callout-important}
+## Report diagnostics with every model
+
+Lecture 10 gave you three checks, and this assignment expects all three for **every** model you
+fit: $\hat{R} < 1.01$, ESS $> 400$, and **zero divergences**. `az.summary(idata)` gives the first
+two; `pm.sample` reports divergences as it runs.
+
+A model that fails these has not converged, and its posterior means nothing — report the failure
+rather than the numbers.
+:::
+
+---
+
+## Initial Prompt for Codex
+
+::: {.callout-important}
+## Initial Prompt for Codex
+
+Paste this as the very first message in your Codex session. It does **not** count against your
+prompt budget.
+
+```
+I am working on Homework 6 Part 2 for ECON 8310: Business Forecasting at the
+University of Nebraska at Omaha.
+
+Dataset: M5/Walmart — weekly aggregated, 30 store-category series, at
+`data/processed/m5_weekly.csv`. Columns: store_id, cat_id, state_id,
+week_start, units (target), avg_price, snap_days, event_days. I derive
+hi_snap = (snap_days >= 5). CA_1_FOODS is the single series used for
+single-series work.
+
+This part covers unpooled, pooled and hierarchical models of a per-series SNAP effect across 30 series. I completed Part 1 already.
+
+This homework uses PyMC and ArviZ. I will ask you questions one at a time.
+For each:
+1. Write clean, well-commented Python that runs end-to-end
+2. Report R-hat, ESS and divergences for every model fitted
+3. Interpret posteriors in plain business language
+4. Log this interaction to PROMPT_LOG.jsonl before responding
+
+My prompt budget is 8 (this context prompt is excluded). I will label
+each question before asking.
+
+Confirm by responding with: HW06P2_CONTEXT_ACK
+```
+
+Submit this text as **`INITIAL_PROMPT.md`** in your submission folder.
+:::
+
+---
+
+## Part C: Pooling Across Thirty Series
+
+The quantity of interest: for each series, the effect of a high-SNAP week on log units.
+
+```{python}
+weekly["ly"] = np.log(weekly.units.clip(lower=1))
+codes, uniq = pd.factorize(weekly.series)
+weekly["idx"] = codes
+J = len(uniq)
+
+# Thin every third series to 8 weeks, to create an informativeness imbalance
+rng = np.random.RandomState(RANDOM_STATE)
+keep = []
+for j in range(J):
+    rows = weekly.index[weekly.idx == j].tolist()
+    n = 8 if j % 3 == 0 else len(rows)
+    keep += list(rng.choice(rows, size=min(n, len(rows)), replace=False))
+sub = weekly.loc[sorted(keep)].copy()
+
+print(f"{J} series, {(np.arange(J) % 3 == 0).sum()} thinned to 8 weeks | {len(sub):,} rows")
+```
+
+### Q1 — Three Models *(Suggested prompts: 3)*
+
+Fit all three, on `sub`:
+
+- **Pooled** — one `b` shared by every series
+- **Unpooled** — `b` with `shape=J`, each estimated independently
+- **Hierarchical** — `b_j ~ Normal(mu_b, sd_b)`, written **non-centred**
+
+Each also needs a per-series intercept `a` with `shape=J`.
+
+```{python}
+# Fit pooled, unpooled and hierarchical
+```
+
+::: {.callout-warning}
+## The centred form will fail, and that is the lesson
+
+Writing the hierarchy as `pm.Normal("b", mu_b, sd_b, shape=J)` produced **104 divergences** in
+lecture. Fit it that way **first**, record the divergence count, then switch to the non-centred
+form and record it again. Report both.
+:::
+
+> **Your response:** Report $\hat{R}$, ESS and divergences for all three models, plus the centred
+> attempt. Explain what a divergence indicates about the posterior's shape, and why
+> reparameterizing fixes it without changing the model.
+
+---
+
+### Q2 — Shrinkage, Measured *(Suggested prompts: 3)*
+
+Compare the per-series estimates from the unpooled and hierarchical fits.
+
+**(a)** Plot each series' estimate before and after pooling — unpooled on the left, hierarchical
+on the right, a line connecting each series. Colour thin series differently from full ones.
+
+**(b)** Compute, separately for thin and full series: the spread of estimates before and after,
+and the **mean absolute distance moved** toward the group mean.
+
+```{python}
+# Shrinkage plot and the movement table
+```
+
+> **Your response:** Report the ratio of mean movement, thin versus full. Nobody told the model
+> which series were thin — explain how it inferred that. Then: the thin series' unpooled estimates
+> vary far more than the full series' do. Are those series genuinely more variable, or is something
+> else going on?
+
+---
+
+### Q3 — The Business Recommendation *(Suggested prompts: 2)*
+
+Report the estimated `mu_b` and `sd_b` with their HDIs.
+
+```{python}
+# Group-level parameters
+```
+
+> **Your response:** A category manager asks whether to build store-specific SNAP-week stocking
+> policies, and shows you the **unpooled** estimates as evidence that stores differ.
+>
+> Using `sd_b` and the shrinkage you measured, write the reply. State plainly whether the
+> per-store differences are supported, and what would have to change for them to become
+> actionable. If your recommendation is the boring one, say so and defend it — a defensible dull
+> answer beats an exciting unsupported one.
+
+---
+
+### Q4 — Reflection *(Suggested prompts: 0 — write yourself)*
+
+No code. 150–200 words.
+
+You have now met the same idea six times: the GAM smoothing penalty, tree pruning,
+`reg_lambda`, Ridge and LASSO, weight decay, and now a hierarchical prior. Each trades fit
+against complexity with one parameter setting the rate.
+
+Explain what makes the hierarchical version different from the other five, and why that
+difference matters when you have groups with very different amounts of data.
+
+> **Your response:**
+
+---
+
+## Submission Checklist
+
+- [ ] All code cells run without errors from top to bottom
+- [ ] Written responses completed in your own words
+- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw06_<your_name>/`
+- [ ] `PROMPT_LOG.jsonl` complete with ≤ 15 entries
+- [ ] One git commit per Codex prompt (`hw06 prompt <id>: <short summary>`)
+- [ ] `REPORT.md` with a clear business recommendation
