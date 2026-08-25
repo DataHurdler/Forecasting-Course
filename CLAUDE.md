@@ -223,4 +223,4 @@ Do not restructure HW02–HW07 before that migration.
 | 5c | `HW05_Part3_Comparison.qmd` ✓ | L07–L09 | M5 weekly | 3 | Five-architecture comparison, full-course table, reflection |
 | 6a | `HW06_Part1_Foundations_TS.qmd` ✓ | L10 + L11 Pt 1 | M5 weekly, CA_1 FOODS | 10 | Beta-Binomial + prior predictive, structural TS, calibration vs usefulness |
 | 6b | `HW06_Part2_Hierarchical.qmd` ✓ | L11 Pt 2 | M5 weekly, 30 series | 8 | Pooled/unpooled/hierarchical, deliberate divergence reproduction, shrinkage |
-| 7 | `HW07_Bayesian_Regression.qmd` ✓ | L12 | Weekly, 30 stores | 15 | DAG construction, OLS benchmark, Bayesian regression, ROPE analysis, conditional simulation |
+| 7 | `HW07_Bayesian_Regression.qmd` ✓ | L12 | **M5 weekly, 30 series** | 16 | DAG, naive vs controlled OLS, Bayesian regression, ROPE, price-scenario simulation |

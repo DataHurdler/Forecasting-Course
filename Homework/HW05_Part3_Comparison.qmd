@@ -118,7 +118,7 @@ I will ask you questions one at a time. For each:
 2. Interpret outputs in plain English for a business audience
 3. Log this interaction to PROMPT_LOG.jsonl before responding
 
-My prompt budget is 3 (this context prompt is excluded). I will label
+My prompt budget for Part 3 is 3 (this context prompt is excluded). I will label
 each question before asking.
 
 Confirm by responding with: HW05P3_CONTEXT_ACK

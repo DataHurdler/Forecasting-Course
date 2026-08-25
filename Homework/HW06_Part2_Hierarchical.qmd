@@ -111,7 +111,7 @@ For each:
 3. Interpret posteriors in plain business language
 4. Log this interaction to PROMPT_LOG.jsonl before responding
 
-My prompt budget is 8 (this context prompt is excluded). I will label
+My prompt budget for Part 2 is 8 (this context prompt is excluded). I will label
 each question before asking.
 
 Confirm by responding with: HW06P2_CONTEXT_ACK
