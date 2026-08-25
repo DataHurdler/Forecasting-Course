@@ -250,7 +250,7 @@ is why boosting has a learning rate at all.
 
 # Before you leave
 
-Your scoreboard should run from a benchmark near 625 down to roughly 230, across five models
+Your scoreboard should run from a benchmark near 625 down to roughly 245, across five models
 fitted to one series.
 
 > **Discuss (the ranking):** Boosting beat the forest here. Name one property of *this* dataset
@@ -261,7 +261,7 @@ fitted to one series.
 > category manager asks whether SNAP timing matters for stocking. Which table do you show them,
 > what do you say, and what would you want to check before committing to an answer?
 >
-> **Discuss (the whole arc):** Across Labs 4 and 5 the RMSE fell from 324 to about 230 on the same
+> **Discuss (the whole arc):** Across Labs 4 and 5 the RMSE fell from 324 to about 245 on the same
 > series with the same features. What was actually purchased with that improvement, and what was
 > given up along the way? Be specific about the thing you can no longer do that you could do in
 > Step 1 of Lab 4.

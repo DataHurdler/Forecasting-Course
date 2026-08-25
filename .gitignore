@@ -99,3 +99,7 @@ Narration/*_solutions_script.md
 # local virtualenvs (any Python version) and Quarto build artifacts
 .venv*/
 *.quarto_ipynb
+
+# rendered previews next to sources (deployed copies live in docs/)
+Homework/*.html
+Labs/*.html

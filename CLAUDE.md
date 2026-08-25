@@ -57,6 +57,10 @@ python scripts/quality_score.py Quarto/LectureNN_Title.qmd
 
 # Render an in-class lab (must run end-to-end without interaction)
 quarto render Labs/LectureNN_lab.qmd
+
+# Environment: Python 3.12 venv at .venv (see requirements.txt)
+python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# macOS also needs: brew install libomp   (for xgboost)
 ```
 
 ---

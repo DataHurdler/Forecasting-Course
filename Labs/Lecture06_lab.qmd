@@ -121,8 +121,9 @@ print(pd.DataFrame(rows).to_string(index=False))
 ```
 
 **Read that table across, then down.** As the training window shrinks, the largest OLS coefficient
-grows by four orders of magnitude and the test RMSE grows by five. Nothing about the *problem*
-changed — same features, same target, same test set. Only the ratio of observations to parameters.
+grows from about 150 to the hundreds of thousands, and the test RMSE from 280 into the millions.
+Nothing about the *problem* changed — same features, same target, same test set. Only the ratio
+of observations to parameters.
 
 Ridge, with a one-line change, degrades gracefully across the entire range.
 
@@ -274,7 +275,7 @@ board = {
     "Benchmark (same day last year)": rmse(y_test, test.units_lag365.values),
     "Single tree (Lab 4)": 324,
     "Random Forest (Lab 5)": 248,
-    "XGBoost (Lab 5)": 230,
+    "XGBoost (Lab 5)": 244,
     "LASSO, 62 features (today)": rmse(y_test, best.predict(X_test)),
 }
 print(pd.Series(board).round(0).astype(int).sort_values(ascending=False).to_string())
