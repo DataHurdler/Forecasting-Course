@@ -1109,52 +1109,33 @@ Department of Economics
 <div class="columns">
 <div class="column" style="width:48%;">
 <p><strong>Linear models (ARIMA, regression):</strong></p>
-<div class="positive">
 <ul>
-<li>Easy to interpret: each coefficient has a clear meaning</li>
-<li>Stable, well-understood properties</li>
+<li><span class="positive">✓</span> Each coefficient has a clear meaning</li>
+<li><span class="positive">✓</span> Stable, well-understood properties</li>
+<li><span class="negative">✗</span> Assume a constant slope everywhere</li>
+<li><span class="negative">✗</span> Miss curvature and threshold effects</li>
 </ul>
-</div>
-<div class="negative">
-<ul>
-<li>Assume a constant slope everywhere</li>
-<li>Cannot capture nonlinear patterns</li>
-<li>Miss threshold effects and curvature</li>
-</ul>
-</div>
 </div><div class="column" style="width:48%;">
 <p><strong>Fully nonlinear models (trees, neural nets):</strong></p>
-<div class="positive">
 <ul>
-<li>Flexible — can capture almost any pattern</li>
-<li>High accuracy on complex data</li>
+<li><span class="positive">✓</span> Capture almost any pattern</li>
+<li><span class="positive">✓</span> High accuracy on complex data</li>
+<li><span class="negative">✗</span> Hard to explain any single prediction</li>
+<li><span class="negative">✗</span> Interactions entangle all variables</li>
 </ul>
-</div>
-<div class="negative">
-<ul>
-<li>Hard to interpret: why did the model make this prediction?</li>
-<li>Interactions entangle all variables</li>
-</ul>
-</div>
 </div></div>
-<div class="keybox">
-<p><strong>GAMs offer a middle ground:</strong> nonlinear, flexible relationships for each variable, but the model stays <strong>additive</strong> — so each variable’s effect can be visualized and explained independently.</p>
-</div>
+<p><strong>GAMs sit between the two.</strong> They allow a nonlinear, flexible relationship for each variable, but keep the model <strong>additive</strong> — so each variable’s effect can still be plotted and explained on its own. That is the whole bargain, and the rest of this lecture is about what it costs.</p>
 </section>
 <section id="why-additivity-matters-for-interpretation" class="slide level2">
 <h2>Why Additivity Matters for Interpretation</h2>
-<p>In a non-additive model, the effect of one variable depends on the value of another — you cannot describe them separately. In a GAM, each variable’s effect is isolated, making the model far easier to explain.</p>
-<div class="warningbox">
-<p><strong>Optional math detail:</strong> Suppose we fit a fully nonlinear model: <span class="math inline">\(y = x_1^2 x_2^2 + \varepsilon\)</span>. The marginal effect of <span class="math inline">\(x_1\)</span> is <span class="math inline">\(\frac{\partial y}{\partial x_1} = 2x_1 x_2^2\)</span>, which depends on <em>both</em> <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> — you cannot describe the effect of <span class="math inline">\(x_1\)</span> without knowing <span class="math inline">\(x_2\)</span>.</p>
-</div>
-<p>This depends on <em>both</em> <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> — you cannot describe the effect of <span class="math inline">\(x_1\)</span> without knowing <span class="math inline">\(x_2\)</span>.</p>
+<p>In a non-additive model the effect of one variable depends on the value of another, so you cannot describe them separately.</p>
+<p><strong>Concretely.</strong> Suppose the truth is <span class="math inline">\(y = x_1^2 x_2^2 + \varepsilon\)</span>. Then <span class="math inline">\(\partial y / \partial x_1 = 2x_1 x_2^{2}\)</span> — it depends on <em>both</em> variables. There is no answer to “what does <span class="math inline">\(x_1\)</span> do to <span class="math inline">\(y\)</span>?” that does not begin with “it depends on <span class="math inline">\(x_2\)</span>.”</p>
 <div class="examplebox">
 <div class="examplebox-title">
 <p>GAM Marginal Effects Are Simple</p>
 </div>
-<p>In a GAM: <span class="math inline">\(y = f_1(x_1) + f_2(x_2) + \varepsilon\)</span></p>
-<p>The marginal effect of <span class="math inline">\(x_1\)</span> is just <span class="math inline">\(f_1&#39;(x_1)\)</span> — a function of <span class="math inline">\(x_1\)</span> alone, regardless of <span class="math inline">\(x_2\)</span>.</p>
-<p><strong>You can plot the effect of each variable separately and explain it to a business stakeholder.</strong></p>
+<p>In a GAM, <span class="math inline">\(y = f_1(x_1) + f_2(x_2) + \varepsilon\)</span>, so the marginal effect of <span class="math inline">\(x_1\)</span> is just <span class="math inline">\(f_1&#39;(x_1)\)</span> — a function of <span class="math inline">\(x_1\)</span> alone, whatever <span class="math inline">\(x_2\)</span> happens to be.</p>
+<p><strong>That is why you can plot each variable’s effect separately and hand the plot to a stakeholder.</strong></p>
 </div>
 </section>
 <section class="slide level2">
@@ -1174,49 +1155,16 @@ Department of Economics
 <p><span class="math display">\[y = \alpha + f_1(x_1) + f_2(x_2) + \cdots + f_k(x_k) + \varepsilon\]</span></p>
 <p>where each <span class="math inline">\(f_j(\cdot)\)</span> is a <strong>smooth, nonlinear function</strong> estimated from the data <span class="citation" data-cites="Wood2017">(<a href="#/references" role="doc-biblioref" onclick>Wood 2017</a>)</span>.</p>
 </div>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Key properties:</strong></p>
-<ul>
-<li>Each <span class="math inline">\(f_j(\cdot)\)</span> is flexible — it can be linear, curved, U-shaped, or threshold-like</li>
-<li>Model is additive — effects are <em>independent</em> and easy to visualize</li>
-<li>Each function is estimated to minimize prediction error subject to a smoothness penalty</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="examplebox">
-<div class="examplebox-title">
-<p>Business Application</p>
-</div>
-<p>Modeling retail sales with:</p>
-<ul>
-<li><span class="math inline">\(f_1(\text{time})\)</span>: long-run trend (nonlinear)</li>
-<li><span class="math inline">\(f_2(\text{month})\)</span>: seasonal effect</li>
-<li><span class="math inline">\(f_3(\text{unemployment})\)</span>: economic sensitivity</li>
-</ul>
-<p>Each effect is plotted and interpreted separately.</p>
-</div>
-</div></div>
+<p>Each <span class="math inline">\(f_j\)</span> is free to be linear, curved, U-shaped, or threshold-like — the data decides. Because the terms are <em>added</em> rather than multiplied, the effects stay independent and each one can be visualized on its own. Every function is fitted to minimize prediction error subject to a smoothness penalty, which is the next slide.</p>
+<p><strong>A retail example.</strong> Model weekly sales as <span class="math inline">\(f_1(\text{time})\)</span> for the long-run trend, plus <span class="math inline">\(f_2(\text{week of year})\)</span> for seasonality, plus <span class="math inline">\(f_3(\text{unemployment})\)</span> for economic sensitivity. Three curves, each plotted and interpreted separately — and none of them requiring you to hold the others fixed to make sense of it.</p>
 </section>
 <section id="controlling-smoothness-the-penalty-term" class="slide level2">
 <h2>Controlling Smoothness: The Penalty Term</h2>
 <p>A GAM minimizes a <strong>penalized</strong> sum of squared errors:</p>
 <p><span class="math display">\[\text{PSSE} = \underbrace{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \int (f&#39;&#39;(x))^2\,dx}_{\text{smoothness penalty}}\]</span></p>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>The penalty term:</strong></p>
-<ul>
-<li><span class="math inline">\(f&#39;&#39;(x)\)</span> is the second derivative of <span class="math inline">\(f\)</span> — measures how fast the slope is changing</li>
-<li>A wiggly function has a large integral; a smooth function has a small integral</li>
-<li><span class="math inline">\(\lambda\)</span> controls the trade-off: large <span class="math inline">\(\lambda\)</span> = smoother; small <span class="math inline">\(\lambda\)</span> = more flexible</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="keybox">
-<p><span class="math inline">\(\lambda \to 0\)</span>: no penalty, fit as wiggly as needed — risk of overfitting</p>
-<p><span class="math inline">\(\lambda \to \infty\)</span>: all <span class="math inline">\(f_j\)</span> become linear — reduces to OLS</p>
-<p>Optimal <span class="math inline">\(\lambda\)</span>: chosen by <strong>cross-validation</strong> or GCV</p>
-</div>
-</div></div>
-<p><strong>Splines</strong> are the mathematical tool used to represent <span class="math inline">\(f(x)\)</span>: piecewise polynomial functions that connect smoothly at <strong>knot</strong> points.</p>
+<p>The second derivative <span class="math inline">\(f&#39;&#39;(x)\)</span> measures how fast the slope is changing, so a wiggly function accumulates a large integral and a smooth one accumulates a small one. The penalty therefore charges the model for wiggliness, and <span class="math inline">\(\lambda\)</span> sets the price.</p>
+<p>The two extremes are worth holding in mind. As <strong><span class="math inline">\(\lambda \to 0\)</span></strong> the penalty vanishes and the curve is free to chase every point — overfitting. As <strong><span class="math inline">\(\lambda \to \infty\)</span></strong> every <span class="math inline">\(f_j\)</span> is forced straight and the GAM collapses back into ordinary least squares. Everything useful happens in between, and <span class="math inline">\(\lambda\)</span> is chosen by <strong>cross-validation</strong> or GCV rather than by eye.</p>
+<p><span class="neutral smaller"><strong>Splines</strong> are how <span class="math inline">\(f(x)\)</span> is represented: piecewise polynomials joined smoothly at <strong>knot</strong> points.</span></p>
 </section>
 <section class="slide level2">
 
@@ -1228,80 +1176,29 @@ Department of Economics
 </section>
 <section id="prophet-forecasting-at-scale" class="slide level2">
 <h2>Prophet: Forecasting at Scale</h2>
-<p><span class="citation" data-cites="TaylorLetham2018">Taylor and Letham (<a href="#/references" role="doc-biblioref" onclick>2018</a>)</span> developed Prophet for large-scale forecasting at Meta (Facebook). It models a time series as:</p>
+<p><span class="citation" data-cites="TaylorLetham2018">Taylor and Letham (<a href="#/references" role="doc-biblioref" onclick>2018</a>)</span> built Prophet for large-scale forecasting at Meta. It is a GAM in time-series clothing — the series is decomposed additively:</p>
 <p><span class="math display">\[y(t) = \underbrace{g(t)}_{\text{trend}} + \underbrace{s(t)}_{\text{seasonality}} + \underbrace{h(t)}_{\text{holidays}} + \varepsilon_t\]</span></p>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Key components:</strong></p>
-<ul>
-<li><strong>Trend <span class="math inline">\(g(t)\)</span>:</strong> piecewise linear or logistic growth, with <em>changepoints</em> where the trend shifts</li>
-<li><strong>Seasonality <span class="math inline">\(s(t)\)</span>:</strong> Fourier series to capture weekly, monthly, yearly patterns</li>
-<li><strong>Holidays <span class="math inline">\(h(t)\)</span>:</strong> user-specified irregular events (Black Friday, COVID lockdowns)</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="keybox">
-<p>Prophet is designed to be:</p>
-<ul>
-<li>Easy to use (one fit + forecast call)</li>
-<li>Robust to missing data and outliers</li>
-<li>Interpretable: each component plotted separately</li>
-</ul>
-</div>
-</div></div>
-<p><span class="neutral smaller"><code>changepoint_prior_scale</code> controls trend flexibility: high = adapts quickly (risk of overfitting); low = stable trend.</span></p>
+<p><strong>Trend <span class="math inline">\(g(t)\)</span></strong> is piecewise linear or logistic, with <em>changepoints</em> where the slope is allowed to shift. <strong>Seasonality <span class="math inline">\(s(t)\)</span></strong> is a Fourier series, which is how Prophet handles weekly and yearly cycles simultaneously. <strong>Holidays <span class="math inline">\(h(t)\)</span></strong> are irregular events you supply yourself — Black Friday, a product launch, a lockdown.</p>
+<p>The design goals were practical rather than statistical: one fit-and-forecast call, robust to missing data and outliers, and interpretable because every component can be plotted on its own. That is why it spread so quickly among analysts who are not statisticians.</p>
+<p><span class="neutral smaller"><code>changepoint_prior_scale</code> controls trend flexibility: high adapts quickly and risks overfitting; low keeps the trend stable.</span></p>
 </section>
 <section id="prophet-code-and-workflow" class="slide level2">
 <h2>Prophet: Code and Workflow</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
 <div class="examplebox">
 <div class="examplebox-title">
 <p>Prophet on Retail Sales</p>
 </div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
 <span id="cb1-2"><a href></a></span>
-<span id="cb1-3"><a href></a><span class="co"># Data must have columns &#39;ds&#39; and &#39;y&#39;</span></span>
-<span id="cb1-4"><a href></a>df <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb1-5"><a href></a>    <span class="st">&#39;ds&#39;</span>: pd.to_datetime(dates),</span>
-<span id="cb1-6"><a href></a>    <span class="st">&#39;y&#39;</span>: sales_values</span>
-<span id="cb1-7"><a href></a>})</span>
-<span id="cb1-8"><a href></a></span>
-<span id="cb1-9"><a href></a><span class="co"># Fit the model</span></span>
-<span id="cb1-10"><a href></a>m <span class="op">=</span> Prophet(</span>
-<span id="cb1-11"><a href></a>    changepoint_prior_scale<span class="op">=</span><span class="fl">0.05</span>,</span>
-<span id="cb1-12"><a href></a>    yearly_seasonality<span class="op">=</span><span class="va">True</span></span>
-<span id="cb1-13"><a href></a>)</span>
-<span id="cb1-14"><a href></a>m.fit(df)</span>
-<span id="cb1-15"><a href></a></span>
-<span id="cb1-16"><a href></a><span class="co"># Forecast 12 months ahead</span></span>
-<span id="cb1-17"><a href></a>future <span class="op">=</span> m.make_future_dataframe(</span>
-<span id="cb1-18"><a href></a>    periods<span class="op">=</span><span class="dv">12</span>, freq<span class="op">=</span><span class="st">&#39;M&#39;</span>)</span>
-<span id="cb1-19"><a href></a>forecast <span class="op">=</span> m.predict(future)</span>
-<span id="cb1-20"><a href></a></span>
-<span id="cb1-21"><a href></a><span class="co"># Visualize components</span></span>
-<span id="cb1-22"><a href></a>m.plot_components(forecast)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href></a>df <span class="op">=</span> pd.DataFrame({<span class="st">&#39;ds&#39;</span>: dates, <span class="st">&#39;y&#39;</span>: sales})</span>
+<span id="cb1-4"><a href></a>m <span class="op">=</span> Prophet(changepoint_prior_scale<span class="op">=</span><span class="fl">0.05</span>, yearly_seasonality<span class="op">=</span><span class="va">True</span>).fit(df)</span>
+<span id="cb1-5"><a href></a></span>
+<span id="cb1-6"><a href></a>future <span class="op">=</span> m.make_future_dataframe(periods<span class="op">=</span><span class="dv">12</span>, freq<span class="op">=</span><span class="st">&#39;M&#39;</span>)</span>
+<span id="cb1-7"><a href></a>forecast <span class="op">=</span> m.predict(future)</span>
+<span id="cb1-8"><a href></a>m.plot_components(forecast)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><div class="column" style="width:44%;">
-<p><strong>The component plots:</strong></p>
-<ul>
-<li><strong>Trend:</strong> overall long-run direction with changepoints</li>
-<li><strong>Yearly seasonality:</strong> seasonal wave across months</li>
-<li><strong>Weekly seasonality:</strong> day-of-week pattern (useful for daily data)</li>
-</ul>
-<p><strong>When to use Prophet:</strong></p>
-<div class="positive">
-<ul>
-<li>Daily, weekly, monthly series with seasonality</li>
-<li>Known holiday or event effects</li>
-<li>When you need interpretable component plots for stakeholders</li>
-</ul>
-</div>
-<div class="negative">
-<ul>
-<li>Many correlated external predictors (use pyGAM instead)</li>
-</ul>
-</div>
-</div></div>
+<p><code>plot_components</code> is the call that matters here: it draws the trend with its changepoints, the yearly wave, and the day-of-week pattern as separate panels — the additive structure made visible.</p>
+<p><strong>Reach for Prophet</strong> on seasonal series with known holiday effects, especially when someone will ask you to explain the forecast. <strong>Reach for pyGAM</strong> when you have many correlated external predictors instead.</p>
 </section>
 <section class="slide level2">
 
@@ -1313,101 +1210,46 @@ Department of Economics
 </section>
 <section id="pygam-flexible-additive-modeling" class="slide level2">
 <h2>pyGAM: Flexible Additive Modeling</h2>
-<p><code>pyGAM</code> fits a GAM with user-specified smooth functions for each predictor:</p>
-<div class="columns">
-<div class="column" style="width:52%;">
+<p><code>pyGAM</code> fits a GAM with a smooth function you specify per predictor:</p>
 <div class="examplebox">
 <div class="examplebox-title">
 <p>pyGAM Example</p>
 </div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, f, l</span>
 <span id="cb2-2"><a href></a></span>
-<span id="cb2-3"><a href></a><span class="co"># s() = spline (smooth nonlinear)</span></span>
-<span id="cb2-4"><a href></a><span class="co"># l() = linear term</span></span>
-<span id="cb2-5"><a href></a><span class="co"># f() = factor (categorical)</span></span>
-<span id="cb2-6"><a href></a></span>
-<span id="cb2-7"><a href></a>gam <span class="op">=</span> LinearGAM(</span>
-<span id="cb2-8"><a href></a>    s(<span class="dv">0</span>) <span class="op">+</span> s(<span class="dv">1</span>) <span class="op">+</span> s(<span class="dv">2</span>) <span class="op">+</span> f(<span class="dv">3</span>)</span>
-<span id="cb2-9"><a href></a>)</span>
-<span id="cb2-10"><a href></a>gam <span class="op">=</span> gam.gridsearch(X, y)</span>
-<span id="cb2-11"><a href></a></span>
-<span id="cb2-12"><a href></a><span class="co"># Plot partial dependence</span></span>
-<span id="cb2-13"><a href></a>pdep, confi <span class="op">=</span> gam.partial_dependence(</span>
-<span id="cb2-14"><a href></a>    term<span class="op">=</span><span class="dv">0</span>, width<span class="op">=</span><span class="fl">0.95</span>)</span>
-<span id="cb2-15"><a href></a></span>
-<span id="cb2-16"><a href></a><span class="co"># Predict</span></span>
-<span id="cb2-17"><a href></a>y_hat <span class="op">=</span> gam.predict(X_new)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href></a>gam <span class="op">=</span> LinearGAM(s(<span class="dv">0</span>) <span class="op">+</span> s(<span class="dv">1</span>) <span class="op">+</span> s(<span class="dv">2</span>) <span class="op">+</span> f(<span class="dv">3</span>))</span>
+<span id="cb2-4"><a href></a>gam <span class="op">=</span> gam.gridsearch(X, y)</span>
+<span id="cb2-5"><a href></a></span>
+<span id="cb2-6"><a href></a>pdep, confi <span class="op">=</span> gam.partial_dependence(term<span class="op">=</span><span class="dv">0</span>, width<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb2-7"><a href></a>y_hat <span class="op">=</span> gam.predict(X_new)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><div class="column" style="width:44%;">
-<p><strong>Function types:</strong></p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 40%">
-<col style="width: 60%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Term</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>s(j)</code></td>
-<td>Smooth (spline) function of feature <span class="math inline">\(j\)</span> — flexible nonlinear effect</td>
-</tr>
-<tr class="even">
-<td><code>l(j)</code></td>
-<td>Linear function of feature <span class="math inline">\(j\)</span></td>
-</tr>
-<tr class="odd">
-<td><code>f(j)</code></td>
-<td>Factor (binary / categorical) feature <span class="math inline">\(j\)</span></td>
-</tr>
-</tbody>
-</table>
-<p><strong><code>gridsearch</code>:</strong> automatically searches for the optimal smoothness penalty <span class="math inline">\(\lambda\)</span> using cross-validation.</p>
-</div></div>
+<p>The three term types are the whole vocabulary: <code>s(j)</code> is a smooth spline of feature <span class="math inline">\(j\)</span> — the flexible nonlinear effect; <code>l(j)</code> forces a straight line, which is worth using when theory says the effect should be linear; and <code>f(j)</code> handles a binary or categorical feature.</p>
+<p><code>gridsearch</code> then tunes <span class="math inline">\(\lambda\)</span> by cross-validation — though you should still look at the resulting curves and ask whether they are plausible.</p>
 </section>
 <section id="interpreting-gam-results-partial-dependence-plots" class="slide level2">
 <h2>Interpreting GAM Results: Partial Dependence Plots</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>Partial dependence plot for each predictor <span class="math inline">\(x_j\)</span>:</strong></p>
+<p>A partial dependence plot shows the estimated function <span class="math inline">\(\hat{f}_j(x_j)\)</span> across the range of values actually observed, with confidence bands for the uncertainty around it. Reading the shape is most of the interpretation:</p>
 <ul>
-<li>Shows the estimated function <span class="math inline">\(\hat{f}_j(x_j)\)</span> over the range of observed values</li>
-<li>Confidence bands show uncertainty around the smooth effect</li>
-<li><strong>Flat line:</strong> <span class="math inline">\(x_j\)</span> has no effect on <span class="math inline">\(y\)</span></li>
-<li><strong>Increasing curve:</strong> <span class="math inline">\(x_j\)</span> has a positive but potentially nonlinear effect</li>
-<li><strong>U-shaped:</strong> <span class="math inline">\(x_j\)</span> has an optimal level (too little or too much is bad)</li>
+<li><strong>Flat line</strong> — <span class="math inline">\(x_j\)</span> does nothing for <span class="math inline">\(y\)</span>, whatever its coefficient would have been in a linear model</li>
+<li><strong>Rising curve</strong> — a positive effect, but not at a constant rate</li>
+<li><strong>U-shape</strong> — there is an optimal level, and both too little and too much are worse</li>
 </ul>
-</div><div class="column" style="width:46%;">
-<div class="examplebox">
-<div class="examplebox-title">
-<p>World Happiness Example</p>
-</div>
-<p>pyGAM partial dependence for “freedom” predicting happiness:</p>
-<ul>
-<li>Near-linear effect: more freedom → more happiness</li>
-<li>Confidence band widens at extremes (sparse data)</li>
-<li>“Economy” effect: clearly nonlinear — diminishing returns at high income levels</li>
-</ul>
-</div>
-</div></div>
+<p>Watch the bands as well as the curve. They widen wherever the data thin out, which is usually at the extremes — exactly where a reader is most tempted to extrapolate.</p>
 <div class="keybox">
-<p>Partial dependence plots make GAM results understandable to business stakeholders: <em>“As unemployment increases from 5% to 10%, predicted sales decline by X%.”</em></p>
+<p>This is what makes a GAM worth its accuracy cost. The output of the model is a sentence a stakeholder can act on: <em>“as unemployment rises from 5% to 10%, predicted sales fall by <span class="math inline">\(X\)</span>% — and the decline steepens past 8%.”</em></p>
 </div>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="key-takeaways-and-roadmap" class="title-slide slide level1 center">
+<h1>Key Takeaways and Roadmap</h1>
+<p>GAMs: flexible, interpretable, and underutilized in business forecasting.</p>
 </section>
 <section id="gams-vs.-other-methods-when-to-choose-each" class="slide level2">
 <h2>GAMs vs. Other Methods: When to Choose Each</h2>
 <table class="caption-top">
-<colgroup>
-<col style="width: 14%">
-<col style="width: 20%">
-<col style="width: 23%">
-<col style="width: 25%">
-<col style="width: 16%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Method</th>
@@ -1423,7 +1265,7 @@ Department of Economics
 <td>No</td>
 <td>No</td>
 <td>High</td>
-<td>Univariate TS</td>
+<td>Univariate time series</td>
 </tr>
 <tr class="even">
 <td>Linear regression</td>
@@ -1434,10 +1276,10 @@ Department of Economics
 </tr>
 <tr class="odd">
 <td><strong>GAM</strong></td>
-<td><strong>Yes</strong></td>
-<td><strong>No</strong></td>
-<td><strong>High</strong></td>
-<td><strong>Few predictors, explain effects</strong></td>
+<td>Yes</td>
+<td>No</td>
+<td>High</td>
+<td>Few predictors, explain effects</td>
 </tr>
 <tr class="even">
 <td>Random Forest</td>
@@ -1455,15 +1297,8 @@ Department of Economics
 </tr>
 </tbody>
 </table>
-<div class="keybox">
-<p><strong>Choose GAMs when:</strong></p>
-<ul>
-<li>You need to <strong>explain</strong> the relationship between each predictor and the outcome</li>
-<li>Predictors have nonlinear, curved effects</li>
-<li>Time series has complex trend and seasonality patterns (use Prophet)</li>
-<li>Interpretability is more important than absolute prediction accuracy</li>
-</ul>
-</div>
+<p>The column that decides it is usually <strong>Interactions</strong>. A GAM is additive by construction, so if the effect of price genuinely depends on whether it is a holiday week, a GAM cannot represent that and a tree can.</p>
+<p><strong>Choose a GAM when</strong> you must explain each predictor’s effect, when those effects are curved rather than straight, when a time series has complex trend and seasonality (reach for Prophet), and when interpretability matters more than the last few points of accuracy. That last clause is the honest one — on tabular data, XGBoost will usually win on RMSE, and Lecture 6 is where we take that seriously.</p>
 </section>
 <section id="lecture-3-key-takeaways" class="slide level2">
 <h2>Lecture 3: Key Takeaways</h2>

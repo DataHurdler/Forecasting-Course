@@ -78,6 +78,7 @@
   \end{itemize}
   Forecasting monthly retail sales, $h=1$ is next month and $h=12$ is a year out.
   The problem gets harder as $h$ grows, because uncertainty compounds.
+
   \vspace{0.15cm}
   Under squared-error loss the optimal forecast is the \textbf{conditional
   expectation}, $\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]$,
@@ -141,6 +142,7 @@
   what if the world \textbf{changes}? When a retailer's sales pattern shifts
   after a store renovation, equal-weighting the pre-renovation data buys months
   of systematic over- or under-forecasting.
+
   \vspace{0.1cm}
   \textbf{Exponential weighting} assigns geometrically declining weights, so
   recent observations matter more:
@@ -206,6 +208,7 @@
   \end{definitionbox}
   Read $\ell_t$ as where the series \emph{is} now and $b_t$ as its current
   growth rate.
+
   \vspace{0.1cm}
   \textbf{Linear extrapolation gets unrealistic at long horizons.} For $h > 6$
   use the \textbf{damped trend} variant,
@@ -269,6 +272,7 @@
   them: \textbf{ETS(A,N,N)} is SES, \textbf{ETS(A,A,N)} is Holt linear,
   \textbf{ETS(A,A\textsubscript{d},N)} is Holt damped, \textbf{ETS(A,A,A)} is
   Holt-Winters additive, and \textbf{ETS(A,A,M)} is Holt-Winters multiplicative.
+
   \vspace{0.15cm}
   \textbf{Automatic selection:} fit all 15 and pick the minimum AIC. In Python,
   \texttt{statsmodels.tsa.exponential\_smoothing.ets.ETSModel}.
@@ -312,6 +316,7 @@
   \vspace{0.2cm}
   \textbf{RMSE vs.\ MAE:} RMSE punishes large errors harder. When big misses are
   especially costly --- a stockout, an understaffed shift --- prefer RMSE.
+
   \vspace{0.1cm}
   \textbf{MASE} is the one to report across series:
   $\text{MASE} < 1$ beats seasonal na\"{i}ve, $\text{MASE} > 1$ is
@@ -395,6 +400,7 @@
   \texttt{xgboost} (gradient boosting) $\cdot$ \texttt{torch} (neural networks)
   $\cdot$ \texttt{prophet} and \texttt{pygam} (GAMs) $\cdot$ \texttt{pymc}
   (Bayesian models).
+
   \vspace{0.25cm}
   \textbf{By the end of the semester you will be able to:}
   \begin{itemize}\itemsep2pt

@@ -41,67 +41,53 @@
     \begin{column}{0.48\textwidth}
       \textbf{Linear models (ARIMA, regression):}
       {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
-      \begin{itemize}
-        \item Easy to interpret: each coefficient
-              has a clear meaning
+      \begin{itemize}\small\itemsep0pt
+        \item Each coefficient has a clear meaning
         \item Stable, well-understood properties
       \end{itemize}}
       {\setbeamertemplate{itemize item}{\negc{$\times$}}
-      \begin{itemize}
+      \begin{itemize}\small\itemsep0pt
         \item Assume a constant slope everywhere
-        \item Cannot capture nonlinear patterns
-        \item Miss threshold effects and curvature
+        \item Miss curvature and threshold effects
       \end{itemize}}
     \end{column}
     \begin{column}{0.48\textwidth}
       \textbf{Fully nonlinear models (trees, neural nets):}
       {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
-      \begin{itemize}
-        \item Flexible --- can capture almost any pattern
+      \begin{itemize}\small\itemsep0pt
+        \item Capture almost any pattern
         \item High accuracy on complex data
       \end{itemize}}
       {\setbeamertemplate{itemize item}{\negc{$\times$}}
-      \begin{itemize}
-        \item Hard to interpret: why did the model
-              make this prediction?
+      \begin{itemize}\small\itemsep0pt
+        \item Hard to explain any single prediction
         \item Interactions entangle all variables
       \end{itemize}}
     \end{column}
   \end{columns}
+
   \vspace{0.3cm}
-  \begin{keybox}
-    \textbf{GAMs offer a middle ground:} nonlinear, flexible relationships
-    for each variable, but the model stays \textbf{additive} ---
-    so each variable's effect can be visualized and explained independently.
-  \end{keybox}
+  \textbf{GAMs sit between the two.} They allow a nonlinear, flexible relationship for each
+  variable, but keep the model \textbf{additive} --- so each variable's effect can still be
+  plotted and explained on its own. That is the whole bargain, and the rest of this lecture
+  is about what it costs.
 \end{frame}
 
 % --- Slide: The nonlinear marginal effect problem ----------------------------
 \begin{frame}{Why Additivity Matters for Interpretation}
-  In a non-additive model, the effect of one variable depends on the value
-  of another --- you cannot describe them separately.
-  In a GAM, each variable's effect is isolated, making the model
-  far easier to explain.
+  In a non-additive model the effect of one variable depends on the value of another, so you
+  cannot describe them separately.
 
-  \begin{warningbox}
-    \small \textbf{Optional math detail:}
-    Suppose we fit $y = x_1^2 x_2^2 + \varepsilon$.
-    The marginal effect of $x_1$ is
-    $\frac{\partial y}{\partial x_1} = 2x_1 x_2^2$,
-    which depends on \emph{both} $x_1$ and $x_2$ ---
-    you cannot describe the effect of $x_1$ without knowing $x_2$.
-  \end{warningbox}
-
-  This depends on \emph{both} $x_1$ and $x_2$ --- you cannot describe
-  the effect of $x_1$ without knowing $x_2$.
-  \vspace{0.2cm}
+  \vspace{0.15cm}
+  \textbf{Concretely.} Suppose the truth is $y = x_1^2 x_2^2 + \varepsilon$. Then
+  $\partial y / \partial x_1 = 2x_1 x_2^{2}$ --- it depends on \emph{both} variables. There
+  is no answer to ``what does $x_1$ do to $y$?'' that does not begin with ``it depends
+  on $x_2$.''
   \begin{examplebox}{GAM Marginal Effects Are Simple}
-    In a GAM: $y = f_1(x_1) + f_2(x_2) + \varepsilon$
-
-    The marginal effect of $x_1$ is just $f_1'(x_1)$ ---
-    a function of $x_1$ alone, regardless of $x_2$.\\[4pt]
-    \textbf{You can plot the effect of each variable separately
-    and explain it to a business stakeholder.}
+    In a GAM, $y = f_1(x_1) + f_2(x_2) + \varepsilon$, so the marginal effect of $x_1$ is
+    just $f_1'(x_1)$ --- a function of $x_1$ alone, whatever $x_2$ happens to be.\\[3pt]
+    \textbf{That is why you can plot each variable's effect separately and hand the plot to
+    a stakeholder.}
   \end{examplebox}
 \end{frame}
 
@@ -120,33 +106,20 @@
       y = \alpha + f_1(x_1) + f_2(x_2) + \cdots + f_k(x_k) + \varepsilon
     \]
     \vspace{-6pt}
-    \small where each $f_j(\cdot)$ is a \textbf{smooth, nonlinear function}
-    estimated from the data \parencite{Wood2017}.
+    \small where each $f_j(\cdot)$ is a \textbf{smooth, nonlinear function} estimated from
+    the data \parencite{Wood2017}.
   \end{definitionbox}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Key properties:}
-      \begin{itemize}\footnotesize
-        \item Each $f_j(\cdot)$ is flexible --- linear, curved,
-              U-shaped, or threshold-like
-        \item Additive --- effects are \emph{independent}
-              and easy to visualize
-        \item Each function minimizes prediction error
-              subject to a smoothness penalty
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{examplebox}{Business Application}
-        \small Modeling retail sales with:
-        \begin{itemize}\footnotesize
-          \item $f_1(\text{time})$: long-run trend
-          \item $f_2(\text{month})$: seasonal effect
-          \item $f_3(\text{unemployment})$: economic sensitivity
-        \end{itemize}
-        Each effect plotted and interpreted separately.
-      \end{examplebox}
-    \end{column}
-  \end{columns}
+  Each $f_j$ is free to be linear, curved, U-shaped, or threshold-like --- the data decides.
+  Because the terms are \emph{added} rather than multiplied, the effects stay independent
+  and each one can be visualized on its own. Every function is fitted to minimize prediction
+  error subject to a smoothness penalty, which is the next slide.
+
+  \vspace{0.2cm}
+  \textbf{A retail example.} Model weekly sales as
+  $f_1(\text{time})$ for the long-run trend, plus $f_2(\text{week of year})$ for
+  seasonality, plus $f_3(\text{unemployment})$ for economic sensitivity. Three curves, each
+  plotted and interpreted separately --- and none of them requiring you to hold the others
+  fixed to make sense of it.
 \end{frame}
 
 % --- Slide: Smoothness penalty -----------------------------------------------
@@ -156,30 +129,20 @@
     \text{PSSE} = \underbrace{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}_{\text{fit}} +
                   \underbrace{\lambda \int (f''(x))^2\,dx}_{\text{smoothness penalty}}
   \]
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{The penalty term:}
-      \begin{itemize}\small
-        \item $f''(x)$ is the second derivative of $f$ ---
-              measures how fast the slope is changing
-        \item A wiggly function has a large integral;
-              a smooth function has a small integral
-        \item $\lambda$ controls the trade-off:
-              large $\lambda$ = smoother; small $\lambda$ = more flexible
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        {\small
-        $\lambda \to 0$: no penalty, fit as wiggly as needed --- risk of overfitting\\[3pt]
-        $\lambda \to \infty$: all $f_j$ become linear --- reduces to OLS\\[3pt]
-        Optimal $\lambda$: chosen by \textbf{cross-validation} or GCV
-        }
-      \end{keybox}
-    \end{column}
-  \end{columns}
-  \muted{\footnotesize \textbf{Splines} represent $f(x)$:
-  piecewise polynomials that connect smoothly at \textbf{knot} points.}
+  The second derivative $f''(x)$ measures how fast the slope is changing, so a wiggly
+  function accumulates a large integral and a smooth one accumulates a small one. The
+  penalty therefore charges the model for wiggliness, and $\lambda$ sets the price.
+
+  \vspace{0.2cm}
+  The two extremes are worth holding in mind. As \textbf{$\lambda \to 0$} the penalty
+  vanishes and the curve is free to chase every point --- overfitting. As
+  \textbf{$\lambda \to \infty$} every $f_j$ is forced straight and the GAM collapses back
+  into ordinary least squares. Everything useful happens in between, and $\lambda$ is
+  chosen by \textbf{cross-validation} or GCV rather than by eye.
+
+  \vspace{0.1cm}
+  \muted{\footnotesize \textbf{Splines} are how $f(x)$ is represented: piecewise polynomials
+  joined smoothly at \textbf{knot} points.}
 \end{frame}
 
 % =============================================================================
@@ -192,78 +155,46 @@
 
 % --- Slide: Prophet overview -------------------------------------------------
 \begin{frame}{Prophet: Forecasting at Scale}
-  \textcite{TaylorLetham2018} developed Prophet for large-scale forecasting
-  at Meta (Facebook). It models a time series as:
+  \textcite{TaylorLetham2018} built Prophet for large-scale forecasting at Meta. It is a GAM
+  in time-series clothing --- the series is decomposed additively:
   \[
     y(t) = \underbrace{g(t)}_{\text{trend}} + \underbrace{s(t)}_{\text{seasonality}}
           + \underbrace{h(t)}_{\text{holidays}} + \varepsilon_t
   \]
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Key components:}
-      \begin{itemize}\small
-        \item \textbf{Trend $g(t)$:} piecewise linear or logistic growth,
-              with \emph{changepoints} where the trend shifts
-        \item \textbf{Seasonality $s(t)$:} Fourier series to capture
-              weekly, monthly, yearly patterns
-        \item \textbf{Holidays $h(t)$:} user-specified irregular events
-              (Black Friday, COVID lockdowns)
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        Prophet is designed to be:
-        \begin{itemize}\small
-          \item Easy to use (one fit + forecast call)
-          \item Robust to missing data and outliers
-          \item Interpretable: each component plotted separately
-        \end{itemize}
-      \end{keybox}
-    \end{column}
-  \end{columns}
-  \muted{\footnotesize\itshape
-    \texttt{changepoint\_prior\_scale} controls trend flexibility:
-    high = adapts quickly (risk of overfitting); low = stable trend.}
+  \textbf{Trend $g(t)$} is piecewise linear or logistic, with \emph{changepoints} where the
+  slope is allowed to shift. \textbf{Seasonality $s(t)$} is a Fourier series, which is how
+  Prophet handles weekly and yearly cycles simultaneously. \textbf{Holidays $h(t)$} are
+  irregular events you supply yourself --- Black Friday, a product launch, a lockdown.
+
+  \vspace{0.2cm}
+  The design goals were practical rather than statistical: one fit-and-forecast call, robust
+  to missing data and outliers, and interpretable because every component can be plotted on
+  its own. That is why it spread so quickly among analysts who are not statisticians.
+
+  \vspace{0.1cm}
+  \muted{\footnotesize\itshape \texttt{changepoint\_prior\_scale} controls trend flexibility:
+  high adapts quickly and risks overfitting; low keeps the trend stable.}
 \end{frame}
 
 % --- Slide: Prophet code -----------------------------------------------------
 \begin{frame}{Prophet: Code and Workflow}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{examplebox}{Prophet on Retail Sales}
-        {\scriptsize
-        \texttt{from prophet import Prophet}\\
-        \texttt{df = pd.DataFrame(\{'ds': dates, 'y': sales\})}\\
-        \texttt{m = Prophet(}\\
-        \texttt{\ \ changepoint\_prior\_scale=0.05,}\\
-        \texttt{\ \ yearly\_seasonality=True)}\\
-        \texttt{m.fit(df)}\\
-        \texttt{future = m.make\_future\_dataframe(}\\
-        \texttt{\ \ periods=12, freq='M')}\\
-        \texttt{forecast = m.predict(future)}\\
-        \texttt{m.plot\_components(forecast)}
-        }
-      \end{examplebox}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \textbf{Component plots:}
-      \begin{itemize}\footnotesize
-        \item \textbf{Trend:} long-run direction with changepoints
-        \item \textbf{Yearly seasonality:} seasonal wave across months
-        \item \textbf{Weekly seasonality:} day-of-week pattern
-      \end{itemize}
-      \textbf{When to use:}
-      {\setbeamertemplate{itemize item}{\pos{$\checkmark$}}
-      \begin{itemize}\footnotesize
-        \item Daily/weekly/monthly series with seasonality
-        \item Known holiday effects; interpretable plots needed
-      \end{itemize}}
-      {\setbeamertemplate{itemize item}{\negc{$\times$}}
-      \begin{itemize}\footnotesize
-        \item Many correlated external predictors (use pyGAM)
-      \end{itemize}}
-    \end{column}
-  \end{columns}
+  \begin{examplebox}{Prophet on Retail Sales}
+    {\scriptsize
+    \texttt{from prophet import Prophet}\\
+    \texttt{df = pd.DataFrame(\{'ds': dates, 'y': sales\})}\\
+    \texttt{m = Prophet(changepoint\_prior\_scale=0.05, yearly\_seasonality=True).fit(df)}\\
+    \texttt{future = m.make\_future\_dataframe(periods=12, freq='M')}\\
+    \texttt{forecast = m.predict(future);\ \ m.plot\_components(forecast)}
+    }
+  \end{examplebox}
+  \texttt{plot\_components} is the call that matters here: it draws the trend with its
+  changepoints, the yearly wave, and the day-of-week pattern as separate panels --- the
+  additive structure made visible.
+
+  \vspace{0.15cm}
+  \textbf{Reach for Prophet} on seasonal series with known holiday effects, especially when
+  someone will ask you to explain the forecast. \textbf{Reach for pyGAM} when you have many
+  correlated external predictors instead.
 \end{frame}
 
 % =============================================================================
@@ -276,70 +207,46 @@
 
 % --- Slide: pyGAM overview ---------------------------------------------------
 \begin{frame}{pyGAM: Flexible Additive Modeling}
-  \texttt{pyGAM} fits a GAM with user-specified smooth functions for each predictor:
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{examplebox}{pyGAM Example}
-        {\footnotesize
-        \texttt{from pygam import LinearGAM, s, f, l}\\[2pt]
-        \texttt{\# s()=spline\ \ l()=linear\ \ f()=factor}\\[2pt]
-        \texttt{gam = LinearGAM(}\\
-        \texttt{\ \ s(0) + s(1) + s(2) + f(3))}\\
-        \texttt{gam = gam.gridsearch(X, y)}\\[2pt]
-        \texttt{pdep, confi = gam.partial\_dependence(}\\
-        \texttt{\ \ term=0, width=0.95)}\\[2pt]
-        \texttt{y\_hat = gam.predict(X\_new)}
-        }
-      \end{examplebox}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \textbf{Function types:}
-      \begin{description}\small
-        \item[\texttt{s(j)}] Smooth (spline) function of feature $j$
-              --- flexible nonlinear effect
-        \item[\texttt{l(j)}] Linear function of feature $j$
-        \item[\texttt{f(j)}] Factor (binary / categorical) feature $j$
-      \end{description}
-      \vspace{0.2cm}
-      \textbf{\texttt{gridsearch}:} automatically searches for the optimal
-      smoothness penalty $\lambda$ using cross-validation.
-    \end{column}
-  \end{columns}
+  \texttt{pyGAM} fits a GAM with a smooth function you specify per predictor:
+  \begin{examplebox}{pyGAM Example}
+    {\footnotesize
+    \texttt{from pygam import LinearGAM, s, f, l}\\[2pt]
+    \texttt{gam = LinearGAM(s(0) + s(1) + s(2) + f(3))}\\
+    \texttt{gam = gam.gridsearch(X, y)}\\[2pt]
+    \texttt{pdep, confi = gam.partial\_dependence(term=0, width=0.95)}\\
+    \texttt{y\_hat = gam.predict(X\_new)}
+    }
+  \end{examplebox}
+  The three term types are the whole vocabulary: \texttt{s(j)} is a smooth spline of
+  feature $j$ --- the flexible nonlinear effect; \texttt{l(j)} forces a straight line, which
+  is worth using when theory says the effect should be linear; and \texttt{f(j)} handles a
+  binary or categorical feature.
+
+  \vspace{0.15cm}
+  \texttt{gridsearch} then tunes $\lambda$ by cross-validation --- though you should still
+  look at the resulting curves and ask whether they are plausible.
 \end{frame}
 
 % --- Slide: Partial dependence -----------------------------------------------
 \begin{frame}{Interpreting GAM Results: Partial Dependence Plots}
-  \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \textbf{Partial dependence plot for each predictor $x_j$:}
-      \begin{itemize}\small
-        \item Shows the estimated function $\hat{f}_j(x_j)$ over the range
-              of observed values
-        \item Confidence bands show uncertainty around the smooth effect
-        \item \textbf{Flat line:} $x_j$ has no effect on $y$
-        \item \textbf{Increasing curve:} $x_j$ has a positive but potentially
-              nonlinear effect
-        \item \textbf{U-shaped:} $x_j$ has an optimal level (too little or too
-              much is bad)
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.46\textwidth}
-      \begin{examplebox}{World Happiness Example}
-        pyGAM partial dependence for
-        ``freedom'' predicting happiness:
-        \begin{itemize}\small
-          \item Near-linear effect: more freedom $\to$ more happiness
-          \item Confidence band widens at extremes (sparse data)
-          \item ``Economy'' effect: clearly nonlinear --- diminishing returns
-                at high income levels
-        \end{itemize}
-      \end{examplebox}
-    \end{column}
-  \end{columns}
+  A partial dependence plot shows the estimated function $\hat{f}_j(x_j)$ across the range
+  of values actually observed, with confidence bands for the uncertainty around it. Reading
+  the shape is most of the interpretation:
+  \begin{itemize}\small\itemsep1pt
+    \item \textbf{Flat line} --- $x_j$ does nothing for $y$, whatever its coefficient
+          would have been in a linear model
+    \item \textbf{Rising curve} --- a positive effect, but not at a constant rate
+    \item \textbf{U-shape} --- there is an optimal level, and both too little and too much
+          are worse
+  \end{itemize}
+
+  \vspace{0.15cm}
+  Watch the bands as well as the curve. They widen wherever the data thin out, which is
+  usually at the extremes --- exactly where a reader is most tempted to extrapolate.
   \begin{keybox}
-    Partial dependence plots make GAM results understandable to
-    business stakeholders: \emph{``As unemployment increases from 5\% to 10\%,
-    predicted sales decline by X\%.''}
+    This is what makes a GAM worth its accuracy cost. The output of the model is a sentence
+    a stakeholder can act on: \emph{``as unemployment rises from 5\% to 10\%, predicted
+    sales fall by $X$\% --- and the decline steepens past 8\%.''}
   \end{keybox}
 \end{frame}
 
@@ -358,25 +265,27 @@
       \toprule
       \textbf{Method} & \textbf{Nonlinear} & \textbf{Interactions} & \textbf{Interpretable} & \textbf{Use case} \\
       \midrule
-      ARIMA / ETS & No & No & High & Univariate TS \\
-      Linear regression & No & Manual & High & Few predictors \\
-      \textbf{GAM} & Yes & No & High & Few predictors, explain effects \\
-      Random Forest & Yes & Yes & Medium & Many predictors, tabular \\
-      XGBoost & Yes & Yes & Low & Best accuracy, tabular \\
+      ARIMA / ETS       & No  & No     & High   & Univariate time series \\
+      Linear regression & No  & Manual & High   & Few predictors \\
+      \textbf{GAM}      & Yes & No     & High   & Few predictors, explain effects \\
+      Random Forest     & Yes & Yes    & Medium & Many predictors, tabular \\
+      XGBoost           & Yes & Yes    & Low    & Best accuracy, tabular \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
-  \vspace{0.2cm}
-  \begin{keybox}
-    Choose GAMs when:
-    \begin{itemize}\small
-      \item You need to \textbf{explain} the relationship between each predictor and the outcome
-      \item Predictors have nonlinear, curved effects
-      \item Time series has complex trend and seasonality patterns (use Prophet)
-      \item Interpretability is more important than absolute prediction accuracy
-    \end{itemize}
-  \end{keybox}
+
+  \vspace{0.15cm}
+  The column that decides it is usually \textbf{Interactions}. A GAM is additive by
+  construction, so if the effect of price genuinely depends on whether it is a holiday week,
+  a GAM cannot represent that and a tree can.
+
+  \vspace{0.15cm}
+  \textbf{Choose a GAM when} you must explain each predictor's effect, when those effects
+  are curved rather than straight, when a time series has complex trend and seasonality
+  (reach for Prophet), and when interpretability matters more than the last few points of
+  accuracy. That last clause is the honest one --- on tabular data, XGBoost will usually
+  win on RMSE, and Lecture 6 is where we take that seriously.
 \end{frame}
 
 % --- Slide: Key takeaways ---------------------------------------------------

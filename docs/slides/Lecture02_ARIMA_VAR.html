@@ -486,72 +486,6 @@ width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
 
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-{ counter-reset: source-line 0; }
-pre.numberSource code > span
-{ position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-{ content: counter(source-line);
-position: relative; left: -1em; text-align: right; vertical-align: baseline;
-border: none; display: inline-block;
--webkit-touch-callout: none; -webkit-user-select: none;
--khtml-user-select: none; -moz-user-select: none;
--ms-user-select: none; user-select: none;
-padding: 0 4px; width: 4em;
-color: #aaaaaa;
-}
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
-div.sourceCode
-{ color: #003b4f; background-color: #f1f3f5; }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span { color: #003b4f; } 
-code span.al { color: #ad0000; } 
-code span.an { color: #5e5e5e; } 
-code span.at { color: #657422; } 
-code span.bn { color: #ad0000; } 
-code span.bu { } 
-code span.cf { color: #003b4f; font-weight: bold; } 
-code span.ch { color: #20794d; } 
-code span.cn { color: #8f5902; } 
-code span.co { color: #5e5e5e; } 
-code span.cv { color: #5e5e5e; font-style: italic; } 
-code span.do { color: #5e5e5e; font-style: italic; } 
-code span.dt { color: #ad0000; } 
-code span.dv { color: #ad0000; } 
-code span.er { color: #ad0000; } 
-code span.ex { } 
-code span.fl { color: #ad0000; } 
-code span.fu { color: #4758ab; } 
-code span.im { color: #00769e; } 
-code span.in { color: #5e5e5e; } 
-code span.kw { color: #003b4f; font-weight: bold; } 
-code span.op { color: #5e5e5e; } 
-code span.ot { color: #003b4f; } 
-code span.pp { color: #ad0000; } 
-code span.sc { color: #5e5e5e; } 
-code span.ss { color: #20794d; } 
-code span.st { color: #20794d; } 
-code span.va { color: #111111; } 
-code span.vs { color: #20794d; } 
-code span.wa { color: #5e5e5e; font-style: italic; } 
-
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
@@ -1112,33 +1046,17 @@ Department of Economics
 <p>A time series <span class="math inline">\(\{y_t\}\)</span> is <strong>weakly stationary</strong> if:</p>
 <ol type="1">
 <li><span class="math inline">\(\mathbb{E}[y_t] = \mu\)</span> — constant mean over time</li>
-<li><span class="math inline">\(\text{Var}(y_t) = \sigma^2 &lt; \infty\)</span> — constant, bounded variance</li>
-<li><span class="math inline">\(\text{Cov}(y_t, y_{t-k}) = \gamma_k\)</span> depends only on lag <span class="math inline">\(k\)</span>, not on <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(\mathrm{Var}(y_t) = \sigma^2 &lt; \infty\)</span> — constant, bounded variance</li>
+<li><span class="math inline">\(\mathrm{Cov}(y_t, y_{t-k}) = \gamma_k\)</span> depends only on lag <span class="math inline">\(k\)</span>, not on <span class="math inline">\(t\)</span></li>
 </ol>
 </div>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Why it matters:</strong></p>
-<ul>
-<li>If the mean drifts, no single value is forecastable</li>
-<li>If variance grows, prediction intervals become infinite</li>
-<li>Stationarity makes the past informative about the future</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="warningbox">
-<p><strong>Common culprits:</strong></p>
-<ul>
-<li>Trending series (GDP, prices, sales)</li>
-<li>Variance that grows with level</li>
-</ul>
-<p><strong>Fix:</strong> first-differencing removes a stochastic trend.</p>
-</div>
-</div></div>
+<p><strong>Why the definition earns its keep:</strong> if the mean drifts, there is no single value to forecast. If the variance grows, prediction intervals widen without bound. Stationarity is what makes the past informative about the future — it is the assumption every model in this lecture rests on.</p>
+<p><strong>The usual culprits</strong> are trending series — GDP, prices, sales — and variance that grows with the level. First-differencing removes a stochastic trend; a log transform stabilizes variance.</p>
 <p><span class="neutral smaller">Rule of thumb: visible trend or growing variance ⟹ likely non-stationary. Test formally with ADF or KPSS.</span></p>
 </section>
 <section id="unit-roots-and-differencing" class="slide level2">
 <h2>Unit Roots and Differencing</h2>
-<p>AR(1) model: <span class="math inline">\(y_t = \phi_1\,y_{t-1} + \varepsilon_t\)</span></p>
+<p><strong>AR(1):</strong> <span class="math inline">\(y_t = \phi_1\,y_{t-1} + \varepsilon_t\)</span>. Everything turns on whether <span class="math inline">\(\phi_1\)</span> is below one or exactly one.</p>
 <table class="caption-top">
 <colgroup>
 <col style="width: 32%">
@@ -1165,35 +1083,20 @@ Department of Economics
 </tr>
 </tbody>
 </table>
-<p><strong>First differencing</strong> removes a stochastic trend: <span class="math inline">\(\Delta y_t = y_t - y_{t-1}\)</span></p>
-<p><strong>Testing:</strong> <strong>ADF</strong> (<span class="math inline">\(H_0\)</span>: unit root) and <strong>KPSS</strong> (<span class="math inline">\(H_0\)</span>: stationary) — they test opposite nulls; use both.</p>
-<div class="columns">
-<div class="column" style="width:48%;">
-<div class="keybox">
-<p><span class="math inline">\(d=0\)</span>: already stationary. <span class="math inline">\(d=1\)</span>: one first difference. <span class="math inline">\(D=1\)</span>: seasonal difference <span class="math inline">\(\Delta_{12}y_t = y_t - y_{t-12}\)</span>.</p>
-</div>
-</div><div class="column" style="width:48%;">
-<div class="warningbox">
-<p><strong>Over-differencing</strong> induces negative autocorrelation. Apply unit-root test <em>after</em> differencing; stop at <span class="math inline">\(d=1\)</span> if the result is stationary.</p>
-</div>
-</div></div>
+<p><strong>First differencing</strong> removes a stochastic trend: <span class="math inline">\(\Delta y_t = y_t - y_{t-1}\)</span>. So <span class="math inline">\(d=0\)</span> means already stationary, <span class="math inline">\(d=1\)</span> means one first difference, and <span class="math inline">\(D=1\)</span> means a seasonal difference, <span class="math inline">\(\Delta_{12}y_t = y_t - y_{t-12}\)</span>.</p>
+<p><strong>Testing:</strong> <strong>ADF</strong> (<span class="math inline">\(H_0\)</span>: unit root) and <strong>KPSS</strong> (<span class="math inline">\(H_0\)</span>: stationary) test <em>opposite</em> nulls — so run both, and be suspicious when they disagree.</p>
+<p><strong>Do not over-difference.</strong> A second difference on an already-stationary series induces negative autocorrelation that you then have to model away — you have manufactured the problem you are now solving. Test <em>after</em> differencing, and stop at <span class="math inline">\(d=1\)</span> once the result is stationary.</p>
 </section>
 <section id="acf-and-pacf-model-identification" class="slide level2">
 <h2>ACF and PACF: Model Identification</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Autocorrelation function (ACF):</strong> <span class="math inline">\(\rho_k = \text{Corr}(y_t, y_{t-k})\)</span></p>
-<ul>
-<li>MA(<span class="math inline">\(q\)</span>): <span class="positive">cuts off</span> after lag <span class="math inline">\(q\)</span></li>
-<li>AR(<span class="math inline">\(p\)</span>): tails off geometrically</li>
-</ul>
-<p><strong>Partial autocorrelation (PACF):</strong> Correlation between <span class="math inline">\(y_t\)</span> and <span class="math inline">\(y_{t-k}\)</span> controlling for intermediate lags</p>
-<ul>
-<li>AR(<span class="math inline">\(p\)</span>): <span class="positive">cuts off</span> after lag <span class="math inline">\(p\)</span></li>
-<li>MA(<span class="math inline">\(q\)</span>): tails off geometrically</li>
-</ul>
-</div><div class="column" style="width:44%;">
+<p>The <strong>autocorrelation function</strong>, <span class="math inline">\(\rho_k = \mathrm{Corr}(y_t, y_{t-k})\)</span>, measures how <span class="math inline">\(y_t\)</span> relates to its own past. The <strong>partial</strong> autocorrelation measures the same thing while controlling for the lags in between — which is what separates a direct effect from one inherited through intermediate lags.</p>
+<p>Read them together and they identify the model:</p>
 <table class="caption-top">
+<colgroup>
+<col style="width: 38%">
+<col style="width: 27%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Model</th>
@@ -1204,13 +1107,13 @@ Department of Economics
 <tbody>
 <tr class="odd">
 <td>AR(<span class="math inline">\(p\)</span>)</td>
-<td>Tails off</td>
-<td>Cuts off at <span class="math inline">\(p\)</span></td>
+<td>Tails off geometrically</td>
+<td><span class="positive">Cuts off</span> after lag <span class="math inline">\(p\)</span></td>
 </tr>
 <tr class="even">
 <td>MA(<span class="math inline">\(q\)</span>)</td>
-<td>Cuts off at <span class="math inline">\(q\)</span></td>
-<td>Tails off</td>
+<td><span class="positive">Cuts off</span> after lag <span class="math inline">\(q\)</span></td>
+<td>Tails off geometrically</td>
 </tr>
 <tr class="odd">
 <td>ARMA</td>
@@ -1218,16 +1121,13 @@ Department of Economics
 <td>Tails off</td>
 </tr>
 <tr class="even">
-<td>Random Walk</td>
+<td>RW / I(1)</td>
 <td>Decays slowly</td>
-<td>Big spike at 1</td>
+<td>Big spike at lag 1</td>
 </tr>
 </tbody>
 </table>
-<div class="keybox">
-<p>Always unit-root test and difference <em>before</em> reading ACF/PACF. The ACF of a non-stationary series is not interpretable.</p>
-</div>
-</div></div>
+<p><strong>Always unit-root test and difference <em>before</em> reading either plot.</strong> The ACF of a non-stationary series decays slowly no matter what the underlying process is, so it tells you nothing about <span class="math inline">\(p\)</span> or <span class="math inline">\(q\)</span> — only that you have not differenced yet.</p>
 </section>
 <section class="slide level2">
 
@@ -1244,63 +1144,25 @@ Department of Economics
 <p>ARIMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(d\)</span>,<span class="math inline">\(q\)</span>) Model</p>
 </div>
 <p>Apply an ARMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(q\)</span>) to the <span class="math inline">\(d\)</span>-times differenced series:</p>
-<p><span class="math display">\[y_t = c + \sum_{i=1}^{p}\phi_i\,y_{t-i} + \varepsilon_t + \sum_{j=1}^{q}\theta_j\,\varepsilon_{t-j} \quad \text{after differencing } d \text{ times}\]</span></p>
+<p><span class="math display">\[y_t = c + \sum_{i=1}^{p}\phi_i y_{t-i} + \varepsilon_t + \sum_{j=1}^{q}\theta_j\varepsilon_{t-j}\]</span></p>
 </div>
-<div class="columns">
-<div class="column" style="width:48%;">
-<p><strong>Parameters:</strong></p>
-<ul>
-<li><span class="math inline">\(p\)</span>: AR lags (past values of <span class="math inline">\(y\)</span>)</li>
-<li><span class="math inline">\(d\)</span>: number of differences needed</li>
-<li><span class="math inline">\(q\)</span>: MA lags (past forecast errors)</li>
-</ul>
-<p><strong>Key special cases:</strong></p>
-<ul>
-<li>ARIMA(0,1,0): random walk</li>
-<li>ARIMA(0,1,1): equivalent to SES</li>
-<li>ARIMA(1,0,0): AR(1)</li>
-</ul>
-</div><div class="column" style="width:48%;">
-<div class="examplebox">
-<div class="examplebox-title">
-<p>Numeric Example</p>
-</div>
-<p>ARIMA(1,1,0) with <span class="math inline">\(\hat{\phi}_1=0.5\)</span>:</p>
-<p><span class="math inline">\(y_{100}=120\)</span>, <span class="math inline">\(y_{99}=118\)</span>, <span class="math inline">\(\Delta y_{100} = 2\)</span></p>
-<p>Forecast: <span class="math inline">\(\hat{y}_{101|100} = 120 + 0.5 \times 2 = \mathbf{121}\)</span></p>
-</div>
-<div class="keybox">
-<p><strong>Python:</strong> <code>pmdarima.auto_arima()</code> searches automatically. <code>statsmodels.SARIMAX</code> fits any specified model.</p>
-</div>
-</div></div>
+<p><span class="math inline">\(p\)</span> is the number of AR lags, <span class="math inline">\(d\)</span> the number of differences, <span class="math inline">\(q\)</span> the number of MA lags. Several familiar models are just corners of this space: <strong>ARIMA(0,1,0)</strong> is a random walk, <strong>ARIMA(1,0,0)</strong> is an AR(1), and <strong>ARIMA(0,1,1)</strong> is algebraically equivalent to simple exponential smoothing from Lecture 1.</p>
+<p><strong>A forecast by hand.</strong> Take ARIMA(1,1,0) with <span class="math inline">\(\hat{\phi}_1 = 0.5\)</span>. If <span class="math inline">\(y_{100} = 120\)</span> and <span class="math inline">\(y_{99} = 118\)</span>, then <span class="math inline">\(\Delta y_{100} = 2\)</span>, and</p>
+<p><span class="math display">\[\hat{y}_{101|100} = 120 + 0.5 \times 2 = \mathbf{121}.\]</span></p>
+<p><strong>In Python:</strong> <code>pmdarima.auto_arima()</code> searches orders automatically; <code>statsmodels.SARIMAX</code> fits any order you specify.</p>
 </section>
 <section id="sarima-adding-seasonal-terms" class="slide level2">
 <h2>SARIMA: Adding Seasonal Terms</h2>
-<p>For monthly or quarterly data, autocorrelation often appears at lags <span class="math inline">\(m, 2m, 3m, \ldots\)</span> SARIMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(d\)</span>,<span class="math inline">\(q\)</span>)(<span class="math inline">\(P\)</span>,<span class="math inline">\(D\)</span>,<span class="math inline">\(Q\)</span>)[<span class="math inline">\(m\)</span>] adds seasonal polynomials.</p>
-<div class="keybox">
-<p>Think of SARIMA as two ARIMA models at different time scales:</p>
-<ul>
-<li><strong>Non-seasonal</strong> <span class="math inline">\((p,d,q)\)</span>: captures month-to-month dynamics</li>
-<li><strong>Seasonal</strong> <span class="math inline">\((P,D,Q)[m]\)</span>: captures year-over-year patterns at lag <span class="math inline">\(m\)</span></li>
-</ul>
-</div>
-<div class="columns">
-<div class="column" style="width:52%;">
+<p>For monthly or quarterly data, autocorrelation often appears at lags <span class="math inline">\(m, 2m, 3m, \ldots\)</span> SARIMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(d\)</span>,<span class="math inline">\(q\)</span>)(<span class="math inline">\(P\)</span>,<span class="math inline">\(D\)</span>,<span class="math inline">\(Q\)</span>)[<span class="math inline">\(m\)</span>] adds seasonal AR and MA polynomials alongside the non-seasonal ones.</p>
+<p>The useful mental model is <strong>two ARIMA models running at different time scales</strong>: the non-seasonal part <span class="math inline">\((p,d,q)\)</span> captures week-to-week dynamics, while the seasonal part <span class="math inline">\((P,D,Q)[m]\)</span> captures the year-over-year pattern at lag <span class="math inline">\(m\)</span>.</p>
 <p><strong>Practical workflow:</strong></p>
 <ol type="1">
-<li>ADF/KPSS → choose <span class="math inline">\(d\)</span></li>
+<li>ADF / KPSS → choose <span class="math inline">\(d\)</span></li>
 <li>Seasonal unit root test → choose <span class="math inline">\(D\)</span></li>
-<li>ACF/PACF on differenced series → guide <span class="math inline">\(p,q,P,Q\)</span></li>
-<li>Minimize AIC; check residual ACF (Ljung-Box test)</li>
+<li>ACF / PACF on the differenced series → guide <span class="math inline">\(p, q, P, Q\)</span></li>
+<li>Minimize AIC, then check the residual ACF with a Ljung-Box test</li>
 </ol>
-</div><div class="column" style="width:44%;">
-<div class="examplebox">
-<div class="examplebox-title">
-<p>US Retail Sales</p>
-</div>
-<p>SARIMA(1,1,1)(0,1,1)[12] is a strong starting point for monthly retail data with trend and December seasonality.</p>
-</div>
-</div></div>
+<p><span class="neutral smaller">For monthly retail data with trend and December seasonality, SARIMA(1,1,1)(0,1,1)[12] is a strong starting point — and a good default to beat before trying anything more elaborate.</span></p>
 </section>
 <section class="slide level2">
 
@@ -1312,46 +1174,35 @@ Department of Economics
 </section>
 <section id="why-use-multiple-series" class="slide level2">
 <h2>Why Use Multiple Series?</h2>
-<p>All univariate models (ETS, ARIMA) use only <span class="math inline">\(y_t\)</span>’s own history. But many business variables are <em>linked</em>:</p>
-<ul>
-<li>Consumer sentiment today → retail spending next month</li>
-<li>Interest rates today → housing starts in 3–6 months</li>
-<li>Advertising spend today → sales over the next few weeks</li>
-</ul>
-<div class="keybox">
-<p>If series <span class="math inline">\(x_t\)</span> contains information about <span class="math inline">\(y_{t+h}\)</span> <strong>not already in</strong> <span class="math inline">\(y_t\)</span>’s own history, then including <span class="math inline">\(x_t\)</span> reduces forecast error. <strong>Granger causality</strong> formalizes this idea.</p>
-</div>
+<p>Every model so far — ETS, ARIMA — uses only <span class="math inline">\(y_t\)</span>’s own history. But business variables are linked: consumer sentiment today moves retail spending next month, interest rates move housing starts within two quarters, advertising spend moves sales over the following weeks.</p>
+<p>The principle underneath all of it: <strong>if <span class="math inline">\(x_t\)</span> carries information about <span class="math inline">\(y_{t+h}\)</span> that is not already in <span class="math inline">\(y_t\)</span>’s own history, including <span class="math inline">\(x_t\)</span> reduces forecast error.</strong> <strong>Granger causality</strong> <span class="citation" data-cites="Granger1969">(<a href="#/references" role="doc-biblioref" onclick>Granger 1969</a>)</span> is the formal test of exactly that claim, and we get to it in two slides.</p>
+<p>That leaves a modelling choice, and it turns on whether the influence runs one way or both:</p>
 <div class="columns">
 <div class="column" style="width:48%;">
-<p><strong>VAR:</strong> treat all variables symmetrically — each variable predicts all others.</p>
+<p><strong>VAR — symmetric</strong></p>
+<ul>
+<li>Every variable predicts every other</li>
+<li>Use when influence runs both ways</li>
+<li>No variable is privileged</li>
+</ul>
 </div><div class="column" style="width:48%;">
-<p><strong>ARIMAX:</strong> one direction only — <span class="math inline">\(x_t\)</span> drives <span class="math inline">\(y_t\)</span> but not vice versa.</p>
+<p><strong>ARIMAX — one direction</strong></p>
+<ul>
+<li><span class="math inline">\(x_t\)</span> drives <span class="math inline">\(y_t\)</span>, not the reverse</li>
+<li>Use when the causal story is clear</li>
+<li>Needs a forecast of <span class="math inline">\(x_t\)</span> itself</li>
+</ul>
 </div></div>
 </section>
 <section id="the-varp-model" class="slide level2">
 <h2>The VAR(<span class="math inline">\(p\)</span>) Model</h2>
-<p>For two stationary series <span class="math inline">\(y_{1t}\)</span> and <span class="math inline">\(y_{2t}\)</span>:</p>
-<p><span class="math display">\[y_{1t} = c_1 + a_{11}\,y_{1,t-1} + a_{12}\,y_{2,t-1} + \varepsilon_{1t}\]</span> <span class="math display">\[y_{2t} = c_2 + a_{21}\,y_{1,t-1} + a_{22}\,y_{2,t-1} + \varepsilon_{2t}\]</span></p>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Key ideas:</strong></p>
-<ul>
-<li><span class="math inline">\(a_{12}\)</span>: how much <span class="math inline">\(y_{2,t-1}\)</span> predicts <span class="math inline">\(y_{1t}\)</span> (what univariate AR misses)</li>
-<li>Each equation estimated by OLS</li>
-<li>Order <span class="math inline">\(p\)</span> chosen by BIC</li>
-<li>If <span class="math inline">\(a_{12}=a_{21}=0\)</span>: reduces to two separate AR models</li>
-</ul>
-</div><div class="column" style="width:44%;">
+<p>For two stationary series <span class="math inline">\(y_{1t}\)</span> and <span class="math inline">\(y_{2t}\)</span>, each equation regresses on the lags of <em>both</em>:</p>
+<p><span class="math display">\[\begin{cases} y_{1t} = c_1 + a_{11}\,y_{1,t-1} + a_{12}\,y_{2,t-1} + \varepsilon_{1t}\\ y_{2t} = c_2 + a_{21}\,y_{1,t-1} + a_{22}\,y_{2,t-1} + \varepsilon_{2t} \end{cases}\]</span></p>
+<p>The cross terms are where the value is: <span class="math inline">\(a_{12}\)</span> is how much <span class="math inline">\(y_{2,t-1}\)</span> predicts <span class="math inline">\(y_{1t}\)</span>, which is precisely what a univariate AR throws away. If <span class="math inline">\(a_{12} = a_{21} = 0\)</span>, the system collapses back into two separate AR models and you have learned that too. Each equation is estimated by OLS; the order <span class="math inline">\(p\)</span> is chosen by BIC.</p>
 <div class="warningbox">
-<p><strong>Parameter explosion:</strong> VAR(<span class="math inline">\(p\)</span>) with <span class="math inline">\(k\)</span> variables has <span class="math inline">\(k^2 p\)</span> coefficients.</p>
-<p><span class="math inline">\(k=5\)</span>, <span class="math inline">\(p=4\)</span>: <strong>100 coefficients!</strong></p>
-<p>Keep <span class="math inline">\(k \leq 4\)</span> unless using LASSO-VAR.</p>
+<p><strong>Parameter explosion.</strong> A VAR(<span class="math inline">\(p\)</span>) with <span class="math inline">\(k\)</span> variables has <span class="math inline">\(k^2 p\)</span> coefficients. At <span class="math inline">\(k=5\)</span> and <span class="math inline">\(p=4\)</span> that is <strong>100 coefficients</strong> — typically more than a monthly business series has observations. Keep <span class="math inline">\(k \leq 4\)</span> unless you are using a LASSO-VAR.</p>
 </div>
-<div class="keybox">
-<p><strong>Python:</strong> <code>statsmodels.tsa.vector_ar.var_model.VAR</code></p>
-<p><code>var.fit(maxlags=p, ic=&#39;bic&#39;)</code></p>
-</div>
-</div></div>
+<p><span class="neutral smaller"><strong>Python:</strong> <code>statsmodels.tsa.api.VAR</code>; <code>var.fit(maxlags=p, ic=&#39;bic&#39;)</code> selects the order.</span></p>
 </section>
 <section id="granger-causality-test" class="slide level2">
 <h2>Granger Causality Test</h2>
@@ -1359,53 +1210,26 @@ Department of Economics
 <div class="definitionbox-title">
 <p>Granger Causality</p>
 </div>
-<p><span class="math inline">\(x_t\)</span> <strong>Granger-causes</strong> <span class="math inline">\(y_t\)</span> if past values of <span class="math inline">\(x_t\)</span> help predict <span class="math inline">\(y_t\)</span> <em>beyond what <span class="math inline">\(y_t\)</span>’s own past explains</em>.</p>
+<p><span class="math inline">\(x_t\)</span> <strong>Granger-causes</strong> <span class="math inline">\(y_t\)</span> if past values of <span class="math inline">\(x_t\)</span> help predict <span class="math inline">\(y_t\)</span> <em>beyond what <span class="math inline">\(y_t\)</span>’s own past already explains</em>.</p>
 </div>
-<p><strong>Test procedure:</strong></p>
-<ol type="1">
-<li>Fit VAR with and without <span class="math inline">\(x\)</span>-lags in the <span class="math inline">\(y\)</span>-equation</li>
-<li>F-test <span class="math inline">\(H_0\)</span>: all <span class="math inline">\(x\)</span>-lag coefficients <span class="math inline">\(= 0\)</span></li>
-<li>Reject ⟹ <span class="math inline">\(x_t\)</span> Granger-causes <span class="math inline">\(y_t\)</span></li>
-</ol>
-<div class="columns">
-<div class="column" style="width:55%;">
-<p><strong>Business example:</strong> Does consumer sentiment (UMCSENT) Granger-cause retail sales (RSXFS)?</p>
-<p><span class="math inline">\(H_0\)</span>: all sentiment lags <span class="math inline">\(= 0\)</span> in the retail equation.</p>
-<p><span class="neutral smaller">Impulse response functions (IRFs) trace how a shock to one variable propagates through the VAR over time — useful for understanding dynamics.</span></p>
-</div><div class="column" style="width:41%;">
-<div class="warningbox">
-<p>Granger causality ≠ structural causality. It tests <strong>predictive content</strong>, not whether <span class="math inline">\(x_t\)</span> mechanically causes <span class="math inline">\(y_t\)</span>.</p>
-</div>
-</div></div>
+<p><strong>The test:</strong> fit the <span class="math inline">\(y\)</span>-equation with and without the <span class="math inline">\(x\)</span>-lags, then run an <span class="math inline">\(F\)</span>-test of <span class="math inline">\(H_0\)</span>: all <span class="math inline">\(x\)</span>-lag coefficients are zero. Rejecting means <span class="math inline">\(x_t\)</span> Granger-causes <span class="math inline">\(y_t\)</span>.</p>
+<p><strong>A concrete question.</strong> Does consumer sentiment (<code>UMCSENT</code>) Granger-cause retail sales (<code>RSXFS</code>)? The null is that every sentiment lag is zero in the retail equation. We will run exactly this in the lab.</p>
+<p><strong>Granger causality is not structural causality.</strong> It tests <em>predictive content</em>, not whether <span class="math inline">\(x\)</span> mechanically brings <span class="math inline">\(y\)</span> about — a rooster reliably predicts sunrise. Report it as “predictive of,” never “causes.”</p>
+<p><span class="neutral smaller">Impulse response functions trace how a shock propagates through the system over time.</span></p>
 </section>
 <section id="arimax-exogenous-variables-with-arima-errors" class="slide level2">
 <h2>ARIMAX: Exogenous Variables with ARIMA Errors</h2>
-<p>When one variable clearly <em>drives</em> another (not symmetric), use ARIMAX:</p>
+<p>When one variable clearly <em>drives</em> another rather than the relationship being symmetric, use ARIMAX.</p>
 <div class="definitionbox">
 <div class="definitionbox-title">
 <p>ARIMAX Model</p>
 </div>
-<p><span class="math display">\[y_t = \mathbf{x}_t&#39;\boldsymbol{\beta} + \eta_t, \qquad \eta_t \sim \text{ARIMA}(p,d,q)\]</span></p>
-<p><span class="math inline">\(\mathbf{x}_t\)</span> are exogenous regressors; <span class="math inline">\(\eta_t\)</span> captures remaining autocorrelation.</p>
+<p><span class="math display">\[y_t = \mathbf{x}_t&#39;\boldsymbol{\beta} + \eta_t, \qquad \eta_t \sim \mathrm{ARIMA}(p,d,q)\]</span></p>
+<p><span class="math inline">\(\mathbf{x}_t\)</span> are exogenous regressors; <span class="math inline">\(\eta_t\)</span> absorbs whatever autocorrelation is left in the residuals.</p>
 </div>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>When to use ARIMAX:</strong></p>
-<ul>
-<li>Causal direction is clear: ads → sales</li>
-<li>You can forecast <span class="math inline">\(x_t\)</span> externally</li>
-<li>Adding <span class="math inline">\(x_t\)</span> reduces forecast error in CV</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<div class="keybox">
-<p><strong>Python:</strong></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href></a>SARIMAX(y, exog<span class="op">=</span>X,</span>
-<span id="cb1-2"><a href></a>  order<span class="op">=</span>(p,d,q)).fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="warningbox">
-<p>ARIMAX requires a future forecast of <span class="math inline">\(x_t\)</span> to forecast <span class="math inline">\(y_t\)</span>. If unavailable, use VAR instead.</p>
-</div>
-</div></div>
+<p><strong>Use it when</strong> the causal direction is clear (advertising → sales), you already have <span class="math inline">\(x_t\)</span> or can forecast it, and adding <span class="math inline">\(x_t\)</span> actually reduces cross-validated forecast error — check that last one rather than assuming it.</p>
+<p><strong>The catch that surprises people:</strong> to forecast <span class="math inline">\(y_{t+h}\)</span> you need <span class="math inline">\(x_{t+h}\)</span> — a forecast of your own predictor. If that is unavailable, ARIMAX buys you nothing at forecast time and you should use a VAR instead, which generates its own.</p>
+<p><span class="neutral smaller"><strong>Python:</strong> <code>SARIMAX(y, exog=X, order=(p,d,q)).fit()</code></span></p>
 </section>
 <section id="key-takeaways" class="slide level2">
 <h2>Key Takeaways</h2>
@@ -1422,8 +1246,10 @@ Department of Economics
 </section>
 <section id="references" class="slide level2 smaller scrollable">
 <h2>References</h2>
-<div id="refs" role="list">
-
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-Granger1969" class="csl-entry" role="listitem">
+Granger, C. W. J. 1969. <span>“Investigating Causal Relations by Econometric Models and Cross-Spectral Methods.”</span> <em>Econometrica</em> 37 (3): 424–38.
+</div>
 </div>
 
 </section></section>

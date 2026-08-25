@@ -67,19 +67,15 @@
 
 % --- Slide: What is bagging --------------------------------------------------
 \begin{frame}{Bagging: The Big Idea}
-  \textbf{Problem from Lecture 4:} a single decision tree has very high
-  variance --- change a few training points and you get a completely
-  different tree.
-  \vspace{0.2cm}
+  \textbf{Problem from Lecture 4:} a single decision tree has very high variance ---
+  change a few training points and you get a completely different tree.
+
   \textbf{Bagging solution \parencite{Breiman1996}:}
-  \begin{enumerate}
-    \item Draw $B$ \textbf{bootstrap samples} from the training data
-          (sample with replacement, same size as original)
-    \item Fit one deep decision tree on each bootstrap sample
+  \begin{enumerate}\small\itemsep0pt
+    \item Draw $B$ \textbf{bootstrap samples} (with replacement, same size as the original)
+    \item Fit one deep decision tree on each
     \item \textbf{Average} all $B$ predictions:
-    \[
-      \hat{y}_{\text{bag}} = \frac{1}{B}\sum_{b=1}^{B} \hat{f}^{(b)}(\mathbf{x})
-    \]
+          $\hat{y}_{\text{bag}} = \tfrac{1}{B}\sum_{b=1}^{B} \hat{f}^{(b)}(\mathbf{x})$
   \end{enumerate}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
@@ -92,11 +88,8 @@
     \end{column}
     \begin{column}{0.44\textwidth}
       \begin{keybox}
-        \small
-        \textbf{Key insight:} more trees always helps
-        (never hurts). The variance floor is $\rho\sigma^2$
-        --- determined by how correlated the trees are,
-        not by the number of trees.
+        \small \textbf{Key insight:} more trees never hurts, but the variance floor is
+        $\rho\sigma^2$ --- set by how correlated the trees are, not by how many there are.
       \end{keybox}
     \end{column}
   \end{columns}

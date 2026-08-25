@@ -38,41 +38,31 @@
 \begin{frame}{What Is Stationarity?}
   \begin{definitionbox}{Weak (Covariance) Stationarity}
     A time series $\{y_t\}$ is \textbf{weakly stationary} if:
-    \begin{enumerate}\small
+    \begin{enumerate}\small\itemsep1pt
       \item $\E[y_t] = \mu$ \quad (constant mean over time)
       \item $\Var(y_t) = \sigma^2 < \infty$ \quad (constant, bounded variance)
       \item $\Cov(y_t, y_{t-k}) = \gamma_k$ depends only on lag $k$, not on $t$
     \end{enumerate}
   \end{definitionbox}
+  \textbf{Why the definition earns its keep:} if the mean drifts, there is no single
+  value to forecast. If the variance grows, prediction intervals widen without bound.
+  Stationarity is what makes the past informative about the future --- it is the
+  assumption every model in this lecture rests on.
+
+  \vspace{0.15cm}
+  \textbf{The usual culprits} are trending series --- GDP, prices, sales --- and variance
+  that grows with the level. First-differencing removes a stochastic trend; a log
+  transform stabilizes variance.
+
   \vspace{0.1cm}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Why it matters:}
-      \begin{itemize}\small
-        \item If the mean drifts, no single value is forecastable
-        \item If variance grows, prediction intervals become infinite
-        \item Stationarity makes the past informative about the future
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{warningbox}
-        \textbf{Common culprits:}
-        \begin{itemize}\small
-          \item Trending series (GDP, prices, sales)
-          \item Variance that grows with level
-        \end{itemize}
-        \textbf{Fix:} first-differencing removes a stochastic trend.
-      \end{warningbox}
-    \end{column}
-  \end{columns}
-  \muted{\footnotesize\itshape
-    Rule of thumb: visible trend or growing variance $\Rightarrow$
-    likely non-stationary. Test formally with ADF or KPSS.}
+  \muted{\footnotesize\itshape Rule of thumb: visible trend or growing variance
+  $\Rightarrow$ likely non-stationary. Test formally with ADF or KPSS.}
 \end{frame}
 
 % --- Slide: Unit root + differencing ------------------------------------------
 \begin{frame}{Unit Roots and Differencing}
-  \textbf{AR(1):} $y_t = \phi_1\,y_{t-1} + \varepsilon_t$
+  \textbf{AR(1):} $y_t = \phi_1\,y_{t-1} + \varepsilon_t$. Everything turns on
+  whether $\phi_1$ is below one or exactly one.
   \begin{center}
     {\small
     \begin{tabular}{lll}
@@ -85,66 +75,46 @@
     \end{tabular}
     }
   \end{center}
-  \textbf{First differencing} removes a stochastic trend:
-  $\Delta y_t = y_t - y_{t-1}$\\[3pt]
-  \textbf{Testing:} \textbf{ADF} ($H_0$: unit root) and \textbf{KPSS}
-  ($H_0$: stationary) --- they test opposite nulls; use both.
-  \begin{columns}[T]
-    \column{0.48\textwidth}
-      \begin{keybox}
-        {\small $d=0$: already stationary.
-        $d=1$: one first difference.
-        $D=1$: seasonal difference ($\Delta_{12}y_t = y_t - y_{t-12}$).}
-      \end{keybox}
-    \column{0.48\textwidth}
-      \begin{warningbox}
-        \small\textbf{Over-differencing} induces negative autocorrelation.
-        Test \emph{after} differencing; stop at $d=1$
-        if the result is stationary.
-      \end{warningbox}
-  \end{columns}
+  \textbf{First differencing} removes a stochastic trend: $\Delta y_t = y_t - y_{t-1}$.
+  So $d=0$ means already stationary, $d=1$ means one first difference, and $D=1$ means a
+  seasonal difference, $\Delta_{12}y_t = y_t - y_{t-12}$.
+
+  \vspace{0.15cm}
+  \textbf{Testing:} \textbf{ADF} ($H_0$: unit root) and \textbf{KPSS} ($H_0$: stationary)
+  test \emph{opposite} nulls --- so run both, and be suspicious when they disagree.
+  \textbf{Do not over-difference.} A second difference on an already-stationary series
+  induces negative autocorrelation that you then have to model away --- you have
+  manufactured the problem you are now solving. Test \emph{after} differencing, and stop at
+  $d=1$ once the result is stationary.
 \end{frame}
 
 % --- Slide: ACF and PACF for identification -----------------------------------
 \begin{frame}{ACF and PACF: Model Identification}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Autocorrelation function (ACF):}
-      $\rho_k = \mathrm{Corr}(y_t, y_{t-k})$
-      \begin{itemize}\small
-        \item MA($q$): \pos{cuts off} after lag $q$
-        \item AR($p$): tails off geometrically
-      \end{itemize}
-      \vspace{0.2cm}
-      \textbf{Partial autocorrelation (PACF):}
-      correlation between $y_t$ and $y_{t-k}$ controlling for intermediate lags
-      \begin{itemize}\small
-        \item AR($p$): \pos{cuts off} after lag $p$
-        \item MA($q$): tails off geometrically
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{center}
-        {\small
-        \begin{tabular}{lll}
-          \toprule
-          \textbf{Model} & \textbf{ACF} & \textbf{PACF} \\
-          \midrule
-          AR($p$)  & Tails off & Cuts off at $p$ \\
-          MA($q$)  & Cuts off at $q$ & Tails off \\
-          ARMA     & Tails off & Tails off \\
-          RW / I(1) & Decays slowly & Big spike at 1 \\
-          \bottomrule
-        \end{tabular}
-        }
-      \end{center}
-      \begin{keybox}
-        \small Always unit-root test and difference
-        \emph{before} reading ACF/PACF.
-        The ACF of a non-stationary series is not interpretable.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  The \textbf{autocorrelation function}, $\rho_k = \mathrm{Corr}(y_t, y_{t-k})$, measures
+  how $y_t$ relates to its own past. The \textbf{partial} autocorrelation measures the same
+  thing while controlling for the lags in between --- which is what separates a direct
+  effect from one inherited through intermediate lags.
+
+  \vspace{0.1cm}
+  Read them together and they identify the model:
+  \begin{center}
+    {\small
+    \begin{tabular}{lll}
+      \toprule
+      \textbf{Model} & \textbf{ACF} & \textbf{PACF} \\
+      \midrule
+      AR($p$)   & Tails off geometrically & \pos{Cuts off} after lag $p$ \\
+      MA($q$)   & \pos{Cuts off} after lag $q$ & Tails off geometrically \\
+      ARMA      & Tails off & Tails off \\
+      RW / I(1) & Decays slowly & Big spike at lag 1 \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+  \vspace{0.1cm}
+  \textbf{Always unit-root test and difference \emph{before} reading either plot.} The ACF
+  of a non-stationary series decays slowly no matter what the underlying process is, so it
+  tells you nothing about $p$ or $q$ --- only that you have not differenced yet.
 \end{frame}
 
 % =============================================================================
@@ -160,62 +130,45 @@
     {\small Apply an ARMA($p$,$q$) to the $d$-times differenced series:
     $y_t = c + \sum_{i=1}^{p}\phi_i y_{t-i} + \varepsilon_t + \sum_{j=1}^{q}\theta_j\varepsilon_{t-j}$}
   \end{definitionbox}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Parameters \& special cases:}
-      \begin{itemize}\small
-        \item $p$: AR lags; $d$: differences; $q$: MA lags
-        \item ARIMA(0,1,0): random walk
-        \item ARIMA(0,1,1): equivalent to SES
-        \item ARIMA(1,0,0): AR(1)
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \begin{examplebox}{Numeric Example}
-        \small ARIMA(1,1,0) with $\hat{\phi}_1=0.5$:\\
-        $y_{100}=120$, $y_{99}=118$, $\Delta y_{100}=2$\\
-        $\hat{y}_{101|100} = 120 + 0.5 \times 2 = \mathbf{121}$
-      \end{examplebox}
-      \begin{keybox}
-        \small\textbf{Python:}
-        \texttt{pmdarima.auto\_arima()} searches automatically.
-        \texttt{statsmodels.SARIMAX} fits any specified model.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+  $p$ is the number of AR lags, $d$ the number of differences, $q$ the number of MA lags.
+  Several familiar models are just corners of this space: \textbf{ARIMA(0,1,0)} is a random
+  walk, \textbf{ARIMA(1,0,0)} is an AR(1), and \textbf{ARIMA(0,1,1)} is algebraically
+  equivalent to simple exponential smoothing from Lecture 1.
+
+  \vspace{0.15cm}
+  \textbf{A forecast by hand.} Take ARIMA(1,1,0) with $\hat{\phi}_1 = 0.5$. If
+  $y_{100} = 120$ and $y_{99} = 118$, then $\Delta y_{100} = 2$, and
+  \[
+    \hat{y}_{101|100} \;=\; 120 + 0.5 \times 2 \;=\; \mathbf{121}.
+  \]
+  \vspace{-0.2cm}
+  \textbf{In Python:} \texttt{pmdarima.auto\_arima()} searches orders automatically;
+  \texttt{statsmodels.SARIMAX} fits any order you specify.
 \end{frame}
 
 % --- Slide: SARIMA ------------------------------------------------------------
 \begin{frame}{SARIMA: Adding Seasonal Terms}
-  For monthly or quarterly data, autocorrelation often appears at lags
-  $m, 2m, 3m, \ldots$ SARIMA($p$,$d$,$q$)($P$,$D$,$Q$)[$m$] adds seasonal
-  AR and MA polynomials:
-  \begin{keybox}
-    Think of SARIMA as two ARIMA models operating at different time scales:
-    \begin{itemize}\small
-      \item Non-seasonal part $(p,d,q)$: captures week-to-week dynamics
-      \item Seasonal part $(P,D,Q)[m]$: captures year-over-year patterns at lag $m$
-    \end{itemize}
-  \end{keybox}
+  For monthly or quarterly data, autocorrelation often appears at lags $m, 2m, 3m, \ldots$
+  SARIMA($p$,$d$,$q$)($P$,$D$,$Q$)[$m$] adds seasonal AR and MA polynomials alongside the
+  non-seasonal ones.
+
+  \vspace{0.15cm}
+  The useful mental model is \textbf{two ARIMA models running at different time scales}:
+  the non-seasonal part $(p,d,q)$ captures week-to-week dynamics, while the seasonal part
+  $(P,D,Q)[m]$ captures the year-over-year pattern at lag $m$.
+
+  \vspace{0.15cm}
+  \textbf{Practical workflow:}
+  \begin{enumerate}\small\itemsep1pt
+    \item ADF / KPSS $\to$ choose $d$
+    \item Seasonal unit root test $\to$ choose $D$
+    \item ACF / PACF on the differenced series $\to$ guide $p, q, P, Q$
+    \item Minimize AIC, then check the residual ACF with a Ljung-Box test
+  \end{enumerate}
   \vspace{0.1cm}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Practical workflow:}
-      \begin{enumerate}\small
-        \item ADF/KPSS $\to$ choose $d$
-        \item Seasonal unit root test $\to$ choose $D$
-        \item ACF/PACF on differenced series $\to$ guide $p,q,P,Q$
-        \item Minimize AIC; check residual ACF (Ljung-Box test)
-      \end{enumerate}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{examplebox}{US Retail Sales}
-        SARIMA(1,1,1)(0,1,1)[12]
-        is a strong starting point for monthly retail data
-        with trend and December seasonality.
-      \end{examplebox}
-    \end{column}
-  \end{columns}
+  \muted{\small For monthly retail data with trend and December seasonality,
+  SARIMA(1,1,1)(0,1,1)[12] is a strong starting point --- and a good default to beat
+  before trying anything more elaborate.}
 \end{frame}
 
 % =============================================================================
@@ -227,129 +180,109 @@
 
 % --- Slide: Why multivariate --------------------------------------------------
 \begin{frame}{Why Use Multiple Series?}
-  All univariate models (ETS, ARIMA) use only $y_t$'s own history.
-  But many business variables are \emph{linked}:
-  \begin{itemize}
-    \item Consumer sentiment today $\to$ retail spending next month
-    \item Interest rates today $\to$ housing starts in 3--6 months
-    \item Advertising spend today $\to$ sales over the next few weeks
-  \end{itemize}
-  \begin{keybox}
-    If series $x_t$ contains information about $y_{t+h}$
-    \emph{not already in} $y_t$'s own history, then including $x_t$
-    reduces forecast error. \textbf{Granger causality} \parencite{Granger1969}
-    formalizes this idea.
-  \end{keybox}
+  Every model so far --- ETS, ARIMA --- uses only $y_t$'s own history. But business
+  variables are linked: consumer sentiment today moves retail spending next month,
+  interest rates move housing starts within two quarters, advertising spend moves sales
+  over the following weeks.
+
+  \vspace{0.1cm}
+  The principle underneath all of it: \textbf{if $x_t$ carries information about $y_{t+h}$
+  that is not already in $y_t$'s own history, including $x_t$ reduces forecast error.}
+  \textbf{Granger causality} \parencite{Granger1969} is the formal test of exactly that
+  claim, and we get to it in two slides.
+
+  \vspace{0.15cm}
+  That leaves a modelling choice, and it turns on whether the influence runs one way or both:
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{VAR:} treat all variables symmetrically ---
-      each variable predicts all others.
+      \textbf{VAR --- symmetric}
+      \begin{itemize}\small\itemsep0pt
+        \item Every variable predicts every other
+        \item Use when influence runs both ways
+        \item No variable is privileged
+      \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \textbf{ARIMAX:} one direction only ---
-      $x_t$ drives $y_t$ but not vice versa.
+      \textbf{ARIMAX --- one direction}
+      \begin{itemize}\small\itemsep0pt
+        \item $x_t$ drives $y_t$, not the reverse
+        \item Use when the causal story is clear
+        \item Needs a forecast of $x_t$ itself
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
 
 % --- Slide: VAR(1) definition -------------------------------------------------
 \begin{frame}{The VAR($p$) Model}
-  For two stationary series $y_{1t}$ and $y_{2t}$:
+  For two stationary series $y_{1t}$ and $y_{2t}$, each equation regresses on the lags of
+  \emph{both}:
   \[
     \begin{cases}
       y_{1t} = c_1 + a_{11}\,y_{1,t-1} + a_{12}\,y_{2,t-1} + \varepsilon_{1t}\\[2pt]
       y_{2t} = c_2 + a_{21}\,y_{1,t-1} + a_{22}\,y_{2,t-1} + \varepsilon_{2t}
     \end{cases}
   \]
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Key ideas:}
-      \begin{itemize}\small
-        \item $a_{12}$: how much $y_{2,t-1}$ predicts $y_{1t}$ (what univariate AR misses)
-        \item Each equation estimated by OLS; order $p$ chosen by BIC
-        \item If $a_{12}=a_{21}=0$: reduces to separate AR models
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{warningbox}
-        \small\textbf{Parameter explosion:}
-        VAR($p$) with $k$ variables has $k^2 p$ coefficients.\\[2pt]
-        $k=5$, $p=4$: \textbf{100 coefficients}!\\[2pt]
-        Keep $k \leq 4$ unless using LASSO-VAR.
-      \end{warningbox}
-    \end{column}
-  \end{columns}
-  \begin{keybox}
-    \small\textbf{Python:} \texttt{statsmodels.tsa.vector\_ar.var\_model.VAR}\\
-    Use \texttt{var.fit(maxlags=p, ic=`bic')} for automatic order selection.
-  \end{keybox}
+  The cross terms are where the value is: $a_{12}$ is how much $y_{2,t-1}$ predicts $y_{1t}$,
+  which is precisely what a univariate AR throws away. If $a_{12} = a_{21} = 0$, the system
+  collapses back into two separate AR models and you have learned that too.
+  Each equation is estimated by OLS; the order $p$ is chosen by BIC.
+  \begin{warningbox}
+    \textbf{Parameter explosion.} A VAR($p$) with $k$ variables has $k^2 p$ coefficients.
+    At $k=5$ and $p=4$ that is \textbf{100 coefficients} --- typically more than a monthly
+    business series has observations. Keep $k \leq 4$ unless you are using a LASSO-VAR.
+  \end{warningbox}
+  \muted{\footnotesize \textbf{Python:}
+  \texttt{statsmodels.tsa.api.VAR}; \texttt{var.fit(maxlags=p, ic='bic')} selects the order.}
 \end{frame}
 
 % --- Slide: Granger causality -------------------------------------------------
 \begin{frame}{Granger Causality Test}
   \begin{definitionbox}{Granger Causality}
-    $x_t$ \textbf{Granger-causes} $y_t$ if past values of $x_t$ help predict
-    $y_t$ \emph{beyond what $y_t$'s own past explains}.
+    $x_t$ \textbf{Granger-causes} $y_t$ if past values of $x_t$ help predict $y_t$
+    \emph{beyond what $y_t$'s own past already explains}.
   \end{definitionbox}
-  \textbf{Test procedure:}
-  \begin{enumerate}\small
-    \item Fit VAR with and without $x$-lags in the $y$-equation
-    \item F-test $H_0$: all $x$-lag coefficients $= 0$
-    \item Reject $\Rightarrow$ $x_t$ Granger-causes $y_t$
-  \end{enumerate}
-  \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-      \textbf{Business example:}\\
-      Does consumer sentiment (UMCSENT)
-      Granger-cause retail sales (RSXFS)?\\
-      $H_0$: all sentiment lags $= 0$ in the retail equation.
-    \end{column}
-    \begin{column}{0.41\textwidth}
-      \begin{warningbox}
-        \small Granger causality $\neq$ structural causality.
-        It tests \emph{predictive content},
-        not whether $x_t$ mechanically causes $y_t$.
-      \end{warningbox}
-    \end{column}
-  \end{columns}
-  \muted{\footnotesize\itshape
-    Impulse response functions (IRFs) trace how a shock propagates
-    through the VAR system over time.}
+  \textbf{The test:} fit the $y$-equation with and without the $x$-lags, then run an
+  $F$-test of $H_0$: all $x$-lag coefficients are zero. Rejecting means $x_t$
+  Granger-causes $y_t$.
+
+  \vspace{0.15cm}
+  \textbf{A concrete question.} Does consumer sentiment (\texttt{UMCSENT}) Granger-cause
+  retail sales (\texttt{RSXFS})? The null is that every sentiment lag is zero in the
+  retail equation. We will run exactly this in the lab.
+
+  \vspace{0.15cm}
+  \textbf{Granger causality is not structural causality.} It tests \emph{predictive
+  content}, not whether $x$ mechanically brings $y$ about --- a rooster reliably predicts
+  sunrise. Report it as ``predictive of,'' never ``causes.''
+
+  \muted{\footnotesize\itshape Impulse response functions trace how a shock propagates
+  through the system over time.}
 \end{frame}
 
 % --- Slide: ARIMAX -----------------------------------------------------------
 \begin{frame}{ARIMAX: Exogenous Variables with ARIMA Errors}
-  When one variable clearly \emph{drives} another (not symmetric), use ARIMAX:
+  When one variable clearly \emph{drives} another rather than the relationship being
+  symmetric, use ARIMAX.
   \begin{definitionbox}{ARIMAX Model}
     \[
       y_t = \mathbf{x}_t'\boldsymbol{\beta} + \eta_t,
       \qquad \eta_t \sim \mathrm{ARIMA}(p,d,q)
     \]
-    $\mathbf{x}_t$ are exogenous regressors;
-    $\eta_t$ captures remaining autocorrelation in the residuals.
+    $\mathbf{x}_t$ are exogenous regressors; $\eta_t$ absorbs whatever autocorrelation is
+    left in the residuals.
   \end{definitionbox}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{When to use ARIMAX:}
-      \begin{itemize}\small
-        \item Causal direction is clear: ads $\to$ sales
-        \item You already have or can forecast $x_t$
-        \item Adding $x_t$ reduces forecast error in CV
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \small
-        \textbf{Python:}\\
-        \texttt{SARIMAX(y, exog=X,}\\
-        \texttt{  order=(p,d,q)).fit()}
-      \end{keybox}
-      \begin{warningbox}
-        \small ARIMAX requires a future forecast of $x_t$ to forecast $y_t$.
-        If that is unavailable, use VAR instead.
-      \end{warningbox}
-    \end{column}
-  \end{columns}
+  \textbf{Use it when} the causal direction is clear (advertising $\to$ sales), you already
+  have $x_t$ or can forecast it, and adding $x_t$ actually reduces cross-validated forecast
+  error --- check that last one rather than assuming it.
+
+  \vspace{0.15cm}
+  \textbf{The catch that surprises people:} to forecast $y_{t+h}$ you need
+  $x_{t+h}$ --- a forecast of your own predictor. If that is unavailable, ARIMAX buys you
+  nothing at forecast time and you should use a VAR instead, which generates its own.
+
+  \vspace{0.1cm}
+  \muted{\footnotesize \textbf{Python:} \texttt{SARIMAX(y, exog=X, order=(p,d,q)).fit()}}
 \end{frame}
 
 % =============================================================================
