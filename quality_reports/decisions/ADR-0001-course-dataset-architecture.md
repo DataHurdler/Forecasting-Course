@@ -53,9 +53,11 @@ Use the M5 Forecasting–Accuracy dataset for everything.
 hierarchies (state→store, category→dept→item); calendar with events and SNAP; weekly
 `sell_prices`; free on Zenodo and via Nixtla `datasetsforecast`, so **no Kaggle login**;
 Walmart is immediately legible to MBA students.
-**Con:** Large raw download; retail stores do not meaningfully Granger-cause one another, so
-L02 would be taught on data where the honest answer is "no relationship"; single-seasonality
-retail understates what Prophet is for.
+**Con:** Large raw download; single-seasonality retail understates what Prophet is for.
+
+*(Corrected 2026-08-24 after testing the data: the original con claimed retail stores do not
+Granger-cause one another. That is empirically false for M5. Two same-state stores share
+regional shocks and the test is significant — see the correction note below.)*
 
 ### Option C: M5 spine + targeted supplements
 
@@ -92,7 +94,7 @@ reason is stated to students.
 | Dataset | Role | Why not the spine |
 |---|---|---|
 | **M5 / Walmart** | Spine, L01–L12 | — |
-| **FRED** macro series | L02 VAR & Granger causality | Retail stores do not cause each other; retail sales, unemployment, CPI, and consumer sentiment do. Free API, no login, `pandas_datareader` support. |
+| **FRED** macro series | L02 VAR & Granger causality | Gives a case where the causal *direction* is defensible — unemployment moves retail spending, not the reverse. M5 gives the complementary case where the test fires but the direction is not identified. Free API, no login, `pandas_datareader` support. |
 | **Electricity demand** (half-hourly) | L03 multiple seasonality | Daily + weekly + yearly at once is what Prophet and GAMs are for; retail shows only one. Monash Forecasting Repository, free, no login. |
 | **Favorita** | Week 16 cameo + final-project seed | Provides a **dated exogenous shock** (2016-04-16 earthquake) that M5 has no equivalent of. Used to close the course: every method fails together, because the future stopped resembling the past. Also a good project dataset — different enough from the spine that students must transfer rather than copy lecture code. |
 
@@ -127,7 +129,37 @@ reason is stated to students.
 
 - **A (keep Rossmann):** the dataset is structurally too short for a 52-week season; the HW01
   bug was a symptom, not an isolated mistake.
-- **B (M5 alone):** would force L02 to teach Granger causality on series with no real causal
-  relationship, and understate what Prophet is for.
+- **B (M5 alone):** would understate what Prophet is for. *(The original reason given here ---
+  that M5 has no real causal relationships to test --- was wrong; see the correction below.)*
 - **D (Favorita spine):** duplicates M5's shape while being shorter, larger to download, and
   Kaggle-gated. Its one unique asset — the earthquake — is retained as a cameo under Option C.
+
+---
+
+## Correction — 2026-08-24, after testing against the data
+
+The original version of this ADR justified bringing in FRED by asserting that **two Walmart
+stores do not meaningfully Granger-cause one another**, so a VAR fitted to M5 would teach the
+mechanics on a case with no relationship to find. That assertion was made from intuition and
+is **empirically false**.
+
+Measured on the prepared weekly panel, CA_1 and CA_3 FOODS:
+
+- contemporaneous correlation of weekly **changes**: **+0.85**
+- Granger test, CA_3 lags added to the CA_1 equation, 4 lags: **F(4, 263) = 8.51** — clearly
+  significant
+
+Two stores 40 miles apart share regional promotions, weather, holidays, and local economic
+conditions. Of course they co-move.
+
+**This makes the teaching case better, not worse.** M5 now supplies the *harder* and more
+realistic lesson: the test fires, and a student still cannot claim CA_3 drives CA_1, because
+the relationship is confounded by shared shocks. That is exactly the "Granger causality is not
+structural causality" point, delivered on data where the temptation to over-claim is real
+rather than hypothetical.
+
+FRED still earns its place, for the complementary reason: it supplies a case where the causal
+*direction* is defensible — unemployment plausibly moves retail spending and not the reverse.
+Between them the two datasets cover both situations a student will meet.
+
+HW01 Part 2 Q4 is built on the M5 case and asks students to reason about precisely this.

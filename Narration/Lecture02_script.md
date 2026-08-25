@@ -474,10 +474,16 @@ Granger-causes $y$.
 Here's a concrete question we'll run in the lab: does consumer sentiment Granger-cause retail
 sales? The null is that every sentiment lag is zero in the retail equation.
 
-And notice we're using macroeconomic series for this, not store sales. That's deliberate.
-Two retail stores in different states don't meaningfully move each other — if we ran this on
-store data, the honest answer would be "no relationship," which is a poor way to learn what
-the test is for. Sentiment and spending genuinely do move together.
+And notice we're using macroeconomic series here rather than store sales. That's deliberate,
+though not for the reason you might guess.
+
+Two Walmart stores in the same state absolutely *do* move together — you'll find a
+significant Granger test between them in the homework. The problem is that finding tells you
+almost nothing, because both stores are responding to the same regional promotions and the
+same weather. The test fires, and you still cannot say which one drives the other.
+
+Sentiment and retail spending give us the case where the direction is at least arguable.
+Between the two you get both situations you'll meet in practice.
 
 **[pause]**
 

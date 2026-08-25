@@ -28,13 +28,13 @@ Part 2 covers ARIMA-based models and their multivariate extension, Vector Autore
 - Diagnose stationarity with the Augmented Dickey-Fuller test and difference a series appropriately
 - Identify a plausible ARIMA($p,d,q$) order from ACF and PACF plots
 - Evaluate a model with walk-forward cross-validation rather than a single train/test split
-- Fit a VAR, run a Granger causality test, and state what the result does and does not license you to claim
+- Fit a VAR, run a Granger causality test, and state precisely what the result does and does not license you to claim
 
 ---
 
 # Dataset and Split
 
-Same weekly Rossmann panel as Part 1, and **the same train/test split**, so your Part 2 numbers are directly comparable to Part 1.
+Same M5 weekly panel as Part 1, and **the same train/test split**, so your Part 2 numbers are directly comparable to Part 1.
 
 ```{python}
 import pandas as pd
@@ -47,11 +47,13 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import warnings
 warnings.filterwarnings('ignore')
 
-weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
-store1 = weekly[weekly["Store"] == 1].set_index("WeekStart")["Sales"]
+weekly = pd.read_csv("data/processed/m5_weekly.csv", parse_dates=["week_start"])
 
-N_TEST = 26                                   # identical to Part 1
-train, test = store1.iloc[:-N_TEST], store1.iloc[-N_TEST:]
+ca1 = (weekly[(weekly.store_id == "CA_1") & (weekly.cat_id == "FOODS")]
+       .set_index("week_start")["units"].sort_index())
+
+N_TEST = 52                                   # identical to Part 1
+train, test = ca1.iloc[:-N_TEST], ca1.iloc[-N_TEST:]
 print(f"train: {len(train)} weeks   test: {len(test)} weeks")
 ```
 
@@ -67,9 +69,9 @@ Start a **new** Codex session for Part 2 and paste the block below as the very f
 ```
 I am working on Homework 1, Part 2 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
-Dataset: Rossmann Store Sales (preprocessed weekly), at `data/processed/rossmann_weekly.csv`. Columns include Store (1-30), WeekStart, Sales, Customers, Promo, StoreType, Assortment, CompetitionDistance, and lag features. Each store has roughly 134 weekly observations covering January 2013 to July 2015.
+Dataset: M5 / Walmart weekly sales, prepared at `data/processed/m5_weekly.csv`. Columns: store_id (10 Walmart stores across CA, TX, WI), cat_id (FOODS, HOBBIES, HOUSEHOLD), state_id, week_start, units, avg_price, snap_days, event_days, and lag features. There are 30 store-category series, each with 277 weekly observations covering January 2011 to May 2016.
 
-Part 2 covers ARIMA, walk-forward cross-validation, VAR, and Granger causality using Python and statsmodels. I already completed exponential smoothing in Part 1 and will compare against those results. The train/test split is fixed: the final 26 weeks are the test set. For each question:
+Part 2 covers ARIMA, walk-forward cross-validation, VAR, and Granger causality using Python and statsmodels, on the CA_1 and CA_3 FOODS series. I already completed exponential smoothing in Part 1 and will compare against those results. The train/test split is fixed: the final 52 weeks are the test set. For each question:
 1. Write clean, well-commented Python code that runs end-to-end
 2. Interpret outputs in plain English for a business audience
 3. Log this interaction to PROMPT_LOG.jsonl before responding
@@ -90,15 +92,25 @@ Submit this text as **`INITIAL_PROMPT.md`** in your Part 2 submission folder.
 
 *(Suggested prompts: 3)*
 
-Work through the following steps for the Store 1 series.
+Work through the following steps for the CA_1 FOODS series.
 
 **(a)** Run the Augmented Dickey-Fuller test. Report the test statistic, p-value, and your conclusion about stationarity. If differencing is needed, apply it and re-test.
 
-**(b)** Plot the ACF and PACF of the (possibly differenced) series. Based on the plots, propose an ARIMA($p, d, q$) order and explain your reasoning.
+::: {.callout-warning}
+## This one is not clean, and that is the point
+
+The ADF result on this series **depends on how many augmenting lags you use**. `adfuller` picks a lag order automatically by default, but you can set `maxlag` yourself — and short lag orders and long ones do not agree here.
+
+Do not just report whatever the default returns. Run it at two or three different lag settings, report what you find, and *commit to a conclusion with a reason*. Then carry that conclusion into (b), (c), and Q4.
+
+Real series are frequently borderline. Learning to defend a judgment call is the skill; a clean p-value would have taught you nothing.
+:::
+
+**(b)** Plot the ACF and PACF of the (possibly differenced) series. Based on the plots, propose an ARIMA($p, d, q$) order and explain your reasoning. Compare what you see against the four reference patterns from Lecture 2 — which one does this series most resemble?
 
 **(c)** Fit your chosen ARIMA model on `train`. Report the AIC and compute the forecast RMSE on `test`.
 
-**(d)** Implement walk-forward cross-validation: use an expanding window with a minimum training length of 52 weeks, re-fit your ARIMA at each step, and produce a 1-step-ahead forecast. Report the mean RMSE across all steps.
+**(d)** Implement walk-forward cross-validation: use an expanding window with a minimum training length of 104 weeks, re-fit your ARIMA at each step, and produce a 1-step-ahead forecast. Report the mean RMSE across all steps.
 
 ```{python}
 # (a) ADF test
@@ -107,10 +119,10 @@ Work through the following steps for the Store 1 series.
 
 # (c) Fit ARIMA on train, report AIC, compute RMSE on test
 
-# (d) Walk-forward CV with expanding window (min 52 weeks), 1-step-ahead forecasts
+# (d) Walk-forward CV, expanding window, min 104 weeks, 1-step-ahead
 ```
 
-> **Your response:** Compare the ARIMA walk-forward RMSE to the best exponential smoothing model from Part 1. Which method would you recommend for a weekly store-level sales forecast and why? Consider accuracy, interpretability, and operational constraints. Note also whether the walk-forward RMSE differs much from the single-split RMSE in (c) — and if it does, which number you would trust.
+> **Your response:** Compare the ARIMA walk-forward RMSE to the best exponential smoothing model from Part 1. Which method would you recommend for a weekly store-category forecast and why — consider accuracy, interpretability, and what it costs to maintain across 30 series. Then note whether the walk-forward RMSE in (d) differs much from the single-split RMSE in (c), and say which number you would trust and why.
 
 ---
 
@@ -118,21 +130,34 @@ Work through the following steps for the Store 1 series.
 
 *(Suggested prompts: 3)*
 
-This question extends the analysis to two stores simultaneously.
+This question extends the analysis to two stores in the same state: **CA_1** and **CA_3**, both FOODS.
 
-**(a)** Test whether Store 2 Sales Granger-causes Store 1 Sales at lag 4 using `grangercausalitytests`. Report the F-statistic and p-value for that lag.
+**(a)** Test whether CA_3 FOODS Granger-causes CA_1 FOODS at lag 4 using `grangercausalitytests`. Report the F-statistic and p-value for that lag.
 
-**(b)** Align the two series on a common date index. Fit a VAR(4) on the training portion of both stores using `statsmodels.tsa.api.VAR`. Forecast the next 4 weeks. Plot actual versus forecast for Store 1 only.
+Use **the transformation you justified in Q3(a)** — levels if you concluded the series is stationary, differences if you concluded it has a unit root. State which you used and why. Lecture 2 covered both hazards: regressing non-stationary series gives you spurious results, and differencing an already-stationary series induces autocorrelation you then have to model away.
+
+**(b)** Fit a VAR(4) on the training window of both series — same transformation as in (a) — using `statsmodels.tsa.api.VAR`. Forecast the next 4 weeks. Plot actual versus forecast for CA_1 only.
+
+**(c)** Report the contemporaneous correlation between the two series' weekly changes.
 
 ```{python}
-store2 = weekly[weekly["Store"] == 2].set_index("WeekStart")["Sales"]
+ca3 = (weekly[(weekly.store_id == "CA_3") & (weekly.cat_id == "FOODS")]
+       .set_index("week_start")["units"].sort_index())
 
-# (a) Granger causality test: does Store 2 Sales Granger-cause Store 1 Sales at lag 4?
+# (a) Granger causality at lag 4, using the transformation you justified in Q3(a)
 
-# (b) Align series, fit VAR(4) on the training window, forecast 4 weeks, plot Store 1
+# (b) VAR(4) on the training window, forecast 4 weeks, plot CA_1
+
+# (c) contemporaneous correlation of the weekly changes
 ```
 
-> **Your response:** In your own words, what does Granger causality actually mean — and what does it *not* mean? Then interpret **your own result**: state whether you found evidence of Granger causality at lag 4, and explain what that finding implies operationally for Rossmann. If you found it, does it mean Store 2 *causes* Store 1's sales? If you did not, does that establish the two stores are independent? Address both directions, whichever way your test came out.
+> **Your response:** Answer in three parts.
+>
+> **First**, state what Granger causality means in your own words, and what it does *not* mean.
+>
+> **Second**, report what you actually found — the F-statistic, the p-value, and the contemporaneous correlation from (c). You will likely find both a strong contemporaneous correlation *and* a significant Granger test.
+>
+> **Third**, and this is the important one: explain what that combination does and does not establish. Two Walmart stores 40 miles apart share regional promotions, weather, holidays, and local economic conditions. Does CA_3's sales *cause* CA_1's? If not, what is generating both the correlation and the predictive relationship — and what would a demand planner be entitled to do with this result? Be specific about the difference between "CA_3 helps me forecast CA_1" and "CA_3 drives CA_1."
 
 ---
 
@@ -142,9 +167,9 @@ store2 = weekly[weekly["Store"] == 2].set_index("WeekStart")["Sales"]
 
 No code required for this question. Write your answer directly below in 150–200 words.
 
-You are a demand planner at Rossmann responsible for producing 52-week store-level sales forecasts, updated monthly. Drawing on your results from Part 1 and from Q3–Q4, answer the following:
+You are a demand planner at Walmart responsible for producing 52-week store-category sales forecasts, updated monthly, across all 30 series in this dataset. Drawing on your results from Part 1 and from Q3–Q4, answer the following:
 
-Which of the methods from this homework (SES, Holt, Holt-Winters, ARIMA, VAR) would you recommend for **production use** at scale, and which would you retain as a **benchmark**? Justify your choice based on forecast accuracy, the operational realities of running 30+ stores, the cost of model maintenance, and interpretability to non-technical stakeholders.
+Which of the methods from this homework (SES, Holt, Holt-Winters, ARIMA, VAR) would you recommend for **production use** at scale, and which would you retain as a **benchmark**? Justify your choice based on forecast accuracy, the operational realities of refitting 30 series every month, the cost of model maintenance, and interpretability to non-technical stakeholders.
 
 > **Your response:** *(150–200 words)*
 

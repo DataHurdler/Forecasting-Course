@@ -18,7 +18,7 @@ itself part of the skill this course is teaching.
 | Dataset | Where it appears | Why it is in the course |
 |---|---|---|
 | **M5 / Walmart** | Throughout — the spine | Five years of daily store-item sales with prices, holidays, and a real store/category hierarchy |
-| **FRED** macro series | Lecture 2 | Two Walmart stores do not cause each other. Retail sales, unemployment, and CPI genuinely do |
+| **FRED** macro series | Lecture 2 | Gives a case where the causal *direction* is defensible — unemployment moves retail spending, not the reverse |
 | **Electricity demand** | Lecture 3 | Half-hourly data has daily, weekly *and* yearly cycles at once. Retail has one |
 | **Favorita** (Ecuador) | Week 16, and available for final projects | A dated exogenous shock — every method we learn fails on the same month |
 
@@ -80,10 +80,16 @@ sales, unemployment, the consumer price index, and consumer sentiment.
 from Python with `pandas_datareader`, which pulls the series by code.
 
 **Why we need it and M5 cannot substitute.** Lecture 2 covers **Vector Autoregression** and
-**Granger causality** — methods for several series that influence one another. Two Walmart
-stores in different states do not meaningfully influence each other's sales. If we fit a VAR to
-them, we would be teaching you the mechanics on a case where the honest answer is "there is no
-relationship here," which is a bad way to learn what the method is for.
+**Granger causality** — methods for several series that influence one another.
+
+M5 can demonstrate the mechanics perfectly well: two Walmart stores in the same state share
+regional promotions, weather, and holidays, and their weekly changes correlate at about 0.85.
+A Granger test between them comes back strongly significant. You will run exactly that in
+Homework 1.
+
+But notice what that case *cannot* settle. Neither store causes the other. Both respond to
+something else, and the test cannot tell you so. That is the honest limit of the method, and
+it is why we also bring in macroeconomic data — where the causal *direction* is defensible.
 
 Macroeconomic series do genuinely move each other. Unemployment affects retail spending;
 retail spending feeds back into sentiment. There is a real transmission mechanism, so a

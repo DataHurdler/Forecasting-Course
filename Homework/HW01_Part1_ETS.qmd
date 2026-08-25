@@ -30,15 +30,17 @@ Exponential smoothing is a workhorse of operational forecasting in retail and su
 - Read a retail time series plot for trend, seasonality, and business-driven irregularity
 - Apply Simple Exponential Smoothing, Holt's linear trend model, and Holt-Winters to seasonal weekly data
 - Interpret the smoothing parameter $\alpha$ in business terms
-- Compare competing models on a held-out test set using RMSE and MAE
+- Compare competing models on a held-out test set using RMSE and MAE, against a benchmark
 
 ---
 
 # Dataset
 
-This homework uses the **Rossmann Store Sales** dataset, a widely studied retail forecasting benchmark from a Kaggle competition. The data contain weekly sales for 30 Rossmann drug stores in Germany covering **January 2013 through July 2015** — roughly 134 weeks per store — preprocessed into a consistent weekly panel. Each row is one store-week and includes sales volume, customer count, promotional indicators, competition information, and pre-computed lag features used in later homeworks.
+This course runs on the **M5 / Walmart** dataset — the spine described in `ECON8310_Datasets.md`. It covers daily unit sales for Walmart stores across California, Texas, and Wisconsin from **29 January 2011 to 22 May 2016**, and it was the data for the M5 forecasting competition.
 
-The preprocessed file is at `data/processed/rossmann_weekly.csv`. If it does not exist, run `python scripts/prep_rossmann.py` once first.
+You will work with the prepared weekly file, `data/processed/m5_weekly.csv`: **30 series** (10 stores × 3 product categories), **277 weeks each**, with average price, SNAP benefit days, and event-day counts alongside the unit sales.
+
+If the file does not exist, run `python scripts/prep_m5.py` once first — it will tell you where to get the raw download.
 
 ```{python}
 import pandas as pd
@@ -48,12 +50,15 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import warnings
 warnings.filterwarnings('ignore')
 
-weekly = pd.read_csv("data/processed/rossmann_weekly.csv", parse_dates=["WeekStart"])
+weekly = pd.read_csv("data/processed/m5_weekly.csv", parse_dates=["week_start"])
 
-# Focus on Store 1 for univariate models
-store1 = weekly[weekly["Store"] == 1].set_index("WeekStart")["Sales"]
-print(f"Store 1: {len(store1)} weekly observations "
-      f"from {store1.index.min().date()} to {store1.index.max().date()}")
+# Store CA_1, FOODS category, for the univariate models in Part 1
+ca1 = (weekly[(weekly.store_id == "CA_1") & (weekly.cat_id == "FOODS")]
+       .set_index("week_start")["units"]
+       .sort_index())
+
+print(f"CA_1 FOODS: {len(ca1)} weekly observations "
+      f"from {ca1.index.min().date()} to {ca1.index.max().date()}")
 ```
 
 ---
@@ -68,9 +73,9 @@ Paste the block below as the very first message in your Codex session before sen
 ```
 I am working on Homework 1, Part 1 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
-Dataset: Rossmann Store Sales (preprocessed weekly), at `data/processed/rossmann_weekly.csv`. Columns include Store (1-30), WeekStart, Sales, Customers, Promo, StoreType, Assortment, CompetitionDistance, and lag features (Sales_lag1 through Sales_lag52). Each store has roughly 134 weekly observations covering January 2013 to July 2015.
+Dataset: M5 / Walmart weekly sales, prepared at `data/processed/m5_weekly.csv`. Columns: store_id (10 Walmart stores across CA, TX, WI), cat_id (FOODS, HOBBIES, HOUSEHOLD), state_id, week_start, units, avg_price, snap_days, event_days, and lag features (units_lag1 through units_lag52). There are 30 store-category series, each with 277 weekly observations covering January 2011 to May 2016.
 
-Part 1 covers exponential smoothing only (SES, Holt, Holt-Winters) using Python and statsmodels. ARIMA and VAR come in Part 2 — do not introduce them here. I will ask you questions one at a time. For each:
+Part 1 covers exponential smoothing only (SES, Holt, Holt-Winters) using Python and statsmodels, on the CA_1 FOODS series. ARIMA and VAR come in Part 2 — do not introduce them here. I will ask you questions one at a time. For each:
 1. Write clean, well-commented Python code that runs end-to-end
 2. Interpret outputs in plain English for a business audience
 3. Log this interaction to PROMPT_LOG.jsonl before responding
@@ -91,13 +96,13 @@ Submit this text as **`INITIAL_PROMPT.md`** in your Part 1 submission folder.
 
 *(Suggested prompts: 1)*
 
-Plot Store 1 weekly sales over the full observation window. After examining the plot, answer the written questions below.
+Plot CA_1 FOODS weekly unit sales over the full 277-week window. After examining the plot, answer the written questions below.
 
 ```{python}
-# Plot Store 1 weekly sales over time
+# Plot CA_1 FOODS weekly units over time
 ```
 
-> **Your response:** Describe what you see in the plot. Mention trend, any seasonal pattern, and a plausible business explanation. What business factors (promotions, holidays, store events) might explain the peaks and troughs you observe?
+> **Your response:** Describe what you see. Is there a trend, and roughly how large is it over the five years? Is there a repeating annual pattern, and where do the peaks fall? Identify at least one irregular spike or dip and propose a business explanation — the dataset includes SNAP benefit days and event flags, and Walmart food sales respond to both.
 
 ---
 
@@ -105,25 +110,25 @@ Plot Store 1 weekly sales over the full observation window. After examining the 
 
 *(Suggested prompts: 2)*
 
-Split the Store 1 series into a training set and a held-out test set of the final 26 weeks. Fit the three models below on the training set, forecast over the test period, and compute RMSE and MAE for each.
+Hold out the final **52 weeks** as a test set. Fit the three models below on the training portion, forecast across the test period, and compute RMSE and MAE for each.
 
 - **Simple Exponential Smoothing (SES)**
 - **Holt's linear trend model**
 - **Holt-Winters (additive seasonality, period = 52)**
 
-Present your accuracy results in a summary table.
+Also compute the same two metrics for a **seasonal naive** benchmark — this week last year — so you can tell whether any of the three models is earning its complexity. Present all four rows in one summary table.
 
 ::: {.callout-note}
-## Why the test set is 26 weeks and not larger
+## Why a 52-week test set works here
 
-Holt-Winters has to estimate a seasonal index for each of the 52 weeks in a year, and it needs **at least two complete cycles** — $2m = 104$ observations — before it can initialize them. This is the same $2m$ rule stated in Lecture 1.
+Holt-Winters must estimate a seasonal index for each of the 52 weeks in a year, and it needs **at least two complete cycles** — $2m = 104$ observations — before it can initialize them. This is the $2m$ rule from Lecture 1.
 
-Store 1 has about 134 weekly observations. Holding out 26 leaves roughly 108 for training, which clears the 104 threshold with a little room. Hold out much more and Holt-Winters will refuse to fit at all. The assertion below makes that constraint explicit rather than letting it fail deep inside statsmodels.
+Each series has 277 weeks. Holding out 52 still leaves 225 for training, comfortably above the threshold, and a one-year holdout is the horizon a demand planner actually cares about. The assertion below makes the constraint explicit rather than letting it fail deep inside statsmodels.
 :::
 
 ```{python}
-N_TEST = 26                                   # final 26 weeks held out
-train, test = store1.iloc[:-N_TEST], store1.iloc[-N_TEST:]
+N_TEST = 52                                   # final year held out
+train, test = ca1.iloc[:-N_TEST], ca1.iloc[-N_TEST:]
 
 SEASONAL_PERIOD = 52
 assert len(train) >= 2 * SEASONAL_PERIOD, (
@@ -133,10 +138,11 @@ assert len(train) >= 2 * SEASONAL_PERIOD, (
 )
 print(f"train: {len(train)} weeks   test: {len(test)} weeks")
 
-# Fit SES, Holt, and Holt-Winters models; compute RMSE and MAE for each
+# Fit SES, Holt, and Holt-Winters; add a seasonal naive benchmark;
+# compute RMSE and MAE for all four
 ```
 
-> **Your response:** Which model performs best on the test set and why? What does the estimated smoothing parameter $\alpha$ tell you about how quickly Store 1 sales respond to recent observations? Is a high or low $\alpha$ appropriate for this series, and what does that imply for how a demand planner should use it?
+> **Your response:** Which model performs best, and does it beat the seasonal naive benchmark? This series trends upward over the sample — explain what that implies for SES specifically, given that SES produces a flat forecast. Then interpret the estimated $\alpha$: what does its value say about how quickly CA_1 food sales respond to recent weeks, and what would you tell a demand planner who wanted to know how much weight the model puts on last week?
 
 ---
 
