@@ -191,36 +191,97 @@ At least one question will be checked for credit, except for homework assignment
 If you really do not know how to proceed with a homework question, you should email me.
 -->
 
-There are 7 homework assignments, each worth 30 points, for a total of 210 points.
-Several assignments are submitted in parts across multiple weeks. **The parts of an assignment
-split that assignment's 30 points between them** — they are not 30 points each. Each part has its
-own Codex context prompt and its own prompt budget. See the weekly schedule below for due dates.
-Each assignment is a Quarto (`.qmd`) document rendered to HTML and submitted through the course repository, together with your `PROMPT_LOG.jsonl` and a short `REPORT.md` containing your business recommendation.
+There are 7 homework assignments worth **300 points in total**. They are not equally weighted —
+points follow the scope of the assignment, and three of them are submitted in parts across
+multiple weeks with each part carrying its own share.
 
-Which lectures each assignment draws on:
+| HW | Covers | Parts and points | Total |
+|---|---|---|---|
+| 1 | Lectures 1–2 | Pt 1 — 12 · Pt 2 — 23 | 35 |
+| 2 | Lecture 3 | single submission | 30 |
+| 3 | Lectures 4–5 | single submission | 35 |
+| 4 | Lecture 6 | single submission | 35 |
+| 5 | Lectures 7–9 | Pt 1 — 27 · Pt 2 — 29 · Pt 3 — 9 | 65 |
+| 6 | Lectures 10–11 | Pt 1 — 28 · Pt 2 — 22 | 50 |
+| 7 | Lecture 12 | single submission | 50 |
+| | | | **300** |
 
-| HW | Covers | | HW | Covers |
-|---|---|---|---|---|
-| 1 Pt 1 | Lecture 1 | | 5 Pt 1 | Lectures 7–8 |
-| 1 Pt 2 | Lecture 2 | | 5 Pt 2 | Lecture 9 |
-| 2 | Lecture 3 | | 5 Pt 3 | Lectures 7–9 |
-| 3 | Lectures 4–5 | | 6 Pt 1 | Lectures 10, 11 Pt 1 |
-| 4 | Lecture 6 | | 6 Pt 2 | Lecture 11 Pt 2 |
-| | | | 7 | Lecture 12 |
+Each part has its own Codex context prompt and its own prompt budget. Due dates are in the
+**weekly schedule** at the end of this syllabus.
 
-Due dates are in the **weekly schedule** at the end of this syllabus.
+### How to Submit Homework
+
+All homework is submitted through your own copy of the course environment repository
+([DataHurdler/Forecasting-Env](https://github.com/DataHurdler/Forecasting-Env)). Submission is a
+**git push** — there is no upload, and nothing is emailed.
+
+For each assignment, your submission folder must contain **four** things:
+
+| File | What it is |
+|---|---|
+| `HWxx.qmd` | The assignment document with your code and written answers filled in |
+| `HWxx.html` | The rendered output. **It must render from a clean restart** — if it does not run, it is not a submission |
+| `PROMPT_LOG.jsonl` | Every Codex interaction for that assignment, one JSON object per line |
+| `INITIAL_PROMPT.md` | The context prompt you pasted at the start of the session |
+
+Assignments that ask for a business recommendation also require a short **`REPORT.md`**. The
+weekly schedule says which.
+
+**Naming and placement.** One folder per submission, named for the assignment exactly as it
+appears in the schedule — `hw01_part1`, `hw05_part2`, and so on. The validation script in the
+environment repository checks this for you before you push; run it.
+
+**Commits.** Make one commit per Codex prompt, with the message
+`hw05 prompt 3: fit the LSTM and report RMSE`. The commit history is part of the record: it shows
+where the work came from and in what order, and it is what makes the prompt budget meaningful
+rather than an honour system.
+
+**Timing.** Due **before class begins** on the date in the weekly schedule. Push time is
+submission time — a push at 6:01pm on the due date is late. Exceptions need at least 24 hours'
+notice unless it is a genuine emergency.
+
+**The single most common way to lose points** is submitting a `.qmd` that does not render.
+Restart your kernel and render the whole document before you push, every time.
 
 ### Final Project
 The final project is completed in **groups of no more than 3 students** and is worth 100 points — a quarter of the course grade.
 Groups are formed by Week 4 and submitted to me for approval.
 
-**Dataset requirements.** Each group selects a real business dataset of its choosing. The dataset must:
-- Be a time series or convertible to one (e.g., daily, weekly, or monthly observations)
+**Dataset.** You have two options, and both are fully acceptable — neither is the "easy" route.
+
+1. **Bring your own.** A real business dataset of your group's choosing.
+2. **Use the dataset I supply.** I expect to provide a real, non-public sales dataset from a
+   working website. If you take this option you skip the sourcing work, but you inherit its
+   quirks — and cleaning a dataset nobody has tidied for you is itself part of the job.
+
+I will confirm the supplied dataset's availability by **Week 4**, when groups are due. If you are
+bringing your own, it must:
+
+- Be a time series or convertible to one (daily, weekly or monthly observations)
 - Have at least 100 time periods
-- Have a clear, specific business forecasting question (e.g., "forecast weekly demand for SKU X to support inventory decisions" — not just "predict a number")
+- Support a clear, specific business forecasting question — "forecast weekly demand for SKU X to
+  support inventory decisions," not "predict a number"
+
+Bring your dataset choice to the proposal in Week 9. If sourcing your own stalls, switch to the
+supplied dataset rather than losing weeks — tell me and it is not a penalty.
 
 **Required content.** The final report must:
-1. Fit at least **3 methods drawn from at least 2 different parts of the course** (e.g., one classical time series method, one tree-based method, and one neural network or Bayesian model)
+1. Fit at least **three forecasting methods**, drawn from at least **two** of the four parts of
+   this course, plus a **benchmark**. The four parts are:
+
+   | Part | Lectures | Examples |
+   |---|---|---|
+   | Classical time series | 1–3 | ETS, ARIMA, VAR, Prophet, pyGAM |
+   | Trees and regularization | 4–6 | Random forest, XGBoost, LASSO, Elastic Net |
+   | Deep learning | 7–9 | FFN, 1D CNN, RNN, LSTM, Transformer |
+   | Bayesian | 10–12 | Structural time series, hierarchical, Bayesian regression |
+
+   The **benchmark does not count** toward the three and is not optional. Use seasonal naive, or
+   another one-line rule appropriate to your series, and report it alongside every model. A
+   report without a benchmark cannot show that any of its work was worth doing.
+
+   Three methods from one part — say XGBoost, random forest and LASSO — does **not** satisfy this.
+   The point is to compare approaches that differ in kind, not in tuning.
 2. Use **walk-forward cross-validation** for all model comparisons
 3. Include a **business recommendation section** written for a non-technical decision-maker — actionable, jargon-free, and grounded in your results
 4. Include a **methods reflection** explaining which model performed best and connecting that result to characteristics of your specific dataset
@@ -240,12 +301,11 @@ There is no page limit, but conciseness is valued: a well-organized 15–20 page
 The grading rubric will be distributed by Week 6.
 
 ### Points and Letter Grades
-| Component | Points |
-|---|---|
-| Homework (7 × 30) | 210 |
-| Pop quizzes (3 × 30) | 90 |
-| Final project | 100 |
-| **Total** | **400** |
+| Component | Points | Share |
+|---|---|---|
+| Homework (7 assignments, 11 submissions) | 300 | 75% |
+| Final project | 100 | 25% |
+| **Total** | **400** | |
 
 Students with full attendance will be awareded 10 extra points. There are time-sensitive extra point opportunities throughout the semester. Please pay attention to annoucements in-class or on Canvas.
 
@@ -299,29 +359,70 @@ For example, if the class has trouble understanding a specific topic, I might ta
 
 ## Weekly Schedule
 
-Everything in one place: what we cover, what to read, and what is due. Assignments are due
-**before class** on the date shown.
+Assignments are due **before class begins**. Readings are listed under each week.
 
-| Wk | Date | Lecture | Reading | Due / Notes |
-|---|---|---|---|---|
-| 1 | Aug 27 | 1 — Intro, Exponential Smoothing & Evaluation | FPP Ch. 1, Ch. 2, §5.1–5.10, Ch. 8 | |
-| 2 | Sep 3 | 2 — ARIMA, VAR & Multivariate | FPP Ch. 9, §10.1–10.3, §10.6, §12.3 | **HW 1 Pt 1**; panel with business professionals, 6–7pm |
-| 3 | Sep 10 | 3 — Generalized Additive Models | FPP §7.4, §7.7, §12.1–12.2 | **HW 1 Pt 2** |
-| 4 | Sep 17 | 4 — Decision Trees | ISLP §8.1 | **HW 2**; **project groups due** |
-| 5 | Sep 24 | 5 — Tree Ensembles: RF & Boosted Trees | ISLP §8.2; XGBoost *Introduction to Boosted Trees*; FPP §12.4 Py / §12.5 R for bagging | **Online, asynchronous — no in-person meeting.** Recorded lecture and self-paced lab on the course site; office hours as usual. Nothing due; use this week for HW 3 |
-| 6 | Oct 1 | 6 — Regularization & Model Selection | ISLP Ch. 6; FPP §7.5 | **HW 3**; project grading rubric distributed |
-| 7 | Oct 8 | 7 — Introduction to Neural Networks | FPP-Py §14.1–14.2, §14.4–14.5, §14.7 | **HW 4** |
-| 8 | Oct 15 | 8 — CNN Architectures | FPP-Py §14.3 | |
-| 9 | Oct 22 | 9 Pt 1 — RNNs and LSTMs | FPP-Py §14.3, §14.6 | **HW 5 Pt 1**; **project proposal due** |
-| 10 | Oct 29 | 9 Pt 2 — Transformers | FPP-Py Ch. 15 | |
-| 11 | Nov 5 | 10 — Bayesian I: Foundations | **BMCP Ch. 1–2**; FPP §5.5, §5.9 for framing | **HW 5 Pt 2** |
-| 12 | Nov 12 | 11 Pt 1 — Bayesian II: Time Series | **BMCP §6.2, §6.4** | **HW 5 Pt 3** |
-| 13 | Nov 19 | 11 Pt 2 — Bayesian II: Hierarchical Models | **BMCP §4.5–4.6** | **HW 6 Pt 1** |
-| 14 | Nov 26 | — | — | **Thanksgiving break, no class** |
-| 15 | Dec 3 | 12 — Bayesian III: Linear Regression | **BMCP §3.2–3.3**; FPP Ch. 7 as the frequentist benchmark | **HW 6 Pt 2** |
-| 16 | Dec 10 | Final thoughts; project work session | FPP Ch. 13 | **HW 7** |
-| 17 | Dec 17 | **Final project presentations** | — | |
-| — | Dec 18 | | | **Final project report due** |
+**Week 1 · Aug 27** — Lecture 1: Introduction, Exponential Smoothing & Forecast Evaluation
+*Reading:* FPP Ch. 1, Ch. 2, §5.1–5.10, Ch. 8
+
+**Week 2 · Sep 3** — Lecture 2: ARIMA, VAR & Multivariate Models
+*Reading:* FPP Ch. 9, §10.1–10.3, §10.6, §12.3
+*Due:* Homework 1 Part 1 · *Also:* roundtable with business professionals, 6–7pm
+
+**Week 3 · Sep 10** — Lecture 3: Generalized Additive Models
+*Reading:* FPP §7.4, §7.7, §12.1–12.2
+*Due:* Homework 1 Part 2
+
+**Week 4 · Sep 17** — Lecture 4: Decision Trees
+*Reading:* ISLP §8.1
+*Due:* Homework 2 · **Final project groups due**
+
+**Week 5 · Sep 24** — Lecture 5: Tree Ensembles — Random Forests & Boosted Trees
+*Reading:* ISLP §8.2; XGBoost "Introduction to Boosted Trees"; FPP §12.4 Python ed. / §12.5 R ed. for the bagging intuition
+**Online, asynchronous — no in-person meeting.** The lecture is posted as a recording and the lab is self-paced; both are on the course site, and office hours run as usual. Nothing is due this week, and Homework 3 is due the following week — so this is the week to work on it.
+
+**Week 6 · Oct 1** — Lecture 6: Regularization & Model Selection
+*Reading:* ISLP Ch. 6; FPP §7.5
+*Due:* Homework 3 · *Also:* final project grading rubric distributed
+
+**Week 7 · Oct 8** — Lecture 7: Introduction to Neural Networks
+*Reading:* FPP-Py §14.1–14.2, §14.4–14.5, §14.7
+*Due:* Homework 4
+
+**Week 8 · Oct 15** — Lecture 8: CNN Architectures
+*Reading:* FPP-Py §14.3
+
+**Week 9 · Oct 22** — Lecture 9 Part 1: RNNs and LSTMs
+*Reading:* FPP-Py §14.3, §14.6
+*Due:* Homework 5 Part 1 · **Final project proposal due**
+
+**Week 10 · Oct 29** — Lecture 9 Part 2: Transformers
+*Reading:* FPP-Py Ch. 15
+
+**Week 11 · Nov 5** — Lecture 10: Bayesian Statistics I — Foundations
+*Reading:* BMCP Ch. 1 (inference, priors, prior predictive checks) and Ch. 2 (MCMC diagnostics); FPP §5.5, §5.9 for framing
+*Due:* Homework 5 Part 2
+
+**Week 12 · Nov 12** — Lecture 11 Part 1: Bayesian Statistics II — Time Series
+*Reading:* BMCP §6.2, §6.4 (time series as regression; state space and Bayesian structural time series)
+*Due:* Homework 5 Part 3
+
+**Week 13 · Nov 19** — Lecture 11 Part 2: Bayesian Statistics II — Hierarchical Models
+*Reading:* BMCP §4.5–4.6 (pooling, multilevel and hierarchical models)
+*Due:* Homework 6 Part 1
+
+**Week 14 · Nov 26** — **Thanksgiving break, no class**
+
+**Week 15 · Dec 3** — Lecture 12: Bayesian Statistics III — Bayesian Linear Regression
+*Reading:* BMCP §3.2–3.3 (linear and multiple regression, counterfactuals); FPP Ch. 7 as the frequentist benchmark
+*Due:* Homework 6 Part 2
+
+**Week 16 · Dec 10** — Final thoughts on forecasting, econometrics and ML/AI; final project work session
+*Reading:* FPP Ch. 13
+*Due:* Homework 7
+
+**Week 17 · Dec 17** — **Final project presentations**
+
+**Dec 18** — **Final project report due**
 
 From Lecture 7 onward the FPP readings exist **only in the Python edition**. Where the two
 editions number a section differently, both numbers are given above.
