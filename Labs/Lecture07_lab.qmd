@@ -1,0 +1,274 @@
+---
+title: "Lab 7: Your First Network — and Why One Run Proves Nothing"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Two things today, and the second matters more than the first.
+
+**First**, you will build the machinery Homework 5 needs: turning a panel of 30 series into
+windowed training examples, and training a feedforward network on them. That scaffolding is the
+part of Homework 5 most likely to eat an evening, so we do it together.
+
+**Second**, you will train the same model several times and discover that it gives you a
+different answer every time. Then you will find out how large that variation is, and what it
+means for every neural network result you will ever read — including your own.
+
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+`data/processed/m5_weekly.csv`.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import warnings
+warnings.filterwarnings('ignore')
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first."
+    )
+
+weekly = (pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
+            .sort_values(["store_id", "cat_id", "week_start"]))
+
+CHANNELS = ["units", "snap_days", "event_days", "avg_price"]
+WINDOW   = 26
+CUTOFF   = np.datetime64("2015-05-17")
+
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+print(f"{weekly.groupby(['store_id','cat_id']).ngroups} series, {len(weekly):,} rows")
+```
+
+---
+
+# Step 1 — From a panel to windows
+
+A network cannot read a dataframe. It needs a stack of fixed-size examples.
+
+For each series, slide a 26-week window along the history: the window is the input, the units in
+the following week is the target.
+
+```{python}
+X, Y, D = [], [], []
+for _, g in weekly.groupby(["store_id", "cat_id"]):
+    arr = g[CHANNELS].values.astype("float32")
+    dates = g.week_start.values
+    for i in range(len(g) - WINDOW):
+        X.append(arr[i:i+WINDOW])      # (26, 4)
+        Y.append(arr[i+WINDOW, 0])     # next week's units
+        D.append(dates[i+WINDOW])      # the target's date decides train/test
+
+X = np.stack(X); Y = np.array(Y, dtype="float32"); D = np.array(D)
+train_mask, test_mask = D < CUTOFF, D >= CUTOFF
+
+print(f"X shape {X.shape}  (windows, weeks, channels)")
+print(f"train {train_mask.sum():,}   test {test_mask.sum():,}")
+```
+
+**Notice the window count is far larger than the row count.** Every week is the end of one window
+and the interior of twenty-five others, so 8,310 rows become ~7,500 overlapping examples. That
+overlap is why the effective sample size is much smaller than it looks.
+
+Now standardize — **using training statistics only**.
+
+```{python}
+mu = X[train_mask].mean(axis=(0, 1), keepdims=True)
+sd = X[train_mask].std(axis=(0, 1), keepdims=True) + 1e-8
+y_mu, y_sd = Y[train_mask].mean(), Y[train_mask].std()
+
+Xn, Yn = (X - mu) / sd, (Y - y_mu) / y_sd
+
+# flatten each window for a feedforward network: (26, 4) -> 104 features
+X_tr = torch.tensor(Xn[train_mask].reshape(train_mask.sum(), -1))
+y_tr = torch.tensor(Yn[train_mask])
+X_te = torch.tensor(Xn[test_mask].reshape(test_mask.sum(), -1))
+
+print(f"flattened to {X_tr.shape[1]} features per example")
+```
+
+**This block is what Homework 5 Part 1 Q1 asks for.** Keep it.
+
+---
+
+# Step 2 — Train a network
+
+```{python}
+def make_model(n_features, seed):
+    torch.manual_seed(seed)
+    return nn.Sequential(
+        nn.Linear(n_features, 128), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(128, 64),         nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(64, 1))
+
+def train(model, epochs=60, lr=5e-4, weight_decay=0.0):
+    opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    lossfn = nn.MSELoss()
+    loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(X_tr, y_tr), batch_size=64, shuffle=False)
+    for _ in range(epochs):
+        model.train()
+        for xb, yb in loader:
+            opt.zero_grad()
+            lossfn(model(xb).squeeze(-1), yb).backward()
+            opt.step()
+    model.eval()
+    with torch.no_grad():
+        return rmse(Y[test_mask], model(X_te).squeeze(-1).numpy() * y_sd + y_mu)
+
+model = make_model(X_tr.shape[1], seed=1)
+print(f"parameters: {sum(p.numel() for p in model.parameters()):,}")
+print(f"test RMSE:  {train(model):,.0f}")
+```
+
+**Note `shuffle=False`.** Almost every PyTorch tutorial sets it `True`. For a time series it
+destroys the ordering, and nothing warns you.
+
+**Compare that RMSE against your records.** XGBoost managed 781 on this panel in Homework 4, and
+a 46-coefficient LASSO managed 744. Your network has around 22,000 parameters.
+
+---
+
+# Step 3 — Run it again
+
+Same code, same data, same settings. Only the random seed changes.
+
+```{python}
+for seed in (1, 2, 3):
+    print(f"seed {seed}:  test RMSE {train(make_model(X_tr.shape[1], seed)):,.0f}")
+```
+
+**Say out loud what just happened**, because it is the point of the lab. Nothing about the
+problem changed. The differences you see come entirely from random weight initialization and
+dropout.
+
+---
+
+# Step 4 — So how would you compare two settings?
+
+Here is the trap. Suppose you want to know whether weight decay helps. You try three values,
+train once each, and pick the winner.
+
+```{python}
+single = {wd: train(make_model(X_tr.shape[1], seed=1), weight_decay=wd)
+          for wd in (0.0, 1e-4, 1e-2)}
+for wd, r in single.items():
+    print(f"weight_decay={wd:<7} test RMSE {r:,.0f}")
+```
+
+Now do it honestly — **five seeds per setting**, and look at the spread as well as the mean.
+
+```{python}
+rows = []
+for wd in (0.0, 1e-4, 1e-2):
+    runs = [train(make_model(X_tr.shape[1], s), weight_decay=wd) for s in (1, 2, 3, 4, 5)]
+    rows.append({"weight_decay": f"{wd:g}", "mean": round(np.mean(runs)),
+                 "sd": round(np.std(runs)), "min": round(min(runs)), "max": round(max(runs))})
+print(pd.DataFrame(rows).to_string(index=False))
+```
+
+::: {.callout-important}
+## Compare the two tables before you go on
+
+When this was run while writing the lab, the single-seed experiment made `1e-4` look like the
+winner — about **100 RMSE** better than no weight decay at all. On five seeds the two means
+differed by **4**.
+
+That 100-point advantage was not a small effect measured imprecisely. It did not exist.
+
+The five-seed table also shows something the single run cannot: `1e-2` is not just worse on
+average, its spread is **three times wider**. A setting that sometimes returns 1,050 and
+sometimes 1,792 is a different kind of bad from one that reliably returns 1,240 — and you would
+never learn that from one run.
+:::
+
+**Your turn:** using your own two tables, state the smallest RMSE difference you would be willing
+to call real.
+
+```{python}
+# ---- your turn: uncomment and fill in ----
+# spread = ___                      # <- a number from your five-seed table
+# print(f"differences smaller than about {spread:,.0f} RMSE are not evidence")
+```
+
+---
+
+# Step 5 — Break it on purpose
+
+One line, no error message.
+
+```{python}
+def train_broken(model, epochs=60, lr=5e-4):
+    opt = torch.optim.Adam(model.parameters(), lr=lr)
+    lossfn = nn.MSELoss()
+    loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(X_tr, y_tr), batch_size=64, shuffle=False)
+    for _ in range(epochs):
+        model.train()
+        for xb, yb in loader:
+            # opt.zero_grad()        <-- deleted
+            lossfn(model(xb).squeeze(-1), yb).backward()
+            opt.step()
+    model.eval()
+    with torch.no_grad():
+        return rmse(Y[test_mask], model(X_te).squeeze(-1).numpy() * y_sd + y_mu)
+
+print(f"with    zero_grad():  {train(make_model(X_tr.shape[1], 1)):,.0f}")
+print(f"without zero_grad():  {train_broken(make_model(X_tr.shape[1], 1)):,.0f}")
+```
+
+Without `zero_grad()`, PyTorch **accumulates** gradients across batches instead of replacing them,
+so every update uses a sum of all gradients seen so far in that epoch.
+
+No exception. No warning. Just a model that trains badly — and note *how* badly. The broken
+version lands around **7,400**, which is more than three times worse than the seasonal-naive
+benchmark of 2,152. A one-line omission turned a working model into something far worse than
+predicting last year's value.
+
+---
+
+# Before you leave
+
+> **Discuss (the seeds):** You now know a single training run tells you very little. But papers,
+> blog posts and vendor benchmarks routinely report exactly one. When you read "our model
+> achieves RMSE 1,050," what should you want to know before believing it beats a baseline at
+> 1,100?
+>
+> **Discuss (the comparison):** Your network has roughly 22,000 parameters and lost to a
+> 46-coefficient LASSO from Homework 4. Give one reason that is not simply "neural networks need
+> more data" — think about what the FFN can and cannot see in a flattened window.
+>
+> **Discuss (the practice):** You will hit this again in Homework 5, where you compare five
+> architectures. Given today, what will you do differently when one of them comes out 80 RMSE
+> ahead of another?
+
+---
+
+*Solutions posted to Canvas after class.*

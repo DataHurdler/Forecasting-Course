@@ -74,10 +74,28 @@ quarto render Labs/LectureNN_lab.qmd
 
 Start from `_TEMPLATE_lab.qmd`.
 
-## Series map — avoid collisions
+## Overlap with homework
 
-Labs run **before** the homework they precede, so a lab must not use the series the homework
-asks about. Keep this table current when adding a lab.
+**Revised 2026-08-25.** The original rule was that a lab must never touch the series its homework
+asks about. That is no longer a requirement.
+
+Overlap is fine. If a lab hands students the answer to a homework question or two, that is often
+a good thing — particularly where the question is scaffolding rather than analysis. In Homework 5
+the hard part is not the feedforward network, it is building a windowing `Dataset` and getting
+the tensor shapes right. A student who loses three hours there has learned nothing the assignment
+was testing.
+
+**But do not force it either way.** Build the lab that teaches the lecture best. Sometimes that
+means reusing the homework's setup; sometimes a different series makes the point better, as in
+Labs 1 and 2 where the *contrast* between series is the lesson. Both are fine.
+
+The one thing to protect is a result the homework is designed to make surprising — Homework 1's
+benchmark winning, Homework 3's planted-noise finding, Homework 5's architecture ranking. Give
+away the setup freely; leave the punchline.
+
+The table below records what each lab uses, mostly so collisions are visible when they matter.
+
+## Series map
 
 | | Primary series | Contrast / second series |
 |---|---|---|

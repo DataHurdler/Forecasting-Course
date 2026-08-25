@@ -135,9 +135,15 @@ The textbook is our anchor, not our boundary. Several topics we cover have no FP
 All lecture code and all assignments use Python. You should have a working Python 3.10+ environment with the following packages before the first class:
 
 ```
-pandas, numpy, matplotlib, statsmodels, prophet, pygam,
+jupyter, pandas, numpy, matplotlib, statsmodels, prophet, pygam,
 scikit-learn, xgboost, torch, pymc, arviz
 ```
+
+**`jupyter` is not optional.** Quarto runs your Python through a Jupyter kernel, so without it
+`quarto render` fails before executing a single cell — even though nothing in your code imports it.
+
+**macOS users need one extra step for XGBoost:** `brew install libomp`, once, before Week 5.
+Without it `import xgboost` fails with an OpenMP error.
 
 Installation instructions and a test script are provided in the course repository.
 

@@ -95,3 +95,7 @@ Narration/*_solutions_script.md
 
 # local virtualenv
 .venv/
+
+# local virtualenvs (any Python version) and Quarto build artifacts
+.venv*/
+*.quarto_ipynb
