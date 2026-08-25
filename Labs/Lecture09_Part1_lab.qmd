@@ -1,0 +1,234 @@
+---
+title: "Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Labs 7 and 8 gave you two models that could not properly use a window. The feedforward network
+flattened it and lost the ordering; the CNN kept ordering but could only see seven weeks at a time.
+
+A recurrent network has neither limit. It reads the sequence in order and carries a hidden state,
+so in principle nothing stops it using the whole window.
+
+Today you build two of them — a plain RNN and an LSTM — and find out that the more sophisticated
+one loses. Understanding *why* is the point, and it is the most transferable thing in this lab.
+
+**Time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+`data/processed/m5_weekly.csv`. Fits here are quick — about six seconds each.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import warnings
+warnings.filterwarnings('ignore')
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first.")
+
+weekly = (pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
+            .sort_values(["store_id", "cat_id", "week_start"]))
+CHANNELS = ["units", "snap_days", "event_days", "avg_price"]
+CUTOFF   = np.datetime64("2015-05-17")
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+
+def build(W):
+    X, Y, D = [], [], []
+    for _, g in weekly.groupby(["store_id", "cat_id"]):
+        arr, dates = g[CHANNELS].values.astype("float32"), g.week_start.values
+        for i in range(len(g) - W):
+            X.append(arr[i:i+W]); Y.append(arr[i+W, 0]); D.append(dates[i+W])
+    X = np.stack(X); Y = np.array(Y, dtype="float32"); D = np.array(D)
+    tr, te = D < CUTOFF, D >= CUTOFF
+    mu, sd = X[tr].mean((0,1), keepdims=True), X[tr].std((0,1), keepdims=True) + 1e-8
+    ym, ys = Y[tr].mean(), Y[tr].std()
+    Xn, Yn = (X - mu)/sd, (Y - ym)/ys
+    # recurrent layers want (batch, time, channels) -- NOT the Conv1d layout
+    return (torch.tensor(Xn[tr]), torch.tensor(Yn[tr]), torch.tensor(Xn[te]), Y[te], ym, ys)
+
+DATA = {W: build(W) for W in (13, 26, 52)}
+print("shape at W=26:", DATA[26][0].shape, "(batch, time, channels)")
+```
+
+::: {.callout-warning}
+## The layout flips back
+
+`Conv1d` wanted `(batch, channels, time)`. `nn.RNN` and `nn.LSTM` with `batch_first=True` want
+`(batch, time, channels)` — the transpose you added in Lab 8 must come **out** again here.
+
+Neither library will complain. Both will train on nonsense.
+:::
+
+---
+
+# Step 1 — A plain RNN
+
+One recurrent layer, then a linear layer on the **final** hidden state — the summary after reading
+the whole window.
+
+```{python}
+class Recurrent(nn.Module):
+    def __init__(self, kind, n_channels=4, hidden=64):
+        super().__init__()
+        layer = nn.RNN if kind == "rnn" else nn.LSTM
+        self.rnn = layer(n_channels, hidden, batch_first=True)
+        self.fc  = nn.Linear(hidden, 1)
+    def forward(self, x):
+        out, _ = self.rnn(x)          # nn.LSTM returns out, (h, c) -- the _ absorbs both
+        return self.fc(out[:, -1, :]).squeeze(-1)
+
+def train(kind, W, seed, epochs=30):
+    Xtr, Ytr, Xte, Yte, ym, ys = DATA[W]
+    torch.manual_seed(seed)
+    model = Recurrent(kind)
+    opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    lossfn = nn.MSELoss()
+    loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(Xtr, Ytr), batch_size=128, shuffle=False)
+    for _ in range(epochs):
+        model.train()
+        for xb, yb in loader:
+            opt.zero_grad()
+            lossfn(model(xb), yb).backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)   # see below
+            opt.step()
+    model.eval()
+    with torch.no_grad():
+        score = rmse(Yte, model(Xte).numpy() * ys + ym)
+    return score, sum(p.numel() for p in model.parameters())
+
+score, n_par = train("rnn", 26, seed=1)
+print(f"vanilla RNN — {n_par:,} parameters, test RMSE {score:,.0f}")
+```
+
+**`clip_grad_norm_` is not decoration.** Backpropagating through 26 steps multiplies gradients
+repeatedly, and the product can explode. Clipping caps the update size. It is one line, it costs
+nothing, and recurrent models are the place you need it.
+
+---
+
+# Step 2 — An LSTM
+
+Identical code, one word changed.
+
+```{python}
+score_lstm, n_par_lstm = train("lstm", 26, seed=1)
+print(f"LSTM        — {n_par_lstm:,} parameters, test RMSE {score_lstm:,.0f}")
+print(f"\nparameter ratio: {n_par_lstm / n_par:.1f}x the RNN")
+```
+
+**Account for that ratio before reading the RMSE.** An LSTM has a forget gate, an input gate, an
+output gate and a candidate — four sets of weights where the RNN has one. Same hidden size, four
+times the parameters.
+
+---
+
+# Step 3 — Which wins, and does it hold?
+
+One comparison at one window is not evidence. Vary the window and use two seeds.
+
+```{python}
+rows = []
+for W in (13, 26, 52):
+    r = [train("rnn",  W, s)[0] for s in (1, 2)]
+    l = [train("lstm", W, s)[0] for s in (1, 2)]
+    rows.append({"window": W,
+                 "RNN": round(np.mean(r)),  "RNN_sd": round(np.std(r)),
+                 "LSTM": round(np.mean(l)), "LSTM_sd": round(np.std(l)),
+                 "winner": "RNN" if np.mean(r) < np.mean(l) else "LSTM"})
+print(pd.DataFrame(rows).to_string(index=False))
+```
+
+::: {.callout-important}
+## Read the columns in this order
+
+**The winner column first.** The plain RNN wins at every window length. This is not a close call
+and not a seed artifact — the run-to-run spreads are small next to the gaps.
+
+**Then the two trends.** The RNN gets *better* as the window grows. The LSTM stays flat. The
+plain recurrence is using the extra history; the gated one is not.
+
+**Then the parameter count.** The model that lost has four times as many parameters as the model
+that won.
+:::
+
+**Your turn:** compute the gap at each window and say whether it is closing or widening.
+
+```{python}
+# ---- your turn: uncomment and fill in ----
+# df = pd.DataFrame(rows)
+# df["gap"] = ___ - ___          # <- which two columns?
+# print(df[["window", "gap"]].to_string(index=False))
+```
+
+---
+
+# Step 4 — Why the fancier model lost
+
+The LSTM's gates exist to solve one problem: in a plain RNN, gradients shrink as they propagate
+backward, so signal from far in the past never reaches the weights. Put a number on it.
+
+```{python}
+for factor in (0.7, 0.9):
+    print(f"gradient shrink factor {factor} per step:")
+    for steps in (1, 5, 10, 26, 52):
+        print(f"   {steps:>3} steps back -> {factor**steps:,.6f}")
+    print()
+```
+
+At 0.7 per step the signal is essentially gone by 26 steps. **That is the problem gating fixes.**
+
+Now ask whether this dataset has that problem. Weekly retail demand is dominated by what happened
+recently — last week, four weeks ago, the same week last year. Those are exactly the dependencies
+a plain recurrence carries without help.
+
+> **So the gates solve something real, on data that does not have it — and charge four times the
+> parameters for the service.**
+
+---
+
+# Before you leave
+
+> **Discuss (the result):** Your table says the simpler model wins. Describe a forecasting problem
+> where you would expect the LSTM to win instead — be specific about what property of the data
+> would change the answer.
+>
+> **Discuss (the practice):** Suppose you had run only `W=26`, one seed, and the LSTM had happened
+> to come out ahead. Given Lab 7, what would you have needed to do before reporting that an LSTM
+> beats an RNN on this data?
+>
+> **Discuss (for Homework 5):** Part 2 asks you to fit an RNN, an LSTM and a Transformer, and to
+> explain where the extra LSTM parameters go and whether they bought anything. You now have the
+> RNN and LSTM half. What is your prediction for the Transformer, and what would make you wrong?
+
+---
+
+*Solutions posted to Canvas after class.*

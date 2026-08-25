@@ -298,9 +298,9 @@
       \midrule
       LASSO, 46 engineered features & \textbf{744} & 46 \\
       XGBoost, 46 engineered features & 781 & --- \\
-      \textbf{Vanilla RNN}, 4 raw channels & \textbf{805} & 4{,}545 \\
+      \textbf{Vanilla RNN}, 4 raw channels & \textbf{842} & 4{,}545 \\
       Random forest & 899 & --- \\
-      \textbf{LSTM}, 4 raw channels & 957 & 17{,}985 \\
+      \textbf{LSTM}, 4 raw channels & 987 & 17{,}985 \\
       1D CNN, best variant & 1{,}202 & 8{,}161 \\
       Seasonal naive & 2{,}152 & 0 \\
       \bottomrule
@@ -327,26 +327,26 @@
       \toprule
       \textbf{Window} & \textbf{Vanilla RNN} & \textbf{LSTM} & \\
       \midrule
-      13 weeks & \textbf{835} & 1{,}026 & RNN wins \\
-      26 weeks & \textbf{805} & \ \ 957 & RNN wins \\
-      52 weeks & \textbf{787} & 1{,}001 & RNN wins \\
+      13 weeks & \textbf{878} & 990 & RNN wins \\
+      26 weeks & \textbf{842} & 987 & RNN wins \\
+      52 weeks & \textbf{805} & 998 & RNN wins \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
 
-  \vspace{-0.15cm}
+  \vspace{-0.2cm}
   \textbf{An LSTM solves a problem this data does not have.} Gating preserves information across
-  \emph{long} dependency chains. Weekly demand is dominated by the recent past, which a vanilla
-  RNN carries perfectly well --- and the gap \emph{widens} at 52 weeks rather than closing.
+  \emph{long} dependency chains, and weekly demand is dominated by the recent past. Note too that
+  the RNN \emph{improves} as the window grows (878 to 805) while the LSTM stays flat --- the plain
+  recurrence uses the extra context, the gated one does not.
 
   \vspace{0.05cm}
-  The gates buy nothing here, and are not free: \textbf{17{,}985 parameters against 4{,}545}.
+  The gates buy nothing, and are not free: \textbf{17{,}985 parameters against 4{,}545}.
 
   \begin{keybox}
     LSTMs were built for \textbf{sequence modelling} --- language, speech, long dependency chains
-    --- not for short forecasting windows. Fit the architecture to the problem, rather than
-    reaching for the more advanced one.
+    --- not short forecasting windows. Fit the architecture to the problem.
   \end{keybox}
 \end{frame}
 
