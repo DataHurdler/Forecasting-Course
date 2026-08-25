@@ -42,7 +42,21 @@ from statsmodels.tsa.arima.model import ARIMA
 import warnings
 warnings.filterwarnings('ignore')
 
-weekly = pd.read_csv("data/processed/m5_weekly.csv", parse_dates=["week_start"])
+from pathlib import Path
+
+def data_path(name):
+    """Find the processed data file whether you render from the repo root or from
+    this file's own folder."""
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first."
+    )
+
+weekly = pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
 
 def get_series(store, cat):
     return (weekly[(weekly.store_id == store) & (weekly.cat_id == cat)]

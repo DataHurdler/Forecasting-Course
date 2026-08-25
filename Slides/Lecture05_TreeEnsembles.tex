@@ -36,26 +36,24 @@
 
 % --- Slide: Wisdom of crowds -------------------------------------------------
 \begin{frame}{The Wisdom of Crowds}
-  A single expert can be wrong. But average many independent estimates
-  and errors tend to cancel out.
+  A single expert can be wrong. Average many \emph{independent} estimates and the errors tend
+  to cancel.
   \begin{examplebox}{Classic Example: Guessing the Ox's Weight}
-    At a 1907 county fair, 800 people guessed the weight of an ox.
-    No individual was very accurate. But the \textbf{average of all 800 guesses}
-    was within 1 pound of the true weight.
+    At a 1907 county fair, 800 people guessed the weight of an ox. No individual was very
+    accurate --- but the \textbf{average of all 800 guesses} came within one pound of the
+    true weight.
   \end{examplebox}
-  \vspace{0.2cm}
-  \textbf{The same principle applies to models:}
-  \begin{itemize}
-    \item A single decision tree is unstable and noisy (high variance)
-    \item Average many trees trained on different versions of the data
-          and the noise cancels out
-    \item The combined forecast is far more stable than any individual tree
-  \end{itemize}
-  \begin{keybox}
-    \textbf{Ensembles work because:} independent errors tend to cancel.
-    The more independent (uncorrelated) the individual predictions,
-    the more variance is reduced by averaging.
-  \end{keybox}
+
+  \vspace{0.15cm}
+  The same principle transfers directly to models. A single decision tree is unstable and
+  noisy --- that was Lecture 4's closing complaint. Train many trees on different versions of
+  the data and average them, and the noise largely cancels while the signal survives.
+
+  \vspace{0.15cm}
+  \textbf{Ensembles work because independent errors cancel.} And that word is doing real
+  work: the \emph{more independent} the individual predictions, the more variance averaging
+  removes. Hold onto it --- the entire difference between bagging and random forests turns on
+  it.
 \end{frame}
 
 % =============================================================================
@@ -67,8 +65,8 @@
 
 % --- Slide: What is bagging --------------------------------------------------
 \begin{frame}{Bagging: The Big Idea}
-  \textbf{Problem from Lecture 4:} a single decision tree has very high variance ---
-  change a few training points and you get a completely different tree.
+  \textbf{Problem from Lecture 4:} a single decision tree has very high variance --- change a
+  few training points and you get a completely different tree.
 
   \textbf{Bagging solution \parencite{Breiman1996}:}
   \begin{enumerate}\small\itemsep0pt
@@ -77,55 +75,43 @@
     \item \textbf{Average} all $B$ predictions:
           $\hat{y}_{\text{bag}} = \tfrac{1}{B}\sum_{b=1}^{B} \hat{f}^{(b)}(\mathbf{x})$
   \end{enumerate}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Why does this work?}
-      \[
-        \Var(\bar{f}) = \rho\sigma^2 + \frac{1-\rho}{B}\sigma^2
-      \]
-      where $\rho$ = pairwise prediction correlation.
-      As $B \to \infty$, variance $\to \rho\sigma^2$.
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \small \textbf{Key insight:} more trees never hurts, but the variance floor is
-        $\rho\sigma^2$ --- set by how correlated the trees are, not by how many there are.
-      \end{keybox}
-    \end{column}
-  \end{columns}
+
+  \vspace{0.1cm}
+  \textbf{Why it works.} The variance of the averaged forecast is
+  \[
+    \Var(\bar{f}) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2,
+  \]
+  where $\rho$ is the pairwise correlation between tree predictions. The second term shrinks
+  as $B$ grows --- so more trees never hurts. But the first term does not move at all.
+
+  \vspace{0.1cm}
+  \textbf{That leaves a floor at $\rho\sigma^2$}, set by how alike the trees are rather than
+  by how many you grow. Averaging a thousand nearly identical trees buys you almost nothing,
+  and that is the problem the next section solves.
 \end{frame}
 
 % --- Slide: Out-of-bag error --------------------------------------------------
 \begin{frame}{Out-of-Bag (OOB) Error: Free Cross-Validation}
-  Each bootstrap sample uses about \textbf{63\%} of the training observations
-  (some appear multiple times; the rest are left out).
-  The \textbf{out-of-bag (OOB)} observations are those \emph{not} in a given bootstrap sample.
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{OOB error estimate:}
-      \begin{enumerate}\small
-        \item For each observation $i$, collect predictions from
-              all trees where $i$ was NOT in the bootstrap sample
-              ($\approx 37\%$ of all trees)
-        \item Average those predictions $\to \hat{y}_i^{\text{OOB}}$
-        \item Compute RMSE: OOB RMSE $\approx$ 5-fold CV RMSE
-      \end{enumerate}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        OOB error is essentially \textbf{free cross-validation}.
-        No need to set aside a separate validation set or run CV.
-        Use it for tuning hyperparameters.
+  Each bootstrap sample draws $n$ observations \emph{with replacement}, so it contains about
+  \textbf{63\%} of the distinct training points. The remaining 37\% are \textbf{out-of-bag}
+  for that tree --- a free test set, different for every tree:
+  \begin{enumerate}\small\itemsep0pt
+    \item For each observation $i$, collect predictions only from the trees where $i$ was
+          out-of-bag
+    \item Average them to get $\hat{y}_i^{\text{OOB}}$
+    \item Compute the RMSE across all observations
+  \end{enumerate}
 
-        {\footnotesize\texttt{RandomForestRegressor(oob\_score=True)}}
-      \end{keybox}
-    \end{column}
-  \end{columns}
-  \vspace{0.2cm}
-  \begin{examplebox}{Practical Tip}
-    With large datasets, OOB error is very close to 5-fold CV.
-    With small datasets ($< 1000$ obs.), use CV --- OOB may be noisy.
-  \end{examplebox}
+  \vspace{0.1cm}
+  Every one of those predictions came from a tree that never saw the observation --- so the
+  OOB RMSE is an honest out-of-sample estimate, and it lands close to 5-fold CV without
+  refitting anything. In \texttt{sklearn} it is one argument:
+  \texttt{RandomForestRegressor(oob\_score=True)}.
+  \begin{warningbox}
+    Below about 1{,}000 observations the OOB estimate gets noisy, because each observation is
+    out-of-bag for too few trees. On a weekly business series --- a few hundred rows --- use
+    proper walk-forward CV instead.
+  \end{warningbox}
 \end{frame}
 
 % =============================================================================
@@ -137,26 +123,26 @@
 
 % --- Slide: The correlation problem ------------------------------------------
 \begin{frame}{The Problem Bagging Does Not Fully Solve}
-  Recall: $\Var(\bar{f}) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2$
-
-  Even with many trees, the variance floor is $\rho\sigma^2$ ---
-  determined by how \emph{correlated} the trees are.
+  Recall the variance of the averaged forecast:
+  $\Var(\bar{f}) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2$. More trees shrink the second
+  term to nothing. The first term never moves.
   \begin{warningbox}
-    \textbf{The correlation problem:} if one feature strongly dominates
-    (e.g., last year's sales always gives the best first split),
-    then almost all trees use that feature at the root.
-    The trees end up highly correlated ($\rho$ stays large), and
-    bagging provides little variance reduction.
+    \textbf{The correlation problem.} If one feature dominates --- and in forecasting it
+    always does, because last year's value is the best single predictor --- then nearly every
+    tree splits on it at the root. The trees end up near-identical, $\rho$ stays large, and
+    bagging buys you very little.
   \end{warningbox}
-  \textbf{Random Forest solution \parencite{Breiman2001}:}
-  At each split, randomly sample only $m < p$ features
-  and find the best split \emph{among those $m$} only.
-  \begin{keybox}
-    Random feature subsampling \textbf{forces diversity} among trees:
-    the dominant feature cannot always be chosen,
-    so trees take different paths $\Rightarrow$ lower $\rho$
-    $\Rightarrow$ lower ensemble variance.
-  \end{keybox}
+
+  \vspace{0.15cm}
+  \textbf{The Random Forest fix \parencite{Breiman2001}} is almost absurdly simple: at each
+  split, consider only a random subset of $m < p$ features, and take the best split among
+  \emph{those}.
+
+  \vspace{0.15cm}
+  Sometimes the dominant feature is not in the candidate set, so the tree is forced to find
+  its second-best story. Across hundreds of trees that produces genuinely different
+  structures --- $\rho$ falls, and the floor falls with it. You deliberately make each
+  individual tree \emph{worse} in order to make the ensemble better.
 \end{frame}
 
 % --- Slide: RF hyperparameters -----------------------------------------------
@@ -167,32 +153,23 @@
       \toprule
       \textbf{Parameter} & \textbf{sklearn name} & \textbf{Default} & \textbf{Effect} \\
       \midrule
-      Number of trees & \texttt{n\_estimators} & 100 & More = lower variance; plateau after $\sim$500 \\
-      Max features/split & \texttt{max\_features} & \texttt{'sqrt'} & Lower = more decorrelated; tune via OOB \\
-      Max depth & \texttt{max\_depth} & None & None = full tree; limit to reduce memory \\
+      Number of trees & \texttt{n\_estimators} & 100 & More = lower variance; plateaus $\sim$500 \\
+      Max features/split & \texttt{max\_features} & \texttt{'sqrt'} & Lower = more decorrelated \\
+      Max depth & \texttt{max\_depth} & None & Limit only to reduce memory \\
       Min samples/leaf & \texttt{min\_samples\_leaf} & 1 & Higher = smoother predictions \\
-      OOB score & \texttt{oob\_score} & False & Set True for free CV error estimate \\
+      OOB score & \texttt{oob\_score} & False & \texttt{True} gives a free CV estimate \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Recommended starting point:}
-      \begin{itemize}\footnotesize
-        \item \texttt{n\_estimators=500}, \texttt{max\_features='sqrt'}
-        \item \texttt{min\_samples\_leaf=5} for smoother predictions
-        \item \texttt{oob\_score=True} to monitor without separate CV
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{warningbox}
-        \small Set \texttt{random\_state=42} for reproducibility.
-        Random forests use randomness in both bootstrap sampling
-        and feature selection.
-      \end{warningbox}
-    \end{column}
-  \end{columns}
+
+  \textbf{Start with} \texttt{n\_estimators=500}, \texttt{max\_features='sqrt'},
+  \texttt{min\_samples\_leaf=5}, \texttt{oob\_score=True}. Note how few genuinely need
+  tuning --- \texttt{max\_features} is the dial controlling $\rho$, and the rest is close to
+  fire-and-forget. That is most of why random forests make a good default.
+
+  \muted{\footnotesize Set \texttt{random\_state=42}: a forest is random twice over, in the
+  bootstrap samples and in the feature subsets.}
 \end{frame}
 
 % =============================================================================
@@ -205,83 +182,61 @@
 % --- Slide: Feature importance -----------------------------------------------
 \begin{frame}{Random Forest Feature Importance \parencite{Molnar2022}}
   \begin{definitionbox}{Mean Decrease in Impurity (MDI)}
-    \small For each feature $j$: average the total reduction in node impurity
-    across all splits on feature $j$, weighted by the fraction of observations
-    in each node. Normalize to sum to 1.
+    \small For each feature $j$, average the total reduction in node impurity across every
+    split on $j$, weighted by the fraction of observations reaching that node. Normalize to
+    sum to 1.
   \end{definitionbox}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Example: retail sales RF}
-      \begin{center}
-        {\small
-        \begin{tabular}{ll}
-          \toprule
-          \textbf{Feature} & \textbf{Importance} \\
-          \midrule
-          Lag 12 (same month last year) & 0.38 \\
-          Lag 1 (previous month)        & 0.24 \\
-          Rolling mean (12m)            & 0.15 \\
-          Lag 2                          & 0.10 \\
-          December dummy                 & 0.08 \\
-          Unemployment rate              & 0.05 \\
-          \bottomrule
-        \end{tabular}
-        }
-      \end{center}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{keybox}
-        \small RF importance aggregates across \textbf{hundreds of trees}.
-        More stable than a single tree's importance.
-      \end{keybox}
-      \begin{warningbox}
-        \small MDI can be biased toward high-cardinality features.
-        Use \textbf{permutation importance}
-        (\texttt{permutation\_importance}) for a less biased
-        measure on the test set.
-      \end{warningbox}
-    \end{column}
-  \end{columns}
+  \begin{center}
+    {\small
+    \begin{tabular}{lc}
+      \toprule
+      \textbf{Feature (CA\_1 FOODS, weekly)} & \textbf{Importance} \\
+      \midrule
+      \texttt{units\_lag4}  & 0.45 \\
+      \texttt{units\_lag1}  & 0.18 \\
+      \texttt{units\_lag52} & 0.11 \\
+      \texttt{snap\_days}   & 0.08 \\
+      \texttt{units\_lag2}  & 0.04 \\
+      \texttt{avg\_price}   & 0.04 \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  Read it as a screening device, not an explanation. \textbf{MDI is biased} toward features
+  with many split points. \texttt{permutation\_importance} --- shuffle a column, see how much
+  accuracy falls --- is the honest alternative.
 \end{frame}
 
 % --- Slide: Python implementation -----------------------------------------
 \begin{frame}{Random Forest in Python}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{examplebox}{sklearn Code Template}
-        {\scriptsize
-        \texttt{from sklearn.ensemble import RandomForestRegressor}\\
-        \texttt{rf = RandomForestRegressor(}\\
-        \texttt{    n\_estimators=500,}\\
-        \texttt{    max\_features='sqrt',}\\
-        \texttt{    min\_samples\_leaf=5,}\\
-        \texttt{    oob\_score=True,}\\
-        \texttt{    random\_state=42)}\\
-        \texttt{rf.fit(X\_train, y\_train)}\\
-        \texttt{print(rf.oob\_score\_)}\\
-        \texttt{importances = rf.feature\_importances\_}
-        }
-      \end{examplebox}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \textbf{Typical performance on RSXFS:}
-      \begin{center}
-        {\footnotesize
-        \begin{tabular}{ll}
-          \toprule
-          \textbf{Model} & \textbf{Test RMSE} \\
-          \midrule
-          Seasonal na\"{i}ve & $\approx$3,800 \\
-          Single deep tree  & $\approx$2,900 \\
-          Random Forest     & $\approx$1,800 \\
-          \bottomrule
-        \end{tabular}
-        }
-      \end{center}
-      \muted{\footnotesize RF reduces RMSE by $\approx$35--40\%
-      vs.\ a single tree on this dataset.}
-    \end{column}
-  \end{columns}
+  \begin{examplebox}{sklearn Code Template}
+    {\scriptsize
+    \texttt{from sklearn.ensemble import RandomForestRegressor}\\
+    \texttt{rf = RandomForestRegressor(n\_estimators=500, max\_features='sqrt',}\\
+    \texttt{\ \ \ min\_samples\_leaf=5, oob\_score=True, random\_state=42).fit(X\_tr, y\_tr)}\\
+    \texttt{print(rf.oob\_score\_);\ \ importances = rf.feature\_importances\_}
+    }
+  \end{examplebox}
+  \begin{center}
+    {\footnotesize
+    \begin{tabular}{lc}
+      \toprule
+      \textbf{Model (CA\_1 FOODS, 52-week test)} & \textbf{Test RMSE} \\
+      \midrule
+      Seasonal na\"{i}ve   & 1,660 \\
+      Single deep tree     & 1,415 \\
+      \textbf{Random Forest} & \textbf{1,020} \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  The forest cuts RMSE roughly \textbf{28\%} against a single deep tree, and is the first
+  method in this course to beat the seasonal naive benchmark on this series.
+
+  \muted{\footnotesize What changed is not a better model of the series but a richer feature
+  set --- lags, price, and SNAP days are information ETS and ARIMA never had.}
 \end{frame}
 
 % =============================================================================
