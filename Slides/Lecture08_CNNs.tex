@@ -267,9 +267,9 @@
       XGBoost (Homework 4) & 781 & --- \\
       Random forest (Homework 3) & 899 & --- \\
       \midrule
-      1D CNN, flatten head & 1{,}202 & 8{,}161 \\
-      1D CNN, global max pool & 1{,}360 & 6{,}945 \\
-      1D CNN, global average pool & 1{,}433 & 6{,}945 \\
+      1D CNN, flatten head & 1{,}032 & 8{,}161 \\
+      1D CNN, global max pool & 1{,}418 & 6{,}945 \\
+      1D CNN, global average pool & 1{,}534 & 6{,}945 \\
       \midrule
       Seasonal naive & 2{,}152 & 0 \\
       \bottomrule
@@ -283,7 +283,7 @@
 
   \vspace{0.05cm}
   And swapping average pooling for \texttt{Flatten}, which keeps \emph{where} each pattern
-  occurred, is worth about 230 RMSE. The pooling objection, measured.
+  occurred, is worth about \textbf{500 RMSE} --- three seeds each, against a spread of about 80.
 \end{frame}
 
 % =============================================================================
@@ -330,7 +330,7 @@
             once and detected everywhere, at a fraction of the parameters.
 
       \item \textbf{Pooling} buys translation invariance --- which an image classifier wants and
-            a forecaster usually does not. Measured cost here: about 230 RMSE.
+            a forecaster usually does not. Measured cost here: about 500 RMSE.
 
       \item The architecture history reduces to three transferable ideas: \textbf{small filters
             stacked deep}, \textbf{skip connections} for trainable depth, and \textbf{learned}

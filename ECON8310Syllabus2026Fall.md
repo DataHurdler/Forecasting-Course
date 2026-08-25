@@ -93,27 +93,12 @@ Two differences matter:
 
 This is the practical reason for the Python recommendation. Through Lecture 6 the choice of language is yours. From **Lecture 7 onward the readings exist only in Python**, and so does all of our course code.
 
-### Reading Map
-| Lecture | Topic | FPP-Py (Python) | FPP3 (R) | Also |
-|---|---|---|---|---|
-| 1 | Intro, Exponential Smoothing & Evaluation | Ch. 1; Ch. 2; §5.1–5.10; Ch. 8 | Same | |
-| 2 | ARIMA, VAR & Multivariate | Ch. 9; §10.1–10.3, §10.6; §12.3 | Same | |
-| 3 | Generalized Additive Models | §7.4, §7.7; §12.1–12.2 | Same | |
-| 4 | Decision Trees | — | — | **ISLP §8.1** |
-| 5 | Tree Ensembles: Random Forests & Boosted Trees | §12.4 (bagging idea only) | §12.5 (bagging idea only) | **ISLP §8.2**; XGBoost tutorial |
-| 6 | Regularization & Model Selection | §7.5 | Same | **ISLP Ch. 6** |
-| 7 | Introduction to Neural Networks | §14.1–14.2, §14.4–14.5, §14.7 | *Not covered* | |
-| 8 | CNN Architectures | §14.3 | *Not covered* | |
-| 9 (Pt 1) | RNNs & LSTMs | §14.3, §14.6 | *Not covered* | |
-| 9 (Pt 2) | Attention & Transformers | Ch. 15 | *Not covered* | |
-| 10 | Bayesian Statistics I | §5.5, §5.9 (framing only) | Same | **BMCP Ch. 1; Ch. 2** |
-| 11 | Bayesian Statistics II | — | — | **BMCP §6.2, §6.4; §4.5–4.6** |
-| 12 | Bayesian Statistics III | Ch. 7 (review) | Same | **BMCP §3.2–3.3** |
-
 Two further free resources, both linked from Canvas:
 
 - **XGBoost, "Introduction to Boosted Trees"** — [https://xgboost.readthedocs.io/en/stable/tutorials/model.html](https://xgboost.readthedocs.io/en/stable/tutorials/model.html). Derives the regularized objective and the split-gain formula we cover in Lecture 5.
 - **Molnar, *Interpretable Machine Learning*** — [https://christophm.github.io/interpretable-ml-book/](https://christophm.github.io/interpretable-ml-book/). Ch. 9 (decision trees), Ch. 19 (partial dependence), Ch. 23 (permutation feature importance). Useful for Lectures 3 through 5.
+
+Per-week readings are in the **weekly schedule** at the end of this syllabus.
 
 ### What the Textbook Does *Not* Cover
 The textbook is our anchor, not our boundary. Several topics we cover have no FPP chapter, and for those the lecture slides are your primary source:
@@ -211,16 +196,18 @@ split that assignment's 20 points between them** — they are not 20 points each
 own Codex context prompt and its own prompt budget. See the weekly schedule below for due dates.
 Each assignment is a Quarto (`.qmd`) document rendered to HTML and submitted through the course repository, together with your `PROMPT_LOG.jsonl` and a short `REPORT.md` containing your business recommendation.
 
-| Assignment | Topics | Lectures | Due |
-|---|---|---|---|
-| 1 (Part 1) | Exponential smoothing | 1 | Week 2 |
-| 1 (Part 2) | ARIMA, VAR, method comparison | 2 | Week 3 |
-| 2 | Generalized Additive Models, Prophet | 3 | Week 4 |
-| 3 | Decision trees, random forests | 4–5 | Week 6 |
-| 4 | Boosted trees, regularization | 6 | Week 7 |
-| 5 | Neural networks, CNNs, RNNs/Transformers | 7–9 | Part 1: Week 9 · Part 2: Week 11 · Part 3: Week 12 |
-| 6 | Bayesian foundations, Bayesian time series | 10–11 | Part 1: Week 13 · Part 2: Week 15 |
-| 7 | Bayesian linear regression | 12 | Week 16 |
+Which lectures each assignment draws on:
+
+| HW | Covers | | HW | Covers |
+|---|---|---|---|---|
+| 1 Pt 1 | Lecture 1 | | 5 Pt 1 | Lectures 7–8 |
+| 1 Pt 2 | Lecture 2 | | 5 Pt 2 | Lecture 9 |
+| 2 | Lecture 3 | | 5 Pt 3 | Lectures 7–9 |
+| 3 | Lectures 4–5 | | 6 Pt 1 | Lectures 10, 11 Pt 1 |
+| 4 | Lecture 6 | | 6 Pt 2 | Lecture 11 Pt 2 |
+| | | | 7 | Lecture 12 |
+
+Due dates are in the **weekly schedule** at the end of this syllabus.
 
 ### Pop Quizzes
 Throughout the semester, there are 3 pop quizzes, each is worth 20 points, for a total of 60 points.
@@ -317,93 +304,31 @@ While this document is designed to be as accurate as possible, learning is a dyn
 For example, if the class has trouble understanding a specific topic, I might take some extra time and go into more detail about it, which may result in cutting down time from other topics.
 <!-- Send me a cat photo for four extra points. -->
 
-## Tentative Weekly Course Schedule
+## Weekly Schedule
 
-### Week 1 (Aug. 27, 2026)
-- Lecture 1: Introduction, Exponential Smoothing & Forecast Evaluation
-- Reading: FPP Ch. 1, Ch. 2, §5.1–5.10, Ch. 8
+Everything in one place: what we cover, what to read, and what is due. Assignments are due
+**before class** on the date shown.
 
-### Week 2 (Sep. 3, 2026)
-- Assignment 1 (Part 1) due before class
-- Roundtable with business professionals (6-7pm)
-- Lecture 2: ARIMA, VAR & Multivariate Models
-- Reading: FPP Ch. 9, §10.1–10.3, §10.6, §12.3
+| Wk | Date | Lecture | Reading | Due / Notes |
+|---|---|---|---|---|
+| 1 | Aug 27 | 1 — Intro, Exponential Smoothing & Evaluation | FPP Ch. 1, Ch. 2, §5.1–5.10, Ch. 8 | |
+| 2 | Sep 3 | 2 — ARIMA, VAR & Multivariate | FPP Ch. 9, §10.1–10.3, §10.6, §12.3 | **HW 1 Pt 1**; roundtable with business professionals, 6–7pm |
+| 3 | Sep 10 | 3 — Generalized Additive Models | FPP §7.4, §7.7, §12.1–12.2 | **HW 1 Pt 2** |
+| 4 | Sep 17 | 4 — Decision Trees | ISLP §8.1 | **HW 2**; **project groups due** |
+| 5 | Sep 24 | 5 — Tree Ensembles: RF & Boosted Trees | ISLP §8.2; XGBoost *Introduction to Boosted Trees*; FPP §12.4 Py / §12.5 R for bagging | **Online, asynchronous — no in-person meeting.** Recorded lecture and self-paced lab on the course site; office hours as usual. Nothing due; use this week for HW 3 |
+| 6 | Oct 1 | 6 — Regularization & Model Selection | ISLP Ch. 6; FPP §7.5 | **HW 3**; project grading rubric distributed |
+| 7 | Oct 8 | 7 — Introduction to Neural Networks | FPP-Py §14.1–14.2, §14.4–14.5, §14.7 | **HW 4** |
+| 8 | Oct 15 | 8 — CNN Architectures | FPP-Py §14.3 | |
+| 9 | Oct 22 | 9 Pt 1 — RNNs and LSTMs | FPP-Py §14.3, §14.6 | **HW 5 Pt 1**; **project proposal due** |
+| 10 | Oct 29 | 9 Pt 2 — Transformers | FPP-Py Ch. 15 | |
+| 11 | Nov 5 | 10 — Bayesian I: Foundations | **BMCP Ch. 1–2**; FPP §5.5, §5.9 for framing | **HW 5 Pt 2** |
+| 12 | Nov 12 | 11 Pt 1 — Bayesian II: Time Series | **BMCP §6.2, §6.4** | **HW 5 Pt 3** |
+| 13 | Nov 19 | 11 Pt 2 — Bayesian II: Hierarchical Models | **BMCP §4.5–4.6** | **HW 6 Pt 1** |
+| 14 | Nov 26 | — | — | **Thanksgiving break, no class** |
+| 15 | Dec 3 | 12 — Bayesian III: Linear Regression | **BMCP §3.2–3.3**; FPP Ch. 7 as the frequentist benchmark | **HW 6 Pt 2** |
+| 16 | Dec 10 | Final thoughts; project work session | FPP Ch. 13 | **HW 7** |
+| 17 | Dec 17 | **Final project presentations, 5:30–7:30pm** | — | |
+| — | Dec 18 | | | **Final project report due** |
 
-### Week 3 (Sep. 10, 2026)
-- Assignment 1 (Part 2) due before class
-- Lecture 3: Generalized Additive Models
-- Reading: FPP §7.4, §7.7, §12.1–12.2
-
-### Week 4 (Sep. 17, 2026)
-- Assignment 2 due before class
-- **Final project groups due**
-- Lecture 4: Decision Trees
-- Reading: ISLP §8.1
-
-### Week 5 (Sep. 24, 2026) — **online, asynchronous**
-- **No in-person meeting.** The lecture is posted as a recording and the lab is self-paced; both
-  are on the course site. Office hours run as usual.
-- Nothing is due this week, and Assignment 3 is due the following week — so this is the week to
-  work on it.
-- Lecture 5: Tree Ensembles — Random Forests & Boosted Trees
-- Reading: ISLP §8.2; XGBoost "Introduction to Boosted Trees"; FPP §12.4 Python ed. / §12.5 R ed. for the bagging intuition
-
-### Week 6 (Oct. 1, 2026)
-- Assignment 3 due before class
-- Final project grading rubric distributed
-- Lecture 6: Regularization & Model Selection
-- Reading: ISLP Ch. 6; FPP §7.5
-
-### Week 7 (Oct. 8, 2026)
-- Assignment 4 due before class
-- Lecture 7: Introduction to Neural Networks
-- Reading: FPP-Py §14.1–14.2, §14.4–14.5, §14.7 (**Python edition only**)
-
-### Week 8 (Oct. 15, 2026)
-- Lecture 8: CNN Architectures
-- Reading: FPP-Py §14.3 (**Python edition only**)
-
-### Week 9 (Oct. 22, 2026)
-- Assignment 5 (Part 1) due before class
-- **Final project proposal due**
-- Lecture 9 (Part 1): RNNs and LSTMs
-- Reading: FPP-Py §14.3, §14.6 (**Python edition only**)
-
-### Week 10 (Oct. 29, 2026)
-- Lecture 9 (Part 2): Transformers
-- Reading: FPP-Py Ch. 15 (**Python edition only**)
-
-### Week 11 (Nov. 5, 2026)
-- Assignment 5 (Part 2) due before class
-- Lecture 10: Bayesian Statistics I — Foundations
-- Reading: **BMCP Ch. 1** (Bayesian inference, priors, prior predictive checks) and **Ch. 2** (MCMC diagnostics). FPP §5.5, §5.9 for framing.
-
-### Week 12 (Nov. 12, 2026)
-- Assignment 5 (Part 3) due before class
-- Lecture 11: Bayesian Statistics II — Time Series & Hierarchical Models
-- Reading: **BMCP §6.2 and §6.4** (time series as regression; state space and Bayesian structural time series)
-
-### Week 13 (Nov. 19, 2026)
-- Assignment 6 (Part 1) due before class
-- Lecture 11 (cont.): Bayesian Statistics II — Time Series & Hierarchical Models
-- Reading: **BMCP §4.5–4.6** (pooling, multilevel and hierarchical models)
-
-### Week 14 (Nov. 26, 2026)
-Thanksgiving break. No class.
-
-### Week 15 (Dec. 3, 2026)
-- Assignment 6 (Part 2) due before class
-- Lecture 12: Bayesian Statistics III — Bayesian Linear Regression
-- Reading: **BMCP §3.2–3.3** (linear and multiple regression, counterfactuals). FPP Ch. 7 as the frequentist benchmark.
-
-### Week 16 (Dec. 10, 2026)
-- Assignment 7 due before class
-- Final thoughts on forecasting, econometrics, and ML/AI
-- Final project work session / consultations
-- Reading: FPP Ch. 13
-
-### Week 17 (Dec. 17, 2026)
-- **Final project presentations, 5:30-7:30pm**
-
-### Dec. 18, 2026
-- **Final project report due**
+From Lecture 7 onward the FPP readings exist **only in the Python edition**. Where the two
+editions number a section differently, both numbers are given above.

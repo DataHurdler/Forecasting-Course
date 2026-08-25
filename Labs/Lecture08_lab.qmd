@@ -1,0 +1,282 @@
+---
+title: "Lab 8: Convolutions — What the Filter Can Actually See"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+Last week you flattened a 26-week window into a vector of 104 numbers and fed it to a network.
+That model had no idea the window was ordered — week 1 and week 26 were just positions in a list.
+
+A convolution does know. It slides a filter along the time axis and looks for local shapes.
+
+Today you will build one, and then find out **how far back it can actually see** — which is
+considerably less than the window you hand it, and is the single most useful thing to understand
+about this architecture.
+
+You will also use last week's lesson: every comparison here runs on **three seeds**, because one
+run tells you nothing.
+
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+`data/processed/m5_weekly.csv`.
+
+::: {.callout-note}
+## Two cells here are slow
+
+Steps 3 and 4 each train several networks, and take roughly two minutes apiece on a laptop. Start
+the cell, read the text underneath it while it runs, and do not assume it has hung.
+:::
+
+---
+
+# Setup
+
+Same windowing as Lab 7, with one change that matters.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import warnings
+warnings.filterwarnings('ignore')
+
+from pathlib import Path
+
+def data_path(name):
+    for base in (Path.cwd(), *Path.cwd().parents):
+        p = base / "data" / "processed" / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        f"Could not find data/processed/{name}. "
+        "Run `python scripts/prep_m5.py` from the repository root first.")
+
+weekly = (pd.read_csv(data_path("m5_weekly.csv"), parse_dates=["week_start"])
+            .sort_values(["store_id", "cat_id", "week_start"]))
+CHANNELS = ["units", "snap_days", "event_days", "avg_price"]
+CUTOFF   = np.datetime64("2015-05-17")
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+
+def build(W):
+    X, Y, D = [], [], []
+    for _, g in weekly.groupby(["store_id", "cat_id"]):
+        arr, dates = g[CHANNELS].values.astype("float32"), g.week_start.values
+        for i in range(len(g) - W):
+            X.append(arr[i:i+W]); Y.append(arr[i+W, 0]); D.append(dates[i+W])
+    X = np.stack(X); Y = np.array(Y, dtype="float32"); D = np.array(D)
+    tr, te = D < CUTOFF, D >= CUTOFF
+    mu, sd = X[tr].mean((0,1), keepdims=True), X[tr].std((0,1), keepdims=True) + 1e-8
+    ym, ys = Y[tr].mean(), Y[tr].std()
+    Xn, Yn = (X - mu)/sd, (Y - ym)/ys
+    # Conv1d wants (batch, channels, time) -- the transpose is the whole point
+    return (torch.tensor(Xn[tr].transpose(0, 2, 1)), torch.tensor(Yn[tr]),
+            torch.tensor(Xn[te].transpose(0, 2, 1)), Y[te], ym, ys)
+
+DATA = {W: build(W) for W in (13, 26, 52)}
+print("shapes at W=26:", DATA[26][0].shape, "(batch, channels, time)")
+```
+
+::: {.callout-warning}
+## The transpose that bites everyone
+
+Your `DataLoader` naturally yields `(batch, time, channels)`. `Conv1d` demands
+`(batch, channels, time)`.
+
+Get it backwards and **nothing crashes**. The model convolves across the four channels instead of
+along time, learns something meaningless, and returns a number. Same failure mode as forgetting
+`zero_grad()` last week: no exception, just a wrong answer.
+:::
+
+---
+
+# Step 1 — How far back can the filter see?
+
+Before building anything, work this out on paper.
+
+Our network is `Conv1d(4, 32, kernel_size=5)` then `Conv1d(32, 64, kernel_size=3)`.
+
+- A neuron in **layer 1** sees **5** consecutive weeks.
+- A neuron in **layer 2** sees 3 layer-1 neurons — which between them span
+  $3 + (5 - 1) = \mathbf{7}$ weeks.
+
+```{python}
+def receptive_field(kernels):
+    rf = 1
+    for k in reversed(kernels):
+        rf = rf + (k - 1)
+    return rf
+
+print(f"kernels (5, 3)      -> receptive field {receptive_field([5,3])} weeks")
+print(f"kernels (5, 3, 3)   -> receptive field {receptive_field([5,3,3])} weeks")
+print(f"kernels (5, 3, 3, 3)-> receptive field {receptive_field([5,3,3,3])} weeks")
+```
+
+**Seven weeks.** Not 26 — seven. Hand this model a 52-week window and each output neuron still
+sees only seven consecutive weeks of it.
+
+**Hold that fact.** Step 4 tests what it costs.
+
+---
+
+# Step 2 — Build the CNN
+
+```{python}
+def conv_out_len(W):
+    return W - 4 - 2          # kernel 5, then kernel 3, no padding
+
+def make_cnn(W, head, seed):
+    torch.manual_seed(seed)
+    body = [nn.Conv1d(4, 32, 5), nn.ReLU(), nn.Conv1d(32, 64, 3), nn.ReLU()]
+    if head == "flatten":
+        tail = [nn.Flatten(), nn.Linear(64 * conv_out_len(W), 1)]
+    elif head == "avgpool":
+        tail = [nn.AdaptiveAvgPool1d(1), nn.Flatten(), nn.Linear(64, 1)]
+    else:
+        tail = [nn.AdaptiveMaxPool1d(1), nn.Flatten(), nn.Linear(64, 1)]
+    return nn.Sequential(*body, *tail)
+
+def train(model, W, epochs=40):
+    Xtr, Ytr, Xte, Yte, ym, ys = DATA[W]
+    opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    lossfn = nn.MSELoss()
+    loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(Xtr, Ytr), batch_size=128, shuffle=False)
+    for _ in range(epochs):
+        model.train()
+        for xb, yb in loader:
+            opt.zero_grad(); lossfn(model(xb).squeeze(-1), yb).backward(); opt.step()
+    model.eval()
+    with torch.no_grad():
+        return rmse(Yte, model(Xte).squeeze(-1).numpy() * ys + ym)
+
+m = make_cnn(26, "flatten", seed=1)
+print(f"parameters: {sum(p.numel() for p in m.parameters()):,}")
+print(f"test RMSE:  {train(m, 26):,.0f}")
+```
+
+---
+
+# Step 3 — Does pooling belong here?
+
+Lecture 8 argued that pooling buys **translation invariance** — an image classifier should not
+care where in the frame the cat is — and that a forecaster usually *should* care where the spike
+was.
+
+Test it. Three heads, three seeds each, because of last week.
+
+```{python}
+head_runs = {}
+rows = []
+for head in ("flatten", "maxpool", "avgpool"):
+    head_runs[head] = [train(make_cnn(26, head, s), 26) for s in (1, 2, 3)]
+    rows.append({"head": head, "mean": round(np.mean(head_runs[head])),
+                 "sd": round(np.std(head_runs[head])),
+                 "runs": [round(r) for r in head_runs[head]]})
+print(pd.DataFrame(rows).to_string(index=False))
+```
+
+**Read the spread before the means.** The run-to-run `sd` is around 50–80. The gap between
+`flatten` and `avgpool` is several hundred. That difference is real in a way last week's weight
+decay comparison was not.
+
+`Flatten` keeps all 64 channels at all 20 remaining time positions, so the final layer knows
+*where* each pattern was found. `AdaptiveAvgPool1d(1)` averages across time and throws that away.
+
+> **Say it in one sentence:** why would averaging over time be the right thing to do for
+> classifying photographs and the wrong thing for forecasting demand?
+
+---
+
+# Step 4 — A longer window, the same receptive field
+
+Now the experiment Step 1 set up. Keep the architecture fixed and vary only the window.
+
+```{python}
+rows = []
+for W in (13, 26, 52):
+    # W=26 was already fitted in Step 3 -- reuse it rather than paying twice
+    runs = head_runs["flatten"][:2] if W == 26 else [train(make_cnn(W, "flatten", s), W) for s in (1, 2)]
+    n_par = sum(p.numel() for p in make_cnn(W, "flatten", 1).parameters())
+    rows.append({"window": W, "receptive_field": receptive_field([5,3]),
+                 "parameters": n_par, "mean_RMSE": round(np.mean(runs)),
+                 "sd": round(np.std(runs))})
+print(pd.DataFrame(rows).to_string(index=False))
+```
+
+::: {.callout-important}
+## The result runs the wrong way, and that is the lesson
+
+A longer window does not help. It **hurts**, monotonically.
+
+The receptive field is stuck at seven weeks no matter how much history you supply. What a longer
+window *does* add is parameters — the flatten layer grows with `W` — so you get more capacity to
+overfit and no additional context to justify it.
+
+**More data into the model is not more information out of it**, unless the architecture can reach
+it.
+:::
+
+**Your turn:** using `receptive_field()`, find how many kernel-3 layers you would need to stack
+after the first kernel-5 layer to actually span 52 weeks.
+
+```{python}
+# ---- your turn: uncomment and fill in ----
+# k = [5]
+# while receptive_field(k) < 52:
+#     k.append(___)               # <- what kernel size?
+# print(f"{len(k)} layers needed: kernels {k} -> {receptive_field(k)} weeks")
+```
+
+---
+
+# Step 5 — Where does it land?
+
+```{python}
+board = {
+    "LASSO, 46 features (HW4)": 744,
+    "XGBoost (HW4)": 781,
+    "FFN, flattened window (Lab 7)": 1084,
+    "1D CNN, flatten head (today)": round(np.mean(head_runs["flatten"])),   # from Step 3
+    "Seasonal naive": 2152,
+}
+print(pd.Series(board).sort_values().to_string())
+```
+
+The CNN is competitive with the feedforward network and well behind both tabular models — on a
+problem where the useful signal sits at lags the filter cannot reach.
+
+---
+
+# Before you leave
+
+> **Discuss (the architecture):** You have now seen two ways to fail to use a 52-week window: the
+> FFN flattens it and loses the ordering, the CNN preserves ordering but can only see seven weeks
+> at a time. Describe, without naming an architecture, what a model would need in order to use
+> the whole window properly.
+>
+> **Discuss (the practice):** Step 4's result — longer window, worse forecast — is the kind of
+> thing a practitioner discovers after a week of tuning. What one calculation, done in Step 1,
+> would have predicted it?
+>
+> **Discuss (for Homework 5):** Part 1 Q4 asks you to run this window experiment yourself and
+> explain the limit. You now have the answer. What it does **not** tell you is what to change
+> architecturally — name two options and say which you would try first.
+
+---
+
+*Solutions posted to Canvas after class.*
