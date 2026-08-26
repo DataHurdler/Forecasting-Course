@@ -2377,7 +2377,7 @@ window.Quarto = {
 <p>This course runs on the <strong>M5 / Walmart</strong> dataset — the spine described in <code>ECON8310_Datasets.md</code>. It covers daily unit sales for Walmart stores across California, Texas, and Wisconsin from <strong>29 January 2011 to 22 May 2016</strong>, and it was the data for the M5 forecasting competition.</p>
 <p>You will work with the prepared weekly file, <code>data/processed/m5_weekly.csv</code>: <strong>30 series</strong> (10 stores × 3 product categories), <strong>277 weeks each</strong>, with average price, SNAP benefit days, and event-day counts alongside the unit sales.</p>
 <p>If the file does not exist, run <code>python scripts/prep_m5.py</code> once first — it will tell you where to get the raw download.</p>
-<div id="1eebe7d6" class="cell" data-execution_count="1">
+<div id="b8a69035" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2454,16 +2454,17 @@ Part 1 covers exponential smoothing only (SES, Holt, Holt-Winters) using Python 
 2. Explain what the output means so that I understand it — but do NOT draft the written
    answers I submit. The interpretation and business-recommendation sections are mine to
    write, in my own words.
-3. Log this interaction to PROMPT_LOG.jsonl before responding
 
 My prompt budget for Part 1 is 4 (this context prompt is excluded). I will label each question before asking.
 
 
 Repository rules — these apply to every prompt in this thread:
 - My submission folder is `submissions/hw01_part1_&lt;my_name&gt;/`. Put everything there.
-- Before responding to each prompt, append ONE line to `PROMPT_LOG.jsonl` in that folder:
-  {&quot;prompt_id&quot;: &lt;int, starts at 1, increments by 1&gt;, &quot;timestamp_local&quot;: &quot;YYYY-MM-DD HH:MM:SS&quot;, &quot;prompt&quot;: &quot;&lt;my prompt, verbatim&gt;&quot;}
-  Never edit or delete a line you already wrote.
+- Keep a `PROMPT_LOG.md` in that folder. For every prompt I send, append a block:
+      ### Prompt &lt;n&gt; — YYYY-MM-DD HH:MM
+      &lt;my prompt, verbatim&gt;
+  Numbered from 1, in order. Never edit or delete an earlier entry. If your tool cannot write
+  files, I will paste them in myself.
 - After finishing the work for each prompt, make exactly one git commit:
   `hw01_part1 prompt &lt;prompt_id&gt;: &lt;short summary&gt;`
 - If a prompt would take me past my budget of 4, do not do the work. Reply exactly
@@ -2483,7 +2484,7 @@ Confirm by responding with: HW01P1_CONTEXT_ACK</code></pre>
 <h2 data-number="4.1" class="anchored" data-anchor-id="q1-exploratory-plot"><span class="header-section-number">4.1</span> Q1 — Exploratory Plot</h2>
 <p><em>(Suggested prompts: 1)</em></p>
 <p>Plot CA_1 FOODS weekly unit sales over the full 277-week window. After examining the plot, answer the written questions below.</p>
-<div id="61a0e13e" class="cell" data-execution_count="2">
+<div id="61b5dd73" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot CA_1 FOODS weekly units over time</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2515,7 +2516,7 @@ Why a 52-week test set works here
 <p>Each series has 277 weeks. Holding out 52 still leaves 225 for training, comfortably above the threshold, and a one-year holdout is the horizon a demand planner actually cares about. The assertion below makes the constraint explicit rather than letting it fail deep inside statsmodels.</p>
 </div>
 </div>
-<div id="70f7f2e6" class="cell" data-execution_count="3">
+<div id="68957980" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span>                                   <span class="co"># final year held out</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2546,7 +2547,7 @@ Why a 52-week test set works here
 <li><label><input type="checkbox">All code cells run without errors from top to bottom (Kernel → Restart &amp; Run All)</label></li>
 <li><label><input type="checkbox">Written responses are completed in your own words — AI-generated prose is not accepted for written sections</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> is saved in your Part 1 submission folder</label></li>
-<li><label><input type="checkbox"><code>PROMPT_LOG.jsonl</code> is complete with <strong>4 or fewer</strong> entries (one entry per Codex prompt sent)</label></li>
+<li><label><input type="checkbox"><code>PROMPT_LOG.md</code> is complete with <strong>4 or fewer</strong> entries (one entry per Codex prompt sent)</label></li>
 <li><label><input type="checkbox">One git commit per Codex prompt used, following the format: <code>hw01_part1 prompt &lt;id&gt;: &lt;one-line summary&gt;</code></label></li>
 </ul>
 <p><em>Part 2 is due before class in Week 3 and carries its own prompt budget. The business recommendation <code>REPORT.md</code> is submitted with Part 2, once you have results from all five questions.</em></p>

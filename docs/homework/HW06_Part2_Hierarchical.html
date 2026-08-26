@@ -2390,7 +2390,7 @@ Your numbers will not match mine, and that is fine
 </section>
 <section id="dataset-and-setup" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</h2>
-<div id="05df3973" class="cell" data-execution_count="1">
+<div id="8785fd84" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2477,7 +2477,6 @@ For each:
 3. Explain what the output means so that I understand it — but do NOT draft the written
    answers I submit. The interpretation and business-recommendation sections are mine to
    write, in my own words.
-4. Log this interaction to PROMPT_LOG.jsonl before responding
 
 My prompt budget for Part 2 is 9 (this context prompt is excluded). I will label
 each question before asking.
@@ -2485,9 +2484,11 @@ each question before asking.
 
 Repository rules — these apply to every prompt in this thread:
 - My submission folder is `submissions/hw06_part2_&lt;my_name&gt;/`. Put everything there.
-- Before responding to each prompt, append ONE line to `PROMPT_LOG.jsonl` in that folder:
-  {&quot;prompt_id&quot;: &lt;int, starts at 1, increments by 1&gt;, &quot;timestamp_local&quot;: &quot;YYYY-MM-DD HH:MM:SS&quot;, &quot;prompt&quot;: &quot;&lt;my prompt, verbatim&gt;&quot;}
-  Never edit or delete a line you already wrote.
+- Keep a `PROMPT_LOG.md` in that folder. For every prompt I send, append a block:
+      ### Prompt &lt;n&gt; — YYYY-MM-DD HH:MM
+      &lt;my prompt, verbatim&gt;
+  Numbered from 1, in order. Never edit or delete an earlier entry. If your tool cannot write
+  files, I will paste them in myself.
 - After finishing the work for each prompt, make exactly one git commit:
   `hw06_part2 prompt &lt;prompt_id&gt;: &lt;short summary&gt;`
 - If a prompt would take me past my budget of 9, do not do the work. Reply exactly
@@ -2503,14 +2504,14 @@ Confirm by responding with: HW06P2_CONTEXT_ACK</code></pre>
 <section id="part-c-pooling-across-series" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="part-c-pooling-across-series"><span class="header-section-number">4</span> Part C: Pooling Across Series</h2>
 <p>The quantity of interest: the effect of a high-SNAP week on log units, store by store.</p>
-<div id="dddf35cb" class="cell" data-execution_count="2">
+<div id="1c9c59ad" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;ly&quot;</span>] <span class="op">=</span> np.log(weekly.units.clip(lower<span class="op">=</span><span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="q1-what-are-you-allowed-to-pool-suggested-prompts-1" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="q1-what-are-you-allowed-to-pool-suggested-prompts-1"><span class="header-section-number">4.1</span> Q1 — What Are You Allowed to Pool? <em>(Suggested prompts: 1)</em></h3>
 <p>A hierarchy says the groups are <strong>exchangeable</strong>: before seeing the data, you have no reason to expect one to differ from another in a particular direction. That is an assumption about the world, and nothing in PyMC will check it for you.</p>
 <p>Before fitting anything, compute the raw high-SNAP effect — the difference in mean log units between high-SNAP weeks and the rest — for every one of the thirty series, and summarize it <strong>by category</strong>.</p>
-<div id="dba079ec" class="cell" data-execution_count="3">
+<div id="f841b3ea" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw effect per series; mean and spread within each category</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2534,7 +2535,7 @@ This question decides the rest of the assignment
 <section id="q2-three-models-suggested-prompts-3" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="q2-three-models-suggested-prompts-3"><span class="header-section-number">4.2</span> Q2 — Three Models <em>(Suggested prompts: 3)</em></h3>
 <p>Work from here on with the series you defended in Q1. Build the information imbalance that partial pooling exists to handle: thin every other series down to <strong>8 weeks</strong>, and keep the weeks you removed — you will need them in Q4.</p>
-<div id="87560926" class="cell" data-execution_count="4">
+<div id="5f6e4080" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>foods <span class="op">=</span> weekly[weekly.cat_id <span class="op">==</span> <span class="st">&quot;FOODS&quot;</span>].dropna(subset<span class="op">=</span>[<span class="st">&quot;units&quot;</span>]).copy()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>codes, uniq <span class="op">=</span> pd.factorize(foods.series)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>foods[<span class="st">&quot;idx&quot;</span>] <span class="op">=</span> codes</span>
@@ -2564,7 +2565,7 @@ This question decides the rest of the assignment
 <li><strong>Hierarchical</strong> — <code>b_j ~ Normal(mu_b, sd_b)</code>, written <strong>non-centred</strong></li>
 </ul>
 <p>Each also needs a per-series intercept <code>a</code> with <code>shape=J</code>.</p>
-<div id="2eb61093" class="cell" data-execution_count="5">
+<div id="56be549b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit pooled, unpooled and hierarchical</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-warning callout-titled">
@@ -2590,7 +2591,7 @@ The centred form will fail, and that is the lesson
 <p>Compare the per-series estimates from the unpooled and hierarchical fits.</p>
 <p><strong>(a)</strong> Plot each series’ estimate before and after pooling — unpooled on the left, hierarchical on the right, a line connecting each series. Colour thin series differently from full ones.</p>
 <p><strong>(b)</strong> Compute, separately for thin and full series: the spread of estimates before and after, and the <strong>mean absolute distance moved</strong> toward the group mean.</p>
-<div id="9d86e49f" class="cell" data-execution_count="6">
+<div id="3303e2cd" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shrinkage plot and the movement table</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2601,7 +2602,7 @@ The centred form will fail, and that is the lesson
 <section id="q4-grade-it-against-data-it-never-saw-suggested-prompts-2" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="q4-grade-it-against-data-it-never-saw-suggested-prompts-2"><span class="header-section-number">4.4</span> Q4 — Grade It Against Data It Never Saw <em>(Suggested prompts: 2)</em></h3>
 <p>You thinned those series yourself, so the removed weeks are sitting in <code>heldout</code>. For each thin series compute the high-SNAP effect that <strong>actually occurred</strong> in its held-out weeks, and compare it against both estimates.</p>
-<div id="73c3d79f" class="cell" data-execution_count="7">
+<div id="1f07ebc0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Held-out effect per thin series; RMSE of each model against it</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2612,7 +2613,7 @@ The centred form will fail, and that is the lesson
 <section id="q5-the-business-recommendation-suggested-prompts-1" class="level3" data-number="4.5">
 <h3 data-number="4.5" class="anchored" data-anchor-id="q5-the-business-recommendation-suggested-prompts-1"><span class="header-section-number">4.5</span> Q5 — The Business Recommendation <em>(Suggested prompts: 1)</em></h3>
 <p>Report the estimated <code>mu_b</code> and <code>sd_b</code> with their HDIs.</p>
-<div id="e762cc4b" class="cell" data-execution_count="8">
+<div id="1ac47471" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Group-level parameters</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2638,7 +2639,7 @@ The centred form will fail, and that is the lesson
 <li><label><input type="checkbox">All code cells run without errors from top to bottom</label></li>
 <li><label><input type="checkbox">Written responses completed in your own words</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in <code>submissions/hw06_part2_&lt;your_name&gt;/</code></label></li>
-<li><label><input type="checkbox"><code>PROMPT_LOG.jsonl</code> complete with <strong>9 or fewer</strong> entries for Part 2</label></li>
+<li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with <strong>9 or fewer</strong> entries for Part 2</label></li>
 <li><label><input type="checkbox">One git commit per Codex prompt (<code>hw06_part2 prompt &lt;id&gt;: &lt;short summary&gt;</code>)</label></li>
 <li><label><input type="checkbox"><code>REPORT.md</code> with a clear business recommendation</label></li>
 </ul>

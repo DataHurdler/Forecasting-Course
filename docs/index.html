@@ -180,7 +180,7 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 <p>You will also need: <code>jupyter</code>, <code>pandas</code>, <code>numpy</code>,
 <code>matplotlib</code>, <code>statsmodels</code>, <code>scikit-learn</code>, <code>prophet</code>,
 <code>pygam</code>, <code>xgboost</code>, <code>torch</code>, <code>pymc</code>, and <code>arviz</code>.
-<code>jupyter</code> is not optional &mdash; Quarto runs your Python through a Jupyter kernel. Assignment submission, the Codex workflow, and the prompt log live in the
+<code>jupyter</code> is not optional &mdash; Quarto runs your Python through a Jupyter kernel. Assignment submission, the AI workflow, and the prompt log live in the
 <a href="https://github.com/DataHurdler/Forecasting-Env">course environment repository</a>.</p>
 
 <h2>Weekly schedule</h2>
@@ -422,10 +422,13 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 
 <div class="callout">
   <span class="t">Each assignment has a prompt budget</span>
-  <p>Every assignment carries a fixed number of Codex prompts and an initial context prompt that
-  does not count against it. You submit a <code>PROMPT_LOG.jsonl</code> alongside your rendered
-  work. The budget is a design feature, not a restriction &mdash; it forces you to decide what is
-  worth asking.</p>
+  <p>Every assignment carries a prompt budget and an initial context prompt that does not count
+  against it. Any AI assistant is fine &mdash; Codex, Copilot, ChatGPT, Claude, Gemini &mdash; in
+  an editor or a browser tab. You submit a <code>PROMPT_LOG.md</code> alongside your rendered
+  work, listing every prompt you sent in order.</p>
+  <p>The budget is a target, not a limit. It exists to make you decide what is worth asking, and
+  you may go over it &mdash; log the extra prompts and say where you got stuck. What does cost you
+  is a log that does not match the work you submit.</p>
 </div>
 
 <footer>
