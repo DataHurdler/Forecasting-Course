@@ -63,23 +63,22 @@
 % --- Slide: PyMC ---------------------------------------------------------------
 \begin{frame}{Bayesian Linear Regression in PyMC}
   \begin{examplebox}{Log units on log price, SNAP and events}
-    {\tiny\linespread{1.05}\selectfont
+    {\tiny\linespread{1.0}\selectfont
     \texttt{with pm.Model() as model:}\\
     \texttt{\ \ a\ \ \ \ \ \ = pm.Normal("a", y.mean(), 1)}\\
     \texttt{\ \ b\_price = pm.Normal("b\_price", 0, 1)\ \ \ \ \ \# weakly informative}\\
     \texttt{\ \ b\_snap\ = pm.Normal("b\_snap",\ 0, 1)}\\
     \texttt{\ \ b\_event = pm.Normal("b\_event", 0, 1)}\\
-    \texttt{\ \ sigma\ \ \ = pm.Exponential("sigma", 1.0)}\\[2pt]
-    \texttt{\ \ mu = a + b\_price*lp + b\_snap*snap + b\_event*event}\\
-    \texttt{\ \ pm.Normal("obs", mu=mu, sigma=sigma, observed=y)}\\[2pt]
+    \texttt{\ \ sigma\ \ \ = pm.Exponential("sigma", 1.0)}\\
+    \texttt{\ \ mu = a + b\_price*lpc + b\_snap*snap + b\_event*event}\\
+    \texttt{\ \ pm.Normal("obs", mu=mu, sigma=sigma, observed=y)}\\
     \texttt{\ \ idata = pm.sample(1000, tune=1500, chains=4)}
     }
   \end{examplebox}
-  Standardize the predictors first, so \texttt{Normal(0, 1)} means the same thing for each.
+  \textbf{Do not standardize log price} --- with both in logs \texttt{b\_price} is an
+  \textbf{elasticity}, percent change in demand per percent change in price. \texttt{lpc} is log
+  price centred within series, which fixed ESS 184 $\rightarrow$ 3{,}097.
 
-  \vspace{0.1cm}
-  With units and price both in logs, \texttt{b\_price} is an \textbf{elasticity} --- the percent
-  change in demand per percent change in price. A quantity a category manager already uses.
 \end{frame}
 
 % =============================================================================
@@ -99,10 +98,10 @@
       \toprule
       \textbf{Coefficient} & \textbf{Mean} & \textbf{94\% HDI} & \textbf{Reading} \\
       \midrule
-      \texttt{b\_price} & $-0.127$ & $[-0.150,\ -0.100]$ & Inelastic, and clearly negative \\
-      \texttt{b\_trend} & $\phantom{-}0.169$ & $[\phantom{-}0.164,\ \phantom{-}0.173]$ & Demand grows over the sample \\
-      \texttt{b\_snap} & $\phantom{-}0.026$ & $[\phantom{-}0.023,\ \phantom{-}0.030]$ & About a 2.6\% SNAP-week lift \\
-      \texttt{b\_event} & $-0.002$ & $[-0.005,\ \phantom{-}0.002]$ & \textbf{Spans zero} \\
+      \texttt{b\_price} & $-0.493$ & $[-0.596,\ -0.387]$ & Near the elastic boundary \\
+      \texttt{b\_trend} & $\phantom{-}0.110$ & $[\phantom{-}0.107,\ \phantom{-}0.113]$ & About 11\% growth per year \\
+      \texttt{b\_snap} & $\phantom{-}0.036$ & $[\phantom{-}0.027,\ \phantom{-}0.046]$ & About a 3.7\% SNAP-week lift \\
+      \texttt{b\_event} & $-0.003$ & $[-0.011,\ \phantom{-}0.004]$ & \textbf{Spans zero} \\
       \bottomrule
     \end{tabular}
     }
@@ -128,21 +127,21 @@
     \texttt{b = idata.posterior["b\_price"].values.ravel()}\\[2pt]
     \texttt{(b < 0).mean()\ \ \ \ \ \ \ \ \ \ \# P(demand falls when price rises)}\\
     \texttt{(b < -0.5).mean()\ \ \ \ \ \ \ \# P(elasticity beyond -0.5)}\\
-    \texttt{((b > -0.2) \& (b < 0)).mean()\ \ \# P(inelastic but negative)}
+    \texttt{((b > -0.5) \& (b < 0)).mean()\ \ \# P(inelastic but negative)}
     }
   \end{examplebox}
 
-  On our fit, $P(\text{elasticity} < 0) = \mathbf{1.00}$ --- every posterior sample is negative,
-  so the direction is not in doubt. But $P(\text{elasticity} < -0.5) \approx 0$: the effect is
-  real and it is \emph{small}.
+  On our fit, $P(\text{elasticity} < 0) = \mathbf{1.00}$ --- the direction is not in doubt. But
+  $P(\text{elasticity} < -0.5) = \mathbf{0.46}$: the data cannot settle whether demand is elastic
+  or inelastic.
 
   \begin{keybox}
-    \textbf{Two different findings, and a p-value conflates them.} ``Statistically significant''
-    reports only the first. The business needs the second.
+    \textbf{Two findings, and a p-value conflates them.} ``Significant'' reports only the
+    direction. The question the business asks --- \emph{how big?} --- gets the answer 46/54.
   \end{keybox}
 
-  \muted{\footnotesize\itshape Asking how much posterior mass falls in a range of negligible
-  values is called a \textbf{ROPE} --- region of practical equivalence.}
+  \muted{\footnotesize\itshape Posterior mass inside a range of negligible values is a
+  \textbf{ROPE} --- region of practical equivalence.}
 \end{frame}
 
 % =============================================================================
@@ -198,16 +197,17 @@
       \toprule
       \textbf{Model} & \textbf{Elasticity} & \textbf{94\% HDI} \\
       \midrule
-      Price, SNAP, events only & $-0.687$ & $[-0.700,\ -0.676]$ \\
-      \ \ $+$ series effects and trend & $\mathbf{-0.127}$ & $[-0.150,\ -0.100]$ \\
+      Price, SNAP, events only & $-2.805$ & $[-2.856,\ -2.756]$ \\
+      \ \ $+$ series effects and trend & $\mathbf{-0.493}$ & $[-0.596,\ -0.387]$ \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
 
   \vspace{-0.05cm}
-  \textbf{The uncontrolled estimate is more than five times too large.} It is not noisier --- its
-  interval is actually \emph{narrower}. It is confidently, precisely wrong.
+  \textbf{The uncontrolled estimate is nearly six times too large} --- it claims demand collapses
+  when price rises. It is not noisier either: its interval is \emph{half the width}. It is
+  confidently, precisely wrong.
 
   \begin{warningbox}
     A tight credible interval says the model is sure. It says nothing about whether the model is
@@ -229,13 +229,14 @@
     }
   \end{examplebox}
 
-  With an elasticity near $-0.127$, a 5\% price rise implies roughly a \textbf{0.6\% fall in
-  units} --- and returns the whole distribution of that fall, so you can report the pessimistic
-  end too.
+  With an elasticity near $-0.493$, a 5\% price rise implies roughly a \textbf{2.4\% fall in
+  units}, 94\% of the posterior between $-2.9\%$ and $-1.9\%$ --- so you can report the
+  pessimistic end too.
 
   \vspace{0.1cm}
   \textbf{Then the decision follows.} Revenue rises if the volume loss is smaller than the price
-  gain, and you can compute that probability directly.
+  gain: here $+2.5\%$ on average, and $P(\text{revenue rises}) = 1.00$ across every posterior
+  sample. Note this holds \emph{even though} the elasticity might be past $-0.5$.
 
   \muted{\footnotesize\itshape Valid only to the extent the DAG is --- this is a causal claim
   about intervening on price.}

@@ -1,0 +1,306 @@
+---
+title: "Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+A Bayesian regression coefficient is a distribution, and a price elasticity is the one number a
+category manager will actually act on. Today you will estimate one, and then find three separate
+ways it can be wrong while every diagnostic still says the model is fine.
+
+Two of the three are not statistical failures at all. One is a routine preprocessing step you
+have used in every lab since Lecture 6.
+
+**Time:** ~45 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
+`data/processed/m5_weekly.csv`. Four model fits, most under 30 seconds.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pymc as pm
+import arviz as az
+import warnings
+
+warnings.filterwarnings("ignore")
+RANDOM_STATE = 42
+
+weekly = pd.read_csv("../data/processed/m5_weekly.csv", parse_dates=["week_start"])
+weekly["series"] = weekly.store_id + "_" + weekly.cat_id
+
+df = weekly.dropna(subset=["units", "avg_price"]).copy()
+df = df[df.avg_price > 0]
+df["ly"]    = np.log(df.units.clip(lower=1))
+df["lp"]    = np.log(df.avg_price)
+df["snap"]  = (df.snap_days >= 5).astype(float)
+df["event"] = (df.event_days > 0).astype(float)
+df["yr"]    = (df.week_start - df.week_start.min()).dt.days / 365.25
+
+codes, uniq = pd.factorize(df.series)
+df["idx"] = codes
+J = len(uniq)
+y = df.ly.values
+
+print(f"{len(df):,} rows | {J} series | sd(log price) = {df.lp.std():.4f}")
+```
+
+With units and price both in logs, the price coefficient is an **elasticity**: the percent change
+in demand per percent change in price. Hold on to that sentence — Step 3 is about the moment it
+stops being true.
+
+One model function, with switches for the three things we want to vary.
+
+```{python}
+def fit(price_col, controlled=True, standardize_price=False, seed=RANDOM_STATE):
+    x = df[price_col].values.astype(float)
+    if standardize_price:
+        x = (x - x.mean()) / x.std()
+    with pm.Model():
+        s  = pm.Exponential("sigma", 1.0)
+        bp = pm.Normal("b_price", 0, 1)
+        bs = pm.Normal("b_snap",  0, 1)
+        be = pm.Normal("b_event", 0, 1)
+        if controlled:
+            a  = pm.Normal("a", y.mean(), 1, shape=J)
+            bt = pm.Normal("b_trend", 0, 1)
+            mu = (a[df.idx.values] + bp * x + bs * df.snap.values
+                  + be * df.event.values + bt * df.yr.values)
+        else:
+            a  = pm.Normal("a", y.mean(), 1)
+            mu = a + bp * x + bs * df.snap.values + be * df.event.values
+        pm.Normal("obs", mu=mu, sigma=s, observed=y)
+        return pm.sample(1000, tune=1500, chains=4, progressbar=False,
+                         random_seed=seed, target_accept=0.9)
+
+def show(idata, controlled=True, label=""):
+    vs = ["b_price", "b_snap", "b_event"] + (["b_trend"] if controlled else [])
+    su = az.summary(idata, var_names=vs, ci_kind="hdi", ci_prob=0.94, round_to=4)
+    print(label)
+    print(su[["mean", "hdi94_lb", "hdi94_ub", "r_hat", "ess_bulk"]].to_string())
+    return su
+```
+
+---
+
+# Step 1 — The naive elasticity
+
+Regress log units on log price, SNAP and events. Nothing else.
+
+```{python}
+idata_naive = fit("lp", controlled=False)
+_ = show(idata_naive, controlled=False, label="Naive")
+```
+
+An elasticity near $-2.8$: a 1% price rise costs almost 3% of volume. Diagnostics are clean,
+$\hat{R}$ is 1.00, ESS is in the thousands, and the interval is tight.
+
+It is also badly wrong, and Lecture 12's DAG says why before any model is fitted. Our thirty
+series are different categories in different stores. Categories differ systematically in **both**
+typical price and typical volume — HOBBIES items cost more per unit and sell fewer of them. So
+series identity is an arrow into price *and* into units: a textbook confounder.
+
+Comparing a hobby item to a food item is not measuring a price response. It is measuring the
+difference between two product categories.
+
+---
+
+# Step 2 — Control for the confounder
+
+Add per-series intercepts and a trend. Centre log price within each series, so the model uses
+only price variation *inside* a series over time — which is the variation a manager could
+actually create.
+
+```{python}
+df["lpc"] = df.lp - df.groupby("series").lp.transform("mean")
+
+idata_ctrl = fit("lpc", controlled=True)
+su_ctrl = show(idata_ctrl, label="Controlled")
+```
+
+```{python}
+b_naive = idata_naive.posterior["b_price"].values.ravel()
+b_ctrl  = idata_ctrl.posterior["b_price"].values.ravel()
+
+print(f"  naive       {b_naive.mean():+.3f}   width of 94% HDI "
+      f"{np.diff(az.hdi(b_naive, prob=0.94))[0]:.3f}")
+print(f"  controlled  {b_ctrl.mean():+.3f}   width of 94% HDI "
+      f"{np.diff(az.hdi(b_ctrl, prob=0.94))[0]:.3f}")
+print(f"  the naive estimate is {b_naive.mean()/b_ctrl.mean():.1f}x too large")
+```
+
+::: {.callout-warning}
+## Precision is not accuracy
+
+The naive estimate is nearly six times too large **and its interval is half the width**. It is
+not noisy. It is confidently, precisely wrong.
+
+A tight credible interval says the model is sure. It says nothing about whether the model is
+answering your question — and no diagnostic in ArviZ will ever tell you that it isn't. Only the
+DAG does.
+:::
+
+```{python}
+# ---- your turn: uncomment and answer in the string ----
+# direction = "..."   # <- the naive estimate is too NEGATIVE. Which arrow in the DAG
+#                     #    makes the bias run that way rather than the other?
+# print(direction)
+```
+
+---
+
+# Step 3 — The preprocessing step that silently destroys the answer
+
+You have standardized predictors in nearly every lab since Lecture 6. It makes `Normal(0, 1)`
+priors mean the same thing across variables, and it helps samplers. It is a good habit.
+
+Do it to log price here and watch what happens.
+
+```{python}
+idata_std = fit("lpc", controlled=True, standardize_price=True)
+b_std = idata_std.posterior["b_price"].values.ravel()
+
+print(f"  unstandardized  b_price = {b_ctrl.mean():+.4f}")
+print(f"  standardized    b_price = {b_std.mean():+.4f}")
+print(f"  sd(centred log price)   = {df.lpc.std():.4f}")
+print(f"  ratio                   = {b_ctrl.mean()/b_std.mean():.4f}")
+```
+
+The two fits agree perfectly — they are the same model. But the *coefficient* is no longer the
+same quantity. Standardizing divided log price by its standard deviation, so the coefficient is
+now the change in log units per **standard deviation** of log price, not per percent.
+
+Both diagnostics are clean. Both intervals exclude zero. Nothing anywhere reports a problem. The
+only thing that changed is what the number means, and the model has no way to tell you.
+
+Now watch it become a business error.
+
+```{python}
+def scenario(b, pct=5.0):
+    """Percent change in units, and in revenue, from a `pct` price rise."""
+    units = 100 * (np.exp(b * np.log(1 + pct/100)) - 1)
+    rev   = 100 * ((1 + pct/100) * np.exp(b * np.log(1 + pct/100)) - 1)
+    return units, rev
+
+for label, b in [("correct (elasticity)", b_ctrl), ("standardized", b_std)]:
+    u, r = scenario(b)
+    print(f"  {label:<22s} 5% price rise -> units {u.mean():+.2f}%  "
+          f"revenue {r.mean():+.2f}%")
+```
+
+::: {.callout-important}
+## This is the lab's point
+
+Read the two lines. Using the standardized coefficient, a manager is told a 5% price rise costs
+about a tenth of a percent of volume. The truth is **more than twenty times that** — because the
+coefficient was divided by the standard deviation of centred log price, which is only 0.0455.
+The revenue projection is inflated too, from $+2.5\%$ to $+4.9\%$.
+
+The smaller the standard deviation you divide by, the larger the distortion. Here the within-series
+price variation is genuinely small, which makes the error enormous — and entirely invisible.
+
+The model was right. The sampler was right. The diagnostics were right. The error entered through
+a preprocessing convenience three cells earlier, and it survived all the way to a stocking
+decision because **nothing downstream carries units**.
+
+The habit that prevents it: write down what one unit of each variable *is* before you rescale it,
+and check that the coefficient still answers the question you asked.
+:::
+
+```{python}
+# ---- your turn: uncomment and fill in ----
+# print("To recover the elasticity from the standardized fit, multiply it by ___")
+```
+
+---
+
+# Step 4 — Ask the posterior a business question
+
+The posterior is samples, so any question is answered by counting. Use the correct fit.
+
+```{python}
+print(f"  P(elasticity < 0)     = {(b_ctrl < 0).mean():.3f}")
+print(f"  P(elasticity < -0.5)  = {(b_ctrl < -0.5).mean():.3f}")
+print(f"  P(-0.5 < e < 0)       = {((b_ctrl > -0.5) & (b_ctrl < 0)).mean():.3f}")
+```
+
+The first number settles the direction: every posterior sample is negative, so demand falls when
+price rises. There is no doubt at all.
+
+The second is the interesting one. Elasticity $-0.5$ is a meaningful business threshold, and the
+posterior puts us within a few points of a coin flip. **The data cannot settle whether demand is
+elastic or inelastic**, and that is the honest report. A significance test would have announced
+the direction and said nothing about the question the manager actually asked.
+
+```{python}
+#| fig-cap: "The full posterior, with the business threshold marked."
+fig, ax = plt.subplots(figsize=(7, 3.6))
+ax.hist(b_ctrl, bins=60, color="steelblue", alpha=0.8)
+ax.axvline(-0.5, color="crimson", ls="--", lw=1.5, label="elastic / inelastic boundary")
+ax.axvline(0, color="gray", ls=":", lw=1)
+ax.set_xlabel("price elasticity"); ax.set_yticks([])
+ax.legend(); plt.tight_layout(); plt.show()
+```
+
+Now the decision the manager actually faces.
+
+```{python}
+u5, r5 = scenario(b_ctrl, 5.0)
+print(f"  5% price rise:  units {u5.mean():+.2f}%  "
+      f"[{np.percentile(u5,3):+.2f}, {np.percentile(u5,97):+.2f}]")
+print(f"                  revenue {r5.mean():+.2f}%  "
+      f"[{np.percentile(r5,3):+.2f}, {np.percentile(r5,97):+.2f}]")
+print(f"  P(revenue rises) = {(r5 > 0).mean():.3f}")
+```
+
+Revenue rises with probability 1.00 across every posterior sample — *even though* the elasticity
+might well be past $-0.5$. Both facts are true at once, and only the posterior lets you say so.
+
+```{python}
+# ---- your turn: uncomment and answer in the strings ----
+# recommend = "..."   # <- two sentences to the manager, with a probability attached
+# caveat    = "..."   # <- name one DAG arrow that, if wrong, invalidates this
+# print(recommend); print(caveat)
+```
+
+---
+
+# Before you leave
+
+> **Discuss (the three failures):** This lab produced a wrong elasticity three ways — an omitted
+> confounder, a rescaled coefficient, and a threshold question the data cannot answer. Which of
+> the three would any ArviZ diagnostic have caught? What does your answer imply about what
+> diagnostics are for?
+>
+> **Discuss (the habit):** Standardizing is genuinely good practice and you should keep doing it.
+> State the rule that lets you keep the habit without repeating Step 3's error.
+>
+> **Discuss (the decision):** You must advise on the 5% rise using only Step 4's output. Write the
+> recommendation. Then say what you would want measured before a 20% rise, and why extrapolating
+> this elasticity that far is a different kind of claim.
+>
+> **Discuss (the course):** You have now estimated the same kind of quantity with OLS, XGBoost,
+> and a Bayesian regression. Only one of them naturally answers "how likely is it that revenue
+> rises?" Explain what about the Bayesian output makes that question cheap, and name one
+> forecasting task from this course where you would still not reach for it.
+
+---
+
+*Solutions posted to Canvas after class.*

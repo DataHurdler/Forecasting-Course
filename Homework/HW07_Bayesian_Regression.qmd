@@ -77,13 +77,14 @@ df = weekly.dropna(subset=["units", "avg_price"]).copy()
 df["ly"] = np.log(df.units.clip(lower=1))          # log units
 df["lp"] = np.log(df.avg_price)                     # log price
 df["t"]  = (df.week_start - df.week_start.min()).dt.days / 365.25
+df["snap"]  = (df.snap_days >= 5).astype(float)     # high-SNAP week
+df["event"] = (df.event_days > 0).astype(float)     # any event that week
 codes, uniq = pd.factorize(df.series)
 df["idx"] = codes
 J = len(uniq)
 
-# standardize the continuous predictors so Normal(0, 1) priors mean the same thing
-for c in ["lp", "t", "snap_days", "event_days"]:
-    df[c + "_z"] = (df[c] - df[c].mean()) / df[c].std()
+# Centre log price within series. NOT standardized -- see the note below.
+df["lpc"] = df.lp - df.groupby("series").lp.transform("mean")
 
 print(f"{len(df):,} rows | {J} series | "
       f"price range {df.avg_price.min():.2f}-{df.avg_price.max():.2f}")
@@ -92,6 +93,20 @@ print(f"{len(df):,} rows | {J} series | "
 **Why logs on both sides.** With `ly` and `lp` both logged, the price coefficient is an
 **elasticity**: the percentage change in units for a one percent change in price. That is
 directly interpretable, and it is what makes the scenario analysis in Q6 possible.
+
+::: {.callout-important}
+## Do not standardize log price
+
+It is a common reflex, and here it is a trap. Dividing `lp` by its standard deviation rescales
+the coefficient into "per standard deviation of log price" — which is **no longer an elasticity**,
+and every percentage claim you build on it in Q6 will be wrong by the factor you divided by.
+Leave `lp` in log units. Every predictor in this assignment is already on a scale a manager reads
+directly: log price in percent, `snap` and `event` as 0/1, `t` in years.
+
+Centring within series (`lpc`) is different and is fine — it shifts the variable without
+rescaling it, leaves the elasticity untouched, and greatly improves sampling, because price
+levels differ across series and otherwise correlate with the intercepts.
+:::
 
 ---
 
@@ -163,10 +178,10 @@ it in the regression.
 Fit **two** OLS regressions with `statsmodels`, and note that the difference between them is the
 whole point of Q1.
 
-**(a) Naive** — regress `ly` on `lp_z`, `snap_days_z`, `event_days_z`.
+**(a) Naive** — regress `ly` on `lp`, `snap`, `event`.
 
-**(b) Controlled** — the same, plus a trend (`t_z`) and series fixed effects
-(`pd.get_dummies(df.series)`).
+**(b) Controlled** — regress `ly` on `lpc`, `snap`, `event`, plus a trend (`t`) and series fixed
+effects (`pd.get_dummies(df.series)`).
 
 Report the coefficient table for each, and put the two price elasticities side by side.
 
@@ -190,7 +205,7 @@ Report the coefficient table for each, and put the two price elasticities side b
 Fit the **controlled** specification from Q2(b) as a Bayesian model — price, SNAP, events,
 trend, and a per-series intercept. Use weakly informative priors:
 
-- `beta_j ~ Normal(0, 1)` for each standardized predictor
+- `beta_j ~ Normal(0, 1)` for each predictor (weakly informative on these scales)
 - `alpha ~ Normal(0, 1)` for the intercept
 - `sigma ~ HalfNormal(1)` for observation noise
 
@@ -250,9 +265,10 @@ For each, report:
 "Credible" and "big enough to act on" are different questions. A **ROPE** — region of practical
 equivalence — makes the second one explicit.
 
-For each predictor, compute the fraction of posterior mass inside `|beta| < 0.05`. In
-standardized units that is an effect smaller than 5% of a standard deviation of log units, which
-no one would act on.
+For each predictor, compute the fraction of posterior mass inside `|beta| < 0.05`. Because
+nothing here is standardized, that threshold reads directly: for price, an elasticity between
+$-0.05$ and $0.05$ means a 1% price change moves units by less than 0.05% — no one would act on
+it. For `snap` and `event` it means a weekly lift under 5%.
 
 Present results in a table:
 
