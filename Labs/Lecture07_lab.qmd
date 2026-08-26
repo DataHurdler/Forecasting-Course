@@ -1,7 +1,6 @@
 ---
 title: "Lab 7: Your First Network — and Why One Run Proves Nothing"
-subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
-date: "Fall 2026"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha · Fall 2026"
 format:
   html:
     theme: cosmo

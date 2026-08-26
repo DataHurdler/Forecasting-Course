@@ -1,8 +1,7 @@
 ---
 title: "Homework 4: Boosted Trees and Regularization"
-subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha · Fall 2026"
 author: "Your Name"
-date: "Fall 2026"
 format:
   html:
     theme: cosmo
