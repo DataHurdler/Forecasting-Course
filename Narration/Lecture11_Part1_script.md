@@ -1,0 +1,451 @@
+# Lecture 11 Part 1 — Recording Script
+
+**ECON 8310: Business Forecasting · Bayesian Statistics II — Time Series**
+
+Deck: `Slides/Lecture11_Part1_BayesianTS.pdf` (18 pages) · Measured runtime: see the timing guide
+
+---
+
+## How to use this document
+
+- **`▶ SLIDE n — Title`** marks where to advance. The number is the PDF page.
+- *Italic parentheticals* are stage directions. **[pause]** means stop for a beat.
+- Slide 4 sets expectations low on purpose and slide 15 collects on it. The argument of this
+  lecture is that a **calibrated but useless** interval is still a better deliverable than a point
+  forecast, because you can *establish* that it's useless. Do not soften that.
+- Slide 12 is the first of two sampler failures in this pair of lectures. Treat it as a rehearsal
+  for Part 2.
+
+---
+
+# ▶ SLIDE 1 — Title page
+
+Lecture 11, Part 1: Bayesian Statistics II — Time Series.
+
+Last week we built the machinery — Bayes' theorem, priors, MCMC, and the three diagnostics. All of
+it on a conversion rate, which is not a time series.
+
+Today we point that machinery at the thing this course is actually about.
+
+**[pause]**
+
+And I'll tell you the ending now, because it's the interesting part. The model we build today will
+beat the seasonal-naive benchmark by about four percent. That is a small win, and after ten weeks
+of this course you should be suspicious of anyone who presents four percent as a triumph.
+
+The argument for today is not the point forecast. It's what else comes back with it.
+
+---
+
+# ▶ SLIDE 2 — Lecture Outline
+
+Five parts. Why you'd do this at all, given that four percent. Then the structural decomposition —
+writing a series as parts you can name. Then fitting it in PyMC, where our first attempt fails.
+Then reading the forecast, and the two very different questions you can ask about an interval. And
+takeaways.
+
+---
+
+# ▶ SLIDE 3 — Section divider: Why Bayesian Time Series
+
+Not a more accurate forecast — a different deliverable.
+
+---
+
+# ▶ SLIDE 4 — What Every Model So Far Gave You
+
+Take stock for a second. Ten weeks of forecasting, and almost every model has returned the same
+object: **one number per period.**
+
+ETS, ARIMA, random forests, XGBoost, the LSTM — a point forecast. And at best, an interval derived
+from asymptotic theory that, let's be honest, nobody checked.
+
+**[pause]**
+
+For a planner, that is often not enough. Consider the question: *how much stock do I need so the
+chance of a stockout is under five percent?*
+
+That is a question about a **distribution**. A point forecast cannot answer it — not because the
+point forecast is inaccurate, but because it isn't the right kind of object. You can't extract a
+fifth percentile from a single number.
+
+*(Point at the key box.)*
+
+A Bayesian time series model returns a full predictive distribution for every future period, plus
+a distribution over each *component* — the trend, the seasonality, the noise, each with its own
+uncertainty.
+
+**[pause]**
+
+*(Now set expectations honestly. This paragraph is load-bearing.)*
+
+And let me set expectations properly, right now.
+
+This will not beat XGBoost on RMSE. On our data it barely beats seasonal naive. The argument for
+it is what it hands you, not where it ranks.
+
+I'm saying that at the start because at the end of this lecture I'm going to hold it to exactly
+that standard — and it's going to partially fail. That's a more useful hour than one where
+everything works.
+
+---
+
+# ▶ SLIDE 5 — Three Things That Become Possible
+
+Three capabilities you didn't have before.
+
+*(Walk the table.)*
+
+**Priors carry knowledge.** "Weekly growth is very unlikely to exceed twenty percent" is a sentence
+you can put *into the model*, rather than hoping the data implies it. When you have short history,
+that's the difference between a usable forecast and a wild one.
+
+**Components get error bars.** Not just a forecast, but "how confident am I that there's a trend at
+all?" — separately from the seasonality. You can decompose your uncertainty, not just your signal.
+
+**Uncertainty compounds honestly.** Forecast fifty-two weeks out and the interval widens, because
+the model propagates uncertainty forward rather than assuming it away.
+
+**[pause]**
+
+*(Point at the third row again — it's the one to dwell on.)*
+
+That third row is the one people underestimate, so let me sharpen it.
+
+An ARIMA prediction interval widens too. But it widens according to a **formula**, derived under
+assumptions about the error process that you did not check and probably could not check.
+
+Here, the widening is a *consequence of the model you wrote down*. If you said the level follows a
+random walk, then fifty-two steps of random walk uncertainty is what you get. You can trace the
+interval back to a modelling choice and argue about that choice.
+
+*(Point at the price.)*
+
+And the price is real: it's slower, it needs priors you must defend, and — as we'll see in twenty
+minutes — it can fail silently in ways a least-squares fit simply cannot.
+
+---
+
+# ▶ SLIDE 6 — Section divider: The Structural Decomposition
+
+Write the series as a sum of parts you can name, and put a prior on each.
+
+---
+
+# ▶ SLIDE 7 — Structural Time Series: One Equation
+
+The whole idea is additive, and you have seen this shape before.
+
+*(Point at the equation.)*
+
+y-t equals mu-t, the level, plus s-t, the seasonality, plus epsilon-t, the noise.
+
+That is the GAM decomposition from Lecture 3, with priors attached. Same additive structure, same
+named components — now each one is a random variable with a distribution.
+
+**[pause]**
+
+And here's why that matters practically. **Each piece is a thing a business person can name**, and
+each gets its own posterior.
+
+"Demand is growing" is a statement about mu-t. "December is our peak" is a statement about s-t.
+"How noisy is this store?" is sigma. Those are three separate questions, and the model answers
+them separately, with uncertainty on each.
+
+*(Point at the key box.)*
+
+That's why the approach is called **structural**. You are not fitting a flexible curve to data and
+hoping. You are stating what you believe the series is *made of*, and asking the data how much of
+each part there is.
+
+**[pause]**
+
+Contrast ARIMA, which we spent Lecture 2 on. There, trend and seasonality are handled by
+*differencing* — you remove them rather than model them — and the parameters that come out are
+autocorrelation coefficients. Nobody has ever walked into a planning meeting and explained the
+business implications of an MA(2) coefficient.
+
+Here, every parameter is a quantity somebody outside the room can interpret.
+
+---
+
+# ▶ SLIDE 8 — The Level: A Random Walk With a Prior On It
+
+The simplest useful trend is a **local level**: the series has a level, and the level itself
+drifts over time.
+
+mu-t equals mu-t-minus-one plus a shock. Read as a sentence: **this week's level is last week's
+level, plus a random disturbance.**
+
+And that disturbance has a standard deviation, sigma-level, which you put a prior on. That single
+parameter controls **how fast the level is allowed to move**.
+
+*(Walk the two rows.)*
+
+Small sigma-level: a nearly constant level. Rigid, but stable far into the future.
+
+Large sigma-level: a level that chases recent data. Fits the training period beautifully, and the
+forecasts wander off.
+
+**[pause]**
+
+*(Point at the callback.)*
+
+And that is a familiar trade in new clothing.
+
+It is the smoothing parameter from Lecture 1's exponential smoothing — alpha, deciding how fast to
+forget. It is the penalty strength from Lecture 6. Now it's expressed as a **prior you can argue
+about**, and — importantly — the data gets a say in it too, because sigma-level is estimated, not
+fixed.
+
+That's the sixth appearance of this idea coming into view. We'll name it properly next week.
+
+---
+
+# ▶ SLIDE 9 — Seasonality as Fourier Terms
+
+Now seasonality. Our data is weekly with an annual cycle, so a naive approach would estimate
+fifty-two separate seasonal parameters. That's a lot to estimate, and most of it would be noise.
+
+Instead, build the seasonal shape out of a few smooth waves.
+
+*(Point at the equation.)*
+
+s-t is a sum over k of sine and cosine terms at increasing frequencies. P is the period —
+fifty-two for us. K is how many waves you allow. K equals one is a single smooth annual cycle;
+larger K lets the shape get more detailed, with sharper peaks.
+
+And each a-k and b-k is just a coefficient with a Normal prior. Nothing exotic.
+
+**[pause]**
+
+*(Point at the key box — this is the third time they've seen this device.)*
+
+You have met this exact construction **twice already**.
+
+It is how Prophet encodes seasonality, in Lecture 3. And it is the Fourier feature block you
+engineered by hand for Homework 4 — those `sin_1`, `cos_1`, `sin_2` columns.
+
+Same device, third appearance. The difference now is that a-k and b-k come back as
+**distributions**, so you can ask how confident you are that the seasonal peak is where you think
+it is.
+
+*(Point at the last line.)*
+
+K trades flexibility against overfitting, exactly like spline knots in Lecture 3. We use K equals
+three — six coefficients standing in for fifty-two parameters.
+
+---
+
+# ▶ SLIDE 10 — Section divider: Fitting It in PyMC
+
+The model in code, and the check you run before believing any of it.
+
+---
+
+# ▶ SLIDE 11 — The Model in PyMC
+
+Here is everything from the last three slides, in about eight lines.
+
+*(Walk the code.)*
+
+`sigma_level` with an Exponential prior — it must be positive, so Exponential, not Normal. Then
+`z`, a vector of standard Normals. Then the level is the **cumulative sum** of z times
+sigma_level.
+
+Stop on that line for a second, because it's the clever bit: `cumsum` of scaled Normal draws **is**
+a random walk. That's the definition. Each step adds a scaled Normal shock to the running total.
+
+Then `beta`, the Fourier coefficients. Then sigma, the observation noise. Then the likelihood: the
+observed data is Normal around level plus the Fourier terms.
+
+**[pause]**
+
+*(This warning is practical and easy to get wrong.)*
+
+One thing you must do, and it's bolded for a reason. **Standardize y first.**
+
+These priors assume the data is on roughly unit scale. Our weekly units are in the tens of
+thousands. An Exponential prior with rate ten on `sigma_level` is a sensible prior for a
+standardized series and an absurdly tight one for raw units of twenty thousand — you'd be telling
+the model the level essentially cannot move.
+
+Standardize, fit, then transform the forecasts back. Getting this wrong produces a model that
+fits terribly for reasons that look mysterious.
+
+---
+
+# ▶ SLIDE 12 — The First Fit Failed — Here Is What That Looks Like
+
+*(This is the honest-failure slide. Deliver it as a story, not a footnote.)*
+
+Now something worth your attention.
+
+The obvious way to write this model uses `pm.GaussianRandomWalk`, which is exactly what it sounds
+like and exactly what the equation says. We wrote it that way first. And it sampled **badly** —
+even with `target_accept` raised to point-nine-five.
+
+*(Walk the table.)*
+
+R-hat: one-point-oh-two-two, against a threshold of one-point-oh-one. Failed. ESS: two hundred
+fifty-two, against four hundred. Failed. Divergences: zero — that one passed.
+
+After the fix: R-hat one-point-oh-oh-two, ESS two thousand six hundred seventeen.
+
+**[pause]**
+
+*(Now the important part.)*
+
+Here is what I want you to take from this.
+
+**Nothing crashed.** The model returned a forecast. The forecast, plotted, looked entirely
+reasonable — a sensible level, a sensible seasonal shape, plausible intervals. If we had not run
+the diagnostics, we would have shipped it and never known.
+
+The only thing that told us was R-hat saying the four chains had not agreed with each other.
+
+That is precisely why Lecture 10 made those three numbers non-negotiable. This is the failure mode
+they exist for.
+
+*(Point at the warning box.)*
+
+**[pause]**
+
+And the fix is worth understanding, because you'll meet it again next week.
+
+The fix was **reparameterization**, not more samples. Not a longer run, not a smaller step size —
+a different way of writing the *same model*.
+
+Writing the walk as `cumsum(z * sigma)`, with z a standard Normal, is called the **non-centred**
+form. It gives the sampler a geometry it can actually navigate. Identical model, identical
+posterior in principle, completely different sampling behaviour.
+
+BMCP section four-point-six-point-one covers exactly this, and next week we'll see the same fix
+applied to a hierarchy — where it will matter even more.
+
+---
+
+# ▶ SLIDE 13 — Section divider: Reading the Forecast
+
+The point estimate, the interval, and whether either is any use.
+
+---
+
+# ▶ SLIDE 14 — Does It Work? The Point Forecast
+
+CA_1 FOODS, fifty-two weeks held out.
+
+*(Point at the table.)*
+
+Bayesian structural model: RMSE one thousand five hundred eighty-seven. Seasonal naive — same week
+last year, one line of code: one thousand six hundred sixty.
+
+So we beat the benchmark by about **four percent**.
+
+**[pause]**
+
+That is a real improvement and a small one. And I'll repeat what I said at the start: after ten
+weeks of this course, you should be suspicious of anyone who reports four percent as a triumph.
+
+*(Now the fair-hearing paragraph. Give it properly.)*
+
+But let me also be fair to the model, because the comparison isn't like-for-like.
+
+Look at what this model was *given*: the series, and a calendar. That's it. No lag features. No
+price. No SNAP flags. No store identity. No cross-series information.
+
+The XGBoost model in Homework 4 had forty-six engineered predictors and thirty series to learn
+from, and beat naive by a much wider margin. It also had a great deal more information.
+
+**[pause]**
+
+So: the point forecast is not the reason to do this. Which brings us to the slide that is.
+
+---
+
+# ▶ SLIDE 15 — The Interval Is the Product
+
+Every forecast comes with a ninety-four percent predictive interval. And there are **two**
+questions you can ask about it, which are different questions, and this is the heart of the
+lecture.
+
+*(Walk the table.)*
+
+**Is it calibrated?** Measured: one hundred percent of held-out weeks fell inside the interval.
+Reading: not overconfident. Though it should be about ninety-four percent, so it's actually
+*conservative* — a bit too wide.
+
+**Is it useful?** Measured: the width is roughly eleven thousand seven hundred units, on a mean of
+nineteen thousand seven hundred. That's about **plus or minus thirty percent**. Honest, and far too
+wide to order against.
+
+**[pause]**
+
+*(This is the sentence of the lecture.)*
+
+**Passing the first does not excuse failing the second.**
+
+A model that says "demand next week will be somewhere between fourteen thousand and twenty-six
+thousand" is telling you the truth and helping nobody. You cannot write a purchase order against
+that.
+
+And the cause is structural, not a bug. A level that is free to random-walk for fifty-two steps
+*drifts*, and the accumulated uncertainty is genuinely that large. The model is correctly
+reporting the consequence of what we told it to believe.
+
+So the fix is a model with a **stronger opinion**: a damped level that reverts rather than
+wandering, or covariates that pin it down — price, promotions, the things we withheld.
+
+**[pause]**
+
+*(And now the payoff. Slow down.)*
+
+But notice what just happened, because this is the argument for the entire lecture.
+
+**We could ask whether the uncertainty was honest.** We computed coverage against held-out data,
+and got an answer.
+
+For every point-forecast model in this course — every single one, from ETS through the Transformer
+— that question had **no answer at all**. There was nothing to check. You got a number, and the
+number was right or wrong, and that was the end of the conversation.
+
+A calibrated-but-too-wide interval is a worse forecast and a better *deliverable*, because it tells
+you something true about how much you actually know. That is worth paying four percent for.
+
+---
+
+# ▶ SLIDE 16 — Section divider: Key Takeaways
+
+What structural models are for.
+
+---
+
+# ▶ SLIDE 17 — Lecture 11 Part 1: Key Takeaways
+
+One. A structural model writes the series as named parts — level, seasonality, noise — and gives
+each one a prior and a posterior.
+
+Two. The local level is a random walk whose step size you put a prior on. Small means rigid, large
+means it chases the data. Same trade as a smoothing parameter or a penalty.
+
+Three. Fourier terms encode seasonality in a few coefficients instead of fifty-two. Same device as
+Prophet in Lecture 3 and the features you built in Homework 4 — third appearance.
+
+Four. **Check the sampler before the forecast.** Our first fit had R-hat one-point-oh-two and ESS
+two fifty-two, while returning a perfectly plausible-looking answer. Reparameterizing fixed it.
+
+Five. The point forecast beat seasonal naive by four percent. That is not the argument.
+
+And six. The interval was **calibrated but too wide to act on** — and being able to *establish*
+that is the actual product.
+
+**[pause]**
+
+Next time: hierarchical models. What to do when you have thirty series and some of them barely
+have any data — and a question you have to answer *before* you fit anything.
+
+---
+
+# ▶ SLIDE 18 — References
+
+*(Advance and close. No narration needed.)*
