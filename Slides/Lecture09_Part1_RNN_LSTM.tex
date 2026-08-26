@@ -44,7 +44,7 @@
   Lecture 8 gave you a 1D CNN, which does see local shape. But its \textbf{receptive field} is
   fixed by architecture: stacked width-5 and width-3 filters reach about seven weeks back, and no
   reasonable stack of small filters reaches an annual lag. Worse, pooling deliberately discarded
-  \emph{where} in the window each pattern occurred --- and we measured that costing about 230 RMSE.
+  \emph{where} in the window each pattern occurred --- and we measured that costing about 500 RMSE.
 
   \begin{keybox}
     Both architectures share one assumption: the input is a \textbf{fixed-size block} to be
@@ -301,7 +301,7 @@
       \textbf{Vanilla RNN}, 4 raw channels & \textbf{842} & 4{,}545 \\
       Random forest & 899 & --- \\
       \textbf{LSTM}, 4 raw channels & 987 & 17{,}985 \\
-      1D CNN, best variant & 1{,}202 & 8{,}161 \\
+      1D CNN, best variant & 1{,}032 & 8{,}161 \\
       Seasonal naive & 2{,}152 & 0 \\
       \bottomrule
     \end{tabular}
@@ -407,7 +407,7 @@
       \item On our panel both recurrent models \textbf{beat every CNN variant} on four raw
             channels --- and both still lose to a 46-coefficient LASSO.
 
-      \item The \textbf{LSTM lost to the vanilla RNN}, at two window lengths. Gating solves
+      \item The \textbf{LSTM lost to the vanilla RNN}, at all three window lengths. Gating solves
             long-range forgetting; a 26-week window does not suffer from it, so the gates only
             bought four times the parameters. \textbf{Fit the architecture to the problem.}
     \end{enumerate}
