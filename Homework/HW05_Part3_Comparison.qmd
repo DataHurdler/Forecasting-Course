@@ -133,7 +133,7 @@ Confirm by responding with: HW05P3_CONTEXT_ACK
 | Model | Window | Parameters | Test RMSE |
 |-------|--------|-----------|-----------|
 | FFN | 26 | | |
-| CNN (best window from Q4) | | | |
+| CNN (best window from Part 1 Q4) | | | |
 | Vanilla RNN | 52 | | |
 | LSTM | 52 | | |
 | Transformer | 52 | | |

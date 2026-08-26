@@ -160,7 +160,8 @@ class RNNForecaster(nn.Module):
 ```
 
 > **Your response:** Report the parameter count (`sum(p.numel() for p in model.parameters())`) and
-> the test RMSE. Compare both against your CNN from Q3.
+> the test RMSE. Compare both against the CNN from **Part 1, Q3** — note that this window is
+> longer, so say what that does and does not make comparable.
 
 ---
 
@@ -169,7 +170,7 @@ class RNNForecaster(nn.Module):
 Same structure, swapping `nn.RNN` for `nn.LSTM(input_size=4, hidden_size=64, batch_first=True)`.
 Note that `nn.LSTM` returns `out, (h, c)` rather than `out, h`.
 
-Train identically to Q5 so the comparison is clean.
+Train identically to Q1 so the comparison is clean.
 
 ```{python}
 class LSTMForecaster(nn.Module):

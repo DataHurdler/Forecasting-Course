@@ -230,7 +230,7 @@ class CNNForecaster(nn.Module):
         pass
 ```
 
-> **Your response:** Lecture 8 measured a 230-RMSE penalty for replacing `Flatten` with
+> **Your response:** Lecture 8 measured roughly a 500-RMSE penalty for replacing `Flatten` with
 > `AdaptiveAvgPool1d(1)`. Explain in one or two sentences *why* pooling costs accuracy here, in
 > terms of what the pooling operation discards.
 
