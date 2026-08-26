@@ -131,7 +131,9 @@ scikit-learn, xgboost, torch, pymc, arviz
 
 **macOS users need one extra step for XGBoost:** `brew install libomp`, once, before Week 5. Without it `import xgboost` fails with an OpenMP error.
 
-Installation instructions and a test script are provided in the course repository.
+**Setting up: [read the Quarto guide first](https://github.com/DataHurdler/forecasting-env/blob/main/QUARTO_GUIDE.md).** It walks through installing Python, Quarto, and an editor — either VS Code or Positron, both fine — then explains what a `.qmd` file is and the four errors students actually hit. Budget twenty minutes.
+
+**Google Colab will not work for this course.** It cannot open `.qmd` files.
 
 ## Course Materials
 **Course website: <https://www.luozijun.com/forecasting-course/>**
