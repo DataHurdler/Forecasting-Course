@@ -2367,6 +2367,22 @@ window.Quarto = {
 <p><strong>Due Week 13.</strong> Covers Lecture 10 (foundations) and Lecture 11 Part 1 (structural time series).</p>
 </blockquote>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Your numbers will not match mine, and that is fine
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every result in this course depends on a random seed, and often also on your library versions, your hardware, and how many CPU threads your machine uses. Two people running identical, correct code will get different numbers — sometimes noticeably different.</p>
+<p><strong>What is graded</strong> is that you used the right model and the right procedure, and that your interpretation follows from the numbers <em>you</em> actually obtained. Quote your own output.</p>
+<p><strong>What is not graded</strong> is matching any particular value. Do not tune your way toward a number you saw on a slide or heard from a classmate — that is the one way to turn this into a wrong answer.</p>
+<p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
+</div>
+</div>
 <section id="overview" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1</span> Overview</h2>
 <p>Two things separate a Bayesian forecast from everything else in this course: you state your assumptions as priors and can check them before fitting, and the answer is a distribution rather than a number.</p>
@@ -2382,7 +2398,7 @@ window.Quarto = {
 </section>
 <section id="dataset-and-setup" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</h2>
-<div id="74a048be" class="cell" data-execution_count="1">
+<div id="ef9da793" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2488,7 +2504,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <li>Likelihood: <code>obs ~ Binomial(n=277, p=theta)</code>, observed = the actual count</li>
 </ul>
 <p><strong>Before fitting anything</strong>, run <code>pm.sample_prior_predictive(500)</code> and plot what the prior alone implies about the number of high-SNAP weeks.</p>
-<div id="ccd2f9aa" class="cell" data-execution_count="2">
+<div id="7641c38d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>n_total <span class="op">=</span> <span class="bu">len</span>(ca1)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>n_hi <span class="op">=</span> <span class="bu">int</span>(ca1.hi_snap.<span class="bu">sum</span>())</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;CA_1 FOODS: </span><span class="sc">{</span>n_hi<span class="sc">}</span><span class="ss"> high-SNAP weeks out of </span><span class="sc">{</span>n_total<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>n_hi<span class="op">/</span>n_total<span class="sc">:.0f}</span><span class="ss">%)&quot;</span>)</span>
@@ -2506,7 +2522,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <section id="q2-posterior-inference-suggested-prompts-2" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="q2-posterior-inference-suggested-prompts-2"><span class="header-section-number">4.2</span> Q2 — Posterior Inference <em>(Suggested prompts: 2)</em></h3>
 <p>Fit the model. Report the posterior mean and the 94% HDI, and report <span class="math inline">\(\hat{R}\)</span>, ESS and divergences.</p>
-<div id="078120a7" class="cell" data-execution_count="3">
+<div id="42c1b8e9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit, then az.summary(idata, ci_kind=&quot;hdi&quot;, ci_prob=0.94) and az.plot_posterior</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2526,7 +2542,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <li><code>sigma_level ~ Exponential(10)</code>, <code>sigma ~ Exponential(1)</code></li>
 <li><strong>Standardize <code>units</code> before fitting</strong>, and invert afterwards</li>
 </ul>
-<div id="bc8896e3" class="cell" data-execution_count="4">
+<div id="4a7c7867" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2543,7 +2559,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <p><strong>(a) Propagated</strong> — let the level keep random-walking forward, which is what the fitted model implies. <strong>(b) Held constant</strong> — carry the last level forward unchanged.</p>
 <p>Report coverage and mean interval width for each, and additionally <strong>split coverage by horizon</strong> (roughly weeks 1–13, 14–39, 40–52). The frozen version produces intervals of near-constant width; the propagated one widens with horizon. Which is better calibrated on this series is a question for your data, not for theory — answer it from your numbers.</p>
 <p>Report three things: RMSE, the seasonal-naive RMSE for comparison, and the <strong>coverage</strong> of your 94% interval (the fraction of held-out weeks falling inside).</p>
-<div id="091ebc8e" class="cell" data-execution_count="5">
+<div id="3e57bc4b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast both ways; compute RMSE, coverage and mean width for each</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Then split coverage by horizon</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>

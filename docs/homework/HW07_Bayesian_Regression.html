@@ -2363,6 +2363,22 @@ window.Quarto = {
 </header>
 
 
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Your numbers will not match mine, and that is fine
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every result in this course depends on a random seed, and often also on your library versions, your hardware, and how many CPU threads your machine uses. Two people running identical, correct code will get different numbers — sometimes noticeably different.</p>
+<p><strong>What is graded</strong> is that you used the right model and the right procedure, and that your interpretation follows from the numbers <em>you</em> actually obtained. Quote your own output.</p>
+<p><strong>What is not graded</strong> is matching any particular value. Do not tune your way toward a number you saw on a slide or heard from a classmate — that is the one way to turn this into a wrong answer.</p>
+<p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
+</div>
+</div>
 <section id="overview" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1</span> Overview</h2>
 <p>Bayesian linear regression replaces OLS point estimates with full posterior distributions over every coefficient. Instead of asking “Is beta significant at p &lt; 0.05?”, you ask “What is the probability that this effect is positive?” and “Is the effect large enough to matter for business decisions?”</p>
@@ -2380,7 +2396,7 @@ window.Quarto = {
 <section id="dataset-and-setup" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</h2>
 <p>The question for this assignment is a causal one: <strong>how much does demand respond to price?</strong> That is an elasticity, and it is the number a category manager would actually act on.</p>
-<div id="dc42ff1d" class="cell" data-execution_count="1">
+<div id="3113b5df" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2507,7 +2523,7 @@ avg_price → units     (the effect we want to estimate)
 <p><strong>(a) Naive</strong> — regress <code>ly</code> on <code>lp</code>, <code>snap</code>, <code>event</code>.</p>
 <p><strong>(b) Controlled</strong> — regress <code>ly</code> on <code>lpc</code>, <code>snap</code>, <code>event</code>, plus a trend (<code>t</code>) and series fixed effects (<code>pd.get_dummies(df.series)</code>).</p>
 <p>Report the coefficient table for each, and put the two price elasticities side by side.</p>
-<div id="4b57c19d" class="cell" data-execution_count="2">
+<div id="97036855" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) naive OLS</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) OLS with trend and series fixed effects</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the two price coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2542,7 +2558,7 @@ Ask ArviZ for the HDI explicitly
 <p>An equal-tailed interval cuts 5.5% off each tail; an HDI is the <em>shortest</em> interval holding 94% of the mass. They coincide for a symmetric posterior and diverge for a skewed one.</p>
 </div>
 </div>
-<div id="a32c92ac" class="cell" data-execution_count="3">
+<div id="235b0fc2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build and sample Bayesian linear regression</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2555,7 +2571,7 @@ Ask ArviZ for the HDI explicitly
 <h3 data-number="4.4" class="anchored" data-anchor-id="q4-posterior-visualization-suggested-prompts-2"><span class="header-section-number">4.4</span> Q4 — Posterior Visualization <em>(Suggested prompts: 2)</em></h3>
 <p>Plot the posterior distributions for the three coefficients that matter most for a business decision — justify the choice from your DAG.</p>
 <p>For each, report: - Posterior mean - 94% HDI - <code>P(beta &gt; 0)</code> — probability the effect is positive - Whether the HDI excludes zero (the Bayesian analog of significance)</p>
-<div id="a5a44e63" class="cell" data-execution_count="4">
+<div id="742380cc" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot posterior distributions and compute P(beta &gt; 0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2589,7 +2605,7 @@ Ask ArviZ for the HDI explicitly
 </tbody>
 </table>
 <p>A predictor is “practically significant” if less than 5% of its posterior falls in the ROPE.</p>
-<div id="7e497d35" class="cell" data-execution_count="5">
+<div id="7236fb2c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute % of posterior in ROPE for each predictor</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2602,7 +2618,7 @@ Ask ArviZ for the HDI explicitly
 <h3 data-number="4.6" class="anchored" data-anchor-id="q6-conditional-scenario-simulation-suggested-prompts-3"><span class="header-section-number">4.6</span> Q6 — Conditional Scenario Simulation <em>(Suggested prompts: 3)</em></h3>
 <p>A category manager is considering a <strong>5% price increase</strong> across the board and wants to know what happens to volume — and how confident anyone can be about it.</p>
 <p>Push the scenario through your posterior rather than through a point estimate.</p>
-<div id="10cfd523" class="cell" data-execution_count="6">
+<div id="de3d0ba1" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># b = idata.posterior[&quot;b_price&quot;].values.ravel()</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pct_change = 100 * (np.exp(b * np.log(1.05)) - 1)</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># report the mean and the 94% interval of pct_change</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

@@ -2377,7 +2377,7 @@ window.Quarto = {
 <p>This course runs on the <strong>M5 / Walmart</strong> dataset — the spine described in <code>ECON8310_Datasets.md</code>. It covers daily unit sales for Walmart stores across California, Texas, and Wisconsin from <strong>29 January 2011 to 22 May 2016</strong>, and it was the data for the M5 forecasting competition.</p>
 <p>You will work with the prepared weekly file, <code>data/processed/m5_weekly.csv</code>: <strong>30 series</strong> (10 stores × 3 product categories), <strong>277 weeks each</strong>, with average price, SNAP benefit days, and event-day counts alongside the unit sales.</p>
 <p>If the file does not exist, run <code>python scripts/prep_m5.py</code> once first — it will tell you where to get the raw download.</p>
-<div id="4d40ee8d" class="cell" data-execution_count="1">
+<div id="3c9437c2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2422,10 +2422,28 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Initial Prompt for Codex
+Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Your numbers will not match mine, and that is fine
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every result in this course depends on a random seed, and often also on your library versions, your hardware, and how many CPU threads your machine uses. Two people running identical, correct code will get different numbers — sometimes noticeably different.</p>
+<p><strong>What is graded</strong> is that you used the right model and the right procedure, and that your interpretation follows from the numbers <em>you</em> actually obtained. Quote your own output.</p>
+<p><strong>What is not graded</strong> is matching any particular value. Do not tune your way toward a number you saw on a slide or heard from a classmate — that is the one way to turn this into a wrong answer.</p>
+<p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
+</div>
+</div>
+<section id="initial-prompt-for-codex-1" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="initial-prompt-for-codex-1"><span class="header-section-number">3.1</span> Initial Prompt for Codex</h2>
 <p>Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
 <pre><code>I am working on Homework 1, Part 1 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
@@ -2440,6 +2458,7 @@ My prompt budget for Part 1 is 4 (this context prompt is excluded). I will label
 
 Confirm by responding with: HW01P1_CONTEXT_ACK</code></pre>
 <p>Submit this text as <strong><code>INITIAL_PROMPT.md</code></strong> in your Part 1 submission folder.</p>
+</section>
 </div>
 </div>
 <hr>
@@ -2450,7 +2469,7 @@ Confirm by responding with: HW01P1_CONTEXT_ACK</code></pre>
 <h2 data-number="4.1" class="anchored" data-anchor-id="q1-exploratory-plot"><span class="header-section-number">4.1</span> Q1 — Exploratory Plot</h2>
 <p><em>(Suggested prompts: 1)</em></p>
 <p>Plot CA_1 FOODS weekly unit sales over the full 277-week window. After examining the plot, answer the written questions below.</p>
-<div id="6abf1022" class="cell" data-execution_count="2">
+<div id="156d4b57" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot CA_1 FOODS weekly units over time</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2482,7 +2501,7 @@ Why a 52-week test set works here
 <p>Each series has 277 weeks. Holding out 52 still leaves 225 for training, comfortably above the threshold, and a one-year holdout is the horizon a demand planner actually cares about. The assertion below makes the constraint explicit rather than letting it fail deep inside statsmodels.</p>
 </div>
 </div>
-<div id="12688c3c" class="cell" data-execution_count="3">
+<div id="e7920417" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span>                                   <span class="co"># final year held out</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>

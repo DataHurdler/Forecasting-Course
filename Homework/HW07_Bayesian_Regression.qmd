@@ -16,6 +16,26 @@ execute:
   message: false
 ---
 
+::: {.callout-note}
+## Your numbers will not match mine, and that is fine
+
+Every result in this course depends on a random seed, and often also on your library
+versions, your hardware, and how many CPU threads your machine uses. Two people running
+identical, correct code will get different numbers — sometimes noticeably different.
+
+**What is graded** is that you used the right model and the right procedure, and that your
+interpretation follows from the numbers *you* actually obtained. Quote your own output.
+
+**What is not graded** is matching any particular value. Do not tune your way toward a number
+you saw on a slide or heard from a classmate — that is the one way to turn this into a wrong
+answer.
+
+One caveat worth knowing. The broad *ordering* of models usually survives this variation. If
+yours comes out backwards from what the lecture found, say so in a sentence and offer a reason:
+either you have found something real about your run, or there is a bug worth hunting. Both are
+worth more marks than quietly reporting a number you do not believe.
+:::
+
 ## Overview
 
 Bayesian linear regression replaces OLS point estimates with full posterior

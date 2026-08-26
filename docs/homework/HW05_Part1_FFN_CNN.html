@@ -2225,6 +2225,22 @@ vertical-align: -.125em;
 <p><strong>Due </strong>Week 9<strong>. Covers the feedforward and convolutional models, and the window-length experiment.</strong></p>
 </blockquote>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Your numbers will not match mine, and that is fine
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every result in this course depends on a random seed, and often also on your library versions, your hardware, and how many CPU threads your machine uses. Two people running identical, correct code will get different numbers — sometimes noticeably different.</p>
+<p><strong>What is graded</strong> is that you used the right model and the right procedure, and that your interpretation follows from the numbers <em>you</em> actually obtained. Quote your own output.</p>
+<p><strong>What is not graded</strong> is matching any particular value. Do not tune your way toward a number you saw on a slide or heard from a classmate — that is the one way to turn this into a wrong answer.</p>
+<p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
+</div>
+</div>
 <section id="overview" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1</span> Overview</h2>
 <p>This homework builds four neural network architectures for time series forecasting, progressing from simple to complex:</p>
@@ -2247,7 +2263,7 @@ vertical-align: -.125em;
 <section id="dataset-and-setup" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</h2>
 <p>We construct fixed-length sliding windows over each store-category series. Each input is a window of past weeks; the target is the next week’s units. <strong>Part A</strong> (FFN, CNN) uses a 26-week window; <strong>Part B</strong> (RNN, LSTM, Transformer) uses 52 weeks, so the sequence models get a full annual cycle.</p>
-<div id="79869fcd" class="cell" data-execution_count="1">
+<div id="210e1659" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2358,7 +2374,7 @@ Confirm by responding with: HW05P1_CONTEXT_ACK</code></pre>
 <li>A window is <strong>training</strong> if its target week falls before <code>CUTOFF</code></li>
 </ul>
 <p>Standardize each channel using <strong>training statistics only</strong>, and standardize <code>y</code> the same way. Build <code>DataLoader</code>s with <code>batch_size=64</code> and <strong><code>shuffle=False</code> for both</strong>.</p>
-<div id="6aded0cf" class="cell" data-execution_count="2">
+<div id="98d30416" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>WINDOW_A <span class="op">=</span> <span class="dv">26</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SeriesWindowDataset(Dataset):</span>
@@ -2383,7 +2399,7 @@ Confirm by responding with: HW05P1_CONTEXT_ACK</code></pre>
 <h3 data-number="4.2" class="anchored" data-anchor-id="q2-feedforward-network-suggested-prompts-2"><span class="header-section-number">4.2</span> Q2 — Feedforward Network <em>(Suggested prompts: 2)</em></h3>
 <p>Flatten the window to a vector of length <code>W × 4</code> and feed it to a plain network: <code>Linear(W*4 → 128)</code>, ReLU, <code>Dropout(0.2)</code>, <code>Linear(128 → 64)</code>, ReLU, <code>Dropout(0.2)</code>, <code>Linear(64 → 1)</code>.</p>
 <p>Train 30 epochs, Adam <code>lr=1e-3</code>, <code>weight_decay=1e-4</code>, MSE loss. Plot the loss curve and report test RMSE in <strong>original units</strong> (invert the standardization before computing RMSE).</p>
-<div id="7899723d" class="cell" data-execution_count="3">
+<div id="4644259b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> FFNForecaster(nn.Module):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, window, n_channels):</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
@@ -2405,7 +2421,7 @@ Confirm by responding with: HW05P1_CONTEXT_ACK</code></pre>
 <p>Build a <code>CNNForecaster</code>: <code>Conv1d(4, 32, kernel_size=5)</code>, ReLU, <code>Conv1d(32, 64, kernel_size=3)</code>, ReLU, then <strong>flatten</strong> and a final <code>Linear</code> to one output.</p>
 <p>Note the input shape: <code>Conv1d</code> expects <code>(batch, channels, time)</code>, so you must transpose the <code>(batch, time, channels)</code> tensors from your DataLoader.</p>
 <p>Train as in Q2 and report test RMSE.</p>
-<div id="7c7d0798" class="cell" data-execution_count="4">
+<div id="2922a8a2" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CNNForecaster(nn.Module):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_channels):</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
@@ -2416,14 +2432,14 @@ Confirm by responding with: HW05P1_CONTEXT_ACK</code></pre>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Lecture 8 measured a 230-RMSE penalty for replacing <code>Flatten</code> with <code>AdaptiveAvgPool1d(1)</code>. Explain in one or two sentences <em>why</em> pooling costs accuracy here, in terms of what the pooling operation discards.</p>
+<p><strong>Your response:</strong> Lecture 8 measured roughly a 500-RMSE penalty for replacing <code>Flatten</code> with <code>AdaptiveAvgPool1d(1)</code>. Explain in one or two sentences <em>why</em> pooling costs accuracy here, in terms of what the pooling operation discards.</p>
 </blockquote>
 <hr>
 </section>
 <section id="q4-receptive-field-and-window-length-suggested-prompts-2" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="q4-receptive-field-and-window-length-suggested-prompts-2"><span class="header-section-number">4.4</span> Q4 — Receptive Field and Window Length <em>(Suggested prompts: 2)</em></h3>
 <p>Retrain the CNN at windows of <strong>13, 26 and 52</strong> weeks. Report test RMSE for each.</p>
-<div id="54af961a" class="cell" data-execution_count="5">
+<div id="da79038a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrain CNN for each window length; collect RMSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
