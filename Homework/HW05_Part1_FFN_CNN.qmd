@@ -195,9 +195,10 @@ class SeriesWindowDataset(Dataset):
 # Instantiate train and test datasets + dataloaders
 ```
 
-> **Your response:** How many training windows do you get, and why is that larger than the number
-> of store-category-week rows before the cutoff? Then: why `shuffle=False` here, when almost every
-> PyTorch tutorial you will find sets it to `True`?
+> **Your response:** How many training windows do you get? It is *fewer* than the number of
+> store-category-week rows before the cutoff — work out exactly how many you lose and explain
+> where they go. (Hint: what has to exist before a window can start?) Then: why `shuffle=False`
+> here, when almost every PyTorch tutorial you will find sets it to `True`?
 
 ---
 
