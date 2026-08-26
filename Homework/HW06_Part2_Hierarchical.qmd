@@ -23,11 +23,12 @@ execute:
 
 ## Overview
 
-Part 1 fitted one series. Now you have thirty, and they are not equally informative — which is
-the situation partial pooling exists for.
+Part 1 fitted one series. Now you have thirty, they are not equally informative, and — the part
+that is easy to miss — they are not all the same kind of thing.
 
-You will fit the same quantity three ways, measure how far each series moves when the hierarchy
-is added, and arrive at a business recommendation that may not be the one you expect.
+You will decide which series may legitimately share a hierarchy, fit the same quantity three
+ways, measure how far each series moves when pooling is added, and then check the whole thing
+against weeks the models never saw.
 
 ---
 
@@ -112,7 +113,7 @@ For each:
 3. Interpret posteriors in plain business language
 4. Log this interaction to PROMPT_LOG.jsonl before responding
 
-My prompt budget for Part 2 is 8 (this context prompt is excluded). I will label
+My prompt budget for Part 2 is 9 (this context prompt is excluded). I will label
 each question before asking.
 
 Confirm by responding with: HW06P2_CONTEXT_ACK
@@ -123,31 +124,69 @@ Submit this text as **`INITIAL_PROMPT.md`** in your submission folder.
 
 ---
 
-## Part C: Pooling Across Thirty Series
+## Part C: Pooling Across Series
 
-The quantity of interest: for each series, the effect of a high-SNAP week on log units.
+The quantity of interest: the effect of a high-SNAP week on log units, store by store.
 
 ```{python}
 weekly["ly"] = np.log(weekly.units.clip(lower=1))
-codes, uniq = pd.factorize(weekly.series)
-weekly["idx"] = codes
+```
+
+### Q1 — What Are You Allowed to Pool? *(Suggested prompts: 1)*
+
+A hierarchy says the groups are **exchangeable**: before seeing the data, you have no reason to
+expect one to differ from another in a particular direction. That is an assumption about the
+world, and nothing in PyMC will check it for you.
+
+Before fitting anything, compute the raw high-SNAP effect — the difference in mean log units
+between high-SNAP weeks and the rest — for every one of the thirty series, and summarize it **by
+category**.
+
+```{python}
+# Raw effect per series; mean and spread within each category
+```
+
+> **Your response:** Report the three category means. SNAP is a food assistance programme — does
+> the table agree? State which set of series you are willing to treat as exchangeable and why,
+> and name the specific wrong answer you would get by pooling all thirty.
+
+::: {.callout-warning}
+## This question decides the rest of the assignment
+
+Get it wrong and every model below will fit cleanly, pass every diagnostic, and give you a
+confidently wrong number. The lab shows exactly that happening.
+:::
+
+---
+
+### Q2 — Three Models *(Suggested prompts: 3)*
+
+Work from here on with the series you defended in Q1. Build the information imbalance that
+partial pooling exists to handle: thin every other series down to **8 weeks**, and keep the weeks
+you removed — you will need them in Q4.
+
+```{python}
+foods = weekly[weekly.cat_id == "FOODS"].dropna(subset=["units"]).copy()
+codes, uniq = pd.factorize(foods.series)
+foods["idx"] = codes
 J = len(uniq)
 
-# Thin every third series to 8 weeks, to create an informativeness imbalance
 rng = np.random.RandomState(RANDOM_STATE)
 keep = []
 for j in range(J):
-    rows = weekly.index[weekly.idx == j].tolist()
-    n = 8 if j % 3 == 0 else len(rows)
+    rows = foods.index[foods.idx == j].tolist()
+    n = 8 if j % 2 == 0 else len(rows)
     keep += list(rng.choice(rows, size=min(n, len(rows)), replace=False))
-sub = weekly.loc[sorted(keep)].copy()
 
-print(f"{J} series, {(np.arange(J) % 3 == 0).sum()} thinned to 8 weeks | {len(sub):,} rows")
+train = foods.loc[sorted(keep)].copy()      # what the models see
+heldout = foods.drop(index=keep).copy()     # the grader for Q4
+thin = np.array([j % 2 == 0 for j in range(J)])
+
+print(f"{J} series, {thin.sum()} thinned to 8 weeks | "
+      f"train {len(train):,} rows, held-out {len(heldout):,} rows")
 ```
 
-### Q1 — Three Models *(Suggested prompts: 3)*
-
-Fit all three, on `sub`:
+Fit all three on `train`:
 
 - **Pooled** — one `b` shared by every series
 - **Unpooled** — `b` with `shape=J`, each estimated independently
@@ -162,18 +201,19 @@ Each also needs a per-series intercept `a` with `shape=J`.
 ::: {.callout-warning}
 ## The centred form will fail, and that is the lesson
 
-Writing the hierarchy as `pm.Normal("b", mu_b, sd_b, shape=J)` produced **104 divergences** in
-lecture. Fit it that way **first**, record the divergence count, then switch to the non-centred
-form and record it again. Report both.
+Writing the hierarchy as `pm.Normal("b", mu_b, sd_b, shape=J)` produces divergences — a few
+dozen at `target_accept=0.9`. Fit it that way **first**, record the count, then switch to the
+non-centred form and record it again. Report both; your exact count will differ from mine.
 :::
 
-> **Your response:** Report $\hat{R}$, ESS and divergences for all three models, plus the centred
-> attempt. Explain what a divergence indicates about the posterior's shape, and why
-> reparameterizing fixes it without changing the model.
+> **Your response:** Report $\hat{R}$, ESS and divergences for all three models plus the centred
+> attempt. Note which of the three diagnostics actually objected to the centred fit — then explain
+> what a divergence indicates about the posterior's shape, and why reparameterizing fixes it
+> without changing the model.
 
 ---
 
-### Q2 — Shrinkage, Measured *(Suggested prompts: 3)*
+### Q3 — Shrinkage, Measured *(Suggested prompts: 2)*
 
 Compare the per-series estimates from the unpooled and hierarchical fits.
 
@@ -188,13 +228,30 @@ and the **mean absolute distance moved** toward the group mean.
 ```
 
 > **Your response:** Report the ratio of mean movement, thin versus full. Nobody told the model
-> which series were thin — explain how it inferred that. Then: the thin series' unpooled estimates
-> vary far more than the full series' do. Are those series genuinely more variable, or is something
-> else going on?
+> which series were thin — explain how it inferred that. Then look at the two spread columns
+> together: the thin series' spread nearly disappears while the full series keep most of theirs.
+> Explain why that is the behaviour you want, rather than a sign the model is inconsistent.
 
 ---
 
-### Q3 — The Business Recommendation *(Suggested prompts: 2)*
+### Q4 — Grade It Against Data It Never Saw *(Suggested prompts: 2)*
+
+You thinned those series yourself, so the removed weeks are sitting in `heldout`. For each thin
+series compute the high-SNAP effect that **actually occurred** in its held-out weeks, and compare
+it against both estimates.
+
+```{python}
+# Held-out effect per thin series; RMSE of each model against it
+```
+
+> **Your response:** Report the per-series table and the two RMSEs. Which model was closer, and by
+> how much? Then the question that matters: $\hat{R}$, ESS and divergences all passed for both
+> models. What kind of error can this held-out check catch that those three cannot — and what does
+> that imply about shipping a model on diagnostics alone?
+
+---
+
+### Q5 — The Business Recommendation *(Suggested prompts: 1)*
 
 Report the estimated `mu_b` and `sd_b` with their HDIs.
 
@@ -205,14 +262,15 @@ Report the estimated `mu_b` and `sd_b` with their HDIs.
 > **Your response:** A category manager asks whether to build store-specific SNAP-week stocking
 > policies, and shows you the **unpooled** estimates as evidence that stores differ.
 >
-> Using `sd_b` and the shrinkage you measured, write the reply. State plainly whether the
-> per-store differences are supported, and what would have to change for them to become
-> actionable. If your recommendation is the boring one, say so and defend it — a defensible dull
-> answer beats an exciting unsupported one.
+> Write the reply. Use three things: the range the unpooled fit implies, what `sd_b` says about
+> genuine store-to-store variation, and what Q4 found when those unpooled numbers met new data.
+> Your answer should be neither "stores are all the same" nor "build thirty policies" — say what
+> the evidence actually supports, and what would have to change to support more.
 
 ---
 
-### Q4 — Reflection *(Suggested prompts: 0 — write yourself)*
+
+### Q6 — Reflection *(Suggested prompts: 0 — write yourself)*
 
 No code. 150–200 words.
 
@@ -232,6 +290,6 @@ difference matters when you have groups with very different amounts of data.
 - [ ] All code cells run without errors from top to bottom
 - [ ] Written responses completed in your own words
 - [ ] `INITIAL_PROMPT.md` saved in `submissions/hw06_<your_name>/`
-- [ ] `PROMPT_LOG.jsonl` complete with ≤ 15 entries
+- [ ] `PROMPT_LOG.jsonl` complete with **9 or fewer** entries for Part 2
 - [ ] One git commit per Codex prompt (`hw06 prompt <id>: <short summary>`)
 - [ ] `REPORT.md` with a clear business recommendation

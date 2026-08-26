@@ -226,5 +226,5 @@ Do not restructure HW02–HW07 before that migration.
 | 5b | `HW05_Part2_Sequence.qmd` ✓ | L09 | M5 weekly, window 52 | 10 | Vanilla RNN, LSTM, Transformer + positional-encoding ablation |
 | 5c | `HW05_Part3_Comparison.qmd` ✓ | L07–L09 | M5 weekly | 3 | Five-architecture comparison, full-course table, reflection |
 | 6a | `HW06_Part1_Foundations_TS.qmd` ✓ | L10 + L11 Pt 1 | M5 weekly, CA_1 FOODS | 10 | Beta-Binomial + prior predictive, structural TS, calibration vs usefulness |
-| 6b | `HW06_Part2_Hierarchical.qmd` ✓ | L11 Pt 2 | M5 weekly, 30 series | 8 | Pooled/unpooled/hierarchical, deliberate divergence reproduction, shrinkage |
+| 6b | `HW06_Part2_Hierarchical.qmd` ✓ | L11 Pt 2 | M5 weekly, 10 FOODS series | 9 | Exchangeability check, pooled/unpooled/hierarchical, divergence reproduction, shrinkage, held-out validation |
 | 7 | `HW07_Bayesian_Regression.qmd` ✓ | L12 | **M5 weekly, 30 series** | 16 | DAG, naive vs controlled OLS, Bayesian regression, ROPE, price-scenario simulation |

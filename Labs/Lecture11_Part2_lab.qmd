@@ -1,0 +1,428 @@
+---
+title: "Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
+date: "Fall 2026"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# What we are doing
+
+A hierarchical model lets thirty series share information: each gets its own effect, drawn from a
+common distribution the data also estimates. Data-poor series borrow from data-rich ones, and
+nobody has to choose the weights.
+
+That is genuinely powerful, and today you will watch it work. You will also watch it produce a
+confidently wrong answer — on the same data, with clean diagnostics, textbook shrinkage, and no
+warning of any kind.
+
+The difference between the two runs is not the code. It is a decision made before any code was
+written: **which series belong in the same hierarchy.**
+
+**Time:** ~45 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
+`data/processed/m5_weekly.csv`. Six model fits, most under 30 seconds.
+
+---
+
+# Setup
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pymc as pm
+import arviz as az
+import warnings
+
+warnings.filterwarnings("ignore")
+RANDOM_STATE = 42
+
+weekly = pd.read_csv("../data/processed/m5_weekly.csv", parse_dates=["week_start"])
+weekly["series"] = weekly.store_id + "_" + weekly.cat_id
+weekly["hi_snap"] = (weekly.snap_days >= 5).astype(int)
+
+df = weekly.dropna(subset=["units"]).copy()
+df["ly"] = np.log(df.units.clip(lower=1))
+
+print(f"{df.series.nunique()} series | {len(df):,} rows | "
+      f"{df.hi_snap.mean():.1%} of weeks are high-SNAP")
+```
+
+Our question: **does a high-SNAP week lift units, and by how much in each store?**
+
+We will need one helper repeatedly — the SNAP effect actually observed in a set of weeks, with
+no model involved. It is just the difference in mean log units between high-SNAP weeks and the
+rest.
+
+```{python}
+def empirical_effect(frame, series_name):
+    """Observed high-SNAP effect on log units for one series."""
+    z = frame[frame.series == series_name]
+    if z.hi_snap.nunique() < 2:
+        return np.nan
+    return z.ly[z.hi_snap == 1].mean() - z.ly[z.hi_snap == 0].mean()
+```
+
+---
+
+# Step 1 — Build the imbalance
+
+Real panels are lopsided: some series have years of history, others are new stores or newly
+re-categorized products with a handful of usable weeks. We create that imbalance deliberately so
+we can check the answer later.
+
+Thin every third series down to 8 weeks. The weeks we remove are not thrown away — they become a
+held-out set that the model never sees, and that we will use in Step 3 to grade it.
+
+```{python}
+codes, uniq = pd.factorize(df.series)
+df["idx"] = codes
+J = len(uniq)
+
+rng = np.random.RandomState(RANDOM_STATE)
+keep = []
+for j in range(J):
+    rows = df.index[df.idx == j].tolist()
+    n = 8 if j % 3 == 0 else len(rows)
+    keep += list(rng.choice(rows, size=min(n, len(rows)), replace=False))
+
+train = df.loc[sorted(keep)].copy()
+heldout = df.drop(index=keep).copy()
+thin = np.array([j % 3 == 0 for j in range(J)])
+
+print(f"train {len(train):,} rows | held-out {len(heldout):,} rows")
+print(f"{thin.sum()} thin series (8 weeks each), {(~thin).sum()} full series")
+```
+
+Here is the model. It is the one from lecture, written non-centred, and it takes a flag so we can
+reuse it for the unpooled fit.
+
+```{python}
+def fit(data, kind, n_series, centred=False, target_accept=0.9):
+    """kind: 'unpooled' or 'hier'. Returns the InferenceData."""
+    i = data.idx.values
+    x = data.hi_snap.values.astype(float)
+    y = data.ly.values
+    with pm.Model():
+        a = pm.Normal("a", y.mean(), 1, shape=n_series)
+        s = pm.Exponential("s", 1.0)
+        if kind == "unpooled":
+            b = pm.Normal("b", 0, 0.5, shape=n_series)
+        else:
+            mu_b = pm.Normal("mu_b", 0, 0.5)
+            sd_b = pm.HalfNormal("sd_b", 0.25)
+            if centred:
+                b = pm.Normal("b", mu_b, sd_b, shape=n_series)
+            else:
+                z = pm.Normal("z", 0, 1, shape=n_series)
+                b = pm.Deterministic("b", mu_b + z * sd_b)
+        pm.Normal("obs", mu=a[i] + b[i] * x, sigma=s, observed=y)
+        return pm.sample(1000, tune=1500, chains=4, progressbar=False,
+                         random_seed=RANDOM_STATE, target_accept=target_accept)
+
+def b_means(idata, n_series):
+    return az.summary(idata, var_names=["b"], ci_kind="hdi",
+                      ci_prob=0.94)["mean"].values
+```
+
+---
+
+# Step 2 — Fit it, and admire the shrinkage
+
+Fit both models on all thirty series and measure how far each estimate moved.
+
+```{python}
+idata_u30 = fit(train, "unpooled", J)
+idata_h30 = fit(train, "hier", J)
+
+bu30, bh30 = b_means(idata_u30, J), b_means(idata_h30, J)
+
+def diag(idata, label):
+    su = az.summary(idata, var_names=["b"], ci_kind="hdi", ci_prob=0.94)
+    print(f"  {label:<14s} r_hat {su.r_hat.max():.3f}  "
+          f"ess {su.ess_bulk.min():5.0f}  "
+          f"divergences {int(idata.sample_stats.diverging.sum()):4d}")
+
+print("Diagnostics")
+diag(idata_u30, "unpooled")
+diag(idata_h30, "hierarchical")
+```
+
+```{python}
+move_thin = np.abs(bh30[thin] - bu30[thin]).mean()
+move_full = np.abs(bh30[~thin] - bu30[~thin]).mean()
+
+print("\n              unpooled spread   after pooling   mean move")
+print(f"  thin (8w)       {bu30[thin].std():.3f}           "
+      f"{bh30[thin].std():.3f}          {move_thin:.3f}")
+print(f"  full (277w)     {bu30[~thin].std():.3f}           "
+      f"{bh30[~thin].std():.3f}          {move_full:.3f}")
+print(f"\n  ratio: thin series moved {move_thin / move_full:.1f}x further")
+
+g = az.summary(idata_h30, var_names=["mu_b", "sd_b"], ci_kind="hdi", ci_prob=0.94)
+print(f"  mu_b {g.loc['mu_b','mean']:.3f}   sd_b {g.loc['sd_b','mean']:.3f}")
+```
+
+Everything a hierarchical model is supposed to do, it did. Diagnostics are clean. The data-poor
+series moved an order of magnitude further toward the group mean than the data-rich ones, and
+nobody told the model which was which.
+
+The shrinkage plot makes it visual.
+
+```{python}
+#| fig-cap: "Each line is one series, before and after pooling."
+fig, ax = plt.subplots(figsize=(7, 5))
+for j in range(J):
+    c = "crimson" if thin[j] else "steelblue"
+    ax.plot([0, 1], [bu30[j], bh30[j]], "-o", color=c, alpha=0.7, ms=4)
+ax.axhline(g.loc["mu_b", "mean"], ls="--", c="gray", lw=1)
+ax.set_xticks([0, 1]); ax.set_xticklabels(["unpooled", "hierarchical"])
+ax.set_ylabel("estimated high-SNAP effect (log units)")
+ax.set_title("Shrinkage: thin series (red) collapse onto the group mean")
+plt.tight_layout(); plt.show()
+```
+
+::: {.callout-note}
+## Before you go on
+
+Write down, in one sentence, what you would now tell the business. Keep it — Step 3 will ask
+whether it was right.
+:::
+
+---
+
+# Step 3 — Grade it against the weeks it never saw
+
+We thinned those ten series ourselves. The weeks we removed are sitting in `heldout`, and each
+thinned series has hundreds of them. So we can compute the effect that *actually* occurred and
+compare.
+
+```{python}
+thin_names = [uniq[j] for j in range(J) if thin[j]]
+truth = np.array([empirical_effect(heldout, s) for s in thin_names])
+est_u = np.array([bu30[j] for j in range(J) if thin[j]])
+est_h = np.array([bh30[j] for j in range(J) if thin[j]])
+
+out = pd.DataFrame({"series": thin_names, "unpooled": est_u.round(3),
+                    "hierarchical": est_h.round(3), "held_out_truth": truth.round(3)})
+print(out.to_string(index=False))
+
+rmse = lambda e: np.sqrt(np.nanmean((e - truth) ** 2))
+print(f"\n  RMSE vs truth:  unpooled {rmse(est_u):.3f}   "
+      f"hierarchical {rmse(est_h):.3f}")
+print(f"  mean held-out effect across these series: {np.nanmean(truth):.3f}")
+```
+
+Read that table before reading on.
+
+The hierarchical model reported an effect near `mu_b` for every one of these series. The held-out
+weeks say the true effects average close to 0.09 — several times larger. The model did not merely
+lose precision on these series; it moved them all to the wrong place, and reported tight
+intervals around it.
+
+And notice what the RMSE column says: pooling barely improved on the unpooled fit at all. All
+that shrinkage bought us essentially nothing.
+
+::: {.callout-important}
+## The diagnostics could never have caught this
+
+$\hat{R}$, ESS and divergences ask whether the sampler explored the posterior of *the model you
+wrote*. They cannot ask whether that model was the right one. Every diagnostic here passed.
+:::
+
+---
+
+# Step 4 — Find out what went wrong
+
+Two things are wrong, and one of them is invisible until you look.
+
+First, look at which series we thinned.
+
+```{python}
+print("thinned series:", thin_names)
+```
+
+```{python}
+print("\nEmpirical high-SNAP effect by category (all data, no model):")
+for cat, grp in df.groupby("cat_id"):
+    effs = [empirical_effect(grp, s) for s in grp.series.unique()]
+    print(f"  {cat:<10s} n={len(effs):2d}  mean {np.mean(effs):+.3f}  "
+          f"sd {np.std(effs):.3f}")
+```
+
+Two findings, and they compound.
+
+**The groups were not exchangeable.** SNAP is a *food* assistance programme. FOODS responds;
+HOBBIES and HOUSEHOLD barely move. Putting all thirty in one hierarchy told the model these are
+thirty interchangeable draws from one distribution — so it estimated a group mean near zero,
+dominated by the twenty series with no effect, and pulled the FOODS series down to it.
+
+**And `j % 3 == 0` selected exactly the FOODS series.** The series are ordered store-major with
+three categories each, so every third one is a FOODS series. We starved precisely the ten series
+that had something to say, then pooled them toward twenty that did not.
+
+::: {.callout-warning}
+## Exchangeability is a modelling assumption, and it is yours to defend
+
+Groups are exchangeable when, before seeing the data, you have no reason to expect one to differ
+from another in a particular direction. Ten FOODS series in ten stores: plausible. FOODS against
+HOBBIES: you knew the answer before you looked.
+
+Nothing in PyMC checks this. No diagnostic reports it. It is subject-matter knowledge, applied
+before the model is written.
+:::
+
+```{python}
+# ---- your turn: uncomment and answer in the strings ----
+# whose_fault = "..."   # <- would a bigger sample have fixed this? why or why not?
+# print(whose_fault)
+```
+
+---
+
+# Step 5 — Do it on the exchangeable set
+
+Restrict to the ten FOODS series — the set we can actually defend pooling — and rebuild the same
+imbalance: thin every other one to 8 weeks.
+
+```{python}
+foods = df[df.cat_id == "FOODS"].copy()
+codes_f, uniq_f = pd.factorize(foods.series)
+foods["idx"] = codes_f
+Jf = len(uniq_f)
+
+rng = np.random.RandomState(RANDOM_STATE)
+keep_f = []
+for j in range(Jf):
+    rows = foods.index[foods.idx == j].tolist()
+    n = 8 if j % 2 == 0 else len(rows)
+    keep_f += list(rng.choice(rows, size=min(n, len(rows)), replace=False))
+
+train_f = foods.loc[sorted(keep_f)].copy()
+heldout_f = foods.drop(index=keep_f).copy()
+thin_f = np.array([j % 2 == 0 for j in range(Jf)])
+
+print(f"{Jf} FOODS series | {thin_f.sum()} thinned to 8 weeks")
+print(f"train {len(train_f):,} rows | held-out {len(heldout_f):,} rows")
+```
+
+```{python}
+idata_uf = fit(train_f, "unpooled", Jf)
+idata_hf = fit(train_f, "hier", Jf)
+buf, bhf = b_means(idata_uf, Jf), b_means(idata_hf, Jf)
+
+gf = az.summary(idata_hf, var_names=["mu_b", "sd_b"], ci_kind="hdi", ci_prob=0.94)
+print(gf.round(3).to_string())
+```
+
+```{python}
+mt = np.abs(bhf[thin_f] - buf[thin_f]).mean()
+mf = np.abs(bhf[~thin_f] - buf[~thin_f]).mean()
+print("              unpooled spread   after pooling   mean move")
+print(f"  thin (8w)       {buf[thin_f].std():.3f}           "
+      f"{bhf[thin_f].std():.3f}          {mt:.3f}")
+print(f"  full (277w)     {buf[~thin_f].std():.3f}           "
+      f"{bhf[~thin_f].std():.3f}          {mf:.3f}")
+print(f"\n  ratio: thin moved {mt / mf:.1f}x further")
+```
+
+Compare that middle column to Step 2's. There, *everything* collapsed onto the group mean. Here
+the thin series collapse but the full series **keep most of their spread** — the model discarded
+variation that 8 weeks could not support and kept variation that 277 weeks could. That is what
+partial pooling is supposed to look like.
+
+Now grade it the same way.
+
+```{python}
+tn = [uniq_f[j] for j in range(Jf) if thin_f[j]]
+truth_f = np.array([empirical_effect(heldout_f, s) for s in tn])
+eu = np.array([buf[j] for j in range(Jf) if thin_f[j]])
+eh = np.array([bhf[j] for j in range(Jf) if thin_f[j]])
+
+print(pd.DataFrame({"series": tn, "unpooled": eu.round(3),
+                    "hierarchical": eh.round(3),
+                    "held_out_truth": truth_f.round(3)}).to_string(index=False))
+
+r_u = np.sqrt(np.nanmean((eu - truth_f) ** 2))
+r_h = np.sqrt(np.nanmean((eh - truth_f) ** 2))
+print(f"\n  RMSE vs truth:  unpooled {r_u:.3f}   hierarchical {r_h:.3f}"
+      f"   ({r_u / r_h:.1f}x better)")
+```
+
+**That is borrowing strength, and now it is real.** The same code, the same priors, the same
+diagnostics — and the thin series are estimated well because the other five exist. The only thing
+that changed was which series were allowed into the hierarchy.
+
+```{python}
+# ---- your turn: uncomment and fill in the comparison ----
+# print("30-series pooling improved RMSE by ___%")   # <- from Step 3's two numbers
+# print("FOODS-only pooling improved RMSE by ___%")  # <- from the two above
+```
+
+---
+
+# Step 6 — The trap in the code
+
+One more failure, and this one *is* mechanical. The natural way to write the hierarchy reads
+exactly like the equation:
+
+```python
+b = pm.Normal("b", mu_b, sd_b, shape=J)   # the centred form
+```
+
+Fit it that way and watch the diagnostics.
+
+```{python}
+idata_cent = fit(train_f, "hier", Jf, centred=True)
+
+print("Diagnostics")
+diag(idata_cent, "centred")
+diag(idata_hf, "non-centred")
+```
+
+Same model. Same data. Same answer, if you could sample it — but the centred form makes the
+sampler walk a funnel: when `sd_b` is small the `b_j` must crowd into a narrow neck, and a
+sampler tuned for the wide part cannot get in.
+
+::: {.callout-tip}
+## Which alarm fired
+
+Look at the two columns. $\hat{R}$ is near the threshold and ESS clears 400 — on those two
+numbers alone you might have shipped it. The divergence count is unambiguous.
+
+On hierarchical models, divergences are the sensitive instrument. Do not wait for $\hat{R}$.
+:::
+
+---
+
+# Before you leave
+
+> **Discuss (the failure):** Step 2's model had clean diagnostics, textbook shrinkage, and a
+> defensible-sounding conclusion. Step 3 showed it was wrong. What kind of check caught it, and
+> why could no amount of sampler diagnostics have done so?
+>
+> **Discuss (the assumption):** You are asked to pool weekly demand across the ten stores in one
+> chain. Name one variable that, if it differed across those stores, would break exchangeability
+> the way category did here — and say how you would handle it without abandoning the hierarchy.
+>
+> **Discuss (the judgement):** In Step 5, `sd_b` came out around 0.07 — stores genuinely differ.
+> The unpooled fit put the range at roughly 5% to 33%. Given both numbers, what do you actually
+> recommend the business do for the next SNAP week?
+>
+> **Discuss (the thread):** This is the sixth time this semester that a model has been improved by
+> pulling estimates toward a common value. Name the other five, and say what is different about
+> the shrinkage strength here.
+
+---
+
+*Solutions posted to Canvas after class.*

@@ -26,49 +26,80 @@
 \end{frame}
 
 % =============================================================================
-\section{Thirty Series, Two Bad Options}
+\section{Which Series May Be Pooled}
 % =============================================================================
 
-\sectionslide{Thirty Series, Two Bad Options}{%
-  You have done this the wrong way twice already.
-  Here is the third way.}
+\sectionslide{Which Series May Be Pooled}{%
+  Before you pool anything, ask what the groups have in common.}
 
 % --- Slide: the problem -----------------------------------------------------
 \begin{frame}{The Question}
   A concrete one, and you have met it before. \textbf{Does demand rise in weeks when SNAP
-  benefits are disbursed, and by how much --- for each of our thirty store-category series?}
+  benefits are disbursed, and by how much --- store by store?} Homework 3's memo had you stock up
+  for SNAP weeks store by store, which assumed those differences are real. Today we check.
 
   \vspace{0.15cm}
-  Homework 3's memo asked you to decide which store-categories to stock up for a SNAP week rather
-  than applying one national uplift. That question assumed the per-series differences are real.
-  Today we check.
+  \textbf{But one question comes before the model.} SNAP is a \emph{food} assistance programme.
+  Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:
+
+  \begin{center}
+    {\small
+    \begin{tabular}{lrr}
+      \toprule
+      \textbf{Category} & \textbf{Mean effect} & \textbf{Spread across stores} \\
+      \midrule
+      \textbf{FOODS} (10 series) & $+0.089$ & 0.058 \\
+      HOBBIES (10 series) & $+0.006$ & 0.010 \\
+      HOUSEHOLD (10 series) & $+0.011$ & 0.014 \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{0.05cm}
+  \textbf{These are not thirty versions of the same thing.} FOODS responds; the other two barely
+  move. Pooling all thirty would tell the model they are interchangeable.
+\end{frame}
+
+% --- Slide: exchangeability -------------------------------------------------
+\begin{frame}{Exchangeability: the Assumption Under Every Hierarchy}
+  Partial pooling rests on one assumption, worth naming before we use it.
+
+  \begin{definitionbox}[Exchangeable]
+    Groups are \textbf{exchangeable} when, before seeing the data, you have no reason to expect
+    one to differ from another in a particular direction. Swapping their labels would not change
+    what you believe.
+  \end{definitionbox}
+
+  \vspace{0.1cm}
+  The ten FOODS series qualify: same category, different stores, and you could not say in advance
+  which store's SNAP effect should be largest. FOODS against HOBBIES does \textbf{not} --- you
+  know before looking that a food-assistance programme moves food.
 
   \vspace{0.15cm}
-  The complication is that the series are not equally informative. Some have years of history;
-  in the real world some are new stores, new products, or recently re-categorized, with only a
-  handful of usable weeks.
+  \textbf{The setup for today.} We work with the \textbf{ten FOODS series}, and deliberately thin
+  \textbf{five} of them down to \textbf{8 weeks}. Five series are data-rich, five are data-poor.
+  That imbalance is the whole point.
 
-  \begin{keybox}
-    \textbf{The setup for today.} We keep all thirty series, but deliberately thin every third
-    one down to \textbf{8 weeks} of data. Twenty series are data-rich; ten are data-poor. That
-    imbalance is the whole point.
-  \end{keybox}
+  \vspace{0.1cm}
+  \muted{\footnotesize\itshape The lab pools all thirty anyway, and measures what it costs.}
 \end{frame}
 
 % --- Slide: two bad options -------------------------------------------------
 \begin{frame}{Complete Pooling and No Pooling}
-  There are two obvious approaches, and each fails in a different direction.
+  Within that exchangeable set there are two obvious approaches, and each fails in a different
+  direction.
   \begin{center}
     {\small
     \begin{tabular}{p{3.0cm}p{4.4cm}p{4.9cm}}
       \toprule
       & \textbf{What it does} & \textbf{How it fails} \\
       \midrule
-      \textbf{Complete pooling} & One SNAP effect for all thirty series. \newline
+      \textbf{Complete pooling} & One SNAP effect for all ten series. \newline
       \texttt{b = pm.Normal("b", 0, 1)} & Denies that stores differ at all. A genuinely
       different store is averaged away. \\[3pt]
       \textbf{No pooling} & A separate effect per series, estimated independently. \newline
-      \texttt{shape=30} & A series with 8 weeks gets an estimate built from 8 weeks. Mostly
+      \texttt{shape=10} & A series with 8 weeks gets an estimate built from 8 weeks. Mostly
       noise, reported as a finding. \\
       \bottomrule
     \end{tabular}
@@ -78,11 +109,8 @@
   \vspace{0.05cm}
   \textbf{You have used both already without naming them.} Homework 3's random forest pooled all
   thirty series into one model with store dummies --- close to complete pooling. Homework 1
-  fitted ARIMA to one series at a time --- no pooling.
-
-  \vspace{0.1cm}
-  Neither is obviously right, and the choice has always been made by convenience. Partial pooling
-  makes it a modelling decision instead, and lets the data settle it.
+  fitted ARIMA to one series at a time --- no pooling. The choice has always been made by
+  convenience; partial pooling makes it a modelling decision and lets the data settle it.
 \end{frame}
 
 % =============================================================================
@@ -97,12 +125,12 @@
 \begin{frame}{The Hierarchy Is One Extra Line}
   Give each series its own effect $b_j$, but say where those effects come from:
   \[
-    b_j \sim \mathcal{N}(\mu_b,\ \sigma_b), \qquad j = 1, \ldots, 30
+    b_j \sim \mathcal{N}(\mu_b,\ \sigma_b), \qquad j = 1, \ldots, 10
   \]
   \vspace{-0.25cm}
 
-  $\mu_b$ is the typical SNAP effect across the business, and $\sigma_b$ is \textbf{how much
-  stores genuinely differ}. Crucially, both are estimated from the data rather than assumed.
+  $\mu_b$ is the typical SNAP effect across FOODS, and $\sigma_b$ is \textbf{how much stores
+  genuinely differ}. Crucially, both are estimated from the data rather than assumed.
 
   \begin{center}
     {\small
@@ -119,9 +147,8 @@
   \end{center}
 
   \vspace{0.05cm}
-  \textbf{That last row is the whole idea.} A series with 277 weeks barely moves; a series with 8
-  weeks moves a long way, because its own estimate carries little information. Nobody chose those
-  weights --- they fall out of the model.
+  \textbf{That last row is the whole idea.} A series with 277 weeks barely moves; one with 8 weeks
+  moves a long way. Nobody chose those weights --- they fall out of the model.
 \end{frame}
 
 % --- Slide: shrinkage intuition ---------------------------------------------
@@ -189,9 +216,9 @@
       \toprule
       & \textbf{Centred} & \textbf{Non-centred} & \textbf{Want} \\
       \midrule
-      Divergences & \textbf{104} & \textbf{0} & 0 \\
-      $\hat{R}$ & 1.030 & 1.000 & $< 1.01$ \\
-      ESS (bulk) & --- & 3{,}846 & $> 400$ \\
+      Divergences & \textbf{43} & \textbf{0} & 0 \\
+      $\hat{R}$ & 1.003 & 1.003 & $< 1.01$ \\
+      ESS (bulk) & 966 & 1{,}719 & $> 400$ \\
       \bottomrule
     \end{tabular}
     }
@@ -203,12 +230,13 @@
   small. A sampler tuned for the wide part cannot navigate the neck, and reports divergences.
 
   \vspace{0.1cm}
-  The non-centred form samples a standard Normal $z$ and \emph{builds} $b_j = \mu_b + z_j
-  \sigma_b$ afterwards. Same model, same answer, geometry the sampler can walk.
+  \textbf{Note which alarm actually fired.} $\hat{R}$ and ESS \emph{both pass} --- on those two
+  numbers you would have shipped it. Only the divergence count objects. On hierarchical models
+  divergences are the sensitive instrument; do not wait for $\hat{R}$ to tell you.
 
-  \vspace{0.05cm}
-  \muted{\footnotesize\itshape This is BMCP §4.6.1, \emph{Posterior Geometry Matters}, and it is
-  the single most common failure in applied hierarchical modelling.}
+  \vspace{0.02cm}
+  \muted{\footnotesize\itshape BMCP §4.6.1, \emph{Posterior Geometry Matters} --- the single most
+  common failure in applied hierarchical modelling.}
 \end{frame}
 
 % =============================================================================
@@ -216,8 +244,8 @@
 % =============================================================================
 
 \sectionslide{Reading the Result}{%
-  Shrinkage, measured --- and a business conclusion
-  that reverses the obvious one.}
+  Shrinkage, measured --- and checked against
+  data the model never saw.}
 
 % --- Slide: the measurement -------------------------------------------------
 \begin{frame}{Shrinkage, Measured}
@@ -228,51 +256,82 @@
       \toprule
       \textbf{Series group} & \textbf{Unpooled spread} & \textbf{After pooling} & \textbf{Mean move} \\
       \midrule
-      \textbf{Thin} --- 8 weeks (10 series) & 0.106 & 0.000 & \textbf{0.110} \\
-      \textbf{Full} --- 277 weeks (20 series) & 0.012 & 0.001 & 0.010 \\
+      \textbf{Thin} --- 8 weeks (5 series) & 0.108 & 0.010 & \textbf{0.120} \\
+      \textbf{Full} --- 277 weeks (5 series) & 0.055 & 0.037 & 0.015 \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
 
   \vspace{-0.05cm}
-  \textbf{The data-poor series moved 11.5 times further toward the group mean than the data-rich
+  \textbf{The data-poor series moved 8.1 times further toward the group mean than the data-rich
   ones.} Nobody told the model which series were thin. It inferred that from how much each series
   had to say.
 
   \vspace{0.15cm}
-  Look also at the unpooled column. The thin series appear to vary nine times more than the full
-  series ($0.106$ against $0.012$). They are the \emph{same kind} of store-category --- that extra
-  spread is not business variation, it is what 8 observations look like.
+  Read the two right-hand columns together. The thin series' apparent spread of $0.108$ nearly
+  vanishes, while the full series \textbf{keep most of theirs} ($0.055 \rightarrow 0.037$). The
+  hierarchy did not flatten everything: it discarded spread that 8 weeks could not support and
+  kept spread that 277 weeks could.
 
   \vspace{0.1cm}
-  \textbf{The hierarchy did not average away a real signal. It removed a fake one.}
+  \textbf{That is the claim to be sceptical of, so the next slide tests it.}
+\end{frame}
+
+% --- Slide: held-out check --------------------------------------------------
+\begin{frame}{Checked Against Data the Model Never Saw}
+  We thinned those five series ourselves, so the weeks we removed are still there. Compare each
+  estimate against the SNAP effect actually observed in the held-out weeks.
+
+  \begin{center}
+    {\small
+    \begin{tabular}{lrrr}
+      \toprule
+      \textbf{Thin series} & \textbf{Unpooled} & \textbf{Hierarchical} & \textbf{Held-out truth} \\
+      \midrule
+      CA\_1\_FOODS & 0.286 & 0.097 & 0.087 \\
+      CA\_3\_FOODS & 0.105 & 0.082 & 0.102 \\
+      TX\_1\_FOODS & 0.052 & 0.075 & 0.082 \\
+      TX\_3\_FOODS & 0.219 & 0.091 & 0.072 \\
+      WI\_2\_FOODS & 0.338 & 0.103 & 0.207 \\
+      \midrule
+      \textbf{RMSE against truth} & \textbf{0.126} & \textbf{0.048} & --- \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.05cm}
+  \textbf{Partial pooling was two and a half times more accurate}, beating the unpooled fit on
+  four series out of five. Those estimates were not just noisy --- they were confidently wrong,
+  and the confidence came from 8 weeks of data.
+
+  \vspace{0.05cm}
+  \muted{\footnotesize\itshape Borrowing strength is not a figure of speech: the thin series were
+  estimated better \emph{because} the other five existed.}
 \end{frame}
 
 % --- Slide: the business answer ---------------------------------------------
 \begin{frame}{What the Model Actually Concluded}
-  The estimated hierarchy: $\mu_b = 0.011$, $\sigma_b = 0.007$.
+  The estimated hierarchy: $\mu_b = 0.078$ with a 94\% HDI of $[0.017,\ 0.150]$, and
+  $\sigma_b = 0.065$.
 
   \vspace{0.1cm}
-  In words: the typical SNAP-week uplift is about \textbf{1\%} on log units, and the genuine
-  spread across store-categories is smaller than that again. The model has concluded the thirty
-  series are, for this purpose, \textbf{nearly the same}.
+  In words: a SNAP week lifts FOODS units by roughly \textbf{8\%}, and stores genuinely differ
+  around that by about \textbf{7 percentage points}. Both numbers are answers, and the second one
+  is the one no point estimate would have given you.
 
   \begin{warningbox}
-    \textbf{That reverses the natural business instinct.} An analyst reading the unpooled fit
-    would report SNAP uplifts ranging from roughly $-2\%$ to $+35\%$, and might well build a
-    store-specific stocking policy on it. Almost all of that range was noise from the thin
-    series.
+    \textbf{It does not license the store-level policy the unpooled fit suggested.} An analyst
+    reading the unpooled numbers would report uplifts from $5\%$ to $40\%$ and stock accordingly.
+    The held-out weeks say that range was mostly noise --- but $\sigma_b = 0.065$ says it is not
+    \emph{all} noise either.
   \end{warningbox}
 
   \vspace{0.1cm}
-  \textbf{So the honest recommendation is the boring one:} apply a common uplift, and do not
-  differentiate by store-category until more data justifies it. That is a real finding, it is
-  worth money, and no point-estimate procedure would have told you.
-
-  \vspace{0.1cm}
-  \muted{\footnotesize\itshape Weekly aggregation is part of the story --- the daily SNAP effect
-  in Homework 2 was larger, because most weeks contain some SNAP days.}
+  \textbf{The defensible recommendation:} plan on an 8\% FOODS uplift everywhere, allow real but
+  modest store variation around it, and do not act on a store's own estimate until that store has
+  the weeks to support one.
 \end{frame}
 
 % =============================================================================
@@ -286,6 +345,10 @@
   \begin{keybox}
     {\footnotesize
     \begin{enumerate}\itemsep2pt
+      \item \textbf{Ask what may be pooled before you pool it.} Groups must be
+            \textbf{exchangeable}. FOODS and HOBBIES are not, and no amount of good sampling
+            fixes a hierarchy built over the wrong set.
+
       \item \textbf{Complete pooling} denies groups differ; \textbf{no pooling} lets a group with
             8 observations report noise as a finding. You have used both without naming them.
 
@@ -293,17 +356,15 @@
             distribution, and estimates how much groups genuinely differ.
 
       \item \textbf{Shrinkage is automatic and proportionate.} Our thin series moved
-            \textbf{11.5$\times$} further toward the group mean than data-rich ones, with nobody
-            specifying that.
+            \textbf{8.1$\times$} further toward the group mean than data-rich ones, with nobody
+            specifying that --- and on held-out weeks it was \textbf{2.6$\times$} more accurate.
 
       \item This is \textbf{regularization for the sixth time} --- and the only version where the
             shrinkage strength is estimated rather than tuned.
 
-      \item \textbf{Write it non-centred.} The obvious form gave 104 divergences; the
-            reparameterized form gave zero. Same model, different geometry.
-
-      \item The business conclusion \textbf{reversed the obvious one}: apparent store-level
-            differences were mostly noise, and a common uplift is the defensible policy.
+      \item \textbf{Write it non-centred.} The obvious form gave 43 divergences; the
+            reparameterized form gave zero. Same model, different geometry --- and divergences
+            were the \emph{only} diagnostic that objected.
     \end{enumerate}
     }
   \end{keybox}
