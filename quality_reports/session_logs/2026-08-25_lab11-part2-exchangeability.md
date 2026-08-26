@@ -172,3 +172,43 @@ Everything below was true when this log was committed.
 4. **Video generation from slides + scripts** — investigated, deferred. `say` cannot reach the
    installed Siri voice (proved: all Siri identifiers fall back to Samantha, byte-identical
    output). The viable path is a GUI-built Shortcut driven by `shortcuts run`, unverified.
+
+---
+
+# Student submission repo — gap analysis and decisions (2026-08-26)
+
+## Owner decision
+The initial prompt embedded in each assignment `.qmd` is the **single source of truth** for
+Codex setup. `prompts/REQUIRED_INITIAL_PROMPT.md` in Forecasting-Env stops being a thing
+students paste and becomes an explainer.
+
+Done: all 11 `.qmd` prompts now carry the repository rules (log schema, one commit per prompt
+with the message format, PROMPT_LIMIT_REACHED behaviour, locked paths), with each assignment's
+own folder name, commit prefix and budget substituted in. Verified the budget in the rules block
+matches the budget stated above it in all eleven.
+
+## Blocking gaps found in Forecasting-Env (a student cannot do HW1 today)
+1. **No assignment `.qmd` reaches the student.** The env repo has only `assignments/hw01_prompt.md`
+   — an essay assignment ("forecasting use cases", citations) from an earlier course design. The
+   course site publishes rendered `.html` only, never the `.qmd` source. There is no path from
+   "clone the repo" to "have the file to fill in."
+2. **No way to create the data.** Every assignment reads `data/processed/m5_weekly.csv`, produced
+   by `scripts/prep_m5.py`, which exists only in the course repo. Env repo has `.gitkeep` only.
+3. **`assignments/hw01_rubric.md`** grades the essay assignment, not HW01 Part 1.
+
+## Naming inconsistency (repo-wide)
+`README.md`, `STUDENT_QUICKSTART.md`, `submissions/README.md` and
+`prompts/REQUIRED_INITIAL_PROMPT.md` all use `hwNN` and `hwNN prompt <id>`, which cannot express
+the part-based scheme (`hw01_part1`, `hw05_part2`) now used by the assignments, the submission
+folders, and `policy/homework_limits.json`.
+
+## Still unpushed in Forecasting-Env
+`55344c7` — the `homework_limits.json` correction. Students push HW01 Part 1 on **Sep 3**.
+
+## Website / hosting (owner is considering a move)
+luozijun.com is a Quarto site on Hostinger with a GitHub repo; a local clone exists at
+`~/Documents/GitHub/luozijun.com/`. Key fact established: **GitHub Pages cannot serve a subpath
+of another domain**, but if the user-site repo (`DataHurdler.github.io`) carries the custom
+domain, every project repo is served at `luozijun.com/<repo>/` automatically. No
+`DataHurdler.github.io` repo exists yet. `scripts/set_course_url.py` now makes the URL change a
+one-command operation whichever way this goes.
