@@ -31,8 +31,8 @@ sync_slides() {
     quarto render "$qmd" >/dev/null 2>&1 || { echo "    FAILED: $qmd"; continue; }
     cp "${qmd%.qmd}.html" "$DOCS/slides/"
   done
-  echo "  copying Beamer PDFs"
-  cp "$REPO_ROOT/Slides/"Lecture*.pdf "$DOCS/slides/" 2>/dev/null || true
+  # Beamer PDFs are deliberately NOT published: untagged LaTeX output is the format
+  # screen readers handle worst. The RevealJS HTML is the accessible version.
 }
 
 sync_one() {   # one lecture mirror by prefix
@@ -41,7 +41,6 @@ sync_one() {   # one lecture mirror by prefix
   [ -n "$m" ] || { echo "No Quarto file matching '${1}'"; exit 1; }
   quarto render "$m"
   cp "${m%.qmd}.html" "$DOCS/slides/"
-  cp "$REPO_ROOT/Slides/${m%.qmd}.pdf" "$DOCS/slides/" 2>/dev/null || true
 }
 
 sync_labs() {

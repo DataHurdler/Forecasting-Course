@@ -136,7 +136,9 @@ Installation instructions and a test script are provided in the course repositor
 ## Course Materials
 **Course website: <https://www.luozijun.com/forecasting-course/>**
 
-Everything is there, organized by week: each lecture as both a PDF and interactive HTML slides, every lab, and every assignment with its due date. Bookmark it — it is the fastest way to find anything in this course.
+Everything is there, organized by week: every lecture, lab, and assignment with its due date. Bookmark it — it is the fastest way to find anything in this course.
+
+Slides are published as **interactive HTML**, not PDF. HTML is the accessible format: it carries real headings, alternative text on every figure, table headers, and math that assistive technology can read. PDF exported from LaTeX carries none of that. If you want a printable copy, use your browser's Print to PDF on the slide deck.
 
 Lecture slides, homework assignments, and data files are distributed through the course website and Canvas.
 
@@ -224,7 +226,7 @@ Each part has its own initial prompt and its own prompt budget. Due dates are in
 ### How to Submit Homework
 
 All homework is submitted through your own copy of the course environment repository
-([DataHurdler/Forecasting-Env](https://github.com/DataHurdler/Forecasting-Env)). Submission is a
+([DataHurdler/forecasting-env](https://github.com/DataHurdler/forecasting-env)). Submission is a
 **git push** — there is no upload, and nothing is emailed.
 
 For each assignment, your submission folder must contain **four** things:
