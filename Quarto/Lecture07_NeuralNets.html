@@ -1102,84 +1102,71 @@ Department of Economics
 <section>
 <section id="from-trees-to-neural-networks" class="title-slide slide level1 center">
 <h1>From Trees to Neural Networks</h1>
-<p>Tree-based methods are powerful but limited by their piecewise-constant predictions. Neural networks learn smooth, continuous functions of arbitrary complexity.</p>
+<p>Trees predict in steps. Networks predict in curves — and that difference buys less than you would expect on tabular data, and everything on sequences.</p>
 </section>
 <section id="why-go-beyond-trees" class="slide level2">
 <h2>Why Go Beyond Trees?</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Tree-based models (L04–L06):</strong></p>
-<ul>
-<li>Excellent for tabular data with many features</li>
-<li>Each row treated <strong>independently</strong> — no built-in notion of order or sequence</li>
-<li>Predictions are piecewise constant: cannot extrapolate beyond training range</li>
-<li>Feature engineering required for temporal patterns (lag columns, rolling means, etc.)</li>
-</ul>
-</div><div class="column" style="width:44%;">
-<p><strong>What neural networks add:</strong></p>
-<ul>
-<li>Learn <strong>smooth, continuous</strong> functions directly</li>
-<li>Flexible architecture: can be adapted for sequences, images, text</li>
-<li>Can learn hierarchical feature representations automatically</li>
-<li>PyTorch enables custom architectures and GPU-accelerated training</li>
-</ul>
-</div></div>
-<div class="keybox">
-<p>Neural networks are not always better than XGBoost on tabular data. They shine when: (1) the data is a sequence (time series, text), (2) raw inputs are images or audio, or (3) you have very large amounts of data (<span class="math inline">\(n &gt; 100\text{K}\)</span>).</p>
+<p>A tree-based model treats every row as independent. Order is not part of the model — everything it knows about time, you put there by hand, as lag columns and rolling means. And its prediction is <strong>piecewise constant</strong>, which is why in Lab 4 the tree could not predict above the largest value it had seen.</p>
+<p>A neural network learns a <strong>smooth, continuous</strong> function instead. Its architecture is not fixed: the same machinery adapts to sequences, images and text, and it can learn its own intermediate representations rather than being handed engineered ones.</p>
+<div class="warningbox">
+<p><strong>This is not an upgrade.</strong> On the tabular problems of Homework 3 and 4, gradient boosting and a tuned LASSO were hard to beat, and a network will often lose to both. Reach for one when the data is a <em>sequence</em>, when the raw input is an image or audio, or when <span class="math inline">\(n\)</span> is very large. Otherwise you are paying in tuning time for accuracy you will not get.</p>
 </div>
+<p>So today is about the machinery. Lectures 8 and 9 are where it earns its place.</p>
 </section>
 <section id="from-linear-regression-to-a-single-neuron" class="slide level2">
 <h2>From Linear Regression to a Single Neuron</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Linear regression</strong> (Lecture 02): <span class="math display">\[\hat{y} = \mathbf{w}^\top \mathbf{x} + b\]</span></p>
-<p><strong>One neuron</strong> wraps the linear combination in a nonlinear <strong>activation function</strong> <span class="math inline">\(\sigma(\cdot)\)</span>: <span class="math display">\[a = \sigma(\mathbf{w}^\top \mathbf{x} + b)\]</span></p>
+<p>Start from something you already know. Linear regression predicts <span class="math inline">\(\hat{y} = \mathbf{w}^\top \mathbf{x} + b\)</span>.</p>
+<p>A <strong>neuron</strong> is that same expression with one addition — a nonlinear <strong>activation</strong> <span class="math inline">\(\sigma(\cdot)\)</span> wrapped around it:</p>
+<p><span class="math display">\[a = \sigma(\mathbf{w}^\top \mathbf{x} + b)\]</span></p>
 <table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Activation</th>
 <th>Formula</th>
-<th>Typical use</th>
+<th>Where it is used</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>ReLU</td>
 <td><span class="math inline">\(\max(0,z)\)</span></td>
-<td>Hidden layers</td>
+<td>Hidden layers — the default</td>
 </tr>
 <tr class="even">
 <td>Sigmoid</td>
 <td><span class="math inline">\(1/(1+e^{-z})\)</span></td>
-<td>Binary output / gates</td>
+<td>Binary outputs, and LSTM gates (Lecture 9)</td>
 </tr>
 <tr class="odd">
 <td>Tanh</td>
 <td><span class="math inline">\(\tanh(z)\)</span></td>
-<td>Sequence hidden states</td>
+<td>Sequence states</td>
 </tr>
 <tr class="even">
 <td>Linear</td>
 <td><span class="math inline">\(z\)</span></td>
-<td>Regression output</td>
+<td>The output layer, for regression</td>
 </tr>
 </tbody>
 </table>
-</div><div class="column" style="width:44%;">
+<p>ReLU makes the intuition literal: the neuron asks <em>“is this pattern present?”</em> If the evidence is positive it passes a signal through; if not it outputs exactly zero and stays silent.</p>
+</section>
+<section id="why-the-nonlinearity-is-the-whole-trick" class="slide level2">
+<h2>Why the Nonlinearity Is the Whole Trick</h2>
+<p>It is worth being precise about what <span class="math inline">\(\sigma(\cdot)\)</span> buys, because it is easy to assume that depth alone is what makes a network powerful. It is not.</p>
 <div class="definitionbox">
 <div class="definitionbox-title">
-<p>Why Non-Linearity?</p>
+<p>Stacking linear layers gains you nothing</p>
 </div>
-<p>Without <span class="math inline">\(\sigma(\cdot)\)</span>, stacking layers is equivalent to a single linear model — the composition of linear functions is still linear.</p>
-<p>Non-linearity enables a network to approximate <strong>any continuous function</strong> to arbitrary accuracy (universal approximation theorem).</p>
+<p>A linear function of a linear function is linear. Compose two layers with no activation between them and you get <span class="math inline">\(\mathbf{W}_2(\mathbf{W}_1\mathbf{x}) = (\mathbf{W}_2\mathbf{W}_1)\mathbf{x}\)</span> — a single matrix, and therefore a single linear model with extra steps.</p>
 </div>
-<div class="examplebox">
-<div class="examplebox-title">
-<p>Business intuition</p>
-</div>
-<p>A neuron asks: “Is this pattern present?” If yes (large positive <span class="math inline">\(z\)</span>), activate. If no, stay off. ReLU makes this literal.</p>
-</div>
-</div></div>
+<p>Insert a nonlinearity between the layers and the picture changes completely. The <strong>universal approximation theorem</strong> says a network with one hidden layer can approximate <em>any</em> continuous function to arbitrary accuracy, given enough neurons.</p>
+<p><strong>Read that claim carefully.</strong> It says a network <em>can</em> represent the function — not that your optimizer will find it, that you have the data to identify it, or that it will generalize. Existence is not estimation, the same gap as between the optimal tree and the greedy one CART builds.</p>
 </section>
 <section class="slide level2">
 
@@ -1187,41 +1174,54 @@ Department of Economics
 <section>
 <section id="feedforward-networks" class="title-slide slide level1 center">
 <h1>Feedforward Networks</h1>
-<p>Stack layers of neurons. Each layer learns higher-level representations of the input.</p>
+<p>Stack layers of neurons, and each layer learns a higher-level representation of the one below it.</p>
 </section>
 <section id="feedforward-network-layers-and-forward-pass" class="slide level2">
 <h2>Feedforward Network: Layers and Forward Pass</h2>
-<p>Think of a feedforward network as a pipeline: raw inputs enter at one end, pass through several transformation stages (hidden layers), and a prediction exits at the other end. Each stage learns to extract more abstract features from the previous stage.</p>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p>A <strong>feedforward network</strong> (FFN / MLP) has:</p>
-<ul>
-<li><strong>Input layer:</strong> raw features <span class="math inline">\(\mathbf{x} \in \mathbb{R}^p\)</span></li>
-<li><strong>Hidden layers:</strong> <span class="math inline">\(H\)</span> layers, each applying a linear transformation followed by an activation: <span class="math display">\[\mathbf{a}^{(\ell)} = \sigma(\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)} + \mathbf{b}^{(\ell)})\]</span></li>
-<li><strong>Output layer:</strong> linear (regression) or softmax (classification)</li>
-</ul>
-<p><strong>Notation:</strong></p>
-<ul>
-<li><span class="math inline">\(\mathbf{W}^{(\ell)}\)</span>: weight matrix for layer <span class="math inline">\(\ell\)</span></li>
-<li><span class="math inline">\(\mathbf{b}^{(\ell)}\)</span>: bias vector for layer <span class="math inline">\(\ell\)</span></li>
-<li>Width = number of neurons per layer</li>
-<li>Depth = number of hidden layers</li>
-</ul>
-</div><div class="column" style="width:44%;">
+<p>A <strong>feedforward network</strong> — an FFN, or multilayer perceptron — is three things in sequence. An <strong>input layer</strong> of raw features <span class="math inline">\(\mathbf{x} \in \mathbb{R}^p\)</span>; some number of <strong>hidden layers</strong>, each applying <span class="math inline">\(\mathbf{a}^{(\ell)} = \sigma\!\left(\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)} + \mathbf{b}^{(\ell)}\right)\)</span>; and an <strong>output layer</strong> that is linear for regression.</p>
+<p>Two words you need: <strong>width</strong> is the number of neurons in a layer, <strong>depth</strong> is the number of hidden layers. Together they set the model’s capacity.</p>
 <div class="keybox">
-<p><strong>Practical sizing for forecasting:</strong></p>
-<ul>
-<li>2–3 hidden layers</li>
-<li>64–256 neurons per layer</li>
-<li>ReLU activations</li>
-<li>Dropout 0.2–0.5 for regularization</li>
-</ul>
-<p>Wider/deeper networks need more data and more regularization.</p>
+<p><strong>Sensible starting sizes for forecasting:</strong> 2–3 hidden layers, 64–256 neurons each, ReLU activations, dropout between 0.2 and 0.5. Start at the small end of every range.</p>
 </div>
-<div class="warningbox">
-<p>Bigger is not always better. Start small, add capacity only if the validation error is still too high.</p>
-</div>
-</div></div>
+<p>Bigger is not better on its own. A wider or deeper network needs more data and more regularization to reach the same generalization, so add capacity only when validation error says the current model is genuinely too simple — not because it is available.</p>
+</section>
+<section id="how-big-is-this-model-actually" class="slide level2">
+<h2>How Big Is This Model, Actually?</h2>
+<p>Capacity is easy to add by accident, so it is worth counting once. A layer mapping <span class="math inline">\(m\)</span> inputs to <span class="math inline">\(n\)</span> outputs holds <span class="math inline">\(m \times n\)</span> weights plus <span class="math inline">\(n\)</span> biases.</p>
+<p>Take a network for our weekly panel: 46 engineered features in, two hidden layers of 128, one output.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Layer</th>
+<th style="text-align: right;">Shape</th>
+<th style="text-align: right;">Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Input <span class="math inline">\(\rightarrow\)</span> hidden 1</td>
+<td style="text-align: right;"><span class="math inline">\(46 \times 128\)</span></td>
+<td style="text-align: right;">6,016</td>
+</tr>
+<tr class="even">
+<td>Hidden 1 <span class="math inline">\(\rightarrow\)</span> hidden 2</td>
+<td style="text-align: right;"><span class="math inline">\(128 \times 128\)</span></td>
+<td style="text-align: right;">16,512</td>
+</tr>
+<tr class="odd">
+<td>Hidden 2 <span class="math inline">\(\rightarrow\)</span> output</td>
+<td style="text-align: right;"><span class="math inline">\(128 \times 1\)</span></td>
+<td style="text-align: right;">129</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>22,657</strong></td>
+</tr>
+</tbody>
+</table>
+<p><span class="key-result"><strong>Twenty-two thousand parameters on five thousand rows</strong> — four per observation.</span></p>
+<p>Lecture 6 called sixty predictors on a hundred and fifty observations a crisis. This is far past that ratio, and networks train here routinely. What makes it survivable is not the architecture but the regularization, next.</p>
 </section>
 <section class="slide level2">
 
@@ -1229,60 +1229,45 @@ Department of Economics
 <section>
 <section id="training-loss-and-backpropagation" class="title-slide slide level1 center">
 <h1>Training: Loss and Backpropagation</h1>
-<p>How does the network learn? By computing the error, then propagating it backward to update weights.</p>
+<p>Compute the error, propagate it backward, adjust every weight by its share of the blame. Repeat.</p>
 </section>
-<section id="training-a-network-loss-gradients-and-sgd" class="slide level2">
-<h2>Training a Network: Loss, Gradients, and SGD</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p><strong>Step 1: Define a loss function</strong></p>
-<p>For regression: <span class="math inline">\(\mathcal{L} = \frac{1}{n}\sum_i (y_i - \hat{y}_i)^2\)</span> (Mean Squared Error)</p>
-<p><strong>Step 2: Backpropagation</strong></p>
-<p>Work backward through the network to figure out how much each weight contributed to the error, then adjust it. PyTorch computes all gradients automatically — you never need to do the calculus by hand.</p>
-<div class="keybox">
-<p><strong>You do not need to understand calculus to use PyTorch.</strong> Call <code>loss.backward()</code> and PyTorch handles all the gradient computation internally.</p>
-</div>
-<p><strong>Step 3: Update weights (SGD step)</strong> <span class="math display">\[\mathbf{W} \leftarrow \mathbf{W} - \eta \frac{\partial \mathcal{L}}{\partial \mathbf{W}}\]</span></p>
-<p>where <span class="math inline">\(\eta\)</span> is the <strong>learning rate</strong>.</p>
-</div><div class="column" style="width:44%;">
+<section id="training-loss-gradients-and-the-update-step" class="slide level2">
+<h2>Training: Loss, Gradients, and the Update Step</h2>
+<p>Training is one loop, repeated. <strong>First</strong>, compute the loss — for regression, mean squared error, <span class="math inline">\(\mathcal{L} = \frac{1}{n}\sum_i (y_i - \hat{y}_i)^2\)</span>.</p>
+<p><strong>Second, backpropagation:</strong> work backward through the network, using the chain rule to assign each weight its share of the error. <strong>Third</strong>, nudge every weight against its gradient:</p>
+<p><span class="math display">\[\mathbf{W} \leftarrow \mathbf{W} - \eta \, \frac{\partial \mathcal{L}}{\partial \mathbf{W}}, \qquad \eta = \text{learning rate}\]</span></p>
 <div class="definitionbox">
 <div class="definitionbox-title">
-<p>Stochastic Gradient Descent</p>
+<p>Stochastic gradient descent</p>
 </div>
-<p>Instead of computing the gradient on all <span class="math inline">\(n\)</span> observations at once (slow), use a random <strong>mini-batch</strong> of size 32–256 per step. One pass through all mini-batches is one <strong>epoch</strong>.</p>
+<p>Rather than using the whole dataset for each update, use a random <strong>mini-batch</strong> of 32–256 rows. Noisier steps, far more of them, and much faster. One pass through every batch is an <strong>epoch</strong>.</p>
 </div>
-<div class="keybox">
-<p><strong>In practice, use Adam optimizer</strong> instead of plain SGD. Adam adapts the learning rate per parameter and converges much faster.</p>
-<p><code>torch.optim.Adam(lr=1e-3)</code></p>
-</div>
-</div></div>
+<p><strong>You never differentiate by hand.</strong> <code>loss.backward()</code> does the backward pass, and <code>torch.optim.Adam(lr=1e-3)</code> beats plain SGD — it adapts the step size per parameter.</p>
 </section>
-<section id="preventing-overfitting-dropout-and-early-stopping" class="slide level2">
-<h2>Preventing Overfitting: Dropout and Early Stopping</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
-<div class="definitionbox">
-<div class="definitionbox-title">
-<p>Dropout</p>
-</div>
-<p>During training, randomly set a fraction <span class="math inline">\(p\)</span> of neuron outputs to zero on each forward pass. This prevents co-adaptation: neurons cannot rely on specific other neurons being present.</p>
-<p>At test time, all neurons are active and outputs are scaled by <span class="math inline">\((1-p)\)</span>.</p>
-</div>
-<p>PyTorch: <code>nn.Dropout(p=0.3)</code></p>
-</div><div class="column" style="width:44%;">
-<div class="warningbox">
-<p><strong>Early stopping</strong> is essential. Monitor validation loss after every epoch. Stop training when validation loss stops improving for <span class="math inline">\(k\)</span> consecutive epochs (patience). Save the model at the best validation epoch.</p>
-</div>
-<div class="keybox">
-<p><strong>Standard regularization toolkit:</strong></p>
-<ul>
-<li>Dropout (p = 0.2–0.5)</li>
-<li>Weight decay in Adam (<code>weight_decay=1e-4</code>)</li>
-<li>Early stopping (patience = 10–20)</li>
-<li>Batch normalization (deeper nets)</li>
-</ul>
-</div>
-</div></div>
+<section id="preventing-overfitting-where-lecture-6-returns" class="slide level2">
+<h2>Preventing Overfitting — Where Lecture 6 Returns</h2>
+<p>Twenty-two thousand parameters on five thousand rows will memorize the training set unless something stops it. Three things do, and <strong>you have met two of them already</strong>.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><code>weight_decay</code></td>
+<td><strong>This is Ridge.</strong> An <span class="math inline">\(\ell_2\)</span> penalty on the weights, under a different name. <code>Adam(..., weight_decay=1e-4)</code></td>
+</tr>
+<tr class="even">
+<td><code>nn.Dropout(p)</code></td>
+<td>Randomly zero a fraction <span class="math inline">\(p\)</span> of neuron outputs on each forward pass, so no neuron can depend on a specific other one being present. All neurons are active at test time.</td>
+</tr>
+<tr class="odd">
+<td>Early stopping</td>
+<td>Watch validation loss each epoch; stop when it has not improved for <span class="math inline">\(k\)</span> epochs, and keep the weights from the <em>best</em> epoch, not the last.</td>
+</tr>
+</tbody>
+</table>
+<p><span class="hi"><strong>That is the fifth appearance of one idea.</strong></span> The GAM smoothing penalty in Lecture 3, cost-complexity pruning in Lecture 4, <code>reg_lambda</code> on leaf weights in Lecture 5, Ridge and LASSO in Lecture 6 — and now weight decay. Fit against complexity, one parameter setting the exchange rate, chosen by validation.</p>
 </section>
 <section class="slide level2">
 
@@ -1290,128 +1275,73 @@ Department of Economics
 <section>
 <section id="pytorch-implementation" class="title-slide slide level1 center">
 <h1>PyTorch Implementation</h1>
-<p>Dataset, DataLoader, model definition, and training loop.</p>
+<p>Four pieces: a Dataset, a DataLoader, a model, and a training loop.</p>
 </section>
 <section id="pytorch-dataset-and-dataloader" class="slide level2">
 <h2>PyTorch: Dataset and DataLoader</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
 <div class="examplebox">
 <div class="examplebox-title">
-<p>Custom Dataset</p>
+<p>Wrapping your arrays</p>
 </div>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href></a><span class="im">import</span> torch</span>
-<span id="cb1-2"><a href></a><span class="im">from</span> torch.utils.data <span class="im">import</span> Dataset, DataLoader</span>
-<span id="cb1-3"><a href></a></span>
-<span id="cb1-4"><a href></a><span class="kw">class</span> ForecastDataset(Dataset):</span>
-<span id="cb1-5"><a href></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, X, y):</span>
-<span id="cb1-6"><a href></a>        <span class="va">self</span>.X <span class="op">=</span> torch.tensor(X, dtype<span class="op">=</span>torch.float32)</span>
-<span id="cb1-7"><a href></a>        <span class="va">self</span>.y <span class="op">=</span> torch.tensor(y, dtype<span class="op">=</span>torch.float32)</span>
-<span id="cb1-8"><a href></a></span>
-<span id="cb1-9"><a href></a>    <span class="kw">def</span> <span class="fu">__len__</span>(<span class="va">self</span>):</span>
-<span id="cb1-10"><a href></a>        <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.X)</span>
-<span id="cb1-11"><a href></a></span>
-<span id="cb1-12"><a href></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, idx):</span>
-<span id="cb1-13"><a href></a>        <span class="cf">return</span> <span class="va">self</span>.X[idx], <span class="va">self</span>.y[idx]</span>
-<span id="cb1-14"><a href></a></span>
-<span id="cb1-15"><a href></a>train_ds <span class="op">=</span> ForecastDataset(X_train, y_train)</span>
-<span id="cb1-16"><a href></a>train_loader <span class="op">=</span> DataLoader(</span>
-<span id="cb1-17"><a href></a>    train_ds, batch_size<span class="op">=</span><span class="dv">64</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href></a><span class="im">from</span> torch.utils.data <span class="im">import</span> Dataset, DataLoader</span>
+<span id="cb1-2"><a href></a></span>
+<span id="cb1-3"><a href></a><span class="kw">class</span> ForecastDataset(Dataset):</span>
+<span id="cb1-4"><a href></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, X, y):</span>
+<span id="cb1-5"><a href></a>        <span class="va">self</span>.X <span class="op">=</span> torch.tensor(X, dtype<span class="op">=</span>torch.float32)</span>
+<span id="cb1-6"><a href></a>        <span class="va">self</span>.y <span class="op">=</span> torch.tensor(y, dtype<span class="op">=</span>torch.float32)</span>
+<span id="cb1-7"><a href></a>    <span class="kw">def</span> <span class="fu">__len__</span>(<span class="va">self</span>): <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.X)</span>
+<span id="cb1-8"><a href></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, i): <span class="cf">return</span> <span class="va">self</span>.X[i], <span class="va">self</span>.y[i]</span>
+<span id="cb1-9"><a href></a></span>
+<span id="cb1-10"><a href></a>loader <span class="op">=</span> DataLoader(ForecastDataset(X_tr, y_tr),</span>
+<span id="cb1-11"><a href></a>                    batch_size<span class="op">=</span><span class="dv">64</span>, shuffle<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><div class="column" style="width:44%;">
-<p><strong>Why Dataset and DataLoader?</strong></p>
-<ul>
-<li><code>Dataset</code>: wraps your data and defines how to get one sample</li>
-<li><code>DataLoader</code>: handles mini-batching, shuffling, and parallel loading</li>
-<li>Separates data handling from model logic — easy to swap in different datasets</li>
-</ul>
-<div class="warningbox">
-<p><strong>Time series:</strong> do NOT shuffle. Set <code>shuffle=False</code> and use <code>TimeSeriesSplit</code> splits on the underlying indices before creating the Dataset.</p>
-</div>
-</div></div>
+<p><code>Dataset</code> fetches <em>one</em> example; <code>DataLoader</code> handles batching.</p>
+<p><strong>Note <code>shuffle=False</code>.</strong> Nearly every tutorial sets it <code>True</code> — right for images, wrong here. It destroys the ordering your lag features depend on.</p>
 </section>
 <section id="pytorch-defining-the-model" class="slide level2">
 <h2>PyTorch: Defining the Model</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
 <div class="examplebox">
 <div class="examplebox-title">
-<p>Feedforward Regressor</p>
+<p>A two-layer network with dropout</p>
 </div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb2-2"><a href></a></span>
-<span id="cb2-3"><a href></a><span class="kw">class</span> FFNRegressor(nn.Module):</span>
-<span id="cb2-4"><a href></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_dim):</span>
-<span id="cb2-5"><a href></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
-<span id="cb2-6"><a href></a>        <span class="va">self</span>.net <span class="op">=</span> nn.Sequential(</span>
-<span id="cb2-7"><a href></a>            nn.Linear(in_dim, <span class="dv">128</span>),</span>
-<span id="cb2-8"><a href></a>            nn.ReLU(),</span>
-<span id="cb2-9"><a href></a>            nn.Dropout(<span class="fl">0.3</span>),</span>
-<span id="cb2-10"><a href></a>            nn.Linear(<span class="dv">128</span>, <span class="dv">64</span>),</span>
-<span id="cb2-11"><a href></a>            nn.ReLU(),</span>
-<span id="cb2-12"><a href></a>            nn.Dropout(<span class="fl">0.3</span>),</span>
-<span id="cb2-13"><a href></a>            nn.Linear(<span class="dv">64</span>, <span class="dv">1</span>)</span>
-<span id="cb2-14"><a href></a>        )</span>
-<span id="cb2-15"><a href></a></span>
-<span id="cb2-16"><a href></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
-<span id="cb2-17"><a href></a>        <span class="cf">return</span> <span class="va">self</span>.net(x).squeeze(<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb2-18"><a href></a></span>
-<span id="cb2-19"><a href></a>model <span class="op">=</span> FFNRegressor(in_dim<span class="op">=</span>X_train.shape[<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href></a>model <span class="op">=</span> nn.Sequential(</span>
+<span id="cb2-4"><a href></a>    nn.Linear(n_features, <span class="dv">128</span>), nn.ReLU(), nn.Dropout(<span class="fl">0.3</span>),</span>
+<span id="cb2-5"><a href></a>    nn.Linear(<span class="dv">128</span>, <span class="dv">128</span>),        nn.ReLU(), nn.Dropout(<span class="fl">0.3</span>),</span>
+<span id="cb2-6"><a href></a>    nn.Linear(<span class="dv">128</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><div class="column" style="width:44%;">
-<p><strong>Key PyTorch concepts:</strong></p>
-<ul>
-<li><code>nn.Module</code>: base class for all models. Override <code>__init__</code> and <code>forward</code>.</li>
-<li><code>nn.Sequential</code>: chains layers in order</li>
-<li><code>nn.Linear(in, out)</code>: fully connected layer with <span class="math inline">\(in \times out\)</span> weights + bias</li>
-<li><code>nn.ReLU()</code>: element-wise ReLU activation</li>
-<li><code>nn.Dropout(p)</code>: dropout layer</li>
-</ul>
-<div class="keybox">
-<p>The <code>forward</code> method defines what happens on each pass through the network. PyTorch automatically computes gradients via <code>autograd</code>.</p>
-</div>
-</div></div>
+<p>Read it top to bottom and it is the diagram: a linear map, a nonlinearity, some dropout, again, then a linear output with no activation because this is regression.</p>
+<p><code>nn.Sequential</code> chains layers in order and is enough for anything in this lecture. When an architecture needs branching or a skip connection — Lecture 8 — you subclass <code>nn.Module</code> and write <code>forward()</code> yourself.</p>
+<p><span class="neutral smaller"><code>nn.Linear(in, out)</code> holds the weight matrix and bias for one layer. That is where the 22,657 parameters live.</span></p>
 </section>
 <section id="pytorch-the-training-loop" class="slide level2">
 <h2>PyTorch: The Training Loop</h2>
-<div class="columns">
-<div class="column" style="width:52%;">
 <div class="examplebox">
 <div class="examplebox-title">
-<p>Training Loop</p>
+<p>The four steps, per mini-batch</p>
 </div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href></a>optimizer <span class="op">=</span> torch.optim.Adam(</span>
-<span id="cb3-2"><a href></a>    model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>)</span>
-<span id="cb3-3"><a href></a>criterion <span class="op">=</span> nn.MSELoss()</span>
-<span id="cb3-4"><a href></a></span>
-<span id="cb3-5"><a href></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
-<span id="cb3-6"><a href></a>    model.train()</span>
-<span id="cb3-7"><a href></a>    <span class="cf">for</span> X_batch, y_batch <span class="kw">in</span> train_loader:</span>
-<span id="cb3-8"><a href></a>        optimizer.zero_grad()</span>
-<span id="cb3-9"><a href></a>        y_hat <span class="op">=</span> model(X_batch)</span>
-<span id="cb3-10"><a href></a>        loss <span class="op">=</span> criterion(y_hat, y_batch)</span>
-<span id="cb3-11"><a href></a>        loss.backward()</span>
-<span id="cb3-12"><a href></a>        optimizer.step()</span>
-<span id="cb3-13"><a href></a></span>
-<span id="cb3-14"><a href></a>    <span class="co"># Evaluate on validation set</span></span>
-<span id="cb3-15"><a href></a>    model.<span class="bu">eval</span>()</span>
-<span id="cb3-16"><a href></a>    <span class="cf">with</span> torch.no_grad():</span>
-<span id="cb3-17"><a href></a>        val_hat <span class="op">=</span> model(X_val_t)</span>
-<span id="cb3-18"><a href></a>        val_loss <span class="op">=</span> criterion(val_hat, y_val_t)</span>
-<span id="cb3-19"><a href></a>    <span class="bu">print</span>(<span class="ss">f&quot;Epoch </span><span class="sc">{</span>epoch<span class="sc">}</span><span class="ss">: val=</span><span class="sc">{</span>val_loss<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href></a>opt <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>, weight_decay<span class="op">=</span><span class="fl">1e-4</span>)</span>
+<span id="cb3-2"><a href></a>lossfn <span class="op">=</span> nn.MSELoss()</span>
+<span id="cb3-3"><a href></a></span>
+<span id="cb3-4"><a href></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(n_epochs):</span>
+<span id="cb3-5"><a href></a>    model.train()</span>
+<span id="cb3-6"><a href></a>    <span class="cf">for</span> xb, yb <span class="kw">in</span> loader:</span>
+<span id="cb3-7"><a href></a>        opt.zero_grad()                        <span class="co"># 1 clear old gradients</span></span>
+<span id="cb3-8"><a href></a>        loss <span class="op">=</span> lossfn(model(xb).squeeze(), yb) <span class="co"># 2 forward</span></span>
+<span id="cb3-9"><a href></a>        loss.backward()                        <span class="co"># 3 backward</span></span>
+<span id="cb3-10"><a href></a>        opt.step()                             <span class="co"># 4 update weights</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><div class="column" style="width:44%;">
-<p><strong>Four required steps per mini-batch:</strong></p>
-<ol type="1">
-<li><code>zero_grad()</code>: clear accumulated gradients</li>
-<li>Forward pass: compute <span class="math inline">\(\hat{y}\)</span></li>
-<li><code>loss.backward()</code>: compute gradients</li>
-<li><code>optimizer.step()</code>: update weights</li>
-</ol>
-<div class="warningbox">
-<p>Always call <code>model.eval()</code> before validation to disable dropout. Use <code>torch.no_grad()</code> to skip gradient computation during evaluation (saves memory and time).</p>
-</div>
-</div></div>
+<p>Every PyTorch training loop is those four lines with more around them.</p>
+<p><strong>The one that bites:</strong> forget <code>zero_grad()</code> and PyTorch <em>accumulates</em> gradients rather than replacing them. No error, no warning — just a model that trains badly.</p>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="key-takeaways" class="title-slide slide level1 center">
+<h1>Key Takeaways</h1>
+<p>Where a network belongs in the toolkit you now have.</p>
 </section>
 <section id="neural-networks-vs.-tree-methods" class="slide level2">
 <h2>Neural Networks vs. Tree Methods</h2>
@@ -1419,70 +1349,73 @@ Department of Economics
 <thead>
 <tr class="header">
 <th>Method</th>
-<th>Handles sequences</th>
+<th>Sequences</th>
 <th>Extrapolates</th>
-<th>Tuning burden</th>
+<th>Tuning</th>
 <th>Best for</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Random Forest</td>
-<td>No (needs lags)</td>
-<td>No</td>
-<td>Low</td>
-<td>Tabular, fast baseline</td>
+<td>LASSO / Ridge</td>
+<td>no</td>
+<td>yes</td>
+<td>light</td>
+<td>Many correlated predictors</td>
 </tr>
 <tr class="even">
-<td>XGBoost</td>
-<td>No (needs lags)</td>
-<td>No</td>
-<td>Medium</td>
-<td>Tabular, best accuracy</td>
+<td>Random forest</td>
+<td>no</td>
+<td>no</td>
+<td>light</td>
+<td>Tabular, robust default</td>
 </tr>
 <tr class="odd">
-<td>FFN (MLP)</td>
-<td>Partially</td>
-<td>Yes</td>
-<td>Medium</td>
-<td>Tabular + smooth functions</td>
+<td>XGBoost</td>
+<td>no</td>
+<td>no</td>
+<td>moderate</td>
+<td>Tabular, best-in-class</td>
 </tr>
 <tr class="even">
+<td>FFN</td>
+<td>no</td>
+<td>yes</td>
+<td>heavy</td>
+<td>Smooth functions, large <span class="math inline">\(n\)</span></td>
+</tr>
+<tr class="odd">
 <td>RNN / LSTM</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>High</td>
-<td>Sequences, time series</td>
+<td><strong>yes</strong></td>
+<td>yes</td>
+<td>heavy</td>
+<td>Sequences (Lecture 9)</td>
 </tr>
 </tbody>
 </table>
-<div class="keybox">
-<p><strong>When to use an FFN for forecasting:</strong></p>
-<ul>
-<li>You have engineered lag and rolling features (same as XGBoost)</li>
-<li>You want a smooth, continuous forecast function</li>
-<li>Baseline: XGBoost usually wins on small-to-medium tabular data; FFN may win with larger data or more complex patterns</li>
-</ul>
-</div>
+<p><strong>An FFN on lag features is doing the same job as XGBoost on lag features</strong> — same inputs, same flat table, no notion of order. It is not obviously the better tool, and on the evidence of Homework 4 it usually is not <span class="citation" data-cites="James2021">(<a href="#/references" role="doc-biblioref" onclick>James et al. 2023</a>)</span>.</p>
+<p>What changes in the next two lectures is the <em>architecture</em>: convolutions that see local structure, and recurrence that carries state through time. That is when the sequence column above starts saying yes, and it is the reason to learn this machinery now.</p>
 </section>
 <section id="lecture-7-key-takeaways" class="slide level2">
 <h2>Lecture 7: Key Takeaways</h2>
 <div class="keybox">
 <ol type="1">
-<li><p>A <strong>neuron</strong> combines inputs linearly, then applies a nonlinear <strong>activation function</strong> (ReLU, sigmoid, tanh). Without non-linearity, stacking layers is equivalent to one linear layer.</p></li>
-<li><p>A <strong>feedforward network</strong> stacks layers of neurons. Each layer learns higher-level representations. Depth adds capacity; width adds breadth.</p></li>
-<li><p><strong>Training</strong> is iterative: compute loss, backpropagate gradients, update weights with Adam. Use mini-batches for efficiency.</p></li>
-<li><p>The <strong>four mandatory steps</strong> per mini-batch in PyTorch: <code>zero_grad()</code> → forward pass → <code>loss.backward()</code> → <code>optimizer.step()</code>.</p></li>
-<li><p>Prevent overfitting with <strong>dropout</strong>, <strong>weight decay</strong>, and <strong>early stopping</strong> on a held-out validation set.</p></li>
-<li><p>For time series, do not shuffle the DataLoader. Use <strong>TimeSeriesSplit</strong> to create train/val splits.</p></li>
+<li><p>A <strong>neuron</strong> is linear regression wrapped in a nonlinear activation. Without the nonlinearity, stacking layers collapses back to one linear model.</p></li>
+<li><p>An <strong>FFN</strong> stacks those layers. Width and depth set capacity, and capacity accumulates faster than you expect — 22,657 parameters on 5,000 rows.</p></li>
+<li><p><strong>Training</strong> is one loop: loss <span class="math inline">\(\to\)</span> <code>backward()</code> <span class="math inline">\(\to\)</span> <code>step()</code>, on mini-batches, using Adam. You never differentiate by hand.</p></li>
+<li><p><strong>Regularization is not new.</strong> Weight decay is Ridge; dropout and early stopping do the same job by other means. Fifth appearance of one idea.</p></li>
+<li><p>For time series: <strong>do not shuffle</strong> the DataLoader, split by time, and call <code>zero_grad()</code> every batch.</p></li>
+<li><p>An FFN on engineered features is a competitor to XGBoost, <strong>not an upgrade</strong>. Architecture is what earns its keep — next two lectures.</p></li>
 </ol>
 </div>
-<p><em>Next: CNN Architectures — convolutional filters, pooling, and residual connections for structured data.</em></p>
+<p><span class="neutral">Next: CNN architectures — convolution, pooling, and 1D convolutions for time series.</span></p>
 </section>
 <section id="references" class="slide level2 smaller scrollable">
 <h2>References</h2>
-<div id="refs" role="list">
-
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-James2021" class="csl-entry" role="listitem">
+James, Gareth, Daniela Witten, Trevor Hastie, Robert Tibshirani, and Jonathan Taylor. 2023. <em>An Introduction to Statistical Learning with Applications in <span>Python</span></em>. 1st ed. Springer. <a href="https://www.statlearning.com/">https://www.statlearning.com/</a>.
+</div>
 </div>
 
 </section></section>
