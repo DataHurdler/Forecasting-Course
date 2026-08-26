@@ -21,6 +21,7 @@ ECON 8310 Business Forecasting
 
 For questions about homework, please post to the Canvas discussion board so that all students benefit from the answer.
 For personal or grade-related matters, email me directly.
+Under normal circumstances, you should expect a reply from me within 24 hours.
 
 ## Course Description
 **From [Academic Catalog](https://catalog.unomaha.edu/undergraduate/coursesaz/econ/)**: The course will cover forecasting tools and applications applied to business settings. The first half of the course will cover traditional Econometric forecasting methods and the second half of the course will focus on predictive analytics models and machine learning. Time in the computer lab will be focused on teaching students how to implement the models discussed in lectures.
@@ -35,7 +36,7 @@ In the summer of 2022, I left academia and worked as a senior data scientist at 
 I returned to the University of Nebraska at Omaha as an assistant professor of economics in Fall 2025.
 You can learn more about my teaching, research, and hobbies on my personal website: [https://www.luozijun.com/](https://www.luozijun.com/).
 
-## 20-Minute In-Person Meeting
+## 10-Minute In-Person Meeting
 1. Go to [this link](https://docs.google.com/spreadsheets/d/1hAtn20hMbHiHCeosNgofzSXGSkyp6vmOUbZsiGwit8I/edit?usp=sharing)
 2. Pick a green slot that works for you and make it into a color other than red or green. This way, your classmates know someone has signed up for that spot
 3. Add the time to your calendar
@@ -100,6 +101,7 @@ Two further free resources, both referenced in our materials:
 
 Per-week readings are in the **weekly schedule** at the end of this syllabus.
 
+<!--
 ### What the Textbook Does *Not* Cover
 The textbook is our anchor, not our boundary. Several topics we cover have no FPP chapter, and for those the lecture slides are your primary source:
 
@@ -115,6 +117,7 @@ The textbook is our anchor, not our boundary. Several topics we cover have no FP
 - **The internals of neural architectures (Lectures 7–9).** FPP-Py Ch. 14 is written at the level of *which model to use and how to call it* through the `neuralforecast` library. We go a layer deeper — backpropagation, convolution arithmetic, LSTM gates, scaled dot-product attention — and write our models directly in PyTorch.
 
 **A warning about the word "hierarchical."** FPP Chapter 11 is titled *Forecasting hierarchical and grouped time series*, and Lecture 11 is *Bayesian Statistics II — Time Series & Hierarchical Models*. **These are different things.** FPP Ch. 11 is about forecast reconciliation: making forecasts of sub-series add up to forecasts of their totals. Our Lecture 11 is about partial pooling, where groups share information through a common prior. Chapter 11 is genuinely worth reading, but do not read it expecting Lecture 11.
+-->
 
 ## Software
 All lecture code and all assignments use Python. You should have a working Python 3.10+ environment with the following packages before the first class:
@@ -124,11 +127,9 @@ jupyter, pandas, numpy, matplotlib, statsmodels, prophet, pygam,
 scikit-learn, xgboost, torch, pymc, arviz
 ```
 
-**`jupyter` is not optional.** Quarto runs your Python through a Jupyter kernel, so without it
-`quarto render` fails before executing a single cell — even though nothing in your code imports it.
+**`jupyter` is not optional.** Quarto runs your Python through a Jupyter kernel, so without it `quarto render` fails before executing a single cell — even though nothing in your code imports it.
 
-**macOS users need one extra step for XGBoost:** `brew install libomp`, once, before Week 5.
-Without it `import xgboost` fails with an OpenMP error.
+**macOS users need one extra step for XGBoost:** `brew install libomp`, once, before Week 5. Without it `import xgboost` fails with an OpenMP error.
 
 Installation instructions and a test script are provided in the course repository.
 
@@ -182,7 +183,7 @@ Exceptions for any assignment should be communicated at least 24 hours ahead of 
 No late homework is otherwise accepted.
 
 All homework is submitted through the course repository, and is due **before class begins** on the date shown in the weekly schedule.
-A submission pushed after that time is late and willnot be accepted.
+A submission pushed after that time is late and will not be accepted.
 
 <!--
 ### Homework
@@ -224,24 +225,16 @@ For each assignment, your submission folder must contain **four** things:
 | `PROMPT_LOG.jsonl` | Every Codex interaction for that assignment, one JSON object per line |
 | `INITIAL_PROMPT.md` | The context prompt you pasted at the start of the session |
 
-Assignments that ask for a business recommendation also require a short **`REPORT.md`**. The
-weekly schedule says which.
+Assignments that ask for a business recommendation also require a short **`REPORT.md`**.
 
-**Naming and placement.** One folder per submission, named for the assignment exactly as it
-appears in the schedule — `hw01_part1`, `hw05_part2`, and so on. The validation script in the
-environment repository checks this for you before you push; run it.
+**Naming and placement.** One folder per submission, named for the assignment exactly as it appears in the schedule — `hw01_part1`, `hw05_part2`, and so on. The validation script in the environment repository checks this for you before you push; run it.
 
 **Commits.** Make one commit per Codex prompt, with the message
-`hw05 prompt 3: fit the LSTM and report RMSE`. The commit history is part of the record: it shows
-where the work came from and in what order, and it is what makes the prompt budget meaningful
-rather than an honour system.
+`hw05 prompt 3: fit the LSTM and report RMSE`. The commit history is part of the record: it shows where the work came from and in what order, and it is what makes the prompt budget meaningful rather than an honour system.
 
-**Timing.** Due **before class begins** on the date in the weekly schedule. Push time is
-submission time — a push at 6:01pm on the due date is late. Exceptions need at least 24 hours'
-notice unless it is a genuine emergency.
+**Timing.** Due **before class begins** on the date in the weekly schedule. Push time is submission time — a push at 6:01pm on the due date is late. Exceptions need at least 24 hours' notice unless it is a genuine emergency.
 
-**The single most common way to lose points** is submitting a `.qmd` that does not render.
-Restart your kernel and render the whole document before you push, every time.
+**The single most common way to lose points** is submitting a `.qmd` that does not render. Restart your kernel and render the whole document before you push, every time.
 
 ### Final Project
 The final project is completed in **groups of no more than 3 students** and is worth 100 points — a quarter of the course grade.
@@ -307,8 +300,6 @@ The grading rubric will be distributed by Week 6.
 | Final project | 100 | 25% |
 | **Total** | **400** | |
 
-Students with full attendance will be awareded 10 extra points. There are time-sensitive extra point opportunities throughout the semester. Please pay attention to annoucements in-class or on Canvas.
-
 Your letter grade will be assigned as follows:
 - A: 360 points or higher
 - B: 320-359 points
@@ -326,15 +317,6 @@ Use office hours early and often.
 
 ## Important Dates
 See the [UNO Academic Calendar](https://www.unomaha.edu/registrar/academic-calendar.php) for all important dates.
-
-Dates that affect this course specifically:
-
-- **Sep. 24, 2026** — no in-person meeting; Week 5 is delivered online (see the schedule below)
-- **Nov. 26, 2026** — Thanksgiving break, no class
-- **Dec. 17, 2026** — final project presentations
-- **Dec. 18, 2026** — final project report due
-
-Withdrawal deadlines and university closures are on the academic calendar linked above.
 
 <!--
 ## CBA Business Core Three-Attempt Rule
@@ -408,6 +390,7 @@ Assignments are due **before class begins**. Readings are listed under each week
 
 **Week 13 · Nov 19** — Lecture 11 Part 2: Bayesian Statistics II — Hierarchical Models
 *Reading:* BMCP §4.5–4.6 (pooling, multilevel and hierarchical models)
+*Not this:* FPP Ch. 11 is also titled *hierarchical*, but it is about forecast **reconciliation** — making sub-series forecasts add up to their totals. This week is about partial pooling, where groups share information through a common prior. Different topic; read Ch. 11 on its own terms, not as preparation for this lecture.
 *Due:* Homework 6 Part 1
 
 **Week 14 · Nov 26** — **Thanksgiving break, no class**
@@ -420,9 +403,7 @@ Assignments are due **before class begins**. Readings are listed under each week
 *Reading:* FPP Ch. 13
 *Due:* Homework 7
 
-**Week 17 · Dec 17** — **Final project presentations**
+**Final Exam Week · Dec 17** — **Final project presentations** (5:30-7:30pm)
 
 **Dec 18** — **Final project report due**
-
-From Lecture 7 onward the FPP readings exist **only in the Python edition**. Where the two
-editions number a section differently, both numbers are given above.
+Please try your best to submit early.

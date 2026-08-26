@@ -289,7 +289,7 @@ difference matters when you have groups with very different amounts of data.
 
 - [ ] All code cells run without errors from top to bottom
 - [ ] Written responses completed in your own words
-- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw06_<your_name>/`
+- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw06_part2_<your_name>/`
 - [ ] `PROMPT_LOG.jsonl` complete with **9 or fewer** entries for Part 2
 - [ ] One git commit per Codex prompt (`hw06 prompt <id>: <short summary>`)
 - [ ] `REPORT.md` with a clear business recommendation

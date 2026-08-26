@@ -252,3 +252,10 @@ Retrain the CNN at windows of **13, 26 and 52** weeks. Report test RMSE for each
 
 ---
 
+## Submission Checklist
+
+- [ ] All code cells run without errors from top to bottom
+- [ ] Written responses completed in your own words
+- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw05_part1_<your_name>/`
+- [ ] `PROMPT_LOG.jsonl` complete with **9 or fewer** entries for Part 1
+- [ ] One git commit per Codex prompt (`hw05 prompt <id>: <short summary>`)

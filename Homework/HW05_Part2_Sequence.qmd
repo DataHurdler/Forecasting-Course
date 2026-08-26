@@ -212,3 +212,10 @@ class TransformerForecaster(nn.Module):
 
 ---
 
+## Submission Checklist
+
+- [ ] All code cells run without errors from top to bottom
+- [ ] Written responses completed in your own words
+- [ ] `INITIAL_PROMPT.md` saved in `submissions/hw05_part2_<your_name>/`
+- [ ] `PROMPT_LOG.jsonl` complete with **10 or fewer** entries for Part 2
+- [ ] One git commit per Codex prompt (`hw05 prompt <id>: <short summary>`)
