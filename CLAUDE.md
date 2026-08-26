@@ -49,6 +49,10 @@ BIBINPUTS=..:$BIBINPUTS bibtex file
 TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
 TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
 
+# The published course URL lives in ONE place: scripts/course_url.txt
+python scripts/set_course_url.py                       # show it + where it appears
+python scripts/set_course_url.py https://new.host/path/ # rewrite all of them, then re-render
+
 # Publish to GitHub Pages (docs/). Targets: all | slides | labs | homework | docs | LectureNN
 ./scripts/sync_to_docs.sh            # everything -- slow, labs fit real models
 ./scripts/sync_to_docs.sh slides     # mirrors + Beamer PDFs only
