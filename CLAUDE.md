@@ -49,8 +49,14 @@ BIBINPUTS=..:$BIBINPUTS bibtex file
 TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
 TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
 
-# Deploy Quarto to GitHub Pages
-./scripts/sync_to_docs.sh LectureNN_Title
+# Publish to GitHub Pages (docs/). Targets: all | slides | labs | homework | docs | LectureNN
+./scripts/sync_to_docs.sh            # everything -- slow, labs fit real models
+./scripts/sync_to_docs.sh slides     # mirrors + Beamer PDFs only
+./scripts/sync_to_docs.sh Lecture07  # one lecture
+
+# Beamer <-> Quarto parity: every deck's frame count must equal its mirror's '## ' count
+python scripts/check_mirror_parity.py                 # all decks
+python scripts/check_mirror_parity.py LectureNN_Name  # + list that deck's frame titles
 
 # Quality score
 python scripts/quality_score.py Quarto/LectureNN_Title.qmd
