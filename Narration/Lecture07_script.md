@@ -1,0 +1,520 @@
+# Lecture 7 — Recording Script
+
+**ECON 8310: Business Forecasting · Introduction to Neural Networks**
+
+Deck: `Slides/Lecture07_NeuralNets.pdf` (20 pages) · Measured runtime: see the timing guide
+
+---
+
+## How to use this document
+
+- **`▶ SLIDE n — Title`** marks where to advance. The number is the PDF page.
+- *Italic parentheticals* are stage directions. **[pause]** means stop for a beat.
+- This lecture opens the second half of the course, and it has an unusual job: it teaches
+  machinery that will **lose** on our data. Do not oversell it. The honesty on slide 4 is what
+  makes Lectures 8 and 9 land, and it is what students remember.
+
+---
+
+# ▶ SLIDE 1 — Title page
+
+Lecture 7: Introduction to Neural Networks.
+
+This is the start of the second half of the course, and I want to set expectations before we
+begin, because this topic arrives with more hype attached than anything else we'll cover.
+
+For the last three weeks you've been building tree models — random forests, gradient boosting,
+regularized regression. Those work extremely well on the kind of data we have. Today we start on
+neural networks, and by the end of the next two lectures you will have fitted several of them.
+
+**[pause]**
+
+Here's what I want you to hold onto. Nothing today makes your XGBoost model obsolete. On our
+data, the networks are going to lose. What today buys you is the machinery — and the machinery
+matters because of what we do with it in Lectures 8 and 9, where the *architecture* starts
+carrying assumptions that a flat table cannot.
+
+---
+
+# ▶ SLIDE 2 — Lecture Outline
+
+Five parts. First, why you'd go beyond trees at all — and when you shouldn't. Then the
+feedforward network itself: layers, width, depth, and how quickly the parameter count runs away
+from you. Then training — loss, backpropagation, the update step. Then PyTorch, which is four
+pieces you'll use in every deep learning assignment for the rest of the semester. And then where
+a network actually belongs in the toolkit you now have.
+
+---
+
+# ▶ SLIDE 3 — Section divider: From Trees to Neural Networks
+
+*(Advance and read the subtitle aloud — it's the thesis of the whole lecture.)*
+
+Trees predict in steps. Networks predict in curves. And that difference buys you less than you
+would expect on tabular data, and everything on sequences.
+
+---
+
+# ▶ SLIDE 4 — Why Go Beyond Trees?
+
+Two honest reasons, and one honest warning.
+
+The first reason: a tree-based model treats every row as independent. Order is not part of the
+model. Everything a random forest knows about *time* — that last week matters, that fifty-two
+weeks ago matters — you put there by hand, as lag columns and rolling means. If you shuffled the
+feature columns, the model would be identical.
+
+The second reason: a tree's prediction is **piecewise constant**. Remember Lab 4, where the tree
+could not predict above the largest value it had ever seen? That's not a bug in our
+implementation. It is what a tree is. It averages training values in a leaf, so it cannot
+extrapolate. A neural network learns a smooth, continuous function, and it can.
+
+**[pause]**
+
+Now the warning, and I want to be blunt about it.
+
+*(Point at the warning box.)*
+
+This is **not an upgrade**. On the tabular problems in Homework 3 and Homework 4, gradient
+boosting and a tuned LASSO were hard to beat, and a network will often lose to both. You reach
+for a network when the data is genuinely a sequence, when the raw input is an image or audio, or
+when your sample size is very large. Otherwise you are paying in tuning time for accuracy you
+will not get.
+
+So today is about the machinery. Lectures 8 and 9 are where it earns its place.
+
+---
+
+# ▶ SLIDE 5 — From Linear Regression to a Single Neuron
+
+Let's build the thing from something you already know.
+
+Linear regression predicts y-hat equals w-transpose x plus b. A weighted sum of your predictors,
+plus an intercept. You've been fitting that since Lecture 2.
+
+A **neuron** is that exact expression with one addition: a nonlinear function wrapped around the
+outside. We call that function the **activation**, and we write it sigma.
+
+So: a equals sigma of w-transpose x plus b. That's it. That is the entire unit.
+
+*(Walk the activation table.)*
+
+Four activations you'll meet. **ReLU** — max of zero and z — is the default for hidden layers.
+**Sigmoid** squashes to between zero and one; you'll see it again in Lecture 9 as an LSTM gate.
+**Tanh** squashes to between minus one and one, and shows up in sequence states. And **linear**,
+which is just z — that's your output layer when you're doing regression, because you don't want
+to squash a forecast.
+
+**[pause]**
+
+ReLU is worth a sentence of intuition, because it makes the whole thing concrete. The neuron is
+asking a question: *is this pattern present?* If the evidence is positive, it passes a signal
+through, proportional to how positive. If the evidence is negative, it outputs exactly zero and
+stays silent. That's a detector.
+
+**[pause]**
+
+And that "exactly zero" is doing more work than it looks. Because ReLU switches fully off, a
+trained network is **sparse** at any given input — most neurons contribute nothing, and the ones
+that fire are the ones whose pattern is present. That sparsity is part of why ReLU trains faster
+than sigmoid: a sigmoid never quite switches off, so every unit is always slightly involved in
+every prediction, and its gradient gets very small at both extremes.
+
+One thing to watch on the output layer. It is genuinely tempting to put an activation there
+because every other layer has one. Don't. A ReLU on the output would make negative forecasts
+impossible, which sounds harmless until you remember we often model *log* units or *differences*,
+where negative is exactly what you want. Regression output layers stay linear.
+
+---
+
+# ▶ SLIDE 6 — Why the Nonlinearity Is the Whole Trick
+
+I want to be precise about what that sigma actually buys, because it is easy to assume that
+*depth* is what makes a network powerful. It is not.
+
+*(Point at the definition box.)*
+
+Here is the thing to understand. A linear function of a linear function is linear. If you stack
+two layers with no activation between them, you get W-two times W-one times x — and W-two times
+W-one is just some other matrix. So you have a single matrix, applied once. You've built a linear
+model with extra steps and a slower fitting procedure.
+
+Depth alone gains you **nothing**.
+
+**[pause]**
+
+Put a nonlinearity between the layers and the picture changes completely. There's a result called
+the **universal approximation theorem** which says a network with a single hidden layer can
+approximate any continuous function to arbitrary accuracy, given enough neurons.
+
+Now — read that claim carefully, because it is quoted far more often than it is understood.
+
+It says the network **can represent** the function. It does not say your optimizer will find it.
+It does not say you have enough data to identify it. And it certainly does not say the result
+will generalize to next quarter.
+
+Existence is not estimation. You've already met that gap: in Lecture 4 we said the optimal
+decision tree exists, and CART builds a greedy one instead, because finding the optimal one is
+computationally hopeless. Same shape of problem, different setting.
+
+**[pause]**
+
+There's a practical reading of the theorem too, and it's more useful than the theoretical one.
+The theorem is about a *single* hidden layer, made arbitrarily wide. In practice nobody builds
+that. Everybody builds narrow-and-deep instead, because depth composes features — layer two
+builds on what layer one found, rather than starting over — and that turns out to need far fewer
+total neurons for the same job.
+
+So when someone tells you "neural networks are universal approximators," the correct response is
+that so are polynomials, and so are splines, and you would not use a degree-forty polynomial to
+forecast demand. Being able to represent everything is not by itself a recommendation. What
+matters is whether the shape the model prefers matches the shape your data actually has — which
+is exactly the theme of the next two lectures.
+
+---
+
+# ▶ SLIDE 7 — Section divider: Feedforward Networks
+
+Stack layers of neurons, and each layer learns a higher-level representation of the one below it.
+
+---
+
+# ▶ SLIDE 8 — Feedforward Network: Layers and Forward Pass
+
+A **feedforward network** — you'll also see it called an FFN or a multilayer perceptron — is
+three things in sequence.
+
+An **input layer**, which is just your raw features. Some number of **hidden layers**, each one
+applying that neuron equation to the layer below it — matrix multiply, add a bias, apply the
+activation. And an **output layer**, which for regression is linear, no activation.
+
+Two words you need. **Width** is how many neurons are in a layer. **Depth** is how many hidden
+layers you have. Together they set the model's capacity — the range of functions it can represent.
+
+*(Point at the key box.)*
+
+Sensible starting sizes for forecasting: two to three hidden layers, sixty-four to two hundred
+fifty-six neurons each, ReLU activations, dropout somewhere between zero-point-two and
+zero-point-five.
+
+**Start at the small end of every one of those ranges.**
+
+**[pause]**
+
+Because here's the trap. Bigger is not better on its own. A wider or deeper network needs *more
+data* and *more regularization* to reach the same generalization. So you add capacity when
+validation error tells you the current model is genuinely too simple — not because the capacity
+is available and it's one keystroke away.
+
+**[pause]**
+
+Here's the diagnostic that tells you which way to move. Look at training error and validation
+error together. If **both** are bad, your model is too simple — add width or depth. If training
+error is excellent and validation error is poor, you have the opposite problem, and more capacity
+will make it worse; you need more regularization, or more data, or fewer features.
+
+That's the bias-variance picture from Lecture 4, and it does not change just because the model
+has twenty thousand parameters instead of twenty leaves. Only the knobs change.
+
+The reason I push you toward the small end is practical. A small network that underfits tells you
+so clearly and trains in seconds. A large network that overfits produces a beautiful training
+curve and a forecast you shouldn't ship, and it takes ten times as long to discover that.
+
+---
+
+# ▶ SLIDE 9 — How Big Is This Model, Actually?
+
+Capacity is easy to add by accident, so let's count it once, properly.
+
+A layer mapping m inputs to n outputs holds m times n weights, plus n biases. That's it — that's
+the whole formula.
+
+*(Walk the table.)*
+
+Take a network for our weekly panel. Forty-six engineered features going in — the same features
+you built for Homework 4. Two hidden layers of a hundred twenty-eight. One output.
+
+Input to hidden one: forty-six times one hundred twenty-eight, that's six thousand and sixteen
+parameters. Hidden one to hidden two: one twenty-eight squared, sixteen thousand five hundred
+twelve. Hidden two to output: one hundred twenty-nine.
+
+Total: **twenty-two thousand six hundred fifty-seven parameters.**
+
+**[pause]**
+
+Now sit with that number for a second. We have about five thousand rows of training data. That's
+roughly **four parameters for every observation**.
+
+In Lecture 6 I described sixty predictors on a hundred and fifty observations as a crisis — the
+situation where ordinary least squares falls apart and you *must* regularize. This is far past
+that ratio. And networks train in this regime routinely, every day, in production.
+
+What makes it survivable is not the architecture. It's the regularization. Which is next.
+
+---
+
+# ▶ SLIDE 10 — Section divider: Training — Loss and Backpropagation
+
+Compute the error, propagate it backward, adjust every weight by its share of the blame. Repeat.
+
+---
+
+# ▶ SLIDE 11 — Training: Loss, Gradients, and the Update Step
+
+Training is one loop, repeated. Three steps.
+
+**First**, compute the loss. For regression that's mean squared error — the average squared gap
+between prediction and truth. Nothing new.
+
+**Second**, backpropagation. You work *backward* through the network, using the chain rule from
+calculus to assign each weight its share of the error. That's all backprop is: the chain rule,
+applied systematically, right to left.
+
+**Third**, you nudge every weight against its gradient. W becomes W minus eta times the
+derivative of the loss with respect to W. Eta is the **learning rate** — how big a step you take.
+
+*(Point at the definition box.)*
+
+One refinement. Rather than using the whole dataset to compute each update, you use a random
+**mini-batch** — typically thirty-two to two hundred fifty-six rows. The steps are noisier, but
+you take far more of them and each one is much cheaper. That's **stochastic gradient descent**.
+One full pass through every batch is called an **epoch**.
+
+**[pause]**
+
+And here's the practical part: **you never differentiate anything by hand.** Calling
+`loss.backward()` does the entire backward pass for you. That's what a deep learning framework
+*is*, fundamentally — it records every operation you performed on the way forward so it can walk
+that record backward and apply the chain rule automatically.
+
+**[pause]**
+
+Two words about the learning rate, because it is the hyperparameter that will waste the most of
+your time if you get it wrong.
+
+Too large, and the loss jumps around or diverges outright — you overshoot the minimum on every
+step. Too small, and training is correct but glacial, and you'll conclude the model doesn't work
+when actually you just didn't wait. If your loss curve is spiky or turns into `nan`, lower the
+learning rate by a factor of ten before you change anything else.
+
+In practice you won't use plain SGD anyway. `torch.optim.Adam` with a learning rate of
+one-e-minus-three adapts the step size separately for each parameter, and it is the sensible
+default for everything in this course. It is more forgiving of a badly chosen learning rate than
+plain SGD, which is most of why it became standard.
+
+---
+
+# ▶ SLIDE 12 — Preventing Overfitting — Where Lecture 6 Returns
+
+Twenty-two thousand parameters on five thousand rows will memorize the training set unless
+something stops it. Three things do — and **you have already met two of them.**
+
+*(Walk the table slowly. This slide is the point of the lecture.)*
+
+`weight_decay`. This is **Ridge regression**. It is an L2 penalty on the network's weights, under
+a different name, passed as an argument to the optimizer. Same mathematics, same effect, new
+label.
+
+`nn.Dropout(p)`. On each forward pass, randomly zero out a fraction p of the neuron outputs. The
+consequence is that no neuron can rely on any specific other neuron being present, so the network
+can't build fragile chains of dependency. At test time you turn it off and all neurons are active.
+
+**Early stopping.** Watch validation loss every epoch. When it stops improving for some number of
+epochs, stop — and critically, keep the weights from the *best* epoch, not the last one.
+
+**[pause]**
+
+*(Now the callback. Slow down here.)*
+
+That is the **fifth appearance of one idea** in this course.
+
+The GAM smoothing penalty in Lecture 3, which penalized wiggliness. Cost-complexity pruning in
+Lecture 4, which penalized the number of leaves. `reg_lambda` in Lecture 5, penalizing leaf
+weights. Ridge and LASSO in Lecture 6, penalizing coefficient size. And now weight decay,
+penalizing network weights.
+
+Five model families that look nothing like each other. One bargain underneath: **fit against
+complexity, with a single parameter setting the exchange rate, chosen by validation.**
+
+You'll see it a sixth time in Lecture 11, and there it will be the cleanest version of all.
+
+---
+
+# ▶ SLIDE 13 — Section divider: PyTorch Implementation
+
+Four pieces: a Dataset, a DataLoader, a model, and a training loop.
+
+---
+
+# ▶ SLIDE 14 — PyTorch: Dataset and DataLoader
+
+*(This is the first of three code slides. Read the structure, not every character.)*
+
+Two objects. A `Dataset` knows how to fetch **one** example — you give it `__len__` so it knows
+how many there are, and `__getitem__` so it can hand back item i. A `DataLoader` wraps that and
+handles batching, so your training loop can just iterate.
+
+You'll write this exact class, or something very close to it, in Homework 5.
+
+**[pause]**
+
+*(Now the important part.)*
+
+Look at `shuffle=False`.
+
+Nearly every PyTorch tutorial you find online sets that to `True`. For image classification that
+is correct — the order of your cat photos is meaningless, and shuffling helps.
+
+For us it is **wrong**, and it will quietly damage your model. Our rows are ordered in time, and
+the lag features depend on that ordering. Shuffling destroys it.
+
+This is the same discipline as `TimeSeriesSplit` instead of `KFold`, from Lecture 5. The default
+in the tooling assumes your rows are exchangeable. Ours are not.
+
+**[pause]**
+
+And notice the failure mode, because it's the one this course keeps returning to. Setting
+`shuffle=True` does not raise an error. It does not warn you. Your model trains, your loss goes
+down, and you get a number — a number that is better than it should be, because you have quietly
+let the model see the future.
+
+That is the same class of error as `KFold` on a time series, as scaling outside the fold, as an
+unshifted rolling feature. None of them crash. All of them return a better-looking answer than
+you deserve. Which is exactly why the discipline has to be procedural: you check these things
+because they're on a list, not because something broke.
+
+---
+
+# ▶ SLIDE 15 — PyTorch: Defining the Model
+
+Here is the network from slide 9, in five lines.
+
+Read it top to bottom and it *is* the diagram. A linear map to a hundred twenty-eight units. A
+ReLU. Some dropout. Then again — linear, ReLU, dropout. Then a final linear layer down to one
+output, with no activation on it, because this is regression and we don't want to squash the
+forecast.
+
+`nn.Sequential` chains layers in order, and it is enough for anything in this lecture. When you
+need an architecture that branches, or that has a skip connection — which is Lecture 8 — you'll
+subclass `nn.Module` and write the `forward()` method yourself.
+
+*(Point at the muted footnote.)*
+
+And `nn.Linear(in, out)` is where the weight matrix and bias vector actually live. That's where
+those twenty-two thousand six hundred fifty-seven parameters are sitting.
+
+---
+
+# ▶ SLIDE 16 — PyTorch: The Training Loop
+
+And here is the loop. Four steps per mini-batch, and every PyTorch training loop you will ever
+read is these four lines with more scaffolding around them.
+
+`zero_grad` — clear the old gradients. Forward pass and compute the loss. `backward` — compute
+the new gradients. `step` — update the weights.
+
+That's it. Set up the optimizer with Adam, learning rate one-e-minus-three, weight decay
+one-e-minus-four — there's your Ridge penalty. Loss function is MSE.
+
+**[pause]**
+
+*(The last paragraph is the one worth emphasizing.)*
+
+Now the one that bites people.
+
+If you forget `zero_grad()`, PyTorch does not raise an error. It does not warn you. What it does
+is **accumulate** gradients across batches instead of replacing them — because gradient
+accumulation is a legitimate technique that some people want deliberately.
+
+So your model trains. It just trains badly, and you have no idea why.
+
+We will do this deliberately in the lab, so you can see what the loss curve looks like when it
+happens. It is worth seeing once in a controlled setting rather than at eleven at night before a
+deadline.
+
+---
+
+# ▶ SLIDE 17 — Section divider: Key Takeaways
+
+Where a network belongs in the toolkit you now have.
+
+---
+
+# ▶ SLIDE 18 — Neural Networks vs. Tree Methods
+
+*(Walk the table across, then land on the paragraph below it.)*
+
+Five methods, four questions. Does it see sequences? Can it extrapolate beyond the training
+range? How much tuning does it need? And what is it actually for?
+
+LASSO and Ridge: no sequences, but they extrapolate, they need almost no tuning, and they're your
+answer when you have many correlated predictors. Random forest: no sequences, no extrapolation,
+light tuning, and it's the robust tabular default. XGBoost: same, more tuning, best-in-class
+accuracy on tabular data. The feedforward network: still no sequences, extrapolates, heavy
+tuning, and it's for smooth functions when n is large. And RNNs and LSTMs — which is Lecture 9 —
+finally say **yes** in that first column.
+
+**[pause]**
+
+Here's the sentence I want you to leave with.
+
+An FFN on lag features is doing **the same job** as XGBoost on lag features. Same inputs, same
+flat table, no notion of order in either one. It is not obviously the better tool, and on the
+evidence of Homework 4 it usually is not.
+
+What changes over the next two lectures is not the fitting procedure. It's the **architecture** —
+convolutions that see local structure, and recurrence that carries state through time. That is
+when the sequence column starts saying yes, and it is precisely why we learned this machinery
+today.
+
+**[pause]**
+
+One more column worth dwelling on: **extrapolation**.
+
+Trees and forests say no, and that's not a tuning problem — it's structural. A tree predicts by
+averaging the training values that landed in a leaf, so it physically cannot output a number
+larger than the largest one it has seen. If your series is trending upward, a random forest will
+forecast a flat line at the top of its training range, forever.
+
+The linear models and the networks say yes. A LASSO fit with a trend term will happily project
+that trend forward. So will a network.
+
+Whether that is a *feature* depends entirely on whether the trend is real. Extrapolating a
+genuine trend is the right answer. Extrapolating a temporary run-up is how forecasts embarrass
+people. The model cannot tell the difference — that judgement is yours, and it's the kind of
+thing a DAG in Lecture 12 helps you reason about.
+
+---
+
+# ▶ SLIDE 19 — Lecture 7: Key Takeaways
+
+*(Six points. Read them at a steady pace; don't rush the last two.)*
+
+One. A neuron is linear regression wrapped in a nonlinear activation — and without that
+nonlinearity, stacking layers collapses back to a single linear model.
+
+Two. An FFN stacks those layers. Width and depth set capacity, and capacity accumulates faster
+than you expect. Twenty-two thousand parameters on five thousand rows.
+
+Three. Training is one loop: loss, `backward()`, `step()`, on mini-batches, using Adam. You never
+differentiate by hand.
+
+Four. Regularization is not new. Weight decay *is* Ridge; dropout and early stopping do the same
+job by other means. That's the fifth appearance of one idea.
+
+Five. For time series specifically: do not shuffle the DataLoader, split by time, and call
+`zero_grad()` every batch.
+
+And six — the one that matters most. An FFN on engineered features is a **competitor** to
+XGBoost, not an upgrade. Architecture is what earns its keep, and that starts next week.
+
+**[pause]**
+
+Next time: CNN architectures. Convolution, pooling, and what a one-dimensional convolution does
+to a time series.
+
+---
+
+# ▶ SLIDE 20 — References
+
+*(Advance and close. No narration needed.)*
