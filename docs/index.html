@@ -68,6 +68,14 @@
   .note { display: inline-block; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
           font-size: .72em; font-weight: 600; background: var(--gray); color: #fff;
           padding: .12em .55em; border-radius: 3px; }
+  .due a { color: #fff; border-bottom: none; }
+  .due a:hover { border-bottom: 1px solid rgba(255,255,255,.7); }
+  .wassign { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: .85em;
+             margin: .1em 0 .55em; padding: .35em .7em; background: var(--tint);
+             border-left: 3px solid var(--crimson); border-radius: 0 3px 3px 0; }
+  .wassign .lab { font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+                  font-size: .82em; color: var(--crimson); margin-right: .4em; }
+  .wassign .dueon { color: var(--gray); }
 
   table { border-collapse: collapse; width: 100%; margin: 1.2em 0; font-size: .93em; }
   th { text-align: left; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -108,6 +116,34 @@ comes from, and why it is in the course (read before Homework 1); and
 <a href="files/project-rubric.html"><strong>Final project rubric</strong></a> &mdash; how all 100 project
 points are awarded.</p>
 
+<h2>Textbooks</h2>
+
+<p>All are free online. None needs to be purchased.</p>
+
+<table>
+  <tr><th>Book</th><th>Used for</th></tr>
+  <tr>
+    <td><a href="https://otexts.com/fpppy/">FPP-Py</a> &mdash; <em>Forecasting: Principles and
+      Practice, the Pythonic Way</em></td>
+    <td>Lectures 1&ndash;3; the primary text</td>
+  </tr>
+  <tr>
+    <td><a href="https://otexts.com/fpp3/">FPP3</a> &mdash; the R edition</td>
+    <td>Same material, R code. Chapter 12 is numbered differently &mdash; both numbers are
+      always given</td>
+  </tr>
+  <tr>
+    <td><a href="https://www.statlearning.com/">ISLP</a> &mdash; <em>An Introduction to
+      Statistical Learning with Applications in Python</em></td>
+    <td>Lectures 4&ndash;6. FPP covers no tree methods and no regularization; this fills that gap</td>
+  </tr>
+  <tr>
+    <td><a href="https://bayesiancomputationbook.com/">BMCP</a> &mdash; <em>Bayesian Modeling and
+      Computation in Python</em></td>
+    <td>Lectures 10&ndash;12. PyMC and ArviZ throughout, which is what we use</td>
+  </tr>
+</table>
+
 <h2>Before the first lab</h2>
 
 <p>Every lab and homework in this course reads from prepared data files that are <em>not</em> in the
@@ -139,6 +175,7 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
   <div class="whead"><span class="wnum">Week 1</span><span class="wdate">Aug 27, 2026</span></div>
   <span class="wtitle">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span>
   <div class="wread"><strong>Reading:</strong> FPP Ch. 1, Ch. 2, §5.1&ndash;5.10, Ch. 8</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW01_Part1_ETS.html">Assignment 1 Part 1</a><span class="dueon"> &mdash; due Week 2 &middot; Sep 3</span></div>
   <div class="wlinks">
     <a href="slides/Lecture01_ETS_Eval.html">Slides</a><span class="sep">|</span><a href="slides/Lecture01_ETS_Eval.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture01_lab.html">Lab 1</a>
@@ -147,9 +184,10 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 2</span><span class="wdate">Sep 3, 2026</span>
-    <span class="due">Assignment 1 Part 1 due</span></div>
+    <span class="due"><a href="homework/HW01_Part1_ETS.html">Assignment 1 Part 1 due</a></span></div>
   <span class="wtitle">ARIMA, VAR &amp; Multivariate Models</span>
   <div class="wread"><strong>Reading:</strong> FPP Ch. 9, §10.1&ndash;10.3, §10.6, §12.3</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW01_Part2_ARIMA_VAR.html">Assignment 1 Part 2</a><span class="dueon"> &mdash; due Week 3 &middot; Sep 10</span></div>
   <div class="wlinks">
     <a href="slides/Lecture02_ARIMA_VAR.html">Slides</a><span class="sep">|</span><a href="slides/Lecture02_ARIMA_VAR.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture02_lab.html">Lab 2</a>
@@ -159,9 +197,10 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 3</span><span class="wdate">Sep 10, 2026</span>
-    <span class="due">Assignment 1 Part 2 due</span></div>
+    <span class="due"><a href="homework/HW01_Part2_ARIMA_VAR.html">Assignment 1 Part 2 due</a></span></div>
   <span class="wtitle">Generalized Additive Models</span>
   <div class="wread"><strong>Reading:</strong> FPP §7.4, §7.7, §12.1&ndash;12.2</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW02_GAMs.html">Assignment 2</a><span class="dueon"> &mdash; due Week 4 &middot; Sep 17</span></div>
   <div class="wlinks">
     <a href="slides/Lecture03_GAMs.html">Slides</a><span class="sep">|</span><a href="slides/Lecture03_GAMs.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture03_lab.html">Lab 3</a>
@@ -170,7 +209,7 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 4</span><span class="wdate">Sep 17, 2026</span>
-    <span class="due">Assignment 2 due</span><span class="due">Project groups due</span></div>
+    <span class="due"><a href="homework/HW02_GAMs.html">Assignment 2 due</a></span><span class="due"><a href="files/project-rubric.html">Project groups due</a></span></div>
   <span class="wtitle">Decision Trees</span>
   <div class="wread"><strong>Reading:</strong> ISLP §8.1</div>
   <div class="wlinks">
@@ -184,17 +223,22 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
   <span class="wtitle">Tree Ensembles &mdash; Random Forests &amp; Boosted Trees</span>
   <div class="wread"><strong>Reading:</strong> ISLP §8.2; XGBoost &ldquo;Introduction to Boosted Trees&rdquo;;
     FPP §12.4 (Python ed.) / §12.5 (R ed.) for the bagging intuition</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW03_Trees_RF.html">Assignment 3</a><span class="dueon"> &mdash; due Week 6 &middot; Oct 1</span></div>
   <div class="wlinks">
     <a href="slides/Lecture05_TreeEnsembles.html">Slides</a><span class="sep">|</span><a href="slides/Lecture05_TreeEnsembles.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture05_lab.html">Lab 5</a>
   </div>
+  <div class="wread" style="margin-top:.5em;margin-bottom:0"><strong>Online, asynchronous &mdash;
+  no in-person meeting.</strong> The lecture is posted as a recording and the lab is self-paced;
+  office hours run as usual. Nothing is due this week, so it is the week to work on Assignment 3.</div>
 </div>
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 6</span><span class="wdate">Oct 1, 2026</span>
-    <span class="due">Assignment 3 due</span></div>
+    <span class="due"><a href="homework/HW03_Trees_RF.html">Assignment 3 due</a></span></div>
   <span class="wtitle">Regularization &amp; Model Selection</span>
   <div class="wread"><strong>Reading:</strong> ISLP Ch. 6; FPP §7.5</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW04_XGBoost_Regularization.html">Assignment 4</a><span class="dueon"> &mdash; due Week 7 &middot; Oct 8</span></div>
   <div class="wlinks">
     <a href="slides/Lecture06_Regularization.html">Slides</a><span class="sep">|</span><a href="slides/Lecture06_Regularization.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture06_lab.html">Lab 6</a>
@@ -204,7 +248,7 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 7</span><span class="wdate">Oct 8, 2026</span>
-    <span class="due">Assignment 4 due</span></div>
+    <span class="due"><a href="homework/HW04_XGBoost_Regularization.html">Assignment 4 due</a></span></div>
   <span class="wtitle">Introduction to Neural Networks</span>
   <div class="wread"><strong>Reading:</strong> FPP-Py §14.1&ndash;14.2, §14.4&ndash;14.5, §14.7 (<strong>Python edition only</strong>)</div>
   <div class="wlinks"><a href="slides/Lecture07_NeuralNets.html">Slides</a><span class="sep">|</span><a href="slides/Lecture07_NeuralNets.pdf">PDF</a>
@@ -215,13 +259,14 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
   <div class="whead"><span class="wnum">Week 8</span><span class="wdate">Oct 15, 2026</span></div>
   <span class="wtitle">CNN Architectures</span>
   <div class="wread"><strong>Reading:</strong> FPP-Py §14.3</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW05_Part1_FFN_CNN.html">Assignment 5 Part 1</a><span class="dueon"> &mdash; due Week 9 &middot; Oct 22</span></div>
   <div class="wlinks"><a href="slides/Lecture08_CNNs.html">Slides</a><span class="sep">|</span><a href="slides/Lecture08_CNNs.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture08_lab.html">Lab 8</a></div>
 </div>
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 9</span><span class="wdate">Oct 22, 2026</span>
-    <span class="due">Assignment 5 Part 1 due</span></div>
+    <span class="due"><a href="homework/HW05_Part1_FFN_CNN.html">Assignment 5 Part 1 due</a></span></div>
   <span class="wtitle">RNNs and LSTMs</span>
   <div class="wread"><strong>Reading:</strong> FPP-Py §14.3, §14.6</div>
   <div class="wlinks"><a href="slides/Lecture09_Part1_RNN_LSTM.html">Slides</a><span class="sep">|</span><a href="slides/Lecture09_Part1_RNN_LSTM.pdf">PDF</a>
@@ -233,13 +278,15 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
   <div class="whead"><span class="wnum">Week 10</span><span class="wdate">Oct 29, 2026</span></div>
   <span class="wtitle">Transformers</span>
   <div class="wread"><strong>Reading:</strong> FPP-Py Ch. 15</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW05_Part2_Sequence.html">Assignment 5 Part 2</a><span class="dueon"> &mdash; due Week 11 &middot; Nov 5</span></div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW05_Part3_Comparison.html">Assignment 5 Part 3</a><span class="dueon"> &mdash; due Week 12 &middot; Nov 12</span></div>
   <div class="wlinks"><a href="slides/Lecture09_Part2_Transformers.html">Slides</a><span class="sep">|</span><a href="slides/Lecture09_Part2_Transformers.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture09_Part2_lab.html">Lab 9 &middot; Part 2</a></div>
 </div>
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 11</span><span class="wdate">Nov 5, 2026</span>
-    <span class="due">Assignment 5 Part 2 due</span></div>
+    <span class="due"><a href="homework/HW05_Part2_Sequence.html">Assignment 5 Part 2 due</a></span></div>
   <span class="wtitle">Bayesian Statistics I &mdash; Foundations</span>
   <div class="wread"><strong>Reading:</strong> BMCP Ch. 1 (inference, priors, prior predictive checks) and Ch. 2 (MCMC diagnostics); FPP §5.5, §5.9 for framing</div>
   <div class="wlinks"><a href="slides/Lecture10_BayesianFoundations.html">Slides</a><span class="sep">|</span><a href="slides/Lecture10_BayesianFoundations.pdf">PDF</a>
@@ -248,18 +295,20 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 12</span><span class="wdate">Nov 12, 2026</span>
-    <span class="due">Assignment 5 Part 3 due</span></div>
+    <span class="due"><a href="homework/HW05_Part3_Comparison.html">Assignment 5 Part 3 due</a></span></div>
   <span class="wtitle">Bayesian Statistics II &mdash; Time Series</span>
   <div class="wread"><strong>Reading:</strong> BMCP §6.2, §6.4 (time series as regression; state space and Bayesian structural time series)</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW06_Part1_Foundations_TS.html">Assignment 6 Part 1</a><span class="dueon"> &mdash; due Week 13 &middot; Nov 19</span></div>
   <div class="wlinks"><a href="slides/Lecture11_Part1_BayesianTS.html">Slides</a><span class="sep">|</span><a href="slides/Lecture11_Part1_BayesianTS.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture11_Part1_lab.html">Lab 11 &middot; Part 1</a></div>
 </div>
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 13</span><span class="wdate">Nov 19, 2026</span>
-    <span class="due">Assignment 6 Part 1 due</span></div>
+    <span class="due"><a href="homework/HW06_Part1_Foundations_TS.html">Assignment 6 Part 1 due</a></span></div>
   <span class="wtitle">Bayesian Statistics II &mdash; Hierarchical Models</span>
   <div class="wread"><strong>Reading:</strong> BMCP §4.5&ndash;4.6 (pooling, multilevel and hierarchical models)</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW06_Part2_Hierarchical.html">Assignment 6 Part 2</a><span class="dueon"> &mdash; due Week 15 &middot; Dec 3</span></div>
   <div class="wlinks"><a href="slides/Lecture11_Part2_Hierarchical.html">Slides</a><span class="sep">|</span><a href="slides/Lecture11_Part2_Hierarchical.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture11_Part2_lab.html">Lab 11 &middot; Part 2</a></div>
   <div class="wread" style="margin-top:.5em;margin-bottom:0"><em>Not this:</em> FPP Ch. 11 is also titled &ldquo;hierarchical,&rdquo; but it covers forecast <strong>reconciliation</strong> &mdash; a different topic from partial pooling.</div>
@@ -272,16 +321,17 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 15</span><span class="wdate">Dec 3, 2026</span>
-    <span class="due">Assignment 6 Part 2 due</span></div>
+    <span class="due"><a href="homework/HW06_Part2_Hierarchical.html">Assignment 6 Part 2 due</a></span></div>
   <span class="wtitle">Bayesian Statistics III &mdash; Bayesian Linear Regression</span>
   <div class="wread"><strong>Reading:</strong> BMCP §3.2&ndash;3.3 (linear and multiple regression, counterfactuals); FPP Ch. 7 as the frequentist benchmark</div>
+  <div class="wassign"><span class="lab">Assigned</span><a href="homework/HW07_Bayesian_Regression.html">Assignment 7</a><span class="dueon"> &mdash; due Week 16 &middot; Dec 10</span></div>
   <div class="wlinks"><a href="slides/Lecture12_BayesianRegression.html">Slides</a><span class="sep">|</span><a href="slides/Lecture12_BayesianRegression.pdf">PDF</a>
     <span class="sep">&middot;</span><a href="labs/Lecture12_lab.html">Lab 12</a></div>
 </div>
 
 <div class="week">
   <div class="whead"><span class="wnum">Week 16</span><span class="wdate">Dec 10, 2026</span>
-    <span class="due">Assignment 7 due</span></div>
+    <span class="due"><a href="homework/HW07_Bayesian_Regression.html">Assignment 7 due</a></span></div>
   <span class="wtitle">Final thoughts on forecasting, econometrics and ML/AI; project work session</span>
   <div class="wread"><strong>Reading:</strong> FPP Ch. 13</div>
   <div class="wlinks"><a href="slides/Lecture13_Synthesis.html">Slides</a><span class="sep">|</span><a href="slides/Lecture13_Synthesis.pdf">PDF</a></div>
@@ -363,34 +413,6 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
   work. The budget is a design feature, not a restriction &mdash; it forces you to decide what is
   worth asking.</p>
 </div>
-
-<h2>Textbooks</h2>
-
-<p>All are free online. None needs to be purchased.</p>
-
-<table>
-  <tr><th>Book</th><th>Used for</th></tr>
-  <tr>
-    <td><a href="https://otexts.com/fpppy/">FPP-Py</a> &mdash; <em>Forecasting: Principles and
-      Practice, the Pythonic Way</em></td>
-    <td>Lectures 1&ndash;3; the primary text</td>
-  </tr>
-  <tr>
-    <td><a href="https://otexts.com/fpp3/">FPP3</a> &mdash; the R edition</td>
-    <td>Same material, R code. Chapter 12 is numbered differently &mdash; both numbers are
-      always given</td>
-  </tr>
-  <tr>
-    <td><a href="https://www.statlearning.com/">ISLP</a> &mdash; <em>An Introduction to
-      Statistical Learning with Applications in Python</em></td>
-    <td>Lectures 4&ndash;6. FPP covers no tree methods and no regularization; this fills that gap</td>
-  </tr>
-  <tr>
-    <td><a href="https://bayesiancomputationbook.com/">BMCP</a> &mdash; <em>Bayesian Modeling and
-      Computation in Python</em></td>
-    <td>Lectures 10&ndash;12. PyMC and ArviZ throughout, which is what we use</td>
-  </tr>
-</table>
 
 <footer>
   ECON 8310 &middot; University of Nebraska at Omaha &middot; Fall 2026<br>
