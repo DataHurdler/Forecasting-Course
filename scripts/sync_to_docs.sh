@@ -3,7 +3,7 @@
 #
 # Usage:
 #   ./scripts/sync_to_docs.sh                 # everything (slides, labs, homework, documents)
-#   ./scripts/sync_to_docs.sh slides          # RevealJS mirrors + Beamer PDFs only
+#   ./scripts/sync_to_docs.sh slides          # RevealJS mirrors only (no PDFs -- see below)
 #   ./scripts/sync_to_docs.sh labs            # labs only  (slow: several render for minutes)
 #   ./scripts/sync_to_docs.sh homework        # homework only
 #   ./scripts/sync_to_docs.sh docs            # syllabus / datasets / rubric only

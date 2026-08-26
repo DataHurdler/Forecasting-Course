@@ -55,7 +55,7 @@ python scripts/set_course_url.py https://new.host/path/ # rewrite all of them, t
 
 # Publish to GitHub Pages (docs/). Targets: all | slides | labs | homework | docs | LectureNN
 ./scripts/sync_to_docs.sh            # everything -- slow, labs fit real models
-./scripts/sync_to_docs.sh slides     # mirrors + Beamer PDFs only
+./scripts/sync_to_docs.sh slides     # RevealJS mirrors only (PDFs are not published)
 ./scripts/sync_to_docs.sh Lecture07  # one lecture
 
 # Student-visible external links (skips commented-out blocks)
@@ -189,7 +189,7 @@ template-maintenance gates that this course repo does not satisfy.
 **Beamer status:** All 15 decks written and compiling clean (0 errors, 0 overfull).
 **Quarto status:** All 15 mirrors written and at frame parity — verify with
 `python scripts/check_mirror_parity.py`.
-**Site status:** `docs/` carries all 16 weeks plus finals week — slides (HTML + PDF), 14 labs,
+**Site status:** `docs/` carries all 16 weeks plus finals week — slides (HTML only -- PDFs are deliberately not published), 14 labs,
 11 homework submissions, and the syllabus, datasets guide and project rubric as HTML.
 **Note:** The pre-redesign lecture set (Lecture01_Intro through Lecture12_Capstone) was removed in the Fall 2026 cleanup; it remains recoverable from git history. Its lab notebooks (`scripts/Lecture*.ipynb`) and QA reports (`quality_reports/`) were deliberately kept — the notebooks are the only worked Python in the repo outside Homework/.
 
