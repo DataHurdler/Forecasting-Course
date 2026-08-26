@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ECON 8310 — Setup and Quarto Guide</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="docstyle.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ECON 8310 — Setup and Quarto Guide</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#working-with-.qmd-files"
+id="toc-working-with-.qmd-files">Working with <code>.qmd</code>
+Files</a></li>
+<li><a href="#part-1-setting-up" id="toc-part-1-setting-up">Part 1 —
+Setting up</a>
+<ul>
+<li><a href="#python" id="toc-python">1. Python</a></li>
+<li><a href="#quarto" id="toc-quarto">2. Quarto</a></li>
+<li><a href="#an-editor-pick-one" id="toc-an-editor-pick-one">3. An
+editor — pick one</a></li>
+<li><a href="#open-the-repository-as-a-folder"
+id="toc-open-the-repository-as-a-folder">Open the repository as a
+<em>folder</em></a></li>
+<li><a href="#check-it-works" id="toc-check-it-works">Check it
+works</a></li>
+</ul></li>
+<li><a href="#part-2-what-a-.qmd-actually-is"
+id="toc-part-2-what-a-.qmd-actually-is">Part 2 — What a
+<code>.qmd</code> actually is</a>
+<ul>
+<li><a href="#the-yaml-header" id="toc-the-yaml-header">The YAML
+header</a></li>
+<li><a href="#prose" id="toc-prose">Prose</a></li>
+<li><a href="#code-chunks" id="toc-code-chunks">Code chunks</a></li>
+<li><a href="#what-the-assignments-look-like"
+id="toc-what-the-assignments-look-like">What the assignments look
+like</a></li>
+</ul></li>
+<li><a href="#part-3-running-and-rendering"
+id="toc-part-3-running-and-rendering">Part 3 — Running and
+rendering</a></li>
+<li><a href="#part-4-the-four-errors-you-will-actually-hit"
+id="toc-part-4-the-four-errors-you-will-actually-hit">Part 4 — The four
+errors you will actually hit</a>
+<ul>
+<li><a href="#quarto-command-not-found"
+id="toc-quarto-command-not-found"><code>quarto: command not found</code></a></li>
+<li><a
+href="#no-module-named-yaml-or-unable-to-start-the-jupyter-kernel"
+id="toc-no-module-named-yaml-or-unable-to-start-the-jupyter-kernel"><code>No module named 'yaml'</code>
+or “Unable to start the Jupyter kernel”</a></li>
+<li><a href="#filenotfounderror-dataprocessedm5_weekly.csv"
+id="toc-filenotfounderror-dataprocessedm5_weekly.csv"><code>FileNotFoundError: data/processed/m5_weekly.csv</code></a></li>
+<li><a href="#your-.html-does-not-show-your-latest-work"
+id="toc-your-.html-does-not-show-your-latest-work">Your
+<code>.html</code> does not show your latest work</a></li>
+</ul></li>
+<li><a href="#other-editors" id="toc-other-editors">Other
+editors</a></li>
+<li><a href="#going-further" id="toc-going-further">Going
+further</a></li>
+</ul>
+</nav>
+<h1 id="working-with-.qmd-files">Working with <code>.qmd</code>
+Files</h1>
+<p>Every assignment in this course is a <strong>Quarto</strong> document
+— a <code>.qmd</code> file. This page gets you set up and shows you what
+you actually need to do with one.</p>
+<p>You will never create a <code>.qmd</code> from scratch. You copy the
+assignment and fill in the blanks.</p>
+<hr />
+<h1 id="part-1-setting-up">Part 1 — Setting up</h1>
+<p>You need three things. Budget twenty minutes the first time.</p>
+<h2 id="python">1. Python</h2>
+<p>You need Python 3.10 or newer. Check what you have:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">--version</span></span></code></pre></div>
+<p>If that fails, try <code>python3 --version</code>. If neither works,
+install from <a href="https://www.python.org/downloads/"
+class="uri">https://www.python.org/downloads/</a> — and on Windows,
+<strong>tick “Add Python to PATH”</strong> on the first screen of the
+installer. Missing that is the single most common Windows setup
+problem.</p>
+<p>Then install the packages:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install jupyter pandas numpy matplotlib statsmodels scikit-learn</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install prophet pygam xgboost torch pymc arviz</span></code></pre></div>
+<p><code>jupyter</code> is not optional. Quarto runs your Python through
+a Jupyter kernel, so rendering fails without it — even though none of
+your code imports it.</p>
+<p><strong>macOS, before Week 5:</strong>
+<code>brew install libomp</code>, once. Without it
+<code>import xgboost</code> fails.</p>
+<h2 id="quarto">2. Quarto</h2>
+<p>Download from <a href="https://quarto.org/docs/get-started/"
+class="uri">https://quarto.org/docs/get-started/</a> and run the
+installer. Then confirm:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> <span class="at">--version</span></span></code></pre></div>
+<p>Any 1.4 or newer is fine.</p>
+<h2 id="an-editor-pick-one">3. An editor — pick one</h2>
+<p><strong>Either of these works well. Choose one and stick with
+it.</strong></p>
+<h3 id="option-a-vs-code">Option A — VS Code</h3>
+<p>The most widely used editor in the industry, and the one you are most
+likely to meet again after this course.</p>
+<ol type="1">
+<li>Install from <a href="https://code.visualstudio.com/"
+class="uri">https://code.visualstudio.com/</a></li>
+<li>Click the Extensions icon in the left sidebar — four squares, one
+detached — or press <code>Ctrl+Shift+X</code> (<code>Cmd+Shift+X</code>
+on Mac)</li>
+<li>Search for and install <strong>two</strong> extensions:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Extension</th>
+<th>Publisher</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Quarto</strong></td>
+<td>Posit</td>
+<td><code>.qmd</code> editing, the Render button, preview</td>
+</tr>
+<tr>
+<td><strong>Python</strong></td>
+<td>Microsoft</td>
+<td>runs your code, picks the interpreter</td>
+</tr>
+</tbody>
+</table>
+<p>Both are free.</p>
+<h3 id="option-b-positron">Option B — Positron</h3>
+<p>Posit’s editor, purpose-built for data science. <strong>Quarto
+support is built in</strong> — no extensions to install — and it shows
+your variables and plots in dedicated panes, which many people find
+easier when working with data.</p>
+<ol type="1">
+<li>Install from <a href="https://positron.posit.co/"
+class="uri">https://positron.posit.co/</a></li>
+<li>That is the whole setup</li>
+</ol>
+<p>If you have used RStudio, Positron will feel familiar
+immediately.</p>
+<h3 id="which-should-you-choose">Which should you choose?</h3>
+<p>Neither is wrong, and every instruction in this course works in
+both.</p>
+<ul>
+<li><strong>VS Code</strong> if you want the more transferable skill, or
+you already use it for something else. More people use it, so more of
+the answers you find online will match what you see.</li>
+<li><strong>Positron</strong> if you want less setup and a layout
+designed around data work. Fewer steps to get running, and the variable
+and plot panes are genuinely nice.</li>
+</ul>
+<h2 id="open-the-repository-as-a-folder">Open the repository as a
+<em>folder</em></h2>
+<p>Whichever you chose: <strong>File → Open Folder</strong> → select the
+repository folder. Not a single file — the whole folder. Both editors
+need to see the project to resolve data paths correctly.</p>
+<h2 id="check-it-works">Check it works</h2>
+<p>Open any assignment in <code>assignments/</code> and click
+<strong>Render</strong>. A preview should appear beside your code. If it
+does, you are set up.</p>
+<hr />
+<h1 id="part-2-what-a-.qmd-actually-is">Part 2 — What a
+<code>.qmd</code> actually is</h1>
+<p>A <code>.qmd</code> is one file holding three things.</p>
+<h2 id="the-yaml-header">The YAML header</h2>
+<p>At the very top, between <code>---</code> lines:</p>
+<pre><code>---
+title: &quot;Homework 1, Part 1: Exponential Smoothing&quot;
+format:
+  html:
+    toc: true
+---</code></pre>
+<p>This controls the output. <strong>Leave it alone</strong> unless an
+assignment says otherwise.</p>
+<h2 id="prose">Prose</h2>
+<p>Ordinary markdown. <code>**bold**</code>, <code>*italic*</code>,
+<code># headings</code>, <code>- bullets</code>. This is where you write
+your answers.</p>
+<h2 id="code-chunks">Code chunks</h2>
+<p>Python between triple backticks with <code>{python}</code>:</p>
+<pre><code>```{python}
+import pandas as pd
+weekly = pd.read_csv(&quot;data/processed/m5_weekly.csv&quot;)
+print(weekly.shape)
+```</code></pre>
+<p>Output appears below the chunk when you run or render it.</p>
+<h2 id="what-the-assignments-look-like">What the assignments look
+like</h2>
+<p>Every question has two parts you fill in:</p>
+<pre><code>```{python}
+# TODO: fit SES and report test RMSE
+```</code></pre>
+<blockquote>
+<p><strong>Your response:</strong> <em>(you write here, in your own
+words)</em></p>
+</blockquote>
+<p>The code chunk is for code. The <strong>Your response</strong> block
+is for your writing — and that part must be yours, not your AI
+assistant’s. See <a href="AI_POLICY.md">AI_POLICY.md</a>.</p>
+<hr />
+<h1 id="part-3-running-and-rendering">Part 3 — Running and
+rendering</h1>
+<p>Two different things, and the distinction matters.</p>
+<p><strong>Running a chunk</strong> executes that one block so you can
+see its output while you work. Click the little <strong>▶ Run
+Cell</strong> that appears above a chunk, or press
+<code>Ctrl+Shift+Enter</code> (<code>Cmd+Shift+Enter</code> on Mac) with
+your cursor inside it.</p>
+<p><strong>Rendering</strong> runs the whole document top to bottom in a
+fresh session and produces the <code>.html</code> you submit. Click
+<strong>Render</strong>, or:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render submissions/hw01_part1_yourname/HW01_Part1_ETS.qmd</span></code></pre></div>
+<blockquote>
+<p><strong>Why the difference matters.</strong> While you work, you run
+chunks one at a time and variables pile up in memory. Rendering starts
+from nothing. <strong>A document that works chunk-by-chunk can fail
+completely on render</strong> — usually because something was defined in
+a chunk you later edited or deleted.</p>
+<p>Always render before you submit. It is the same discipline as
+restarting a notebook kernel.</p>
+</blockquote>
+<hr />
+<h1 id="part-4-the-four-errors-you-will-actually-hit">Part 4 — The four
+errors you will actually hit</h1>
+<h2
+id="quarto-command-not-found"><code>quarto: command not found</code></h2>
+<p>Quarto is not installed, or your terminal opened before you installed
+it. Install it, then <strong>close and reopen VS Code
+entirely</strong>.</p>
+<h2
+id="no-module-named-yaml-or-unable-to-start-the-jupyter-kernel"><code>No module named 'yaml'</code>
+or “Unable to start the Jupyter kernel”</h2>
+<p><code>jupyter</code> is not installed in the Python that Quarto is
+using.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install jupyter</span></code></pre></div>
+<p>If it persists, VS Code is probably using a different Python than
+your terminal. Press <code>Ctrl+Shift+P</code>
+(<code>Cmd+Shift+P</code>), type <strong>Python: Select
+Interpreter</strong>, and pick the one where you installed the
+packages.</p>
+<h2
+id="filenotfounderror-dataprocessedm5_weekly.csv"><code>FileNotFoundError: data/processed/m5_weekly.csv</code></h2>
+<p>Your working directory is wrong. Assignments read that path relative
+to the <strong>repository root</strong>, so you must open the repository
+as a folder in VS Code — not the <code>.qmd</code> on its own.</p>
+<p>If you opened a single file, close it and use File → Open Folder
+instead.</p>
+<h2 id="your-.html-does-not-show-your-latest-work">Your
+<code>.html</code> does not show your latest work</h2>
+<p>You edited the <code>.qmd</code> and did not re-render. This is the
+most common way to lose marks in this course, and
+<code>python scripts/check_my_submission.py</code> checks for it
+specifically — it compares the timestamps and tells you if your
+<code>.html</code> is older than your <code>.qmd</code>.</p>
+<p>Render, then check, then push.</p>
+<hr />
+<h1 id="other-editors">Other editors</h1>
+<p><strong>RStudio</strong> also renders <code>.qmd</code>, though
+Python environment setup takes more configuring than in either VS Code
+or Positron. Workable if it is what you already have.</p>
+<p><strong>Google Colab does not support <code>.qmd</code>
+files.</strong> It is a notebook environment with no Quarto installed
+and no way to add it. You cannot complete these assignments in Colab —
+please set up VS Code or Positron instead.</p>
+<hr />
+<h1 id="going-further">Going further</h1>
+<ul>
+<li><strong><a href="https://quarto.org/docs/get-started/"
+class="uri">https://quarto.org/docs/get-started/</a></strong> — official
+tutorial; pick your editor at the top and it adapts</li>
+<li><strong><a href="https://quarto.org/docs/computations/python.html"
+class="uri">https://quarto.org/docs/computations/python.html</a></strong>
+— code chunks and chunk options</li>
+<li><strong><a
+href="https://quarto.org/docs/output-formats/html-basics.html"
+class="uri">https://quarto.org/docs/output-formats/html-basics.html</a></strong>
+— HTML output options</li>
+</ul>
+</body>
+</html>

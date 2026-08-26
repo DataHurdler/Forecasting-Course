@@ -69,6 +69,33 @@ sync_homework() {
   done
 }
 
+# The student repository holds three documents that are course material rather than repo
+# mechanics. They are rendered from there so there is only ever one copy to keep correct.
+# Override the location with STUDENT_REPO=/path ./scripts/sync_to_docs.sh docs
+find_student_repo() {
+  for c in "$STUDENT_REPO" "$REPO_ROOT/../forecasting-env" "$REPO_ROOT/../Forecasting-Env"; do
+    [ -n "$c" ] && [ -f "$c/QUARTO_GUIDE.md" ] && { echo "$c"; return; }
+  done
+}
+
+sync_student_docs() {
+  local SR; SR="$(find_student_repo)"
+  if [ -z "$SR" ]; then
+    echo "  student repo not found — skipping the setup guide, AI policy and quickstart."
+    echo "  (set STUDENT_REPO=/path/to/forecasting-env to include them)"
+    return
+  fi
+  echo "  student repo: $SR"
+  [ -n "$PANDOC" ] || return
+  "$PANDOC" "$SR/QUARTO_GUIDE.md" -s --toc --toc-depth=2 -c docstyle.css \
+     --metadata title="ECON 8310 — Setup and Quarto Guide" -o "$DOCS/files/setup-guide.html"
+  "$PANDOC" "$SR/AI_POLICY.md" -s --toc --toc-depth=2 -c docstyle.css \
+     --metadata title="ECON 8310 — Using AI on Homework" -o "$DOCS/files/ai-policy.html"
+  "$PANDOC" "$SR/STUDENT_QUICKSTART.md" -s --toc --toc-depth=2 -c docstyle.css \
+     --metadata title="ECON 8310 — Homework Quickstart" -o "$DOCS/files/quickstart.html"
+  echo "  OK   setup-guide, ai-policy, quickstart"
+}
+
 sync_documents() {
   echo "=== Syllabus, datasets, rubric ==="
   [ -n "$PANDOC" ] || { echo "  pandoc not found — skipping"; return; }
@@ -80,6 +107,7 @@ sync_documents() {
   "$PANDOC" ECON8310_Project_Rubric.md -s --toc --toc-depth=2 -c docstyle.css \
      --metadata title="ECON 8310 — Final Project Rubric" -o "$DOCS/files/project-rubric.html"
   echo "  OK   syllabus, datasets, project-rubric"
+  sync_student_docs
 }
 
 sync_figures() {

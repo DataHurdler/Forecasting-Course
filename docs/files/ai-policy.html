@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ECON 8310 — Using AI on Homework</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="docstyle.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ECON 8310 — Using AI on Homework</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#using-ai-on-econ-8310-homework"
+id="toc-using-ai-on-econ-8310-homework">Using AI on ECON 8310
+Homework</a>
+<ul>
+<li><a href="#any-tool-is-fine" id="toc-any-tool-is-fine">Any tool is
+fine</a></li>
+<li><a href="#your-prompt-log" id="toc-your-prompt-log">Your prompt
+log</a></li>
+<li><a href="#the-prompt-budget-is-a-target-not-a-limit"
+id="toc-the-prompt-budget-is-a-target-not-a-limit">The prompt budget is
+a target, not a limit</a></li>
+<li><a href="#what-you-must-write-yourself"
+id="toc-what-you-must-write-yourself">What you must write
+yourself</a></li>
+<li><a href="#being-stuck-is-allowed"
+id="toc-being-stuck-is-allowed">Being stuck is allowed</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="using-ai-on-econ-8310-homework">Using AI on ECON 8310
+Homework</h1>
+<p>This course expects you to use an AI assistant. This page says
+how.</p>
+<hr />
+<h2 id="any-tool-is-fine">Any tool is fine</h2>
+<p>Codex, GitHub Copilot, ChatGPT, Claude, Gemini — in an editor or in a
+browser tab. Use what you have.</p>
+<p>If your tool cannot run code or write files, you will copy code
+across, run it yourself, and paste results back. <strong>That is a
+perfectly good way to do this course</strong>, and arguably a better
+one: you will see every error message with your own eyes, which is where
+a lot of the learning is.</p>
+<hr />
+<h2 id="your-prompt-log">Your prompt log</h2>
+<p>Keep a <code>PROMPT_LOG.md</code> in your submission folder listing
+every prompt you sent, in order:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prompt 1 — 2026-09-01 14:32</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Fit simple exponential smoothing to the CA_1 FOODS series and report the test RMSE.</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prompt 2 — 2026-09-01 14:51</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>Now add Holt&#39;s linear trend with damping, and compare against the previous fit.</span></code></pre></div>
+<p>If your assistant can write the file, let it. If you are in a browser
+chat, paste them in as you go — it takes seconds and is far easier than
+reconstructing them afterwards.</p>
+<hr />
+<h2 id="the-prompt-budget-is-a-target-not-a-limit">The prompt budget is
+a target, not a limit</h2>
+<p>Each assignment states a budget. It exists to make you decide what is
+worth asking, which is a real skill and the reason it is there at
+all.</p>
+<p><strong>You may go over it.</strong> If you do, log the extra prompts
+and add one line at the end of your log saying where you got stuck. That
+costs you nothing.</p>
+<p>It also helps me: if half the class needs fourteen prompts on a
+question I budgeted nine for, the question is harder than I intended and
+I want to know.</p>
+<p><strong>What does cost you</strong> is a log that does not match the
+work you submit. Under-reporting to hit a number is the one thing here
+that is genuinely dishonest.</p>
+<hr />
+<h2 id="what-you-must-write-yourself">What you must write yourself</h2>
+<p><strong>The code can be AI-assisted. The thinking
+cannot.</strong></p>
+<p>Write these yourself, in your own words:</p>
+<ul>
+<li>every <strong>interpretation</strong> of a result</li>
+<li>every <strong>business recommendation</strong></li>
+<li>every <strong>reflection</strong> question</li>
+<li>anything explaining <em>why</em> a model behaved as it did</li>
+</ul>
+<p>The assignments’ initial prompts now tell your assistant explicitly
+to explain output to you but <strong>not</strong> to draft the answers
+you submit. Keep it that way.</p>
+<p>This is not an arbitrary rule. Those sections are what the marks are
+actually for. A model can produce fluent prose about a forecast in
+seconds; what it cannot do is know which of your results surprised you,
+or which number you do not believe. That is the part worth your time,
+and the part worth mine to read.</p>
+<hr />
+<h2 id="being-stuck-is-allowed">Being stuck is allowed</h2>
+<p>If you cannot get something working, say so in your submission and
+describe what you tried. A clear account of a failure earns marks. A
+quietly copied number that you cannot explain does not.</p>
+</body>
+</html>
