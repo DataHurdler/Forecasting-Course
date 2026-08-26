@@ -347,8 +347,7 @@ Assignments are due **before class begins**. Readings are listed under each week
 *Reading:* FPP Ch. 1, Ch. 2, §5.1–5.10, Ch. 8
 
 **Week 2 · Sep 3** — Lecture 2: ARIMA, VAR & Multivariate Models
-*6:00–7:30pm:* **Industry panel and Q&A** with two business professionals, followed by time to
-mingle. Lecture 2 runs after the panel.
+*6:00–7:30pm:* **Industry panel and Q&A** with two business professionals, followed by time to mingle. Lecture 2 runs after the panel.
 *Reading:* FPP Ch. 9, §10.1–10.3, §10.6, §12.3
 *Due:* Homework 1 Part 1
 
