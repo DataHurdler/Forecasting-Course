@@ -143,6 +143,18 @@ For each:
 My prompt budget for Part 1 is 10 (this context prompt is excluded). I will label
 each question before asking.
 
+
+Repository rules — these apply to every prompt in this thread:
+- My submission folder is `submissions/hw06_part1_<my_name>/`. Put everything there.
+- Before responding to each prompt, append ONE line to `PROMPT_LOG.jsonl` in that folder:
+  {"prompt_id": <int, starts at 1, increments by 1>, "timestamp_local": "YYYY-MM-DD HH:MM:SS", "prompt": "<my prompt, verbatim>"}
+  Never edit or delete a line you already wrote.
+- After finishing the work for each prompt, make exactly one git commit:
+  `hw06_part1 prompt <prompt_id>: <short summary>`
+- If a prompt would take me past my budget of 10, do not do the work. Reply exactly
+  PROMPT_LIMIT_REACHED, and still log that prompt.
+- Never modify `AGENTS.md`, anything in `assignments/`, or anything in `policy/`.
+
 Confirm by responding with: HW06P1_CONTEXT_ACK
 ```
 
