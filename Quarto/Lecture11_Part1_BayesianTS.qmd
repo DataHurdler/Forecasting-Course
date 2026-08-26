@@ -159,7 +159,7 @@ Written the obvious way, with `pm.GaussianRandomWalk`, this model samples badly 
 | | First attempt | After the fix | Want |
 |---|---:|---:|---|
 | $\hat{R}$ | 1.022 | **1.002** | $< 1.01$ |
-| ESS (bulk) | 252 | **2,617** | $> 400$ |
+| ESS (bulk) | 252 | **2,376** | $> 400$ |
 | Divergences | 0 | 0 | $0$ |
 
 Nothing crashed. The model returned a forecast, and the forecast looked reasonable. Only the diagnostics said the chains had not agreed with each other.
