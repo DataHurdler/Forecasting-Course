@@ -58,6 +58,9 @@ python scripts/set_course_url.py https://new.host/path/ # rewrite all of them, t
 ./scripts/sync_to_docs.sh slides     # mirrors + Beamer PDFs only
 ./scripts/sync_to_docs.sh Lecture07  # one lecture
 
+# Student-visible external links (skips commented-out blocks)
+python scripts/check_links.py
+
 # Beamer <-> Quarto parity: every deck's frame count must equal its mirror's '## ' count
 python scripts/check_mirror_parity.py                 # all decks
 python scripts/check_mirror_parity.py LectureNN_Name  # + list that deck's frame titles

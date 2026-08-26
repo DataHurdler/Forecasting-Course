@@ -157,7 +157,7 @@ There is nothing you need to buy for this course.
 - *DON'T* wait until the last minute to complete homework assignments
 
 ## Academic Integrity and Behavior
-All students are required to adhere to the highest standards of academic integrity and behavior and must satisfy the [**UNO Academic Integrity Policy**](http://www.unomaha.edu/student-life/student-conduct-and-community-standards/policies/academic-integrity.php) and [**Student Code of Conduct**](http://www.unomaha.edu/student-life/student-conduct-and-community-standards/policies/code-of-conduct.php).
+All students are required to adhere to the highest standards of academic integrity and behavior and must satisfy the [**UNO Academic Integrity Policy**](https://www.unomaha.edu/campus-policies/academic-integrity.php) and [**Student Code of Conduct**](http://www.unomaha.edu/student-life/student-conduct-and-community-standards/policies/code-of-conduct.php).
 It is the student's responsibility to read, understand and abide by these policies.
 
 Beyond the AI tools described in the next section:
