@@ -1,92 +1,101 @@
 #!/bin/bash
-# sync_to_docs.sh
-# Renders Quarto slides and syncs everything to docs/ for GitHub Pages
+# sync_to_docs.sh — render course materials and publish them to docs/ for GitHub Pages.
 #
-# Usage: ./scripts/sync_to_docs.sh [lecture_name]
-# Examples:
-#   ./scripts/sync_to_docs.sh                    # Sync all lectures
-#   ./scripts/sync_to_docs.sh Lecture2           # Sync only Lecture2
+# Usage:
+#   ./scripts/sync_to_docs.sh                 # everything (slides, labs, homework, documents)
+#   ./scripts/sync_to_docs.sh slides          # RevealJS mirrors + Beamer PDFs only
+#   ./scripts/sync_to_docs.sh labs            # labs only  (slow: several render for minutes)
+#   ./scripts/sync_to_docs.sh homework        # homework only
+#   ./scripts/sync_to_docs.sh docs            # syllabus / datasets / rubric only
+#   ./scripts/sync_to_docs.sh Lecture07       # one lecture's mirror
+#
+# Everything is rendered with the project venv so package versions match the labs.
 
 set -e
-
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-QUARTO_DIR="$REPO_ROOT/Quarto"
-DOCS_DIR="$REPO_ROOT/docs"
+DOCS="$REPO_ROOT/docs"
+export PATH="$REPO_ROOT/.venv/bin:$PATH"
+export QUARTO_PYTHON="$REPO_ROOT/.venv/bin/python"
+PANDOC=/Applications/quarto/bin/tools/aarch64/pandoc
+[ -x "$PANDOC" ] || PANDOC=$(command -v pandoc || echo "")
 
-echo "=== Syncing Quarto slides to docs/ ==="
-echo "Repo root: $REPO_ROOT"
+TARGET="${1:-all}"
+mkdir -p "$DOCS/slides" "$DOCS/labs" "$DOCS/homework" "$DOCS/files"
 
-# 1. Render Quarto files
-cd "$QUARTO_DIR"
+sync_slides() {
+  echo "=== Slides ==="
+  cd "$REPO_ROOT/Quarto"
+  for qmd in Lecture*.qmd; do
+    [ -f "$qmd" ] || continue
+    echo "  rendering $qmd"
+    quarto render "$qmd" >/dev/null 2>&1 || { echo "    FAILED: $qmd"; continue; }
+    cp "${qmd%.qmd}.html" "$DOCS/slides/"
+  done
+  echo "  copying Beamer PDFs"
+  cp "$REPO_ROOT/Slides/"Lecture*.pdf "$DOCS/slides/" 2>/dev/null || true
+}
 
-if [ -n "$1" ]; then
-    # Render specific lecture
-    echo "Rendering $1..."
-    matched_qmd=$(ls ${1}_*.qmd ${1}.qmd 2>/dev/null | head -1)
-    if [ -n "$matched_qmd" ]; then
-        quarto render "$matched_qmd"
+sync_one() {   # one lecture mirror by prefix
+  cd "$REPO_ROOT/Quarto"
+  local m; m=$(ls ${1}*.qmd 2>/dev/null | head -1)
+  [ -n "$m" ] || { echo "No Quarto file matching '${1}'"; exit 1; }
+  quarto render "$m"
+  cp "${m%.qmd}.html" "$DOCS/slides/"
+  cp "$REPO_ROOT/Slides/${m%.qmd}.pdf" "$DOCS/slides/" 2>/dev/null || true
+}
+
+sync_labs() {
+  echo "=== Labs (several take minutes — they fit real models) ==="
+  cd "$REPO_ROOT"
+  for qmd in Labs/Lecture*_lab.qmd; do
+    b=$(basename "$qmd" .qmd); s=$(date +%s)
+    if quarto render "$qmd" --to html >/dev/null 2>&1; then
+      cp "Labs/$b.html" "$DOCS/labs/"; echo "  OK   $b ($(( $(date +%s) - s ))s)"
     else
-        echo "Error: No QMD file found matching '${1}'"
-        exit 1
+      echo "  FAIL $b"
     fi
-else
-    # Render all QMD files (skip backups)
-    echo "Rendering all Quarto files..."
-    for qmd in *.qmd; do
-        if [ -f "$qmd" ] && [[ ! "$qmd" == *"_backup"* ]]; then
-            echo "  Rendering $qmd..."
-            quarto render "$qmd" || echo "  Warning: Failed to render $qmd"
-        fi
-    done
-fi
+  done
+}
 
-# 2. Sync HTML files and their _files directories to docs/slides/
-echo "Syncing HTML and assets to docs/slides/..."
-mkdir -p "$DOCS_DIR/slides"
-
-for html in *.html; do
-    if [ -f "$html" ]; then
-        echo "  Copying $html..."
-        cp "$html" "$DOCS_DIR/slides/"
-
-        # Copy associated _files directory if it exists
-        files_dir="${html%.html}_files"
-        if [ -d "$files_dir" ]; then
-            echo "  Copying $files_dir/..."
-            rm -rf "$DOCS_DIR/slides/$files_dir"
-            cp -r "$files_dir" "$DOCS_DIR/slides/"
-        fi
+sync_homework() {
+  echo "=== Homework ==="
+  cd "$REPO_ROOT"
+  for qmd in Homework/HW*.qmd; do
+    b=$(basename "$qmd" .qmd)
+    if quarto render "$qmd" --to html >/dev/null 2>&1; then
+      cp "Homework/$b.html" "$DOCS/homework/"; echo "  OK   $b"
+    else
+      echo "  FAIL $b"
     fi
-done
+  done
+}
 
-# 3. Sync Beamer PDFs to docs/slides/
-echo "Syncing Beamer PDFs..."
-for pdf in "$REPO_ROOT/Slides/"*.pdf; do
-    if [ -f "$pdf" ]; then
-        echo "  Copying $(basename "$pdf")..."
-        cp "$pdf" "$DOCS_DIR/slides/"
-    fi
-done
+sync_documents() {
+  echo "=== Syllabus, datasets, rubric ==="
+  [ -n "$PANDOC" ] || { echo "  pandoc not found — skipping"; return; }
+  cd "$REPO_ROOT"
+  "$PANDOC" ECON8310Syllabus2026Fall.md -s --toc --toc-depth=2 -c docstyle.css \
+     --metadata title="ECON 8310 Syllabus — Fall 2026" -o "$DOCS/files/syllabus.html"
+  "$PANDOC" ECON8310_Datasets.md -s --toc --toc-depth=2 -c docstyle.css \
+     --metadata title="ECON 8310 — Course Datasets" -o "$DOCS/files/datasets.html"
+  "$PANDOC" ECON8310_Project_Rubric.md -s --toc --toc-depth=2 -c docstyle.css \
+     --metadata title="ECON 8310 — Final Project Rubric" -o "$DOCS/files/project-rubric.html"
+  echo "  OK   syllabus, datasets, project-rubric"
+}
 
-# 4. Sync R scripts to docs/files/code/
-echo "Syncing R scripts..."
-mkdir -p "$DOCS_DIR/files/code"
-for rscript in "$REPO_ROOT/scripts/R/"*.R; do
-    if [ -f "$rscript" ]; then
-        echo "  Copying $(basename "$rscript")..."
-        cp "$rscript" "$DOCS_DIR/files/code/"
-    fi
-done
+sync_figures() {
+  if command -v rsync >/dev/null; then rsync -a --delete "$REPO_ROOT/Figures/" "$DOCS/Figures/"
+  else rm -rf "$DOCS/Figures"; cp -r "$REPO_ROOT/Figures" "$DOCS/Figures"; fi
+}
 
-# 5. Sync Figures directory (using rsync for efficiency)
-echo "Syncing Figures/..."
-if command -v rsync &> /dev/null; then
-    rsync -av --delete "$REPO_ROOT/Figures/" "$DOCS_DIR/Figures/"
-else
-    rm -rf "$DOCS_DIR/Figures"
-    cp -r "$REPO_ROOT/Figures" "$DOCS_DIR/Figures"
-fi
+case "$TARGET" in
+  all)      sync_slides; sync_labs; sync_homework; sync_documents; sync_figures ;;
+  slides)   sync_slides; sync_figures ;;
+  labs)     sync_labs ;;
+  homework) sync_homework ;;
+  docs)     sync_documents ;;
+  *)        sync_one "$TARGET" ;;
+esac
 
 echo ""
-echo "=== Sync complete! ==="
-echo "Files synced to: $DOCS_DIR/slides/"
+echo "=== Done. Published to $DOCS ==="

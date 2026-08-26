@@ -8,7 +8,7 @@
 
 <meta name="author" content="Your Name">
 
-<title>Homework 1, Part 1: Exponential Smoothing</title>
+<title>Homework 7: Bayesian Linear Regression</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -2319,12 +2319,17 @@ window.Quarto = {
    
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
-  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="header-section-number">2</span> Dataset</a></li>
+  <li><a href="#dataset-and-setup" id="toc-dataset-and-setup" class="nav-link" data-scroll-target="#dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</a></li>
   <li><a href="#initial-prompt-for-codex" id="toc-initial-prompt-for-codex" class="nav-link" data-scroll-target="#initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</a></li>
   <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">4</span> Questions</a>
   <ul class="collapse">
-  <li><a href="#q1-exploratory-plot" id="toc-q1-exploratory-plot" class="nav-link" data-scroll-target="#q1-exploratory-plot"><span class="header-section-number">4.1</span> Q1 — Exploratory Plot</a></li>
-  <li><a href="#q2-exponential-smoothing-models" id="toc-q2-exponential-smoothing-models" class="nav-link" data-scroll-target="#q2-exponential-smoothing-models"><span class="header-section-number">4.2</span> Q2 — Exponential Smoothing Models</a></li>
+  <li><a href="#q1-draw-a-dag-suggested-prompts-1" id="toc-q1-draw-a-dag-suggested-prompts-1" class="nav-link" data-scroll-target="#q1-draw-a-dag-suggested-prompts-1"><span class="header-section-number">4.1</span> Q1 — Draw a DAG <em>(Suggested prompts: 1)</em></a></li>
+  <li><a href="#q2-ols-benchmark-two-ways-suggested-prompts-2" id="toc-q2-ols-benchmark-two-ways-suggested-prompts-2" class="nav-link" data-scroll-target="#q2-ols-benchmark-two-ways-suggested-prompts-2"><span class="header-section-number">4.2</span> Q2 — OLS Benchmark, Two Ways <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q3-bayesian-linear-regression-suggested-prompts-3" id="toc-q3-bayesian-linear-regression-suggested-prompts-3" class="nav-link" data-scroll-target="#q3-bayesian-linear-regression-suggested-prompts-3"><span class="header-section-number">4.3</span> Q3 — Bayesian Linear Regression <em>(Suggested prompts: 3)</em></a></li>
+  <li><a href="#q4-posterior-visualization-suggested-prompts-2" id="toc-q4-posterior-visualization-suggested-prompts-2" class="nav-link" data-scroll-target="#q4-posterior-visualization-suggested-prompts-2"><span class="header-section-number">4.4</span> Q4 — Posterior Visualization <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q5-rope-analysis-suggested-prompts-2" id="toc-q5-rope-analysis-suggested-prompts-2" class="nav-link" data-scroll-target="#q5-rope-analysis-suggested-prompts-2"><span class="header-section-number">4.5</span> Q5 — ROPE Analysis <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q6-conditional-scenario-simulation-suggested-prompts-3" id="toc-q6-conditional-scenario-simulation-suggested-prompts-3" class="nav-link" data-scroll-target="#q6-conditional-scenario-simulation-suggested-prompts-3"><span class="header-section-number">4.6</span> Q6 — Conditional Scenario Simulation <em>(Suggested prompts: 3)</em></a></li>
+  <li><a href="#q7-course-capstone-reflection-suggested-prompts-0-write-yourself" id="toc-q7-course-capstone-reflection-suggested-prompts-0-write-yourself" class="nav-link" data-scroll-target="#q7-course-capstone-reflection-suggested-prompts-0-write-yourself"><span class="header-section-number">4.7</span> Q7 — Course Capstone Reflection <em>(Suggested prompts: 0 — write yourself)</em></a></li>
   </ul></li>
   <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">5</span> Submission Checklist</a></li>
   </ul>
@@ -2334,7 +2339,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Homework 1, Part 1: Exponential Smoothing</h1>
+<h1 class="title">Homework 7: Bayesian Linear Regression</h1>
 <p class="subtitle lead">ECON 8310: Business Forecasting — University of Nebraska at Omaha · Fall 2026</p>
 </div>
 
@@ -2358,64 +2363,90 @@ window.Quarto = {
 </header>
 
 
-<section id="overview" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
-<p>Homework 1 comes in two parts. <strong>Part 1 (this document)</strong> covers exponential smoothing and is due before class in Week 2 — it uses only material from Lecture 1. <strong>Part 2</strong> covers ARIMA, VAR, and method comparison, and is due before class in Week 3, after Lecture 2.</p>
-<p>Each part has its own Codex context prompt, its own prompt budget, and its own submission. Do not start Part 2 until Part 1 is submitted.</p>
-<p>Exponential smoothing is a workhorse of operational forecasting in retail and supply chain: interpretable, cheap to fit, and hard to beat at scale. Working through real store-level sales data, you will see how the choice of smoothing model and the rigor of evaluation translate directly into business decisions.</p>
-<p><strong>Learning objectives.</strong> By the end of Part 1 you will be able to:</p>
+<section id="overview" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1</span> Overview</h2>
+<p>Bayesian linear regression replaces OLS point estimates with full posterior distributions over every coefficient. Instead of asking “Is beta significant at p &lt; 0.05?”, you ask “What is the probability that this effect is positive?” and “Is the effect large enough to matter for business decisions?”</p>
+<p>This final homework fits a Bayesian regression model for store sales as a function of promotions, competition, and store characteristics. It also introduces Directed Acyclic Graphs (DAGs) as a tool for deciding which variables to include and how to interpret the coefficients causally.</p>
+<p><strong>Learning objectives:</strong></p>
 <ul>
-<li>Read a retail time series plot for trend, seasonality, and business-driven irregularity</li>
-<li>Apply Simple Exponential Smoothing, Holt’s linear trend model, and Holt-Winters to seasonal weekly data</li>
-<li>Interpret the smoothing parameter <span class="math inline">\(\alpha\)</span> in business terms</li>
-<li>Compare competing models on a held-out test set using RMSE and MAE, against a benchmark</li>
+<li>Draw and interpret a DAG for a business forecasting model</li>
+<li>Specify weakly informative priors for regression coefficients</li>
+<li>Read posterior coefficient distributions (HDI, probability of direction)</li>
+<li>Apply ROPE analysis to distinguish statistical from practical significance</li>
+<li>Use posterior samples to simulate conditional scenarios</li>
 </ul>
 <hr>
 </section>
-<section id="dataset" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Dataset</h1>
-<p>This course runs on the <strong>M5 / Walmart</strong> dataset — the spine described in <code>ECON8310_Datasets.md</code>. It covers daily unit sales for Walmart stores across California, Texas, and Wisconsin from <strong>29 January 2011 to 22 May 2016</strong>, and it was the data for the M5 forecasting competition.</p>
-<p>You will work with the prepared weekly file, <code>data/processed/m5_weekly.csv</code>: <strong>30 series</strong> (10 stores × 3 product categories), <strong>277 weeks each</strong>, with average price, SNAP benefit days, and event-day counts alongside the unit sales.</p>
-<p>If the file does not exist, run <code>python scripts/prep_m5.py</code> once first — it will tell you where to get the raw download.</p>
-<div id="4d40ee8d" class="cell" data-execution_count="1">
+<section id="dataset-and-setup" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</h2>
+<p>The question for this assignment is a causal one: <strong>how much does demand respond to price?</strong> That is an elasticity, and it is the number a category manager would actually act on.</p>
+<div id="dc42ff1d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.holtwinters <span class="im">import</span> ExponentialSmoothing</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">&#39;ignore&#39;</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Find the processed data file whether you render from the repo root or from</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">    this file&#39;s own folder.&quot;&quot;&quot;</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">&quot;data&quot;</span> <span class="op">/</span> <span class="st">&quot;processed&quot;</span> <span class="op">/</span> name</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. &quot;</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Run `python scripts/prep_m5.py` from the repository root first.&quot;</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> pd.read_csv(data_path(<span class="st">&quot;m5_weekly.csv&quot;</span>), parse_dates<span class="op">=</span>[<span class="st">&quot;week_start&quot;</span>])</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Store CA_1, FOODS category, for the univariate models in Part 1</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ca1 <span class="op">=</span> (weekly[(weekly.store_id <span class="op">==</span> <span class="st">&quot;CA_1&quot;</span>) <span class="op">&amp;</span> (weekly.cat_id <span class="op">==</span> <span class="st">&quot;FOODS&quot;</span>)]</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>       .set_index(<span class="st">&quot;week_start&quot;</span>)[<span class="st">&quot;units&quot;</span>]</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>       .sort_index())</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings, logging</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">&#39;ignore&#39;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">&#39;pymc&#39;</span>).setLevel(logging.ERROR)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">&quot;data&quot;</span> <span class="op">/</span> <span class="st">&quot;processed&quot;</span> <span class="op">/</span> name</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. &quot;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Run `python scripts/prep_m5.py` from the repository root first.&quot;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> (pd.read_csv(data_path(<span class="st">&quot;m5_weekly.csv&quot;</span>), parse_dates<span class="op">=</span>[<span class="st">&quot;week_start&quot;</span>])</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            .sort_values([<span class="st">&quot;store_id&quot;</span>, <span class="st">&quot;cat_id&quot;</span>, <span class="st">&quot;week_start&quot;</span>]))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;series&quot;</span>] <span class="op">=</span> weekly.store_id <span class="op">+</span> <span class="st">&quot;_&quot;</span> <span class="op">+</span> weekly.cat_id</span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;CA_1 FOODS: </span><span class="sc">{</span><span class="bu">len</span>(ca1)<span class="sc">}</span><span class="ss"> weekly observations &quot;</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f&quot;from </span><span class="sc">{</span>ca1<span class="sc">.</span>index<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>ca1<span class="sc">.</span>index<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> weekly.dropna(subset<span class="op">=</span>[<span class="st">&quot;units&quot;</span>, <span class="st">&quot;avg_price&quot;</span>]).copy()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;ly&quot;</span>] <span class="op">=</span> np.log(df.units.clip(lower<span class="op">=</span><span class="dv">1</span>))          <span class="co"># log units</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;lp&quot;</span>] <span class="op">=</span> np.log(df.avg_price)                     <span class="co"># log price</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;t&quot;</span>]  <span class="op">=</span> (df.week_start <span class="op">-</span> df.week_start.<span class="bu">min</span>()).dt.days <span class="op">/</span> <span class="fl">365.25</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;snap&quot;</span>]  <span class="op">=</span> (df.snap_days <span class="op">&gt;=</span> <span class="dv">5</span>).astype(<span class="bu">float</span>)     <span class="co"># high-SNAP week</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;event&quot;</span>] <span class="op">=</span> (df.event_days <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">float</span>)     <span class="co"># any event that week</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>codes, uniq <span class="op">=</span> pd.factorize(df.series)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;idx&quot;</span>] <span class="op">=</span> codes</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="bu">len</span>(uniq)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Centre log price within series. NOT standardized -- see the note below.</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;lpc&quot;</span>] <span class="op">=</span> df.lp <span class="op">-</span> df.groupby(<span class="st">&quot;series&quot;</span>).lp.transform(<span class="st">&quot;mean&quot;</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">:,}</span><span class="ss"> rows | </span><span class="sc">{</span>J<span class="sc">}</span><span class="ss"> series | &quot;</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f&quot;price range </span><span class="sc">{</span>df<span class="sc">.</span>avg_price<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">-</span><span class="sc">{</span>df<span class="sc">.</span>avg_price<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>CA_1 FOODS: 277 weekly observations from 2011-01-31 to 2016-05-16</code></pre>
+<pre><code>8,310 rows | 30 series | price range 2.77-5.83</code></pre>
+</div>
+</div>
+<p><strong>Why logs on both sides.</strong> With <code>ly</code> and <code>lp</code> both logged, the price coefficient is an <strong>elasticity</strong>: the percentage change in units for a one percent change in price. That is directly interpretable, and it is what makes the scenario analysis in Q6 possible.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Do not standardize log price
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is a common reflex, and here it is a trap. Dividing <code>lp</code> by its standard deviation rescales the coefficient into “per standard deviation of log price” — which is <strong>no longer an elasticity</strong>, and every percentage claim you build on it in Q6 will be wrong by the factor you divided by. Leave <code>lp</code> in log units. Every predictor in this assignment is already on a scale a manager reads directly: log price in percent, <code>snap</code> and <code>event</code> as 0/1, <code>t</code> in years.</p>
+<p>Centring within series (<code>lpc</code>) is different and is fine — it shifts the variable without rescaling it, leaves the elasticity untouched, and greatly improves sampling, because price levels differ across series and otherwise correlate with the intercepts.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="initial-prompt-for-codex" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Initial Prompt for Codex</h1>
+<section id="initial-prompt-for-codex" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</h2>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -2426,97 +2457,189 @@ Initial Prompt for Codex
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
-<pre><code>I am working on Homework 1, Part 1 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
+<p>Paste the following as your first message to Codex. Save it as <code>INITIAL_PROMPT.md</code> in your submission folder.</p>
+<pre><code>I am working on Homework 7 for ECON 8310: Business Forecasting at the
+University of Nebraska at Omaha.
 
-Dataset: M5 / Walmart weekly sales, prepared at `data/processed/m5_weekly.csv`. Columns: store_id (10 Walmart stores across CA, TX, WI), cat_id (FOODS, HOBBIES, HOUSEHOLD), state_id, week_start, units, avg_price, snap_days, event_days, and lag features (units_lag1 through units_lag52). There are 30 store-category series, each with 277 weekly observations covering January 2011 to May 2016.
+Dataset: M5/Walmart — weekly aggregated, 30 store-category series, at
+`data/processed/m5_weekly.csv`. Columns: store_id, cat_id, state_id,
+week_start, units, avg_price, snap_days, event_days. I work with log units
+(ly) on log price (lp), plus a trend and series identifiers.
 
-Part 1 covers exponential smoothing only (SES, Holt, Holt-Winters) using Python and statsmodels, on the CA_1 FOODS series. ARIMA and VAR come in Part 2 — do not introduce them here. I will ask you questions one at a time. For each:
-1. Write clean, well-commented Python code that runs end-to-end
-2. Interpret outputs in plain English for a business audience
+This homework covers Bayesian linear regression using PyMC (v4+),
+including DAGs, posterior coefficient interpretation, ROPE analysis,
+and conditional scenario simulation. I will ask you questions one at
+a time. For each:
+1. Write clean, well-commented PyMC code that runs end-to-end
+2. Interpret posterior distributions in plain English
 3. Log this interaction to PROMPT_LOG.jsonl before responding
 
-My prompt budget for Part 1 is 4 (this context prompt is excluded). I will label each question before asking.
+My prompt budget is 16 (this context prompt is excluded). I will label
+each question before asking.
 
-Confirm by responding with: HW01P1_CONTEXT_ACK</code></pre>
-<p>Submit this text as <strong><code>INITIAL_PROMPT.md</code></strong> in your Part 1 submission folder.</p>
+Confirm by responding with: HW07_CONTEXT_ACK</code></pre>
 </div>
 </div>
 <hr>
 </section>
-<section id="questions" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Questions</h1>
-<section id="q1-exploratory-plot" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="q1-exploratory-plot"><span class="header-section-number">4.1</span> Q1 — Exploratory Plot</h2>
-<p><em>(Suggested prompts: 1)</em></p>
-<p>Plot CA_1 FOODS weekly unit sales over the full 277-week window. After examining the plot, answer the written questions below.</p>
-<div id="6abf1022" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot CA_1 FOODS weekly units over time</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<section id="questions" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="questions"><span class="header-section-number">4</span> Questions</h2>
+<section id="q1-draw-a-dag-suggested-prompts-1" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="q1-draw-a-dag-suggested-prompts-1"><span class="header-section-number">4.1</span> Q1 — Draw a DAG <em>(Suggested prompts: 1)</em></h3>
+<p>Before fitting anything, think about the causal structure. <strong>This question determines what the rest of the assignment means</strong>, so do it first and do it honestly.</p>
+<p>Draw a DAG for weekly demand including at least: <code>units</code>, <code>avg_price</code>, <code>series</code> (which store-category this is), <code>time</code> (trend), <code>snap_days</code>, and <code>event_days</code>.</p>
+<p>No code needed — a Markdown table or ASCII diagram is fine. Justify every arrow in one sentence.</p>
+<pre><code>series  → avg_price   (categories differ systematically in price level)
+series  → units       (categories differ systematically in volume)
+time    → avg_price   (prices drift over five years)
+time    → units       (demand grows over the sample)
+avg_price → units     (the effect we want to estimate)
+...</code></pre>
+<p><strong>Then answer the question this exists to answer:</strong> is there a confounder between <code>avg_price</code> and <code>units</code>? Name it, explain the mechanism in business terms, and state what you must do about it in the regression.</p>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Describe what you see. Is there a trend, and roughly how large is it over the five years? Is there a repeating annual pattern, and where do the peaks fall? Identify at least one irregular spike or dip and propose a business explanation — the dataset includes SNAP benefit days and event flags, and Walmart food sales respond to both.</p>
+<p><strong>Your response:</strong></p>
 </blockquote>
 <hr>
 </section>
-<section id="q2-exponential-smoothing-models" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="q2-exponential-smoothing-models"><span class="header-section-number">4.2</span> Q2 — Exponential Smoothing Models</h2>
-<p><em>(Suggested prompts: 2)</em></p>
-<p>Hold out the final <strong>52 weeks</strong> as a test set. Fit the three models below on the training portion, forecast across the test period, and compute RMSE and MAE for each.</p>
+<section id="q2-ols-benchmark-two-ways-suggested-prompts-2" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="q2-ols-benchmark-two-ways-suggested-prompts-2"><span class="header-section-number">4.2</span> Q2 — OLS Benchmark, Two Ways <em>(Suggested prompts: 2)</em></h3>
+<p>Fit <strong>two</strong> OLS regressions with <code>statsmodels</code>, and note that the difference between them is the whole point of Q1.</p>
+<p><strong>(a) Naive</strong> — regress <code>ly</code> on <code>lp</code>, <code>snap</code>, <code>event</code>.</p>
+<p><strong>(b) Controlled</strong> — regress <code>ly</code> on <code>lpc</code>, <code>snap</code>, <code>event</code>, plus a trend (<code>t</code>) and series fixed effects (<code>pd.get_dummies(df.series)</code>).</p>
+<p>Report the coefficient table for each, and put the two price elasticities side by side.</p>
+<div id="4b57c19d" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) naive OLS</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) OLS with trend and series fixed effects</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the two price coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Report both elasticities. They will differ substantially. Using your DAG from Q1, explain <strong>which one estimates the quantity you actually want</strong>, and why the other is biased in the direction it is.</p>
+<p>Then look at the standard errors: the naive estimate is not merely different, it is at least as <em>precise</em>. Explain why precision is no defence here.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q3-bayesian-linear-regression-suggested-prompts-3" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="q3-bayesian-linear-regression-suggested-prompts-3"><span class="header-section-number">4.3</span> Q3 — Bayesian Linear Regression <em>(Suggested prompts: 3)</em></h3>
+<p>Fit the <strong>controlled</strong> specification from Q2(b) as a Bayesian model — price, SNAP, events, trend, and a per-series intercept. Use weakly informative priors:</p>
 <ul>
-<li><strong>Simple Exponential Smoothing (SES)</strong></li>
-<li><strong>Holt’s linear trend model</strong></li>
-<li><strong>Holt-Winters (additive seasonality, period = 52)</strong></li>
+<li><code>beta_j ~ Normal(0, 1)</code> for each predictor (weakly informative on these scales)</li>
+<li><code>alpha ~ Normal(0, 1)</code> for the intercept</li>
+<li><code>sigma ~ HalfNormal(1)</code> for observation noise</li>
 </ul>
-<p>Also compute the same two metrics for a <strong>seasonal naive</strong> benchmark — this week last year — so you can tell whether any of the three models is earning its complexity. Present all four rows in one summary table.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<p>Give the per-series intercepts a hierarchical prior, written <strong>non-centred</strong>, as in Homework 6.</p>
+<p>Sample with <code>pm.sample(1000, tune=1500, chains=4, target_accept=0.9)</code> and report the posterior mean, sd and 94% HDI for each coefficient — plus <span class="math inline">\(\hat{R}\)</span>, ESS and divergences.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Why a 52-week test set works here
+Ask ArviZ for the HDI explicitly
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Holt-Winters must estimate a seasonal index for each of the 52 weeks in a year, and it needs <strong>at least two complete cycles</strong> — <span class="math inline">\(2m = 104\)</span> observations — before it can initialize them. This is the <span class="math inline">\(2m\)</span> rule from Lecture 1.</p>
-<p>Each series has 277 weeks. Holding out 52 still leaves 225 for training, comfortably above the threshold, and a one-year holdout is the horizon a demand planner actually cares about. The assertion below makes the constraint explicit rather than letting it fail deep inside statsmodels.</p>
+<p><code>az.summary(idata)</code> reports an <strong>89% equal-tailed interval</strong> by default, not the HDI. For the highest-density interval this course uses, call <code>az.summary(idata, ci_kind=&quot;hdi&quot;, ci_prob=0.94)</code>, or <code>az.hdi(samples, prob=0.94)</code> on raw draws.</p>
+<p>An equal-tailed interval cuts 5.5% off each tail; an HDI is the <em>shortest</em> interval holding 94% of the mass. They coincide for a symmetric posterior and diverge for a skewed one.</p>
 </div>
 </div>
-<div id="12688c3c" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span>                                   <span class="co"># final year held out</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>SEASONAL_PERIOD <span class="op">=</span> <span class="dv">52</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(train) <span class="op">&gt;=</span> <span class="dv">2</span> <span class="op">*</span> SEASONAL_PERIOD, (</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f&quot;Training set has </span><span class="sc">{</span><span class="bu">len</span>(train)<span class="sc">}</span><span class="ss"> weeks but Holt-Winters with period &quot;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f&quot;</span><span class="sc">{</span>SEASONAL_PERIOD<span class="sc">}</span><span class="ss"> needs at least </span><span class="sc">{</span><span class="dv">2</span> <span class="op">*</span> SEASONAL_PERIOD<span class="sc">}</span><span class="ss">. &quot;</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f&quot;Reduce N_TEST.&quot;</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;train: </span><span class="sc">{</span><span class="bu">len</span>(train)<span class="sc">}</span><span class="ss"> weeks   test: </span><span class="sc">{</span><span class="bu">len</span>(test)<span class="sc">}</span><span class="ss"> weeks&quot;</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit SES, Holt, and Holt-Winters; add a seasonal naive benchmark;</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># compute RMSE and MAE for all four</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train: 225 weeks   test: 52 weeks</code></pre>
-</div>
+<div id="a32c92ac" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build and sample Bayesian linear regression</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Which model performs best, and does it beat the seasonal naive benchmark? This series trends upward over the sample — explain what that implies for SES specifically, given that SES produces a flat forecast. Then interpret the estimated <span class="math inline">\(\alpha\)</span>: what does its value say about how quickly CA_1 food sales respond to recent weeks, and what would you tell a demand planner who wanted to know how much weight the model puts on last week?</p>
+<p><strong>Your response:</strong> Compare the posterior means to the controlled OLS coefficients from Q2(b). With this much data they should agree closely — say whether they do, and explain why agreement is the <em>expected</em> result rather than a disappointing one.</p>
+<p>Then: what does a wide HDI tell you that a narrow one does not, and which coefficient here has the widest relative to its mean?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q4-posterior-visualization-suggested-prompts-2" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="q4-posterior-visualization-suggested-prompts-2"><span class="header-section-number">4.4</span> Q4 — Posterior Visualization <em>(Suggested prompts: 2)</em></h3>
+<p>Plot the posterior distributions for the three coefficients that matter most for a business decision — justify the choice from your DAG.</p>
+<p>For each, report: - Posterior mean - 94% HDI - <code>P(beta &gt; 0)</code> — probability the effect is positive - Whether the HDI excludes zero (the Bayesian analog of significance)</p>
+<div id="a5a44e63" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot posterior distributions and compute P(beta &gt; 0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> For the <strong>price</strong> coefficient, report <span class="math inline">\(P(\beta_{\text{price}} &lt; 0)\)</span> — the probability that raising price reduces demand. Contrast that statement with what the OLS p-value in Q2 actually claims, and say which one you could put in front of a manager without having to correct it afterwards.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q5-rope-analysis-suggested-prompts-2" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="q5-rope-analysis-suggested-prompts-2"><span class="header-section-number">4.5</span> Q5 — ROPE Analysis <em>(Suggested prompts: 2)</em></h3>
+<p>“Credible” and “big enough to act on” are different questions. A <strong>ROPE</strong> — region of practical equivalence — makes the second one explicit.</p>
+<p>For each predictor, compute the fraction of posterior mass inside <code>|beta| &lt; 0.05</code>. Because nothing here is standardized, that threshold reads directly: for price, an elasticity between <span class="math inline">\(-0.05\)</span> and <span class="math inline">\(0.05\)</span> means a 1% price change moves units by less than 0.05% — no one would act on it. For <code>snap</code> and <code>event</code> it means a weekly lift under 5%.</p>
+<p>Present results in a table:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 20%">
+<col style="width: 12%">
+<col style="width: 15%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Predictor</th>
+<th>Posterior Mean</th>
+<th>94% HDI</th>
+<th>% in ROPE</th>
+<th>Practically significant?</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<p>A predictor is “practically significant” if less than 5% of its posterior falls in the ROPE.</p>
+<div id="7e497d35" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute % of posterior in ROPE for each predictor</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Name any predictor that is <strong>credible but negligible</strong> — HDI excluding zero while most of its posterior sits inside the ROPE. That combination is common in large samples and is exactly what a p-value cannot express.</p>
+<p>What should a manager do with such a finding, and what would have to change for it to become worth acting on?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q6-conditional-scenario-simulation-suggested-prompts-3" class="level3" data-number="4.6">
+<h3 data-number="4.6" class="anchored" data-anchor-id="q6-conditional-scenario-simulation-suggested-prompts-3"><span class="header-section-number">4.6</span> Q6 — Conditional Scenario Simulation <em>(Suggested prompts: 3)</em></h3>
+<p>A category manager is considering a <strong>5% price increase</strong> across the board and wants to know what happens to volume — and how confident anyone can be about it.</p>
+<p>Push the scenario through your posterior rather than through a point estimate.</p>
+<div id="10cfd523" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># b = idata.posterior[&quot;b_price&quot;].values.ravel()</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pct_change = 100 * (np.exp(b * np.log(1.05)) - 1)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># report the mean and the 94% interval of pct_change</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>(a)</strong> Report the mean percentage change in units and its 94% interval.</p>
+<p><strong>(b)</strong> Revenue rises if the percentage volume loss is smaller than the 5% price gain. Compute the <strong>probability that revenue increases</strong>, directly from the posterior samples.</p>
+<p><strong>(c)</strong> Repeat using the <em>naive</em> elasticity from Q2(a). Report how the recommendation changes.</p>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Give the manager a two-sentence recommendation with a probability attached. Then state the caveat honestly: this is a causal claim about intervening on price, and it is only as good as the DAG in Q1. Name one arrow that, if wrong, would invalidate the answer.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q7-course-capstone-reflection-suggested-prompts-0-write-yourself" class="level3" data-number="4.7">
+<h3 data-number="4.7" class="anchored" data-anchor-id="q7-course-capstone-reflection-suggested-prompts-0-write-yourself"><span class="header-section-number">4.7</span> Q7 — Course Capstone Reflection <em>(Suggested prompts: 0 — write yourself)</em></h3>
+<p>No code required. In 200–250 words: Look back at the full arc of this course — from exponential smoothing in Homework 1 to Bayesian regression in this homework.</p>
+<p>Answer the following:</p>
+<ol type="1">
+<li><p><strong>Which method from the course would you use first</strong> when you encounter a new business forecasting problem, and why? (Consider ease of implementation, interpretability, and typical performance.)</p></li>
+<li><p><strong>Where does Bayesian inference add the most value</strong> compared to the classical and machine learning methods you used earlier? Give a specific example from your homework results.</p></li>
+<li><p><strong>What is one limitation</strong> of every method in this course — something none of them handle well — and what would you do in practice to address it?</p></li>
+</ol>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong></p>
 </blockquote>
 <hr>
 </section>
 </section>
-<section id="submission-checklist" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Submission Checklist</h1>
-<p>Before submitting Part 1, confirm each item below.</p>
+<section id="submission-checklist" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="submission-checklist"><span class="header-section-number">5</span> Submission Checklist</h2>
 <ul class="task-list">
-<li><label><input type="checkbox">All code cells run without errors from top to bottom (Kernel → Restart &amp; Run All)</label></li>
-<li><label><input type="checkbox">Written responses are completed in your own words — AI-generated prose is not accepted for written sections</label></li>
-<li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> is saved in your Part 1 submission folder</label></li>
-<li><label><input type="checkbox"><code>PROMPT_LOG.jsonl</code> is complete with <strong>4 or fewer</strong> entries (one entry per Codex prompt sent)</label></li>
-<li><label><input type="checkbox">One git commit per Codex prompt used, following the format: <code>hw01_part1 prompt &lt;id&gt;: &lt;one-line summary&gt;</code></label></li>
+<li><label><input type="checkbox">All code cells run without errors from top to bottom</label></li>
+<li><label><input type="checkbox">Written responses completed in your own words</label></li>
+<li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in <code>submissions/hw07_&lt;your_name&gt;/</code></label></li>
+<li><label><input type="checkbox"><code>PROMPT_LOG.jsonl</code> complete with <strong>16 or fewer</strong> entries</label></li>
+<li><label><input type="checkbox">One git commit per Codex prompt (<code>hw07 prompt &lt;id&gt;: &lt;short summary&gt;</code>)</label></li>
+<li><label><input type="checkbox"><code>REPORT.md</code> with a clear business recommendation</label></li>
 </ul>
-<p><em>Part 2 is due before class in Week 3 and carries its own prompt budget. The business recommendation <code>REPORT.md</code> is submitted with Part 2, once you have results from all five questions.</em></p>
 </section>
 
 </main>

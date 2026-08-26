@@ -8,7 +8,7 @@
 
 <meta name="author" content="Your Name">
 
-<title>Homework 1, Part 1: Exponential Smoothing</title>
+<title>Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -2319,12 +2319,16 @@ window.Quarto = {
    
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
-  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="header-section-number">2</span> Dataset</a></li>
+  <li><a href="#dataset-and-setup" id="toc-dataset-and-setup" class="nav-link" data-scroll-target="#dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</a></li>
   <li><a href="#initial-prompt-for-codex" id="toc-initial-prompt-for-codex" class="nav-link" data-scroll-target="#initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</a></li>
-  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">4</span> Questions</a>
+  <li><a href="#part-c-pooling-across-series" id="toc-part-c-pooling-across-series" class="nav-link" data-scroll-target="#part-c-pooling-across-series"><span class="header-section-number">4</span> Part C: Pooling Across Series</a>
   <ul class="collapse">
-  <li><a href="#q1-exploratory-plot" id="toc-q1-exploratory-plot" class="nav-link" data-scroll-target="#q1-exploratory-plot"><span class="header-section-number">4.1</span> Q1 — Exploratory Plot</a></li>
-  <li><a href="#q2-exponential-smoothing-models" id="toc-q2-exponential-smoothing-models" class="nav-link" data-scroll-target="#q2-exponential-smoothing-models"><span class="header-section-number">4.2</span> Q2 — Exponential Smoothing Models</a></li>
+  <li><a href="#q1-what-are-you-allowed-to-pool-suggested-prompts-1" id="toc-q1-what-are-you-allowed-to-pool-suggested-prompts-1" class="nav-link" data-scroll-target="#q1-what-are-you-allowed-to-pool-suggested-prompts-1"><span class="header-section-number">4.1</span> Q1 — What Are You Allowed to Pool? <em>(Suggested prompts: 1)</em></a></li>
+  <li><a href="#q2-three-models-suggested-prompts-3" id="toc-q2-three-models-suggested-prompts-3" class="nav-link" data-scroll-target="#q2-three-models-suggested-prompts-3"><span class="header-section-number">4.2</span> Q2 — Three Models <em>(Suggested prompts: 3)</em></a></li>
+  <li><a href="#q3-shrinkage-measured-suggested-prompts-2" id="toc-q3-shrinkage-measured-suggested-prompts-2" class="nav-link" data-scroll-target="#q3-shrinkage-measured-suggested-prompts-2"><span class="header-section-number">4.3</span> Q3 — Shrinkage, Measured <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q4-grade-it-against-data-it-never-saw-suggested-prompts-2" id="toc-q4-grade-it-against-data-it-never-saw-suggested-prompts-2" class="nav-link" data-scroll-target="#q4-grade-it-against-data-it-never-saw-suggested-prompts-2"><span class="header-section-number">4.4</span> Q4 — Grade It Against Data It Never Saw <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q5-the-business-recommendation-suggested-prompts-1" id="toc-q5-the-business-recommendation-suggested-prompts-1" class="nav-link" data-scroll-target="#q5-the-business-recommendation-suggested-prompts-1"><span class="header-section-number">4.5</span> Q5 — The Business Recommendation <em>(Suggested prompts: 1)</em></a></li>
+  <li><a href="#q6-reflection-suggested-prompts-0-write-yourself" id="toc-q6-reflection-suggested-prompts-0-write-yourself" class="nav-link" data-scroll-target="#q6-reflection-suggested-prompts-0-write-yourself"><span class="header-section-number">4.6</span> Q6 — Reflection <em>(Suggested prompts: 0 — write yourself)</em></a></li>
   </ul></li>
   <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">5</span> Submission Checklist</a></li>
   </ul>
@@ -2334,7 +2338,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Homework 1, Part 1: Exponential Smoothing</h1>
+<h1 class="title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</h1>
 <p class="subtitle lead">ECON 8310: Business Forecasting — University of Nebraska at Omaha · Fall 2026</p>
 </div>
 
@@ -2358,38 +2362,31 @@ window.Quarto = {
 </header>
 
 
-<section id="overview" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
-<p>Homework 1 comes in two parts. <strong>Part 1 (this document)</strong> covers exponential smoothing and is due before class in Week 2 — it uses only material from Lecture 1. <strong>Part 2</strong> covers ARIMA, VAR, and method comparison, and is due before class in Week 3, after Lecture 2.</p>
-<p>Each part has its own Codex context prompt, its own prompt budget, and its own submission. Do not start Part 2 until Part 1 is submitted.</p>
-<p>Exponential smoothing is a workhorse of operational forecasting in retail and supply chain: interpretable, cheap to fit, and hard to beat at scale. Working through real store-level sales data, you will see how the choice of smoothing model and the rigor of evaluation translate directly into business decisions.</p>
-<p><strong>Learning objectives.</strong> By the end of Part 1 you will be able to:</p>
-<ul>
-<li>Read a retail time series plot for trend, seasonality, and business-driven irregularity</li>
-<li>Apply Simple Exponential Smoothing, Holt’s linear trend model, and Holt-Winters to seasonal weekly data</li>
-<li>Interpret the smoothing parameter <span class="math inline">\(\alpha\)</span> in business terms</li>
-<li>Compare competing models on a held-out test set using RMSE and MAE, against a benchmark</li>
-</ul>
+<blockquote class="blockquote">
+<p><strong>Due Week 15.</strong> Covers Lecture 11 Part 2 (pooling and hierarchical models).</p>
+</blockquote>
+<hr>
+<section id="overview" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1</span> Overview</h2>
+<p>Part 1 fitted one series. Now you have thirty, they are not equally informative, and — the part that is easy to miss — they are not all the same kind of thing.</p>
+<p>You will decide which series may legitimately share a hierarchy, fit the same quantity three ways, measure how far each series moves when pooling is added, and then check the whole thing against weeks the models never saw.</p>
 <hr>
 </section>
-<section id="dataset" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Dataset</h1>
-<p>This course runs on the <strong>M5 / Walmart</strong> dataset — the spine described in <code>ECON8310_Datasets.md</code>. It covers daily unit sales for Walmart stores across California, Texas, and Wisconsin from <strong>29 January 2011 to 22 May 2016</strong>, and it was the data for the M5 forecasting competition.</p>
-<p>You will work with the prepared weekly file, <code>data/processed/m5_weekly.csv</code>: <strong>30 series</strong> (10 stores × 3 product categories), <strong>277 weeks each</strong>, with average price, SNAP benefit days, and event-day counts alongside the unit sales.</p>
-<p>If the file does not exist, run <code>python scripts/prep_m5.py</code> once first — it will tell you where to get the raw download.</p>
-<div id="4d40ee8d" class="cell" data-execution_count="1">
+<section id="dataset-and-setup" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</h2>
+<div id="10120d53" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.holtwinters <span class="im">import</span> ExponentialSmoothing</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">&#39;ignore&#39;</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings, logging</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">&#39;ignore&#39;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">&#39;pymc&#39;</span>).setLevel(logging.ERROR)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Find the processed data file whether you render from the repo root or from</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">    this file&#39;s own folder.&quot;&quot;&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">&quot;data&quot;</span> <span class="op">/</span> <span class="st">&quot;processed&quot;</span> <span class="op">/</span> name</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
@@ -2399,23 +2396,42 @@ window.Quarto = {
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Run `python scripts/prep_m5.py` from the repository root first.&quot;</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> pd.read_csv(data_path(<span class="st">&quot;m5_weekly.csv&quot;</span>), parse_dates<span class="op">=</span>[<span class="st">&quot;week_start&quot;</span>])</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Store CA_1, FOODS category, for the univariate models in Part 1</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ca1 <span class="op">=</span> (weekly[(weekly.store_id <span class="op">==</span> <span class="st">&quot;CA_1&quot;</span>) <span class="op">&amp;</span> (weekly.cat_id <span class="op">==</span> <span class="st">&quot;FOODS&quot;</span>)]</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>       .set_index(<span class="st">&quot;week_start&quot;</span>)[<span class="st">&quot;units&quot;</span>]</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>       .sort_index())</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;CA_1 FOODS: </span><span class="sc">{</span><span class="bu">len</span>(ca1)<span class="sc">}</span><span class="ss"> weekly observations &quot;</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f&quot;from </span><span class="sc">{</span>ca1<span class="sc">.</span>index<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>ca1<span class="sc">.</span>index<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> (pd.read_csv(data_path(<span class="st">&quot;m5_weekly.csv&quot;</span>), parse_dates<span class="op">=</span>[<span class="st">&quot;week_start&quot;</span>])</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            .sort_values([<span class="st">&quot;store_id&quot;</span>, <span class="st">&quot;cat_id&quot;</span>, <span class="st">&quot;week_start&quot;</span>]))</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;series&quot;</span>] <span class="op">=</span> weekly.store_id <span class="op">+</span> <span class="st">&quot;_&quot;</span> <span class="op">+</span> weekly.cat_id</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># A &quot;high-SNAP&quot; week is one with 5 or more SNAP benefit days</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;hi_snap&quot;</span>] <span class="op">=</span> (weekly.snap_days <span class="op">&gt;=</span> <span class="dv">5</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># One series for the single-series work</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>ca1 <span class="op">=</span> weekly[weekly.series <span class="op">==</span> <span class="st">&quot;CA_1_FOODS&quot;</span>].reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>weekly<span class="sc">.</span>series<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> series | CA_1 FOODS: </span><span class="sc">{</span><span class="bu">len</span>(ca1)<span class="sc">}</span><span class="ss"> weeks | &quot;</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f&quot;high-SNAP: </span><span class="sc">{</span>ca1<span class="sc">.</span>hi_snap<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span><span class="bu">len</span>(ca1)<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>ca1<span class="sc">.</span>hi_snap<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">%)&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>CA_1 FOODS: 277 weekly observations from 2011-01-31 to 2016-05-16</code></pre>
+<pre><code>30 series | CA_1 FOODS: 277 weeks | high-SNAP: 72 of 277 (26%)</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Report diagnostics with every model
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Lecture 10 gave you three checks, and this assignment expects all three for <strong>every</strong> model you fit: <span class="math inline">\(\hat{R} &lt; 1.01\)</span>, ESS <span class="math inline">\(&gt; 400\)</span>, and <strong>zero divergences</strong>. <code>az.summary(idata, ci_kind=&quot;hdi&quot;, ci_prob=0.94)</code> gives the first two; <code>pm.sample</code> reports divergences as it runs.</p>
+<p>A model that fails these has not converged, and its posterior means nothing — report the failure rather than the numbers.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="initial-prompt-for-codex" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Initial Prompt for Codex</h1>
+<section id="initial-prompt-for-codex" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</h2>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -2426,97 +2442,176 @@ Initial Prompt for Codex
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
-<pre><code>I am working on Homework 1, Part 1 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
+<p>Paste this as the very first message in your Codex session. It does <strong>not</strong> count against your prompt budget.</p>
+<pre><code>I am working on Homework 6 Part 2 for ECON 8310: Business Forecasting at the
+University of Nebraska at Omaha.
 
-Dataset: M5 / Walmart weekly sales, prepared at `data/processed/m5_weekly.csv`. Columns: store_id (10 Walmart stores across CA, TX, WI), cat_id (FOODS, HOBBIES, HOUSEHOLD), state_id, week_start, units, avg_price, snap_days, event_days, and lag features (units_lag1 through units_lag52). There are 30 store-category series, each with 277 weekly observations covering January 2011 to May 2016.
+Dataset: M5/Walmart — weekly aggregated, 30 store-category series, at
+`data/processed/m5_weekly.csv`. Columns: store_id, cat_id, state_id,
+week_start, units (target), avg_price, snap_days, event_days. I derive
+hi_snap = (snap_days &gt;= 5). CA_1_FOODS is the single series used for
+single-series work.
 
-Part 1 covers exponential smoothing only (SES, Holt, Holt-Winters) using Python and statsmodels, on the CA_1 FOODS series. ARIMA and VAR come in Part 2 — do not introduce them here. I will ask you questions one at a time. For each:
-1. Write clean, well-commented Python code that runs end-to-end
-2. Interpret outputs in plain English for a business audience
-3. Log this interaction to PROMPT_LOG.jsonl before responding
+This part covers unpooled, pooled and hierarchical models of a per-series SNAP effect across 30 series. I completed Part 1 already.
 
-My prompt budget for Part 1 is 4 (this context prompt is excluded). I will label each question before asking.
+This homework uses PyMC and ArviZ. I will ask you questions one at a time.
+For each:
+1. Write clean, well-commented Python that runs end-to-end
+2. Report R-hat, ESS and divergences for every model fitted
+3. Interpret posteriors in plain business language
+4. Log this interaction to PROMPT_LOG.jsonl before responding
 
-Confirm by responding with: HW01P1_CONTEXT_ACK</code></pre>
-<p>Submit this text as <strong><code>INITIAL_PROMPT.md</code></strong> in your Part 1 submission folder.</p>
+My prompt budget for Part 2 is 9 (this context prompt is excluded). I will label
+each question before asking.
+
+Confirm by responding with: HW06P2_CONTEXT_ACK</code></pre>
+<p>Submit this text as <strong><code>INITIAL_PROMPT.md</code></strong> in your submission folder.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="questions" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Questions</h1>
-<section id="q1-exploratory-plot" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="q1-exploratory-plot"><span class="header-section-number">4.1</span> Q1 — Exploratory Plot</h2>
-<p><em>(Suggested prompts: 1)</em></p>
-<p>Plot CA_1 FOODS weekly unit sales over the full 277-week window. After examining the plot, answer the written questions below.</p>
-<div id="6abf1022" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot CA_1 FOODS weekly units over time</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="part-c-pooling-across-series" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="part-c-pooling-across-series"><span class="header-section-number">4</span> Part C: Pooling Across Series</h2>
+<p>The quantity of interest: the effect of a high-SNAP week on log units, store by store.</p>
+<div id="ec46ce53" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">&quot;ly&quot;</span>] <span class="op">=</span> np.log(weekly.units.clip(lower<span class="op">=</span><span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="q1-what-are-you-allowed-to-pool-suggested-prompts-1" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="q1-what-are-you-allowed-to-pool-suggested-prompts-1"><span class="header-section-number">4.1</span> Q1 — What Are You Allowed to Pool? <em>(Suggested prompts: 1)</em></h3>
+<p>A hierarchy says the groups are <strong>exchangeable</strong>: before seeing the data, you have no reason to expect one to differ from another in a particular direction. That is an assumption about the world, and nothing in PyMC will check it for you.</p>
+<p>Before fitting anything, compute the raw high-SNAP effect — the difference in mean log units between high-SNAP weeks and the rest — for every one of the thirty series, and summarize it <strong>by category</strong>.</p>
+<div id="661269ec" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw effect per series; mean and spread within each category</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Describe what you see. Is there a trend, and roughly how large is it over the five years? Is there a repeating annual pattern, and where do the peaks fall? Identify at least one irregular spike or dip and propose a business explanation — the dataset includes SNAP benefit days and event flags, and Walmart food sales respond to both.</p>
+<p><strong>Your response:</strong> Report the three category means. SNAP is a food assistance programme — does the table agree? State which set of series you are willing to treat as exchangeable and why, and name the specific wrong answer you would get by pooling all thirty.</p>
 </blockquote>
-<hr>
-</section>
-<section id="q2-exponential-smoothing-models" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="q2-exponential-smoothing-models"><span class="header-section-number">4.2</span> Q2 — Exponential Smoothing Models</h2>
-<p><em>(Suggested prompts: 2)</em></p>
-<p>Hold out the final <strong>52 weeks</strong> as a test set. Fit the three models below on the training portion, forecast across the test period, and compute RMSE and MAE for each.</p>
-<ul>
-<li><strong>Simple Exponential Smoothing (SES)</strong></li>
-<li><strong>Holt’s linear trend model</strong></li>
-<li><strong>Holt-Winters (additive seasonality, period = 52)</strong></li>
-</ul>
-<p>Also compute the same two metrics for a <strong>seasonal naive</strong> benchmark — this week last year — so you can tell whether any of the three models is earning its complexity. Present all four rows in one summary table.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Why a 52-week test set works here
+This question decides the rest of the assignment
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Holt-Winters must estimate a seasonal index for each of the 52 weeks in a year, and it needs <strong>at least two complete cycles</strong> — <span class="math inline">\(2m = 104\)</span> observations — before it can initialize them. This is the <span class="math inline">\(2m\)</span> rule from Lecture 1.</p>
-<p>Each series has 277 weeks. Holding out 52 still leaves 225 for training, comfortably above the threshold, and a one-year holdout is the horizon a demand planner actually cares about. The assertion below makes the constraint explicit rather than letting it fail deep inside statsmodels.</p>
+<p>Get it wrong and every model below will fit cleanly, pass every diagnostic, and give you a confidently wrong number. The lab shows exactly that happening.</p>
 </div>
 </div>
-<div id="12688c3c" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span>                                   <span class="co"># final year held out</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>SEASONAL_PERIOD <span class="op">=</span> <span class="dv">52</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(train) <span class="op">&gt;=</span> <span class="dv">2</span> <span class="op">*</span> SEASONAL_PERIOD, (</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f&quot;Training set has </span><span class="sc">{</span><span class="bu">len</span>(train)<span class="sc">}</span><span class="ss"> weeks but Holt-Winters with period &quot;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f&quot;</span><span class="sc">{</span>SEASONAL_PERIOD<span class="sc">}</span><span class="ss"> needs at least </span><span class="sc">{</span><span class="dv">2</span> <span class="op">*</span> SEASONAL_PERIOD<span class="sc">}</span><span class="ss">. &quot;</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f&quot;Reduce N_TEST.&quot;</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;train: </span><span class="sc">{</span><span class="bu">len</span>(train)<span class="sc">}</span><span class="ss"> weeks   test: </span><span class="sc">{</span><span class="bu">len</span>(test)<span class="sc">}</span><span class="ss"> weeks&quot;</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit SES, Holt, and Holt-Winters; add a seasonal naive benchmark;</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># compute RMSE and MAE for all four</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="q2-three-models-suggested-prompts-3" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="q2-three-models-suggested-prompts-3"><span class="header-section-number">4.2</span> Q2 — Three Models <em>(Suggested prompts: 3)</em></h3>
+<p>Work from here on with the series you defended in Q1. Build the information imbalance that partial pooling exists to handle: thin every other series down to <strong>8 weeks</strong>, and keep the weeks you removed — you will need them in Q4.</p>
+<div id="7d77b435" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>foods <span class="op">=</span> weekly[weekly.cat_id <span class="op">==</span> <span class="st">&quot;FOODS&quot;</span>].dropna(subset<span class="op">=</span>[<span class="st">&quot;units&quot;</span>]).copy()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>codes, uniq <span class="op">=</span> pd.factorize(foods.series)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>foods[<span class="st">&quot;idx&quot;</span>] <span class="op">=</span> codes</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="bu">len</span>(uniq)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>keep <span class="op">=</span> []</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(J):</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    rows <span class="op">=</span> foods.index[foods.idx <span class="op">==</span> j].tolist()</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="dv">8</span> <span class="cf">if</span> j <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> <span class="bu">len</span>(rows)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    keep <span class="op">+=</span> <span class="bu">list</span>(rng.choice(rows, size<span class="op">=</span><span class="bu">min</span>(n, <span class="bu">len</span>(rows)), replace<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> foods.loc[<span class="bu">sorted</span>(keep)].copy()      <span class="co"># what the models see</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>heldout <span class="op">=</span> foods.drop(index<span class="op">=</span>keep).copy()     <span class="co"># the grader for Q4</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>thin <span class="op">=</span> np.array([j <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span> <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(J)])</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>J<span class="sc">}</span><span class="ss"> series, </span><span class="sc">{</span>thin<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> thinned to 8 weeks | &quot;</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f&quot;train </span><span class="sc">{</span><span class="bu">len</span>(train)<span class="sc">:,}</span><span class="ss"> rows, held-out </span><span class="sc">{</span><span class="bu">len</span>(heldout)<span class="sc">:,}</span><span class="ss"> rows&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train: 225 weeks   test: 52 weeks</code></pre>
+<pre><code>10 series, 5 thinned to 8 weeks | train 1,425 rows, held-out 1,345 rows</code></pre>
+</div>
+</div>
+<p>Fit all three on <code>train</code>:</p>
+<ul>
+<li><strong>Pooled</strong> — one <code>b</code> shared by every series</li>
+<li><strong>Unpooled</strong> — <code>b</code> with <code>shape=J</code>, each estimated independently</li>
+<li><strong>Hierarchical</strong> — <code>b_j ~ Normal(mu_b, sd_b)</code>, written <strong>non-centred</strong></li>
+</ul>
+<p>Each also needs a per-series intercept <code>a</code> with <code>shape=J</code>.</p>
+<div id="117341c3" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit pooled, unpooled and hierarchical</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The centred form will fail, and that is the lesson
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Writing the hierarchy as <code>pm.Normal(&quot;b&quot;, mu_b, sd_b, shape=J)</code> produces divergences — a few dozen at <code>target_accept=0.9</code>. Fit it that way <strong>first</strong>, record the count, then switch to the non-centred form and record it again. Report both; your exact count will differ from mine.</p>
 </div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Which model performs best, and does it beat the seasonal naive benchmark? This series trends upward over the sample — explain what that implies for SES specifically, given that SES produces a flat forecast. Then interpret the estimated <span class="math inline">\(\alpha\)</span>: what does its value say about how quickly CA_1 food sales respond to recent weeks, and what would you tell a demand planner who wanted to know how much weight the model puts on last week?</p>
+<p><strong>Your response:</strong> Report <span class="math inline">\(\hat{R}\)</span>, ESS and divergences for all three models plus the centred attempt. Note which of the three diagnostics actually objected to the centred fit — then explain what a divergence indicates about the posterior’s shape, and why reparameterizing fixes it without changing the model.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q3-shrinkage-measured-suggested-prompts-2" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="q3-shrinkage-measured-suggested-prompts-2"><span class="header-section-number">4.3</span> Q3 — Shrinkage, Measured <em>(Suggested prompts: 2)</em></h3>
+<p>Compare the per-series estimates from the unpooled and hierarchical fits.</p>
+<p><strong>(a)</strong> Plot each series’ estimate before and after pooling — unpooled on the left, hierarchical on the right, a line connecting each series. Colour thin series differently from full ones.</p>
+<p><strong>(b)</strong> Compute, separately for thin and full series: the spread of estimates before and after, and the <strong>mean absolute distance moved</strong> toward the group mean.</p>
+<div id="4a7f047e" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shrinkage plot and the movement table</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Report the ratio of mean movement, thin versus full. Nobody told the model which series were thin — explain how it inferred that. Then look at the two spread columns together: the thin series’ spread nearly disappears while the full series keep most of theirs. Explain why that is the behaviour you want, rather than a sign the model is inconsistent.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q4-grade-it-against-data-it-never-saw-suggested-prompts-2" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="q4-grade-it-against-data-it-never-saw-suggested-prompts-2"><span class="header-section-number">4.4</span> Q4 — Grade It Against Data It Never Saw <em>(Suggested prompts: 2)</em></h3>
+<p>You thinned those series yourself, so the removed weeks are sitting in <code>heldout</code>. For each thin series compute the high-SNAP effect that <strong>actually occurred</strong> in its held-out weeks, and compare it against both estimates.</p>
+<div id="19731c6c" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Held-out effect per thin series; RMSE of each model against it</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Report the per-series table and the two RMSEs. Which model was closer, and by how much? Then the question that matters: <span class="math inline">\(\hat{R}\)</span>, ESS and divergences all passed for both models. What kind of error can this held-out check catch that those three cannot — and what does that imply about shipping a model on diagnostics alone?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q5-the-business-recommendation-suggested-prompts-1" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="q5-the-business-recommendation-suggested-prompts-1"><span class="header-section-number">4.5</span> Q5 — The Business Recommendation <em>(Suggested prompts: 1)</em></h3>
+<p>Report the estimated <code>mu_b</code> and <code>sd_b</code> with their HDIs.</p>
+<div id="22e56dfa" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Group-level parameters</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> A category manager asks whether to build store-specific SNAP-week stocking policies, and shows you the <strong>unpooled</strong> estimates as evidence that stores differ.</p>
+<p>Write the reply. Use three things: the range the unpooled fit implies, what <code>sd_b</code> says about genuine store-to-store variation, and what Q4 found when those unpooled numbers met new data. Your answer should be neither “stores are all the same” nor “build thirty policies” — say what the evidence actually supports, and what would have to change to support more.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q6-reflection-suggested-prompts-0-write-yourself" class="level3" data-number="4.6">
+<h3 data-number="4.6" class="anchored" data-anchor-id="q6-reflection-suggested-prompts-0-write-yourself"><span class="header-section-number">4.6</span> Q6 — Reflection <em>(Suggested prompts: 0 — write yourself)</em></h3>
+<p>No code. 150–200 words.</p>
+<p>You have now met the same idea six times: the GAM smoothing penalty, tree pruning, <code>reg_lambda</code>, Ridge and LASSO, weight decay, and now a hierarchical prior. Each trades fit against complexity with one parameter setting the rate.</p>
+<p>Explain what makes the hierarchical version different from the other five, and why that difference matters when you have groups with very different amounts of data.</p>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong></p>
 </blockquote>
 <hr>
 </section>
 </section>
-<section id="submission-checklist" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Submission Checklist</h1>
-<p>Before submitting Part 1, confirm each item below.</p>
+<section id="submission-checklist" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="submission-checklist"><span class="header-section-number">5</span> Submission Checklist</h2>
 <ul class="task-list">
-<li><label><input type="checkbox">All code cells run without errors from top to bottom (Kernel → Restart &amp; Run All)</label></li>
-<li><label><input type="checkbox">Written responses are completed in your own words — AI-generated prose is not accepted for written sections</label></li>
-<li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> is saved in your Part 1 submission folder</label></li>
-<li><label><input type="checkbox"><code>PROMPT_LOG.jsonl</code> is complete with <strong>4 or fewer</strong> entries (one entry per Codex prompt sent)</label></li>
-<li><label><input type="checkbox">One git commit per Codex prompt used, following the format: <code>hw01_part1 prompt &lt;id&gt;: &lt;one-line summary&gt;</code></label></li>
+<li><label><input type="checkbox">All code cells run without errors from top to bottom</label></li>
+<li><label><input type="checkbox">Written responses completed in your own words</label></li>
+<li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in <code>submissions/hw06_part2_&lt;your_name&gt;/</code></label></li>
+<li><label><input type="checkbox"><code>PROMPT_LOG.jsonl</code> complete with <strong>9 or fewer</strong> entries for Part 2</label></li>
+<li><label><input type="checkbox">One git commit per Codex prompt (<code>hw06_part2 prompt &lt;id&gt;: &lt;short summary&gt;</code>)</label></li>
+<li><label><input type="checkbox"><code>REPORT.md</code> with a clear business recommendation</label></li>
 </ul>
-<p><em>Part 2 is due before class in Week 3 and carries its own prompt budget. The business recommendation <code>REPORT.md</code> is submitted with Part 2, once you have results from all five questions.</em></p>
 </section>
 
 </main>

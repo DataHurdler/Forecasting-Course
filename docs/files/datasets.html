@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ECON 8310 — Course Datasets</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="docstyle.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ECON 8310 — Course Datasets</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#econ-8310-the-data-we-use"
+id="toc-econ-8310-the-data-we-use">ECON 8310 — The Data We Use</a>
+<ul>
+<li><a href="#why-there-is-a-spine-and-why-there-are-supplements"
+id="toc-why-there-is-a-spine-and-why-there-are-supplements">Why there is
+a spine, and why there are supplements</a></li>
+<li><a href="#m5-walmart-the-spine" id="toc-m5-walmart-the-spine">1. M5
+/ Walmart — the spine</a></li>
+<li><a href="#fred-macro-series-lecture-2"
+id="toc-fred-macro-series-lecture-2">2. FRED macro series — Lecture
+2</a></li>
+<li><a href="#electricity-demand-lecture-3"
+id="toc-electricity-demand-lecture-3">3. Electricity demand — Lecture
+3</a></li>
+<li><a href="#favorita-week-16-and-final-projects"
+id="toc-favorita-week-16-and-final-projects">4. Favorita — Week 16, and
+final projects</a></li>
+<li><a href="#getting-set-up" id="toc-getting-set-up">Getting set
+up</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="econ-8310-the-data-we-use">ECON 8310 — The Data We Use</h1>
+<h3 id="fall-2026-a-guide-to-the-four-datasets-in-this-course">Fall 2026
+· A guide to the four datasets in this course</h3>
+<hr />
+<h2 id="why-there-is-a-spine-and-why-there-are-supplements">Why there is
+a spine, and why there are supplements</h2>
+<p>Almost everything in this course — lecture examples, in-class
+demonstrations, and homework — runs on <strong>one</strong> dataset.
+That is deliberate. When exponential smoothing and an LSTM disagree in
+Week 9, you should be able to say the difference came from the
+<strong>method</strong>. If we switched datasets every lecture, you
+could never make that claim: the data would be a confound.</p>
+<p>Three other datasets appear during the semester. Each one is here for
+exactly <strong>one</strong> reason — something the spine genuinely
+cannot demonstrate. Noticing <em>which</em> dataset a question needs is
+itself part of the skill this course is teaching.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Where it appears</th>
+<th>Why it is in the course</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M5 / Walmart</strong></td>
+<td>Throughout — the spine</td>
+<td>Five years of daily store-item sales with prices, holidays, and a
+real store/category hierarchy</td>
+</tr>
+<tr>
+<td><strong>FRED</strong> macro series</td>
+<td>Lecture 2</td>
+<td>Gives a case where the causal <em>direction</em> is defensible —
+unemployment moves retail spending, not the reverse</td>
+</tr>
+<tr>
+<td><strong>Electricity demand</strong></td>
+<td>Lecture 3</td>
+<td>Half-hourly data has daily, weekly <em>and</em> yearly cycles at
+once. Retail has one</td>
+</tr>
+<tr>
+<td><strong>Favorita</strong> (Ecuador)</td>
+<td>Week 16, and available for final projects</td>
+<td>A dated exogenous shock — every method we learn fails on the same
+month</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="m5-walmart-the-spine">1. M5 / Walmart — the spine</h2>
+<p><strong>What it is.</strong> Daily unit sales for 3,049 products
+across 10 Walmart stores in three US states, covering <strong>1,941
+days</strong> — roughly five and a half years. It was the dataset for
+the M5 forecasting competition, one of the most studied benchmarks in
+the field, so when you read a paper claiming a method works, there is a
+good chance it was tested on exactly this data.</p>
+<p><strong>Where to get it.</strong> Free, and <strong>no Kaggle account
+is required</strong>:</p>
+<ul>
+<li>Zenodo mirror: <a
+href="https://zenodo.org/records/10203108">https://zenodo.org/records/10203108</a></li>
+<li>Python package: <a
+href="https://nixtlaverse.nixtla.io/datasetsforecast/m5.html"><code>datasetsforecast</code></a>
+from Nixtla</li>
+<li>Original competition (needs a Kaggle login): <a
+href="https://www.kaggle.com/competitions/m5-forecasting-accuracy">M5
+Forecasting — Accuracy</a></li>
+</ul>
+<p>We use a prepared subset, not the raw download. Run the prep script
+once before your first assignment; it writes the processed files the
+homework expects.</p>
+<p><strong>What is in it.</strong></p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sales</td>
+<td>Daily units sold per item, per store</td>
+</tr>
+<tr>
+<td><code>calendar</code></td>
+<td>Dates, weekday, month, year, plus event/holiday flags and a SNAP
+benefits indicator</td>
+</tr>
+<tr>
+<td><code>sell_prices</code></td>
+<td>Weekly price per item per store</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why it can carry the whole course.</strong></p>
+<ul>
+<li><strong>Lecture 1 (ETS).</strong> Aggregated to weekly it gives ~277
+observations per series. Holt-Winters needs two full 52-week cycles —
+104 — to estimate its seasonal indices, so this clears the requirement
+with room to spare.</li>
+<li><strong>Lecture 2 (ARIMA, ARIMAX).</strong> Long enough to identify
+an order from ACF and PACF, and <code>sell_prices</code> gives you a
+genuine exogenous regressor: price drives demand.</li>
+<li><strong>Lecture 3 (GAMs, Prophet).</strong> Daily data with an
+explicit holiday and event calendar — the input Prophet was designed
+around.</li>
+<li><strong>Lectures 4–6 (trees, boosting, regularization).</strong> A
+wide tabular feature set: price, promo, SNAP, calendar effects, store
+type, category, and lags. Plenty of correlated predictors, which is what
+makes regularization worth doing.</li>
+<li><strong>Lectures 7–9 (deep learning).</strong> Thousands of parallel
+series and nearly 2,000 time steps. Neural networks need volume, and
+this has it.</li>
+<li><strong>Lecture 11 (hierarchical Bayes).</strong> The hierarchy is
+real and explicit — state → store, and category → department → item.
+This is what partial pooling is <em>for</em>: a store with a short
+history borrows strength from the stores around it.</li>
+<li><strong>Lecture 12 (Bayesian regression).</strong> Price → demand is
+a clean causal question with obvious confounders, which is exactly what
+a DAG is for.</li>
+</ul>
+<hr />
+<h2 id="fred-macro-series-lecture-2">2. FRED macro series — Lecture
+2</h2>
+<p><strong>What it is.</strong> The Federal Reserve Bank of St. Louis
+publishes hundreds of thousands of economic time series, free and
+without a login. We use a handful of monthly US series: retail sales,
+unemployment, the consumer price index, and consumer sentiment.</p>
+<p><strong>Where to get it.</strong> <a
+href="https://fred.stlouisfed.org">https://fred.stlouisfed.org</a>, or
+directly from Python with <code>pandas_datareader</code>, which pulls
+the series by code.</p>
+<p><strong>Why we need it and M5 cannot substitute.</strong> Lecture 2
+covers <strong>Vector Autoregression</strong> and <strong>Granger
+causality</strong> — methods for several series that influence one
+another.</p>
+<p>M5 can demonstrate the mechanics perfectly well: two Walmart stores
+in the same state share regional promotions, weather, and holidays, and
+their weekly changes correlate at about 0.85. A Granger test between
+them comes back strongly significant. You will run exactly that in
+Homework 1.</p>
+<p>But notice what that case <em>cannot</em> settle. Neither store
+causes the other. Both respond to something else, and the test cannot
+tell you so. That is the honest limit of the method, and it is why we
+also bring in macroeconomic data — where the causal <em>direction</em>
+is defensible.</p>
+<p>Macroeconomic series do genuinely move each other. Unemployment
+affects retail spending; retail spending feeds back into sentiment.
+There is a real transmission mechanism, so a significant Granger test
+means something you can reason about — and an insignificant one is
+informative rather than inevitable.</p>
+<hr />
+<h2 id="electricity-demand-lecture-3">3. Electricity demand — Lecture
+3</h2>
+<p><strong>What it is.</strong> Half-hourly electricity demand, with
+temperature as a covariate. We take it from the <a
+href="https://forecastingdata.org/">Monash Time Series Forecasting
+Repository</a>, a free curated archive of 30 forecasting datasets that
+requires no login.</p>
+<p><strong>Why we need it and M5 cannot substitute.</strong> Lecture 3
+covers GAMs and Prophet, whose real strength is handling <strong>several
+seasonal cycles at the same time</strong>. Retail sales have one
+meaningful season: the yearly cycle. Electricity demand has three
+simultaneously —</p>
+<ul>
+<li>a <strong>daily</strong> cycle (demand peaks morning and
+evening),</li>
+<li>a <strong>weekly</strong> cycle (weekdays differ from
+weekends),</li>
+<li>a <strong>yearly</strong> cycle (heating and cooling).</li>
+</ul>
+<p>On top of that, temperature drives demand non-linearly — demand rises
+when it is very cold <em>and</em> when it is very hot. That U-shape is
+precisely what a smooth term in a GAM captures and a linear model
+cannot. Retail data would let you fit the method; electricity lets you
+see why it exists.</p>
+<hr />
+<h2 id="favorita-week-16-and-final-projects">4. Favorita — Week 16, and
+final projects</h2>
+<p><strong>What it is.</strong> Daily sales for Corporación Favorita, a
+large Ecuadorian grocery chain, covering 2013 to 2017. It includes
+promotions, store metadata, national holidays, and — because Ecuador’s
+economy is oil-dependent — a daily <strong>oil price</strong>.</p>
+<p><strong>Where to get it.</strong> <a
+href="https://www.kaggle.com/c/favorita-grocery-sales-forecasting">Kaggle:
+Corporación Favorita Grocery Sales Forecasting</a>. This one does
+require a Kaggle account.</p>
+<p><strong>Why we need it and M5 cannot substitute.</strong> On
+<strong>16 April 2016</strong>, a magnitude 7.8 earthquake struck
+Ecuador. Sales spiked for weeks afterward as people bought water and
+relief supplies. The competition organizers documented this in the data
+description, so it is not something you have to reverse-engineer.</p>
+<p>We close the semester there, and the reason is worth stating plainly.
+A forecast made on 15 April 2016 — by exponential smoothing, by ARIMA,
+by XGBoost, by an LSTM, by a Bayesian model, by anything in this course
+— is catastrophically wrong for the following month. Not because the
+model was badly specified. Because the future stopped resembling the
+past, and every method in this course assumes it does not.</p>
+<p>Knowing where the whole toolkit stops working is part of knowing how
+to use it.</p>
+<p><strong>For final projects.</strong> Favorita is also a good project
+dataset if your group wants one ready-made: it is rich enough for
+serious work and different enough from the spine that you cannot reuse
+lecture code unchanged — which is rather the point.</p>
+<hr />
+<h2 id="getting-set-up">Getting set up</h2>
+<ol type="1">
+<li>Install the Python packages listed in the syllabus.</li>
+<li>Run the data preparation script once, before your first assignment.
+It downloads and subsets M5 and writes the processed files that the
+homework expects.</li>
+<li>Confirm the output files exist before starting Homework 1.</li>
+</ol>
+<p>If any step fails, email me <em>before</em> the assignment is due
+rather than the night it is due.</p>
+<hr />
+<p><em>This document accompanies the course syllabus. If a dataset
+detail here and the syllabus ever disagree, the syllabus governs on
+deadlines and grading; this document governs on data.</em></p>
+</body>
+</html>

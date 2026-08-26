@@ -1,0 +1,265 @@
+---
+title: "Bayesian Statistics I --- Foundations"
+subtitle: "ECON 8310: Business Forecasting --- Lecture 10"
+author: "Department of Economics"
+institute: "University of Nebraska at Omaha"
+format:
+  revealjs:
+    theme: [default, uno-clean.scss]
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    toc: false
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.05
+    logo: ""
+    footer: "ECON 8310 | University of Nebraska at Omaha"
+    embed-resources: true
+bibliography: ../Bibliography_base.bib
+csl: https://www.zotero.org/styles/chicago-author-date
+---
+
+## Lecture Outline
+
+1. Why Bayesian Thinking?
+2. Bayes' Theorem
+3. Prior Distributions
+4. Posterior Inference with PyMC
+5. Key Takeaways
+
+---
+
+# Why Bayesian Thinking?
+
+A different answer to the question of what a forecast should tell you.
+
+---
+
+## Frequentist vs. Bayesian: What Is Random?
+
+The whole difference is which thing you treat as uncertain.
+
+| | Frequentist | Bayesian |
+|---|---|---|
+| The parameter | A fixed, unknown constant | A quantity you are uncertain about |
+| The data | Random — one draw of many possible samples | Fixed — it is what you observed |
+| The answer | A point estimate and a standard error | A full distribution over values |
+| Prior belief | No formal place for it | Stated explicitly, and updated |
+
+Everything else follows from that first row. If the parameter is fixed, you can only describe how your *estimate* would vary across hypothetical repeated samples. If the parameter is uncertain, you can describe your uncertainty about *it* directly — which is almost always the question someone actually asked.
+
+---
+
+## What This Buys You in a Meeting
+
+A 95% confidence interval of $[0.02,\ 0.08]$ does *not* mean there is a 95% chance the parameter lies in that range. It means that intervals built this way would contain the true value 95% of the time across repeated samples. That is a statement about the procedure.
+
+A 95% **credible** interval of $[0.02,\ 0.08]$ does mean there is a 95% probability the parameter lies in that range, given your model and data.
+
+::: {.keybox}
+That is not a technicality. It is the difference between a sentence you can say out loud to a decision-maker and one you have to keep correcting.
+:::
+
+And because the answer is a full distribution, you can ask questions of it directly: *What is the probability the promotion lifts demand by more than 5%? What is the chance we stock out if we order 400 units?* Those are the questions a planner has, and a point estimate with a standard error does not answer them.
+
+[The cost is that you must state a prior, and defend it. That is the rest of this lecture.]{.neutral .smaller}
+
+---
+
+# Bayes' Theorem
+
+One equation, and it is a bookkeeping rule rather than a philosophy.
+
+---
+
+## Bayes' Theorem
+
+::: {.definitionbox}
+::: {.definitionbox-title}
+The update rule
+:::
+$$\underbrace{p(\theta \mid \mathcal{D})}_{\text{posterior}} = \frac{\overbrace{p(\mathcal{D} \mid \theta)}^{\text{likelihood}} \cdot \overbrace{p(\theta)}^{\text{prior}}}{\underbrace{p(\mathcal{D})}_{\text{evidence}}}$$
+:::
+
+Read it as a sentence [@Gelman2013]. **What I believe after seeing the data** equals **how well each value explains the data**, times **what I believed beforehand**, rescaled to sum to one.
+
+The denominator is only that rescaling — it does not change the *shape*. So the working form is:
+
+$$\text{posterior} \;\propto\; \text{likelihood} \times \text{prior}$$
+
+**You will not compute this by hand**, and this course never asks you to. You are responsible for choosing the prior, checking the sampler worked, and reading the posterior.
+
+---
+
+## The Update, in Pictures
+
+Take a concrete case: estimating a conversion rate $\theta$ from 200 trials.
+
+| | |
+|---|---|
+| **Prior** | A curve over $\theta$ from 0 to 1, showing what you thought before. Broad if you know little; peaked if you have history. |
+| **Likelihood** | A second curve, from the data alone: 30 successes out of 200 peaks near 0.15. |
+| **Posterior** | Multiply the two curves point by point and rescale. It sits *between* them, closer to whichever was more confident. |
+
+**Our numbers:** the prior is centred on 0.10, the data say 0.15, and the posterior mean lands at [**0.14**]{.hi} — between them, nearer the data, because 200 observations outweigh a prior worth about 50.
+
+More data sharpens the likelihood, so the posterior moves toward it and the prior matters less. With little data the prior does most of the work — a feature when it is defensible, a problem when it is not.
+
+---
+
+# Prior Distributions
+
+The part you have to justify, and the part people worry about.
+
+---
+
+## Priors You Will Actually Use
+
+A prior is a distribution over a parameter, chosen to match what that parameter *can* be.
+
+| Prior | Support | Use it for |
+|---|---|---|
+| $\theta \sim \text{Beta}(\alpha, \beta)$ | $[0, 1]$ | Rates and proportions — conversion, click-through, defect rate |
+| $\theta \sim \mathcal{N}(\mu_0, \sigma_0^2)$ | all reals | Regression coefficients, trends, anything that can be negative |
+| $\theta \sim \text{Exp}(\lambda)$ | $[0, \infty)$ | Standard deviations, waiting times, anything that must be positive |
+
+**The support is the first thing to get right.** Putting a Normal prior on a standard deviation allows negative values, which are impossible — the sampler will struggle and the model may not be wrong so much as incoherent.
+
+[$\text{Beta}(5, 45)$ has mean $5/50 = 0.1$ — a prior centred on a 10% rate, worth about 50 observations of prior evidence.]{.neutral .smaller}
+
+---
+
+## Choosing a Prior You Can Defend
+
+The standard objection to Bayesian work is that the prior is arbitrary. The standard answer is that you should not be choosing arbitrary priors.
+
+| | |
+|---|---|
+| **Weakly informative** | Rules out the absurd, stays agnostic about the plausible. A Normal(0, 1) on a standardized coefficient says "probably not larger than about 2," which is nearly always true and nearly never controversial. **This is the default.** |
+| **Informative** | Encodes real prior evidence — last year's conversion rate, a published elasticity. Defensible when you can name the source. |
+| **Flat / "uninformative"** | Sounds neutral, often is not, and can be improper. Avoid it as a reflex choice. |
+
+**The honest framing:** a prior is an assumption stated in public, where it can be argued with. Frequentist analyses contain assumptions too — functional form, variable selection, sampling scheme — they are just not written as distributions.
+
+---
+
+# Posterior Inference with PyMC
+
+Sampling, the code, and how to tell whether the answer is trustworthy.
+
+---
+
+## MCMC: The Big Idea
+
+For any model more complicated than a textbook example, the rescaling denominator in Bayes' theorem cannot be computed. So we do not compute the posterior — we **draw samples from it**, and work with the samples.
+
+**The picture to hold.** You are exploring a hilly landscape in the dark, where height is posterior probability. You take a step, and if the ground is higher you move; if it is lower you usually move back. Over thousands of steps you spend most of your time on the high ground.
+
+The record of where you walked *is* the answer. A histogram of your visited positions has the shape of the posterior, without ever having computed it.
+
+::: {.keybox}
+**The samples are the answer.** Posterior mean, credible interval, and the probability of any event you care about are all just summaries of that list of visited values — counted, not derived.
+:::
+
+[PyMC's default sampler is NUTS, which takes smarter steps than the random walk above. The intuition is unchanged.]{.neutral .smaller}
+
+---
+
+## PyMC: A First Model
+
+::: {.examplebox}
+::: {.examplebox-title}
+Estimating a conversion rate — 30 successes in 200 trials
+:::
+```python
+import pymc as pm
+
+with pm.Model() as model:
+    theta = pm.Beta("theta", alpha=5, beta=45)        # prior
+    obs   = pm.Binomial("obs", n=200, p=theta,        # likelihood
+                        observed=30)
+    idata = pm.sample(2000, tune=1000, chains=4)      # posterior
+
+import arviz as az
+az.plot_posterior(idata)
+```
+:::
+
+A PyMC model describes **how the data could have been generated**: what I believe about the rate, and how observations arise given it. You write the story; the sampler infers.
+
+`tune=1000` discards the first 1,000 steps, while the sampler is still finding the high ground. `chains=4` runs four independent walks — which is what makes the next slide possible.
+
+---
+
+## Did the Sampler Actually Work?
+
+MCMC can fail quietly. It always returns samples; whether they came from the posterior is a separate question [@MartinKumarLao2021].
+
+| Check | Want | What it means |
+|---|---|---|
+| $\hat{R}$ | $< 1.01$ | Did the chains land in the same place? If not, nothing else matters. |
+| ESS | $> 400$ | Effective sample size — 8,000 correlated draws may carry as much information as 200 independent ones. |
+| Divergences | $0$ | The sampler hit terrain it could not navigate. Even a few means the posterior is explored wrongly. |
+
+`az.summary(idata, ci_kind="hdi", ci_prob=0.94)` prints the interval, $\hat{R}$ and ESS. **Pass both arguments** — ArviZ now defaults to an 89% equal-tailed interval, not the HDI.
+
+On the model above: $\hat{R} = 1.00$, ESS 3,686, zero divergences. **Report all three.**
+
+---
+
+## Prior Predictive Checks
+
+Before touching the data, simulate from the prior alone [@McElreath2020].
+
+::: {.examplebox}
+::: {.examplebox-title}
+Two lines
+:::
+```python
+with model:
+    prior_pred = pm.sample_prior_predictive(500)
+
+az.plot_ppc(prior_pred, group="prior")
+```
+:::
+
+**Ask whether the simulated data could plausibly have come from your business.** Impossible values — negative sales, probabilities above one — mean the prior is misspecified, not merely wide. Data spanning a billion units means it is too vague; identical simulations mean it is too tight.
+
+::: {.keybox}
+A prior predictive check is **model debugging** that costs two lines — and the habit most often skipped.
+:::
+
+---
+
+# Key Takeaways
+
+Bayesian inference: beliefs in, beliefs out. Data updates your prior into a posterior.
+
+---
+
+## Lecture 10: Key Takeaways
+
+::: {.keybox}
+1. **Bayesian inference** treats parameters as random variables with probability distributions. The posterior distribution $p(\theta \mid \mathcal{D})$ represents updated beliefs after seeing data.
+
+2. **Bayes' theorem:** posterior $\propto$ likelihood $\times$ prior. The normalizing constant $p(\mathcal{D})$ is usually intractable, so we sample instead of computing it.
+
+3. **Priors** encode prior knowledge. Use weakly informative priors (Beta, Normal, HalfNormal) to constrain parameters to plausible values without overwhelming the data.
+
+4. **MCMC** (specifically NUTS in PyMC) draws samples from the posterior. From samples, compute any summary statistic: mean, median, HDI, or the probability that a parameter exceeds a threshold.
+
+5. **Prior predictive checks** verify that your model generates plausible data before fitting. Run them every time.
+:::
+
+[Next: Bayesian Statistics II — Bayesian time series models, trend and seasonality, hierarchical models.]{.neutral}
+
+---
+
+## References
+
+::: {#refs}
+:::

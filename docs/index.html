@@ -99,11 +99,14 @@ predictive analytics and machine learning. Everything is implemented in Python.<
 
 <h2>Syllabus</h2>
 
-<div class="placeholder">
-  <strong>Full syllabus &mdash; coming soon</strong><br>
-  Grading, course policies, the AI-use and prompt-budget rules, final project milestones,
-  and the complete 17-week schedule will be posted here.
-</div>
+<p><a href="files/syllabus.html"><strong>Read the full syllabus</strong></a> &mdash; grading, course
+policies, the AI-use and prompt-budget rules, final project milestones, and the complete schedule.</p>
+
+<p>Two companion documents:
+<a href="files/datasets.html"><strong>Course datasets</strong></a> &mdash; what each dataset is, where it
+comes from, and why it is in the course (read before Homework 1); and
+<a href="files/project-rubric.html"><strong>Final project rubric</strong></a> &mdash; how all 100 project
+points are awarded.</p>
 
 <h2>Before the first lab</h2>
 
@@ -124,9 +127,10 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
   than during it.</p>
 </div>
 
-<p>You will also need: <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>,
-<code>statsmodels</code>, <code>scikit-learn</code>, <code>prophet</code>, <code>pygam</code>, and
-<code>xgboost</code>. Assignment submission, the Codex workflow, and the prompt log live in the
+<p>You will also need: <code>jupyter</code>, <code>pandas</code>, <code>numpy</code>,
+<code>matplotlib</code>, <code>statsmodels</code>, <code>scikit-learn</code>, <code>prophet</code>,
+<code>pygam</code>, <code>xgboost</code>, <code>torch</code>, <code>pymc</code>, and <code>arviz</code>.
+<code>jupyter</code> is not optional &mdash; Quarto runs your Python through a Jupyter kernel. Assignment submission, the Codex workflow, and the prompt log live in the
 <a href="https://github.com/DataHurdler/Forecasting-Env">course environment repository</a>.</p>
 
 <h2>Weekly schedule</h2>
@@ -198,17 +202,97 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
   <div class="wread" style="margin-top:.5em;margin-bottom:0">Final project grading rubric distributed.</div>
 </div>
 
-<div class="week pending">
+<div class="week">
   <div class="whead"><span class="wnum">Week 7</span><span class="wdate">Oct 8, 2026</span>
-    <span class="due">Assignment 4 due</span><span class="note">Not yet posted</span></div>
+    <span class="due">Assignment 4 due</span></div>
   <span class="wtitle">Introduction to Neural Networks</span>
-  <div class="wread"><strong>Reading:</strong> FPP-Py §14.1&ndash;14.2, §14.4&ndash;14.5, §14.7
-    (<strong>Python edition only</strong>)</div>
+  <div class="wread"><strong>Reading:</strong> FPP-Py §14.1&ndash;14.2, §14.4&ndash;14.5, §14.7 (<strong>Python edition only</strong>)</div>
+  <div class="wlinks"><a href="slides/Lecture07_NeuralNets.html">Slides</a><span class="sep">|</span><a href="slides/Lecture07_NeuralNets.pdf">PDF</a>
+    <span class="sep">&middot;</span><a href="labs/Lecture07_lab.html">Lab 7</a></div>
 </div>
 
-<p style="font-size:.93em;color:var(--gray)">Weeks 7 through 17 &mdash; neural networks, CNNs,
-RNNs and Transformers, and three weeks of Bayesian methods &mdash; are posted as the term
-progresses. Readings for every week are in the syllabus.</p>
+<div class="week">
+  <div class="whead"><span class="wnum">Week 8</span><span class="wdate">Oct 15, 2026</span></div>
+  <span class="wtitle">CNN Architectures</span>
+  <div class="wread"><strong>Reading:</strong> FPP-Py §14.3</div>
+  <div class="wlinks"><a href="slides/Lecture08_CNNs.html">Slides</a><span class="sep">|</span><a href="slides/Lecture08_CNNs.pdf">PDF</a>
+    <span class="sep">&middot;</span><a href="labs/Lecture08_lab.html">Lab 8</a></div>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Week 9</span><span class="wdate">Oct 22, 2026</span>
+    <span class="due">Assignment 5 Part 1 due</span></div>
+  <span class="wtitle">RNNs and LSTMs</span>
+  <div class="wread"><strong>Reading:</strong> FPP-Py §14.3, §14.6</div>
+  <div class="wlinks"><a href="slides/Lecture09_Part1_RNN_LSTM.html">Slides</a><span class="sep">|</span><a href="slides/Lecture09_Part1_RNN_LSTM.pdf">PDF</a>
+    <span class="sep">&middot;</span><a href="labs/Lecture09_Part1_lab.html">Lab 9 &middot; Part 1</a></div>
+  <div class="wread" style="margin-top:.5em;margin-bottom:0">Final project proposal due.</div>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Week 10</span><span class="wdate">Oct 29, 2026</span></div>
+  <span class="wtitle">Transformers</span>
+  <div class="wread"><strong>Reading:</strong> FPP-Py Ch. 15</div>
+  <div class="wlinks"><a href="slides/Lecture09_Part2_Transformers.html">Slides</a><span class="sep">|</span><a href="slides/Lecture09_Part2_Transformers.pdf">PDF</a>
+    <span class="sep">&middot;</span><a href="labs/Lecture09_Part2_lab.html">Lab 9 &middot; Part 2</a></div>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Week 11</span><span class="wdate">Nov 5, 2026</span>
+    <span class="due">Assignment 5 Part 2 due</span></div>
+  <span class="wtitle">Bayesian Statistics I &mdash; Foundations</span>
+  <div class="wread"><strong>Reading:</strong> BMCP Ch. 1 (inference, priors, prior predictive checks) and Ch. 2 (MCMC diagnostics); FPP §5.5, §5.9 for framing</div>
+  <div class="wlinks"><a href="slides/Lecture10_BayesianFoundations.html">Slides</a><span class="sep">|</span><a href="slides/Lecture10_BayesianFoundations.pdf">PDF</a>
+    <span class="sep">&middot;</span><a href="labs/Lecture10_lab.html">Lab 10</a></div>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Week 12</span><span class="wdate">Nov 12, 2026</span>
+    <span class="due">Assignment 5 Part 3 due</span></div>
+  <span class="wtitle">Bayesian Statistics II &mdash; Time Series</span>
+  <div class="wread"><strong>Reading:</strong> BMCP §6.2, §6.4 (time series as regression; state space and Bayesian structural time series)</div>
+  <div class="wlinks"><a href="slides/Lecture11_Part1_BayesianTS.html">Slides</a><span class="sep">|</span><a href="slides/Lecture11_Part1_BayesianTS.pdf">PDF</a>
+    <span class="sep">&middot;</span><a href="labs/Lecture11_Part1_lab.html">Lab 11 &middot; Part 1</a></div>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Week 13</span><span class="wdate">Nov 19, 2026</span>
+    <span class="due">Assignment 6 Part 1 due</span></div>
+  <span class="wtitle">Bayesian Statistics II &mdash; Hierarchical Models</span>
+  <div class="wread"><strong>Reading:</strong> BMCP §4.5&ndash;4.6 (pooling, multilevel and hierarchical models)</div>
+  <div class="wlinks"><a href="slides/Lecture11_Part2_Hierarchical.html">Slides</a><span class="sep">|</span><a href="slides/Lecture11_Part2_Hierarchical.pdf">PDF</a>
+    <span class="sep">&middot;</span><a href="labs/Lecture11_Part2_lab.html">Lab 11 &middot; Part 2</a></div>
+  <div class="wread" style="margin-top:.5em;margin-bottom:0"><em>Not this:</em> FPP Ch. 11 is also titled &ldquo;hierarchical,&rdquo; but it covers forecast <strong>reconciliation</strong> &mdash; a different topic from partial pooling.</div>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Week 14</span><span class="wdate">Nov 26, 2026</span></div>
+  <span class="wtitle">Thanksgiving break &mdash; no class</span>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Week 15</span><span class="wdate">Dec 3, 2026</span>
+    <span class="due">Assignment 6 Part 2 due</span></div>
+  <span class="wtitle">Bayesian Statistics III &mdash; Bayesian Linear Regression</span>
+  <div class="wread"><strong>Reading:</strong> BMCP §3.2&ndash;3.3 (linear and multiple regression, counterfactuals); FPP Ch. 7 as the frequentist benchmark</div>
+  <div class="wlinks"><a href="slides/Lecture12_BayesianRegression.html">Slides</a><span class="sep">|</span><a href="slides/Lecture12_BayesianRegression.pdf">PDF</a>
+    <span class="sep">&middot;</span><a href="labs/Lecture12_lab.html">Lab 12</a></div>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Week 16</span><span class="wdate">Dec 10, 2026</span>
+    <span class="due">Assignment 7 due</span></div>
+  <span class="wtitle">Final thoughts on forecasting, econometrics and ML/AI; project work session</span>
+  <div class="wread"><strong>Reading:</strong> FPP Ch. 13</div>
+  <div class="wlinks"><a href="slides/Lecture13_Synthesis.html">Slides</a><span class="sep">|</span><a href="slides/Lecture13_Synthesis.pdf">PDF</a></div>
+  <div class="wread" style="margin-top:.5em;margin-bottom:0">The Lecture 13 synthesis deck is not examinable &mdash; it is posted as a course-wide review.</div>
+</div>
+
+<div class="week">
+  <div class="whead"><span class="wnum">Final Exam Week</span><span class="wdate">Dec 17, 2026</span></div>
+  <span class="wtitle">Final project presentations &mdash; 5:30&ndash;7:30pm</span>
+  <div class="wread" style="margin-top:.5em;margin-bottom:0"><strong>Dec 18:</strong> final project report due.</div>
+</div>
 
 <h2>Assignments</h2>
 
@@ -239,7 +323,38 @@ progresses. Readings for every week are in the syllabus.</p>
     <td>XGBoost tuning, LASSO paths, Elastic Net</td>
     <td>Oct 8</td><td>12</td>
   </tr>
+  <tr>
+    <td><a href="homework/HW05_Part1_FFN_CNN.html">5 &middot; Part 1</a></td>
+    <td>Windowing datasets, FFN, 1D CNN</td>
+    <td>Oct 22</td><td>9</td>
+  </tr>
+  <tr>
+    <td><a href="homework/HW05_Part2_Sequence.html">5 &middot; Part 2</a></td>
+    <td>RNN, LSTM, Transformer, positional encoding</td>
+    <td>Nov 5</td><td>10</td>
+  </tr>
+  <tr>
+    <td><a href="homework/HW05_Part3_Comparison.html">5 &middot; Part 3</a></td>
+    <td>Five-architecture comparison and reflection</td>
+    <td>Nov 12</td><td>3</td>
+  </tr>
+  <tr>
+    <td><a href="homework/HW06_Part1_Foundations_TS.html">6 &middot; Part 1</a></td>
+    <td>Beta-Binomial, prior predictive, structural TS</td>
+    <td>Nov 19</td><td>10</td>
+  </tr>
+  <tr>
+    <td><a href="homework/HW06_Part2_Hierarchical.html">6 &middot; Part 2</a></td>
+    <td>Exchangeability, pooling, shrinkage, divergences</td>
+    <td>Dec 3</td><td>9</td>
+  </tr>
+  <tr>
+    <td><a href="homework/HW07_Bayesian_Regression.html">7</a></td>
+    <td>DAGs, Bayesian regression, ROPE, scenarios</td>
+    <td>Dec 10</td><td>16</td>
+  </tr>
 </table>
+
 
 <div class="callout">
   <span class="t">Each assignment has a prompt budget</span>
@@ -251,7 +366,7 @@ progresses. Readings for every week are in the syllabus.</p>
 
 <h2>Textbooks</h2>
 
-<p>Both are free online. Neither needs to be purchased.</p>
+<p>All are free online. None needs to be purchased.</p>
 
 <table>
   <tr><th>Book</th><th>Used for</th></tr>
@@ -269,6 +384,11 @@ progresses. Readings for every week are in the syllabus.</p>
     <td><a href="https://www.statlearning.com/">ISLP</a> &mdash; <em>An Introduction to
       Statistical Learning with Applications in Python</em></td>
     <td>Lectures 4&ndash;6. FPP covers no tree methods and no regularization; this fills that gap</td>
+  </tr>
+  <tr>
+    <td><a href="https://bayesiancomputationbook.com/">BMCP</a> &mdash; <em>Bayesian Modeling and
+      Computation in Python</em></td>
+    <td>Lectures 10&ndash;12. PyMC and ArviZ throughout, which is what we use</td>
   </tr>
 </table>
 
