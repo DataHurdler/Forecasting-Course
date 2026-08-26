@@ -42,6 +42,17 @@ want you to be suspicious. Then twenty years of image architectures, compressed 
 ideas that outlived them. And then one-dimensional CNNs on our own time series, with an honest
 measurement at the end.
 
+**[pause]**
+
+A word on why we're spending time on image architectures in a forecasting course, since that's a
+fair question to have.
+
+Two reasons. The first is that three of their ideas transfer directly, and you'll recognize one of
+them again next week inside a completely different model. The second is that the history is a
+worked example of the thing this course keeps insisting on: every one of these architectures won
+by encoding a *better assumption* about its data, not by being bigger. That's the transferable
+lesson, and it happens to be easier to see in pictures than in demand curves.
+
 ---
 
 # ▶ SLIDE 3 — Section divider: Convolution — The Core Idea
@@ -85,6 +96,17 @@ The analogy that makes it stick: you don't memorize the letter "A" separately fo
 on the page. You learn it once, and you apply that one recognizer everywhere you look. A filter
 does exactly that.
 
+**[pause]**
+
+And notice this is the same *kind* of move we've made before, in a different costume. Weight
+sharing is a constraint. We are telling the model, before it sees any data, that a pattern
+occurring at position ten and the same pattern at position two hundred should be treated
+identically. That is a strong assumption, and it is what buys the parameter reduction.
+
+Constraints that encode true structure make models better. Constraints that encode false structure
+make them worse, and no amount of training fixes it. Hold that thought — by the end of this
+lecture we will have an example of each, on the same dataset.
+
 ---
 
 # ▶ SLIDE 5 — How a Convolutional Layer Works
@@ -113,6 +135,21 @@ count of the output.
 Here's what to hold onto. Each filter learns **one local pattern** — an edge, a spike, a seasonal
 dip. What comes out is called a **feature map**, and its high values mark the places where that
 pattern was found.
+
+**[pause]**
+
+Two things follow from that, and they're worth stating explicitly because they shape how you read
+the results later.
+
+First, the filter's weights are **learned**, not designed. You don't tell it to look for a
+promotional spike. You give it a slot for thirty-two patterns and gradient descent decides what
+those patterns are. That is the "learned features" promise — the thing that's supposed to replace
+your hand-built lag columns.
+
+Second — and this is the constraint — a filter can only see K steps at a time. Stack two layers
+and the second one sees a window of windows, so the reach grows, but it grows *slowly*. This is
+called the **receptive field**, and I'm naming it now because it is going to be the single most
+important number in this lecture.
 
 ---
 
@@ -184,6 +221,17 @@ VGG's cost was its size — around a hundred thirty-eight million parameters, an
 were sitting in the final fully connected layers, not in the convolutions at all. That is exactly
 the problem the next two architectures went after.
 
+**[pause]**
+
+That detail is worth pausing on, because it is a good lesson about where cost actually lives. The
+convolutions — the part everyone talks about — were relatively cheap, precisely because of weight
+sharing. The expensive part was the ordinary dense layers bolted on the end, which have no sharing
+at all.
+
+When you profile a model and find the bottleneck, it is very often in the least interesting
+component. That's true of forecasting pipelines too: the modelling is rarely what costs you, the
+data preparation is.
+
 ---
 
 # ▶ SLIDE 10 — Inception and ResNet: Depth That Trains
@@ -213,6 +261,22 @@ That single change made networks of a hundred layers and more trainable. Skip co
 appear in essentially every deep architecture — including the Transformers we'll see in Lecture 9,
 and, as it turns out, inside the LSTM, which predates ResNet by eighteen years.
 
+**[pause]**
+
+I want to draw out why the addition matters, because we will use this exact argument again next
+week and it's easier to absorb twice.
+
+When a gradient travels backward through a chain of layers, each layer *multiplies* it by
+something. Multiply enough numbers below one together and you get essentially zero — the signal
+dies before it reaches the early layers, so they never learn.
+
+Addition doesn't do that. The plus-x term hands the gradient a route home that skips the
+multiplication entirely. Repeated multiplication shrinks; repeated addition doesn't.
+
+Remember that sentence. In Lecture 9 you'll see the LSTM's cell state doing precisely the same
+thing, for precisely the same reason, invented eighteen years earlier for time rather than for
+depth.
+
 ---
 
 # ▶ SLIDE 11 — What Carries Over to Time Series
@@ -238,6 +302,19 @@ translation invariance.
 
 An image classifier should not care where the cat is. A forecaster usually should care very much
 where the spike was.
+
+**[pause]**
+
+So we're carrying two assumptions into the next section, and they are not equally good.
+
+**Locality** — that nearby time steps are more related than distant ones — is largely *true* of
+demand data. Last week matters more than the week before. Good assumption.
+
+**Translation invariance** — that where a pattern occurred doesn't matter — is largely *false* for
+forecasting. Good assumption for images, bad one here.
+
+A CNN gives you both, bundled together, because they came from the same field. Part of using one
+well is knowing which half you actually wanted.
 
 ---
 
@@ -276,6 +353,16 @@ is going to reach that far.
 So you have two options. Add dilation — filters with gaps in them, which reach further for the
 same parameter count. Or feed the annual lag in as its own channel, which is a confession that
 you're doing feature engineering after all.
+
+**[pause]**
+
+And notice what that second option costs you rhetorically. The entire pitch for a CNN was "stop
+choosing lags, let the filters find the structure." The moment you hand it `lag_52` as a channel
+because the receptive field can't reach, you have given that pitch back. You're now doing feature
+engineering *and* paying for a neural network.
+
+That is not a reason never to use one. It is a reason to be clear-eyed about what the architecture
+is actually buying you on a given problem.
 
 Remember that number — seven weeks. It explains the results two slides from now.
 
@@ -337,6 +424,20 @@ spread of roughly eighty. That gap is real.
 That's the objection from slide 7, measured. Pooling threw away position, and position was
 carrying signal.
 
+**[pause]**
+
+And I want to be careful about how far to push that conclusion, because there's a tempting
+overreach here.
+
+This does **not** mean pooling is bad. It means pooling encodes an assumption — that position is
+irrelevant — and on this dataset that assumption is false. Run the same experiment on image
+classification and the sign would flip, decisively.
+
+That's the shape of nearly every result in this course. There is no ranking of methods that holds
+across problems. There's a match, or a mismatch, between what the method assumes and what the data
+is. Your job is to know what your method assumes — which is much harder than knowing how to call
+it, and much more valuable.
+
 ---
 
 # ▶ SLIDE 16 — Section divider: Key Takeaways
@@ -354,6 +455,11 @@ depth trainable. And the 1D CNN, which is that same machinery run along a time a
 **Reach for a 1D CNN** when local shape matters more than exact position, when you have many
 parallel series, or as a cheap feature extractor that feeds something else.
 
+That third use is underrated, incidentally. You don't have to use a CNN as the whole model. A
+common production pattern is to let convolutions compress a long raw window into a handful of
+learned summary features, then feed *those* into gradient boosting alongside your engineered
+columns. You get the pattern discovery without betting the forecast on it.
+
 **Do not reach for one** when the dominant signal is at a long lag, when you already have well
 engineered tabular features, or when a stakeholder needs to read the model and understand it.
 
@@ -361,6 +467,20 @@ engineered tabular features, or when a stakeholder needs to read the model and u
 
 And be honest about what that second list covers. On the evidence we just saw, it describes most
 of what we forecast in this course.
+
+**[pause]**
+
+Which raises the obvious question: why teach it, then?
+
+Because the receptive field problem is not a fact about CNNs, it's a fact about *this data* — a
+strong annual cycle and a short window. Change either one and the answer changes. And because
+convolution is a component, not just a model: it shows up inside architectures you'll meet later,
+in production forecasting systems, and in every paper on the subject. Knowing what it assumes is
+what lets you predict, before fitting anything, whether it will work on a problem you haven't
+seen yet.
+
+That prediction — made in advance, from structure rather than from trying it — is the skill this
+course is actually training.
 
 ---
 
