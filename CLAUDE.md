@@ -173,8 +173,11 @@ template-maintenance gates that this course repo does not satisfy.
 
 ## Current Project State
 
-**Beamer status:** All 12 new lectures written (Spring 2026 redesign).
-**Quarto status:** All 12 new lectures written.
+**Beamer status:** All 15 decks written and compiling clean (0 errors, 0 overfull).
+**Quarto status:** All 15 mirrors written and at frame parity — verify with
+`python scripts/check_mirror_parity.py`.
+**Site status:** `docs/` carries all 16 weeks plus finals week — slides (HTML + PDF), 14 labs,
+11 homework submissions, and the syllabus, datasets guide and project rubric as HTML.
 **Note:** The pre-redesign lecture set (Lecture01_Intro through Lecture12_Capstone) was removed in the Fall 2026 cleanup; it remains recoverable from git history. Its lab notebooks (`scripts/Lecture*.ipynb`) and QA reports (`quality_reports/`) were deliberately kept — the notebooks are the only worked Python in the repo outside Homework/.
 
 | Lecture | Beamer | Quarto | Key Content |
@@ -187,27 +190,27 @@ template-maintenance gates that this course repo does not satisfy.
 | 6: Regularization & Model Selection | `Lecture06_Regularization.tex` ✓ | `Lecture06_Regularization.qmd` ✓ | Subset selection vs shrinkage, Ridge, LASSO, Elastic Net, l1/l2 geometry, regularization paths, choosing λ by walk-forward CV. |
 | 7: Introduction to Neural Networks | `Lecture07_NeuralNets.tex` ✓ | `Lecture07_NeuralNets.qmd` ✓ | Neurons, activations, FFN layers, MSE loss, backprop, Adam, dropout, PyTorch Dataset/DataLoader/training loop. |
 | 8: CNN Architectures | `Lecture08_CNNs.tex` ✓ | `Lecture08_CNNs.qmd` ✓ | Convolution, pooling, LeNet→VGG→Inception→ResNet, residual connections, 1D CNN for time series. |
-| 9 Part 1: RNNs & LSTMs (Wk 9) | `Lecture09_Part1_RNN_LSTM.tex` ✓ | *(pending)* | Recurrence, BPTT, vanishing gradients, LSTM gates, cell state as additive path. Measured: the vanilla RNN beats the LSTM at all three windows (842 vs 987 at 26 weeks). |
-| 9 Part 2: Transformers (Wk 10) | `Lecture09_Part2_Transformers.tex` ✓ | *(pending)* | Scaled dot-product attention, multi-head, encoder block, positional encoding (measured: 895 with, 1,289 without). |
+| 9 Part 1: RNNs & LSTMs (Wk 9) | `Lecture09_Part1_RNN_LSTM.tex` ✓ | `Lecture09_Part1_RNN_LSTM.qmd` ✓ | Recurrence, BPTT, vanishing gradients, LSTM gates, cell state as additive path. Measured: the vanilla RNN beats the LSTM at all three windows (842 vs 987 at 26 weeks). |
+| 9 Part 2: Transformers (Wk 10) | `Lecture09_Part2_Transformers.tex` ✓ | `Lecture09_Part2_Transformers.qmd` ✓ | Scaled dot-product attention, multi-head, encoder block, positional encoding (measured: 990 with, 1,282 without — a 292 penalty). Ties the LSTM; loses to the vanilla RNN. |
 | 10: Bayesian Statistics I — Foundations | `Lecture10_BayesianFoundations.tex` ✓ | `Lecture10_BayesianFoundations.qmd` ✓ | Frequentist vs Bayesian, Bayes' theorem, priors (Beta/Normal/Exponential), MCMC/NUTS, PyMC, prior predictive checks. |
-| 11 Part 1: Bayesian TS (Wk 12) | `Lecture11_Part1_BayesianTS.tex` ✓ | *(pending)* | Structural decomposition, local level, Fourier seasonality. Measured: RMSE 1,587 vs naive 1,660; 94% interval 100% covered but ±30% wide. |
-| 11 Part 2: Hierarchical (Wk 13) | `Lecture11_Part2_Hierarchical.tex` ✓ | *(pending)* | Complete/no/partial pooling, non-centred parameterization. Measured: thin series shrink 11.5× more; 104 divergences → 0. |
+| 11 Part 1: Bayesian TS (Wk 12) | `Lecture11_Part1_BayesianTS.tex` ✓ | `Lecture11_Part1_BayesianTS.qmd` ✓ | Structural decomposition, local level, Fourier seasonality. Measured: RMSE 1,587 vs naive 1,660; 94% interval 100% covered but ±30% wide. |
+| 11 Part 2: Hierarchical (Wk 13) | `Lecture11_Part2_Hierarchical.tex` ✓ | `Lecture11_Part2_Hierarchical.qmd` ✓ | **Exchangeability first** (the ten FOODS series), then complete/no/partial pooling, non-centred parameterization. Measured: thin series shrink 8.1× more; held-out RMSE 0.126 → 0.048; 43 divergences → 0. |
 | 12: Bayesian Statistics III — Linear Regression | `Lecture12_BayesianRegression.tex` ✓ | `Lecture12_BayesianRegression.qmd` ✓ | Bayesian linear regression, posterior coefficient distributions, HDI, DAGs, scenario analysis, course method map. |
-| 13: Synthesis *(not on syllabus)* | `Lecture13_Synthesis.tex` ✓ | *(pending)* | Course-wide scoreboard, the three lessons the measurements taught, method-choice guide, silent-failure catalogue. **Needs updating once the final-project / homework / lab decisions settle.** |
+| 13: Synthesis *(not on syllabus)* | `Lecture13_Synthesis.tex` ✓ | `Lecture13_Synthesis.qmd` ✓ | Course-wide scoreboard, the three lessons the measurements taught, method-choice guide, a two-part silent-failure catalogue (pipeline bugs vs. correct code / wrong answer), and the final-project frame. |
 
 ---
 
 ## Homework Assignments
 
-**Dataset decision pending migration:** see
+**Dataset architecture:** see
 [`quality_reports/decisions/ADR-0001-course-dataset-architecture.md`](quality_reports/decisions/ADR-0001-course-dataset-architecture.md).
-The spine moves from Rossmann to **M5/Walmart**, supplemented by FRED (L02 VAR/Granger),
-electricity demand (L03 multiple seasonality), and Favorita (Week 16 shock cameo + project seed).
-Do not restructure HW02–HW07 before that migration.
+**M5/Walmart** is the spine, supplemented by FRED (L02 VAR/Granger), electricity demand
+(L03 multiple seasonality), and Favorita (Week 16 shock cameo + project seed). The migration off
+Rossmann is **complete** — no Rossmann reference remains in `Homework/` or `Labs/`.
 
-**Status:** All 8 assignments written (Spring 2026).
-**Dataset:** M5 / Walmart is the spine (HW01 migrated; HW02–HW07 still reference Rossmann and
-**cannot render** — the Rossmann CSVs no longer exist. See ADR-0001).
+**Status:** All 11 submissions written and rendering. Each part's checklist states its own prompt
+budget, and the folder stem is also the commit-message prefix and the key in the student repo's
+`policy/homework_limits.json` (e.g. `hw06_part1`).
 **Data prep:** Run each once from the repo root:
 `python scripts/prep_m5.py` → `data/processed/m5_weekly.csv`, `m5_daily.csv`
 `python scripts/prep_fred.py` → `fred_monthly.csv` (L02 Granger; no API key)
