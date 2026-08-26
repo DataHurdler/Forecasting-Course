@@ -13,6 +13,13 @@ import re, sys, pathlib, urllib.request, urllib.error, ssl
 
 DOCS = ["ECON8310Syllabus2026Fall.md", "ECON8310_Datasets.md", "ECON8310_Project_Rubric.md"]
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+
+# Hosts that block automated requests to their web pages while serving data normally.
+# Verified reachable by other means; reported as ok with a note rather than as a problem.
+KNOWN_BOT_BLOCKERS = {
+    "fred.stlouisfed.org": "blocks non-browser clients; the CSV endpoint used by "
+                           "scripts/prep_fred.py returns 200",
+}
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 def visible_links(path: pathlib.Path):
@@ -49,8 +56,13 @@ def main() -> int:
             print(f"  CHECK {code}  {u}   (host blocks automation — verify in a browser)")
             unclear.append(u)
         elif code is None:
-            print(f"  CHECK  --   {u}   ({err} — verify in a browser)")
-            unclear.append(u)
+            host = re.sub(r"^https?://([^/]+).*", r"\1", u)
+            note = KNOWN_BOT_BLOCKERS.get(host)
+            if note:
+                print(f"  ok     --   {u}   (known: {note})")
+            else:
+                print(f"  CHECK  --   {u}   ({err} — verify in a browser)")
+                unclear.append(u)
         else:
             print(f"  BROKEN {code} {u}   in: {', '.join(sorted(seen[u]))}")
             broken.append(u)
