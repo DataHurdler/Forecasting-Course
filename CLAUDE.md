@@ -202,7 +202,7 @@ template-maintenance gates that this course repo does not satisfy.
 | 11 Part 1: Bayesian TS (Wk 12) | `Lecture11_Part1_BayesianTS.tex` ✓ | `Lecture11_Part1_BayesianTS.qmd` ✓ | Structural decomposition, local level, Fourier seasonality. Measured: RMSE 1,587 vs naive 1,660; 94% interval 100% covered but ±30% wide. |
 | 11 Part 2: Hierarchical (Wk 13) | `Lecture11_Part2_Hierarchical.tex` ✓ | `Lecture11_Part2_Hierarchical.qmd` ✓ | **Exchangeability first** (the ten FOODS series), then complete/no/partial pooling, non-centred parameterization. Measured: thin series shrink 8.1× more; held-out RMSE 0.126 → 0.048; 43 divergences → 0. |
 | 12: Bayesian Statistics III — Linear Regression | `Lecture12_BayesianRegression.tex` ✓ | `Lecture12_BayesianRegression.qmd` ✓ | Bayesian linear regression, posterior coefficient distributions, HDI, DAGs, scenario analysis, course method map. |
-| 13: Synthesis *(not on syllabus)* | `Lecture13_Synthesis.tex` ✓ | `Lecture13_Synthesis.qmd` ✓ | Course-wide scoreboard, the three lessons the measurements taught, method-choice guide, a two-part silent-failure catalogue (pipeline bugs vs. correct code / wrong answer), and the final-project frame. |
+| 13: Synthesis *(Wk 16, no lab)* | `Lecture13_Synthesis.tex` ✓ | `Lecture13_Synthesis.qmd` ✓ | Course-wide scoreboard, the three lessons the measurements taught, method-choice guide, a two-part silent-failure catalogue (pipeline bugs vs. correct code / wrong answer), and the final-project frame. |
 
 ---
 

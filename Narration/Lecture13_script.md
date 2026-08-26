@@ -10,8 +10,8 @@ Deck: `Slides/Lecture13_Synthesis.pdf` (20 pages) · Measured runtime: see the t
 
 - **`▶ SLIDE n — Title`** marks where to advance. The number is the PDF page.
 - *Italic parentheticals* are stage directions. **[pause]** means stop for a beat.
-- This deck is **not on the syllabus**. It exists so the online version of the course has a
-  closing session, and as a review students can use before the final project.
+- Week 16 on the syllabus. **Deliberately has no lab** — the session is this synthesis followed
+  by project work time, so budget for questions about their projects.
 - Slides 13 and 14 are the heart of it. The split — bugs in the code versus a correct program
   answering the wrong question — is the most durable thing in the hour.
 

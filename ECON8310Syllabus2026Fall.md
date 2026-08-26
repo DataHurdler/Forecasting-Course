@@ -400,8 +400,9 @@ Assignments are due **before class begins**. Readings are listed under each week
 *Reading:* BMCP §3.2–3.3 (linear and multiple regression, counterfactuals); FPP Ch. 7 as the frequentist benchmark
 *Due:* Homework 6 Part 2
 
-**Week 16 · Dec 10** — Final thoughts on forecasting, econometrics and ML/AI; final project work session
+**Week 16 · Dec 10** — Lecture 13: Synthesis — What the Semester Measured
 *Reading:* FPP Ch. 13
+**No lab this week.** The session is the course synthesis followed by project work time — bring your project and your questions.
 *Due:* Homework 7
 
 **Final Exam Week · Dec 17** — **Final project presentations** (5:30-7:30pm)
