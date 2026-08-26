@@ -197,5 +197,5 @@ Before submitting Part 2, confirm each item below.
 - [ ] Written responses are completed in your own words — AI-generated prose is not accepted for written sections
 - [ ] `INITIAL_PROMPT.md` is saved in your Part 2 submission folder
 - [ ] `PROMPT_LOG.jsonl` is complete with **8 or fewer** entries (one entry per Codex prompt sent)
-- [ ] One git commit per Codex prompt used, following the format: `hw01p2 prompt <id>: <one-line summary>`
+- [ ] One git commit per Codex prompt used, following the format: `hw01_part2 prompt <id>: <one-line summary>`
 - [ ] `REPORT.md` included with a final business recommendation (3–5 sentences) addressed to a non-technical manager, drawing on **both** parts of Homework 1

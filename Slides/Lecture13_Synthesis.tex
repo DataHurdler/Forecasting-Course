@@ -221,8 +221,9 @@
   The errors in this field do not announce themselves.}
 
 % --- Slide: silent errors ----------------------------------------------------------
-\begin{frame}{The Errors That Fail Silently}
-  Every one of these produces a confident, plausible, wrong answer with no error message.
+\begin{frame}{Errors That Fail Silently I: the Pipeline}
+  Every one of these produces a confident, plausible, wrong answer with no error message ---
+  and every one is a \textbf{bug in the code}.
   \begin{center}
     {\small
     \begin{tabular}{p{3.5cm}p{8.8cm}}
@@ -234,17 +235,45 @@
       Rolling features unshifted & A window including the current week leaks the target into its
       own predictor. \\[2pt]
       Reading MDI importance & Pure noise ranked \textbf{17th of 29} in Homework 3 --- above a
-      real feature --- purely for having many distinct values. \\[2pt]
-      Ignoring $\hat{R}$ and divergences & Our first two Bayesian fits returned reasonable-looking
-      forecasts while failing convergence. \\
+      real feature --- purely for having many distinct values. \\
       \bottomrule
     \end{tabular}
     }
   \end{center}
 
-  \textbf{The common thread:} the failure mode is not a crash, it is a number that looks fine ---
-  which is why the discipline is procedural. Benchmark first, split by time, check the
-  diagnostic, plant a control.
+  \vspace{0.05cm}
+  \textbf{The common thread:} the failure is not a crash, it is a number that looks fine --- which
+  is why the discipline is procedural. Split by time, scale inside the fold, shift the window,
+  plant a control.
+\end{frame}
+
+% --- Slide: silent failures II ------------------------------------------------------
+\begin{frame}{Errors That Fail Silently II: the Code Was Fine}
+  Harder, and more common in professional work. Here \textbf{nothing is wrong with the program}:
+  the model fits, the diagnostics pass, and the answer is still wrong.
+  \begin{center}
+    {\small
+    \begin{tabular}{p{3.7cm}p{8.6cm}}
+      \toprule
+      Pooling groups that are not \textbf{exchangeable} & Lecture 11 Part 2 pooled ten FOODS
+      series with twenty that ignore SNAP. Textbook shrinkage, clean diagnostics, and it reported
+      $+0.011$ where held-out weeks said $+0.089$. \\[3pt]
+      Standardizing a coefficient you then \textbf{interpret} & Lecture 12: divide log price by
+      its standard deviation and \texttt{b\_price} stops being an elasticity. Identical fit,
+      identical diagnostics, and the 5\% price scenario moves by \textbf{22$\times$}. \\[3pt]
+      Omitting a confounder & The naive elasticity was six times too large \emph{with an interval
+      half the width}. Precision is not accuracy. \\[3pt]
+      Ignoring $\hat{R}$ and divergences & Our first two Bayesian fits returned
+      reasonable-looking forecasts while failing convergence outright. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.05cm}
+  \textbf{Only the last row has a diagnostic.} The first three were caught by held-out data, by a
+  DAG drawn before the model, and by asking what one unit of a variable means --- none of which
+  any library will run for you.
 \end{frame}
 
 % --- Slide: what to report ---------------------------------------------------------
@@ -272,6 +301,34 @@
   \vspace{0.1cm}
   You have practised this all semester: the assignments were built so the obvious answer is
   frequently the wrong one, and the credit was for noticing.
+\end{frame}
+
+% --- Slide: the final project -------------------------------------------------------
+\begin{frame}{Where You Do This Yourself}
+  The final project asks for exactly the report on the previous slide, on data of your choosing.
+
+  \begin{center}
+    {\small
+    \begin{tabular}{p{3.6cm}p{8.7cm}}
+      \toprule
+      \textbf{Three methods, from at least two parts of the course} & Classical, trees, deep
+      learning, Bayesian. Three variations on one family does not count --- the comparison must be
+      between approaches differing \emph{in kind}. \\[3pt]
+      \textbf{Plus a benchmark} & Which does not count toward the three, and is not optional.
+      Lesson 1 is why. \\[3pt]
+      \textbf{Walk-forward validation} & For every comparison. Not a random split, not once. \\[3pt]
+      \textbf{A recommendation a non-specialist can act on} & In the units of the business, with
+      the uncertainty attached. \\[3pt]
+      \textbf{A methods reflection} & Which model won, and what about \emph{your} data made it
+      win. This is where the course is actually assessed. \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.05cm}
+  \textbf{The last row is not a formality.} Every scoreboard in this course came with a reason,
+  and a project that reports a ranking without one has done the computation but not the work.
 \end{frame}
 
 % =============================================================================
@@ -324,6 +381,10 @@
 
       \item \textbf{Split by time, always.} The leakage errors in this field do not crash --- they
             return a better-looking number.
+
+      \item \textbf{Diagnostics check the model you wrote, not whether it was the right one.}
+            Convergence, $\hat{R}$ and ESS all passed on the two worst answers this course
+            produced. Held-out data caught them.
 
       \item \textbf{Report what went against you.} It is the part that makes the rest credible.
 

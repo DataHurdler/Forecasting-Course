@@ -218,4 +218,4 @@ class TransformerForecaster(nn.Module):
 - [ ] Written responses completed in your own words
 - [ ] `INITIAL_PROMPT.md` saved in `submissions/hw05_part2_<your_name>/`
 - [ ] `PROMPT_LOG.jsonl` complete with **10 or fewer** entries for Part 2
-- [ ] One git commit per Codex prompt (`hw05 prompt <id>: <short summary>`)
+- [ ] One git commit per Codex prompt (`hw05_part2 prompt <id>: <short summary>`)

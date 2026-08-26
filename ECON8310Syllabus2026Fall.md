@@ -36,7 +36,7 @@ In the summer of 2022, I left academia and worked as a senior data scientist at 
 I returned to the University of Nebraska at Omaha as an assistant professor of economics in Fall 2025.
 You can learn more about my teaching, research, and hobbies on my personal website: [https://www.luozijun.com/](https://www.luozijun.com/).
 
-## 10-Minute In-Person Meeting
+## 20-Minute In-Person Meeting
 1. Go to [this link](https://docs.google.com/spreadsheets/d/1hAtn20hMbHiHCeosNgofzSXGSkyp6vmOUbZsiGwit8I/edit?usp=sharing)
 2. Pick a green slot that works for you and make it into a color other than red or green. This way, your classmates know someone has signed up for that spot
 3. Add the time to your calendar
@@ -291,7 +291,7 @@ supplied dataset rather than losing weeks — tell me and it is not a penalty.
 **Final report format.** Submit as a rendered Quarto HTML file (`.qmd` + `.html`) through the course repository.
 The report should include all code, outputs, and written analysis in a single self-contained document.
 There is no page limit, but conciseness is valued: a well-organized 15–20 page report is better than a disorganized 40-page one.
-The grading rubric will be distributed by Week 6.
+The full grading rubric is **`ECON8310_Project_Rubric.md`**, distributed with the course materials. Read it before writing the proposal.
 
 ### Points and Letter Grades
 | Component | Points | Share |
@@ -364,7 +364,7 @@ Assignments are due **before class begins**. Readings are listed under each week
 
 **Week 6 · Oct 1** — Lecture 6: Regularization & Model Selection
 *Reading:* ISLP Ch. 6; FPP §7.5
-*Due:* Homework 3 · *Also:* final project grading rubric distributed
+*Due:* Homework 3 · *Also:* final project grading rubric (`ECON8310_Project_Rubric.md`) walked through in class
 
 **Week 7 · Oct 8** — Lecture 7: Introduction to Neural Networks
 *Reading:* FPP-Py §14.1–14.2, §14.4–14.5, §14.7
