@@ -119,6 +119,14 @@ Here, the widening is a *consequence of the model you wrote down*. If you said t
 random walk, then fifty-two steps of random walk uncertainty is what you get. You can trace the
 interval back to a modelling choice and argue about that choice.
 
+**[pause]**
+
+That traceability is worth more than it sounds. When a planner tells you the interval is too wide
+to use — which is exactly what will happen at the end of this lecture — you can point at the
+specific assumption producing it and propose changing *that*, rather than shrugging at a formula.
+
+An ARIMA interval you can only accept or reject. This one you can negotiate with.
+
 *(Point at the price.)*
 
 And the price is real: it's slower, it needs priors you must defend, and — as we'll see in twenty
@@ -166,6 +174,21 @@ autocorrelation coefficients. Nobody has ever walked into a planning meeting and
 business implications of an MA(2) coefficient.
 
 Here, every parameter is a quantity somebody outside the room can interpret.
+
+**[pause]**
+
+There's a real trade being made, though, and I don't want to sell only one side.
+
+ARIMA's differencing is *automatic*. You don't have to know whether the trend is linear or
+wandering or damped — you difference, and the trend is gone, whatever shape it had.
+
+Structural modelling makes you **commit**. You have to say what kind of level you believe in
+before you fit. Commit correctly and you get interpretable components and honest uncertainty.
+Commit wrongly and you have baked a false assumption into the model, and the posterior will look
+perfectly confident about it.
+
+That's the same bargain as the DAG in Lecture 12: stating your assumptions gets you more, and
+makes you responsible for them.
 
 ---
 
@@ -235,6 +258,21 @@ it is.
 K trades flexibility against overfitting, exactly like spline knots in Lecture 3. We use K equals
 three — six coefficients standing in for fifty-two parameters.
 
+**[pause]**
+
+Notice what that construction *assumes*, because it's an assumption and not a free lunch: it
+assumes the seasonal shape is **smooth**.
+
+Three sine-cosine pairs can describe a broad annual hump with a couple of gentle bumps. What they
+cannot describe is a single enormous one-week spike — Black Friday, say — sitting on an otherwise
+flat year. Fourier terms will smear that spike across neighbouring weeks, because smooth curves
+are all they can make.
+
+If your business has sharp calendar events, the honest answer is to model them as **separate
+indicator variables** rather than raising K until the waves can approximate a spike. That's what
+Prophet does with its holiday regressors, and it's what you did by hand with the SNAP and event
+flags in Homework 2.
+
 ---
 
 # ▶ SLIDE 10 — Section divider: Fitting It in PyMC
@@ -272,6 +310,16 @@ the model the level essentially cannot move.
 
 Standardize, fit, then transform the forecasts back. Getting this wrong produces a model that
 fits terribly for reasons that look mysterious.
+
+**[pause]**
+
+This is the same lesson as Lecture 6's warning about standardizing before Ridge, and it will come
+back one more time in Lecture 12 with the opposite sign — where standardizing a variable you then
+*interpret* silently destroys the interpretation.
+
+So the rule isn't "always standardize" or "never." It's: **know what scale each variable is on,
+and know what your priors assume about that scale.** A prior is a statement about magnitudes. If
+you don't know the magnitudes, you don't know what you've assumed.
 
 ---
 
@@ -356,6 +404,17 @@ price. No SNAP flags. No store identity. No cross-series information.
 
 The XGBoost model in Homework 4 had forty-six engineered predictors and thirty series to learn
 from, and beat naive by a much wider margin. It also had a great deal more information.
+
+**[pause]**
+
+And there's nothing stopping you from combining them, which is what a serious production system
+usually does. Add price and promotion regressors to this structural model and the level has less
+work to do, so it drifts less, so the interval narrows. You keep the predictive distribution and
+you buy back some accuracy.
+
+We're not doing that today because I want the mechanism visible rather than buried under
+covariates. But it is the obvious next step, and it's a very reasonable direction for a final
+project.
 
 **[pause]**
 
