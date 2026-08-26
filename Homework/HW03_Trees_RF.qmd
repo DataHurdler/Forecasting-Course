@@ -130,7 +130,9 @@ Dataset: M5/Walmart — weekly aggregated, 30 store-category series (10 stores a
 
 This homework covers Decision Trees and Random Forests for sales forecasting using scikit-learn. I will ask you questions one at a time. For each:
 1. Write clean, well-commented Python code that runs end-to-end
-2. Interpret outputs in plain English for a business audience
+2. Explain what the output means so that I understand it — but do NOT draft the written
+   answers I submit. The interpretation and business-recommendation sections are mine to
+   write, in my own words.
 3. Log this interaction to PROMPT_LOG.jsonl before responding
 
 My prompt budget is 12 (this context prompt is excluded). I will label each question before asking.

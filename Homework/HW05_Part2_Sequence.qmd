@@ -134,7 +134,9 @@ This homework covers four neural network architectures for time series
 forecasting: FFN, 1D CNN, LSTM, and Transformer encoder (all in PyTorch).
 I will ask you questions one at a time. For each:
 1. Write clean, well-commented PyTorch code that runs end-to-end
-2. Interpret outputs in plain English for a business audience
+2. Explain what the output means so that I understand it — but do NOT draft the written
+   answers I submit. The interpretation and business-recommendation sections are mine to
+   write, in my own words.
 3. Log this interaction to PROMPT_LOG.jsonl before responding
 
 My prompt budget for Part 2 is 10 (this context prompt is excluded). I will label

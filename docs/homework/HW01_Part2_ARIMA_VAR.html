@@ -2375,7 +2375,7 @@ window.Quarto = {
 <section id="dataset-and-split" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Dataset and Split</h1>
 <p>Same M5 weekly panel as Part 1, and <strong>the same train/test split</strong>, so your Part 2 numbers are directly comparable to Part 1.</p>
-<div id="e91b8dbe" class="cell" data-execution_count="1">
+<div id="797139ea" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2451,7 +2451,9 @@ Dataset: M5 / Walmart weekly sales, prepared at `data/processed/m5_weekly.csv`. 
 
 Part 2 covers ARIMA, walk-forward cross-validation, VAR, and Granger causality using Python and statsmodels, on the CA_1 and CA_3 FOODS series. I already completed exponential smoothing in Part 1 and will compare against those results. The train/test split is fixed: the final 52 weeks are the test set. For each question:
 1. Write clean, well-commented Python code that runs end-to-end
-2. Interpret outputs in plain English for a business audience
+2. Explain what the output means so that I understand it — but do NOT draft the written
+   answers I submit. The interpretation and business-recommendation sections are mine to
+   write, in my own words.
 3. Log this interaction to PROMPT_LOG.jsonl before responding
 
 My prompt budget for Part 2 is 8 (this context prompt is excluded). I will label each question before asking.
@@ -2500,7 +2502,7 @@ This one is not clean, and that is the point
 <p><strong>(b)</strong> Plot the ACF and PACF of the (possibly differenced) series. Based on the plots, propose an ARIMA(<span class="math inline">\(p, d, q\)</span>) order and explain your reasoning. Compare what you see against the four reference patterns from Lecture 2 — which one does this series most resemble?</p>
 <p><strong>(c)</strong> Fit your chosen ARIMA model on <code>train</code>. Report the AIC and compute the forecast RMSE on <code>test</code>.</p>
 <p><strong>(d)</strong> Implement walk-forward cross-validation: use an expanding window with a minimum training length of 104 weeks, re-fit your ARIMA at each step, and produce a 1-step-ahead forecast. Report the mean RMSE across all steps.</p>
-<div id="8348d9d9" class="cell" data-execution_count="2">
+<div id="323722a5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) ADF test</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) ACF and PACF plots</span></span>
@@ -2522,7 +2524,7 @@ This one is not clean, and that is the point
 <p>Use <strong>the transformation you justified in Q3(a)</strong> — levels if you concluded the series is stationary, differences if you concluded it has a unit root. State which you used and why. Lecture 2 covered both hazards: regressing non-stationary series gives you spurious results, and differencing an already-stationary series induces autocorrelation you then have to model away.</p>
 <p><strong>(b)</strong> Fit a VAR(4) on the training window of both series — same transformation as in (a) — using <code>statsmodels.tsa.api.VAR</code>. Forecast the next 4 weeks. Plot actual versus forecast for CA_1 only.</p>
 <p><strong>(c)</strong> Report the contemporaneous correlation between the two series’ weekly changes.</p>
-<div id="5a2bbced" class="cell" data-execution_count="3">
+<div id="1c497f99" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ca3 <span class="op">=</span> (weekly[(weekly.store_id <span class="op">==</span> <span class="st">&quot;CA_3&quot;</span>) <span class="op">&amp;</span> (weekly.cat_id <span class="op">==</span> <span class="st">&quot;FOODS&quot;</span>)]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>       .set_index(<span class="st">&quot;week_start&quot;</span>)[<span class="st">&quot;units&quot;</span>].sort_index())</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>

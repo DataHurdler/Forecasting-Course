@@ -106,7 +106,9 @@ Dataset: M5 / Walmart weekly sales, prepared at `data/processed/m5_weekly.csv`. 
 
 Part 2 covers ARIMA, walk-forward cross-validation, VAR, and Granger causality using Python and statsmodels, on the CA_1 and CA_3 FOODS series. I already completed exponential smoothing in Part 1 and will compare against those results. The train/test split is fixed: the final 52 weeks are the test set. For each question:
 1. Write clean, well-commented Python code that runs end-to-end
-2. Interpret outputs in plain English for a business audience
+2. Explain what the output means so that I understand it — but do NOT draft the written
+   answers I submit. The interpretation and business-recommendation sections are mine to
+   write, in my own words.
 3. Log this interaction to PROMPT_LOG.jsonl before responding
 
 My prompt budget for Part 2 is 8 (this context prompt is excluded). I will label each question before asking.
