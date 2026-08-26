@@ -2,7 +2,7 @@ ECON 8310 — The Data We Use
 ===========================
 ### Fall 2026 · A guide to the four datasets in this course
 
-[← Course website](https://datahurdler.github.io/Forecasting-Course/) · [Syllabus](https://datahurdler.github.io/Forecasting-Course/files/syllabus.html)
+[← Course website](https://www.luozijun.com/forecasting-course/) · [Syllabus](https://www.luozijun.com/forecasting-course/files/syllabus.html)
 
 ---
 
