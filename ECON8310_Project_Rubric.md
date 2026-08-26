@@ -1,6 +1,8 @@
 # ECON 8310 Final Project — Grading Rubric
 ### Fall 2026 · 100 points · 25% of the course grade
 
+[← Course website](https://datahurdler.github.io/Forecasting-Course/) · [Syllabus](https://datahurdler.github.io/Forecasting-Course/files/syllabus.html)
+
 Groups of no more than three. Four graded deliverables, described in the syllabus and broken
 down here. Read this before the proposal, not after — the proposal is worth 20 points and most
 of what it is graded on is decided before you write any code.

@@ -134,9 +134,13 @@ scikit-learn, xgboost, torch, pymc, arviz
 Installation instructions and a test script are provided in the course repository.
 
 ## Course Materials
-All lecture slides (PDF and interactive HTML), homework assignments, and data files are distributed through the course website and Canvas.
+**Course website: <https://datahurdler.github.io/Forecasting-Course/>**
 
-The course runs on one main dataset, with three others introduced where that one cannot demonstrate something. **`ECON8310_Datasets.md`** explains what each dataset is, where to download it, and why it is in the course. Read it before Homework 1.
+Everything is there, organized by week: each lecture as both a PDF and interactive HTML slides, every lab, and every assignment with its due date. Bookmark it — it is the fastest way to find anything in this course.
+
+Lecture slides, homework assignments, and data files are distributed through the course website and Canvas.
+
+The course runs on one main dataset, with three others introduced where that one cannot demonstrate something. **[`ECON8310_Datasets.md`](https://datahurdler.github.io/Forecasting-Course/files/datasets.html)** explains what each dataset is, where to download it, and why it is in the course. Read it before Homework 1.
 The textbooks above are free online.
 There is nothing you need to buy for this course.
 
@@ -291,7 +295,7 @@ supplied dataset rather than losing weeks — tell me and it is not a penalty.
 **Final report format.** Submit as a rendered Quarto HTML file (`.qmd` + `.html`) through the course repository.
 The report should include all code, outputs, and written analysis in a single self-contained document.
 There is no page limit, but conciseness is valued: a well-organized 15–20 page report is better than a disorganized 40-page one.
-The full grading rubric is **`ECON8310_Project_Rubric.md`**, distributed with the course materials. Read it before writing the proposal.
+The full grading rubric is **[`ECON8310_Project_Rubric.md`](https://datahurdler.github.io/Forecasting-Course/files/project-rubric.html)**, on the course website. Read it before writing the proposal.
 
 ### Points and Letter Grades
 | Component | Points | Share |

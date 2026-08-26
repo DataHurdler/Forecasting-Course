@@ -2,6 +2,8 @@ ECON 8310 — The Data We Use
 ===========================
 ### Fall 2026 · A guide to the four datasets in this course
 
+[← Course website](https://datahurdler.github.io/Forecasting-Course/) · [Syllabus](https://datahurdler.github.io/Forecasting-Course/files/syllabus.html)
+
 ---
 
 ## Why there is a spine, and why there are supplements
