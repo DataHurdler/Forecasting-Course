@@ -182,7 +182,6 @@ questions one at a time. For each:
 2. Explain what the output means so that I understand it — but do NOT draft the written
    answers I submit. The interpretation and business-recommendation sections are mine to
    write, in my own words.
-3. Log this interaction to PROMPT_LOG.jsonl before responding
 
 My prompt budget is 12 (this context prompt is excluded). I will label
 each question before asking.
@@ -190,9 +189,11 @@ each question before asking.
 
 Repository rules — these apply to every prompt in this thread:
 - My submission folder is `submissions/hw04_<my_name>/`. Put everything there.
-- Before responding to each prompt, append ONE line to `PROMPT_LOG.jsonl` in that folder:
-  {"prompt_id": <int, starts at 1, increments by 1>, "timestamp_local": "YYYY-MM-DD HH:MM:SS", "prompt": "<my prompt, verbatim>"}
-  Never edit or delete a line you already wrote.
+- Keep a `PROMPT_LOG.md` in that folder. For every prompt I send, append a block:
+      ### Prompt <n> — YYYY-MM-DD HH:MM
+      <my prompt, verbatim>
+  Numbered from 1, in order. Never edit or delete an earlier entry. If your tool cannot write
+  files, I will paste them in myself.
 - After finishing the work for each prompt, make exactly one git commit:
   `hw04 prompt <prompt_id>: <short summary>`
 - If a prompt would take me past my budget of 12, do not do the work. Reply exactly
@@ -426,6 +427,6 @@ Before submitting, confirm:
 - [ ] All code cells run without errors from top to bottom
 - [ ] Written responses completed in your own words (not AI-generated prose)
 - [ ] `INITIAL_PROMPT.md` saved in `submissions/hw04_<your_name>/`
-- [ ] `PROMPT_LOG.jsonl` complete with ≤ 12 entries
+- [ ] `PROMPT_LOG.md` complete with ≤ 12 entries
 - [ ] One git commit per Codex prompt (`hw04 prompt <id>: <short summary>`)
 - [ ] `REPORT.md` with a clear business recommendation
