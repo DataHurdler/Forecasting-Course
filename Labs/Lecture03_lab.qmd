@@ -138,7 +138,7 @@ for label, X in [("one harmonic", one), ("two harmonics", two)]:
 
 **This is the whole argument for a flexible term.** One harmonic can put its peak in summer or
 in winter — not both. Adding the second harmonic (a cycle that repeats *twice* a year) cuts the
-error by roughly a factor of three.
+error by about a factor of two and a half.
 
 Prophet's `yearly_seasonality` is exactly this idea with more terms: a Fourier series of order
 10 by default, so 10 sine/cosine pairs. A `pyGAM` spline gets there differently — by bending
@@ -256,12 +256,17 @@ The confidence band widens where the data is thin — say that too.
 
 # Before you leave
 
-You should have found that every method beat the seasonal-naive benchmark, and that the single
-harmonic was the worst of the three models.
+You should have found that every method beat the seasonal-naive benchmark **on RMSE**, and that
+the single harmonic was the worst of the three models.
 
-> **Discuss:** `pyGAM` was given only day-of-year and day-of-week. Prophet was given a trend, a
-> weekly cycle, *and* a yearly cycle with ten harmonics. Yet on this holdout the simpler model
-> was competitive.
+Look at the MAE column before you move on. The single-harmonic Prophet has a *worse* MAE than the
+benchmark it beat on RMSE. Same two models, same holdout, opposite verdict depending on which
+error measure you quote — because RMSE squares errors and so punishes the occasional large miss,
+while MAE treats every error proportionally.
+
+> **Discuss:** `pyGAM` was given only day-of-year and day-of-week — no trend term at all. Prophet
+> was given a trend, a weekly cycle, *and* a yearly cycle with ten harmonics. Yet on this holdout
+> the simpler model won, by roughly 12% on both RMSE and MAE.
 >
 > Give one reason a more flexible model can lose on a held-out year, and name the thing you
 > would check before concluding that pyGAM is genuinely the better choice here.

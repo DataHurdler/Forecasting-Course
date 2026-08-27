@@ -16,15 +16,20 @@ Lab: `Labs/Lecture03_lab.qmd` (6 steps) · Measured runtime: **~25 minutes** of 
   MAP estimation rather than MCMC here, so it is deterministic — no seed required.
 - Nothing here is sacred. If a sentence doesn't sound like you, change it.
 
-### Two corrections to the lab text, folded into this script
+### Three corrections that were applied to the lab
 
-1. **Step 2** says two harmonics cut the error "by roughly a factor of three." It is
-   **3,428 → 1,348**, a factor of **2.5**. The script says two and a half.
-2. **The closing** says the simpler model "was competitive." pyGAM does not merely compete —
-   it **wins**, 3,444 against Prophet's 3,935, about 12% better. The script says so, because
-   understating your own result trains students to do the same.
+Writing this script turned up three claims in the `.qmd` that the measured output did not
+support. **All three are now fixed in the lab**, so script and lab agree — this note is here so
+you know why the wording changed if you remember the earlier version.
 
-Neither changes the lab's argument. Both are worth fixing in the `.qmd` when you next touch it.
+1. **Step 2** said two harmonics cut the error "by roughly a factor of three." It is
+   **3,428 → 1,348**, a factor of **2.5**.
+2. **The closing** said every method beat the benchmark. True on RMSE; **false on MAE**, where
+   the single-harmonic Prophet (3,358) loses to seasonal naive (3,333). The lab now says "on
+   RMSE" and points at the disagreement.
+3. **The closing** said the simpler model "was competitive." pyGAM **wins** — 3,444 against
+   Prophet's 3,935, about 12% better on both metrics. Understating your own result trains
+   students to do the same.
 
 ### In-room language that needs replacing
 
