@@ -19,6 +19,9 @@ format:
     logo: ""
     footer: "ECON 8310 | University of Nebraska at Omaha"
     embed-resources: true
+    # Deep-linkable slide URLs, but one browser-history entry per deck rather
+    # than one per slide -- so Back returns to the site, not the previous slide.
+    history: false
 bibliography: ../Bibliography_base.bib
 csl: https://www.zotero.org/styles/chicago-author-date
 ---
