@@ -1098,9 +1098,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="from-single-trees-to-ensembles" class="title-slide slide level1 center">
 <h1>From Single Trees to Ensembles</h1>
@@ -1117,9 +1114,6 @@ Department of Economics
 </div>
 <p>The same principle transfers directly to models. A single decision tree is unstable and noisy — that was Lecture 4’s closing complaint. Train many trees on different versions of the data and average them, and the noise largely cancels while the signal survives.</p>
 <p><strong>Ensembles work because independent errors cancel.</strong> And that word is doing real work: the <em>more independent</em> the individual predictions, the more variance averaging removes. Hold onto it — the entire difference between bagging and random forests turns on it.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="bagging-bootstrap-aggregating" class="title-slide slide level1 center">
@@ -1152,9 +1146,6 @@ Department of Economics
 <div class="warningbox">
 <p>Below about 1,000 observations the OOB estimate gets noisy, because each observation is out-of-bag for too few trees. On a weekly business series — a few hundred rows — use proper walk-forward CV instead.</p>
 </div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="random-forests-decorrelating-the-trees" class="title-slide slide level1 center">
@@ -1222,9 +1213,6 @@ Department of Economics
 </table>
 <p><strong>Start with</strong> <code>n_estimators=500</code>, <code>max_features=&#39;sqrt&#39;</code>, <code>min_samples_leaf=5</code>, <code>oob_score=True</code>. Note how few genuinely need tuning — <code>max_features</code> is the dial controlling <span class="math inline">\(\rho\)</span>, and the rest is close to fire-and-forget. That is most of why random forests make a good default.</p>
 <p><span class="neutral smaller">Set <code>random_state=42</code>: a forest is random twice over, in the bootstrap samples and in the feature subsets.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="feature-importance-and-interpretation" class="title-slide slide level1 center">
@@ -1313,9 +1301,6 @@ Department of Economics
 </table>
 <p>The forest cuts RMSE roughly <strong>28%</strong> against a single deep tree, and is the first method in this course to beat the seasonal naive benchmark on this series.</p>
 <p><span class="neutral smaller">What changed is not a better model of the series but a richer feature set — lags, price, and SNAP days are information ETS and ARIMA never had.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="gradient-boosting" class="title-slide slide level1 center">
@@ -1360,9 +1345,6 @@ Department of Economics
 </div>
 <p>The trees are deliberately <strong>shallow</strong> — depth 3 to 6 — because each one only has to capture a small piece of the remaining error. The ensemble converges slowly and on purpose.</p>
 <p><strong>The learning rate <span class="math inline">\(\eta\)</span> is the main dial.</strong> Small values (0.01–0.1) take a tiny step per tree: slower, needs more trees, far more robust. Large values (<span class="math inline">\(&gt; 0.3\)</span>) move fast and risk overshooting. The reliable recipe is a small <span class="math inline">\(\eta\)</span>, many trees, and <strong>early stopping</strong> — without which boosting will happily fit your noise.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="xgboost" class="title-slide slide level1 center">
@@ -1453,9 +1435,6 @@ Department of Economics
 <p><code>eval_set</code> is what makes <code>early_stopping_rounds</code> work: XGBoost watches validation RMSE and halts when it stops improving, which is how you get away with setting <code>n_estimators</code> far higher than you need.</p>
 <p><strong>The validation set must respect time.</strong> Build it with <code>TimeSeriesSplit</code> and hold out the final stretch as a true test set.</p>
 <p><span class="neutral smaller">On macOS <code>xgboost</code> also needs OpenMP: <code>brew install libomp</code>, or the import fails.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways-and-roadmap" class="title-slide slide level1 center">

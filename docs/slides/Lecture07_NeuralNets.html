@@ -1096,9 +1096,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="from-trees-to-neural-networks" class="title-slide slide level1 center">
 <h1>From Trees to Neural Networks</h1>
@@ -1167,9 +1164,6 @@ Department of Economics
 </div>
 <p>Insert a nonlinearity between the layers and the picture changes completely. The <strong>universal approximation theorem</strong> says a network with one hidden layer can approximate <em>any</em> continuous function to arbitrary accuracy, given enough neurons.</p>
 <p><strong>Read that claim carefully.</strong> It says a network <em>can</em> represent the function — not that your optimizer will find it, that you have the data to identify it, or that it will generalize. Existence is not estimation, the same gap as between the optimal tree and the greedy one CART builds.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="feedforward-networks" class="title-slide slide level1 center">
@@ -1222,9 +1216,6 @@ Department of Economics
 </table>
 <p><span class="key-result"><strong>Twenty-two thousand parameters on five thousand rows</strong> — four per observation.</span></p>
 <p>Lecture 6 called sixty predictors on a hundred and fifty observations a crisis. This is far past that ratio, and networks train here routinely. What makes it survivable is not the architecture but the regularization, next.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="training-loss-and-backpropagation" class="title-slide slide level1 center">
@@ -1268,9 +1259,6 @@ Department of Economics
 </tbody>
 </table>
 <p><span class="hi"><strong>That is the fifth appearance of one idea.</strong></span> The GAM smoothing penalty in Lecture 3, cost-complexity pruning in Lecture 4, <code>reg_lambda</code> on leaf weights in Lecture 5, Ridge and LASSO in Lecture 6 — and now weight decay. Fit against complexity, one parameter setting the exchange rate, chosen by validation.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="pytorch-implementation" class="title-slide slide level1 center">
@@ -1334,9 +1322,6 @@ Department of Economics
 </div>
 <p>Every PyTorch training loop is those four lines with more around them.</p>
 <p><strong>The one that bites:</strong> forget <code>zero_grad()</code> and PyTorch <em>accumulates</em> gradients rather than replacing them. No error, no warning — just a model that trains badly.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways" class="title-slide slide level1 center">

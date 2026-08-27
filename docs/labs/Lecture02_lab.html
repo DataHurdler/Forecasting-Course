@@ -2360,7 +2360,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
-<div id="09828d3a" class="cell" data-execution_count="1">
+<div id="0840b9a1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2405,7 +2405,7 @@ window.Quarto = {
 </section>
 <section id="step-1-look-then-test" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Step 1 — Look, then test</h1>
-<div id="7e4fab35" class="cell" data-execution_count="2">
+<div id="79452875" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.2</span>))</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax.plot(y.index, y.values, lw<span class="op">=</span><span class="fl">1.3</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">&quot;CA_1 HOUSEHOLD — weekly units&quot;</span>)<span class="op">;</span> plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2418,7 +2418,7 @@ window.Quarto = {
 </div>
 </div>
 <p><strong>Notice:</strong> the level wanders. Your eye says non-stationary. Now make the test agree.</p>
-<div id="75f6694c" class="cell" data-execution_count="3">
+<div id="d0b7cc33" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> report_adf(series, label):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    stat, p, lags, nobs, crit, _ <span class="op">=</span> adfuller(series.dropna(), autolag<span class="op">=</span><span class="st">&quot;AIC&quot;</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>label<span class="sc">:&lt;28}</span><span class="ss"> ADF </span><span class="sc">{</span>stat<span class="sc">:&gt;7.2f}</span><span class="ss">   p </span><span class="sc">{</span>p<span class="sc">:&gt;6.3f}</span><span class="ss">   lags </span><span class="sc">{</span>lags<span class="sc">:&gt;2}</span><span class="ss">   &quot;</span></span>
@@ -2430,7 +2430,7 @@ window.Quarto = {
 </div>
 </div>
 <p>Now difference it and re-test.</p>
-<div id="779c8630" class="cell" data-execution_count="4">
+<div id="5683107c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dy <span class="op">=</span> y.diff().dropna()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>report_adf(dy, <span class="st">&quot;first difference&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2443,7 +2443,7 @@ window.Quarto = {
 <section id="step-2-now-you-are-allowed-to-read-the-acf" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Step 2 — Now you are allowed to read the ACF</h1>
 <p>Lecture 2’s rule: the ACF of a non-stationary series decays slowly no matter what the underlying process is. Run both and see it.</p>
-<div id="4f78ba79" class="cell" data-execution_count="5">
+<div id="f5730d25" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">5</span>))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plot_acf(y, lags<span class="op">=</span><span class="dv">30</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>,<span class="dv">0</span>])<span class="op">;</span>  axes[<span class="dv">0</span>,<span class="dv">0</span>].set_title(<span class="st">&quot;ACF — levels (uninformative)&quot;</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>plot_pacf(y, lags<span class="op">=</span><span class="dv">30</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>,<span class="dv">1</span>])<span class="op">;</span> axes[<span class="dv">0</span>,<span class="dv">1</span>].set_title(<span class="st">&quot;PACF — levels&quot;</span>)</span>
@@ -2464,7 +2464,7 @@ window.Quarto = {
 </section>
 <section id="step-3-fit-it" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Step 3 — Fit it</h1>
-<div id="b8ab76bf" class="cell" data-execution_count="6">
+<div id="054e2506" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>order <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)                           <span class="co"># &lt;- REPLACE with your proposal from Step 2</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ARIMA(train, order<span class="op">=</span>order).fit()</span>
@@ -2478,8 +2478,8 @@ window.Quarto = {
 ==============================================================================
 Dep. Variable:                  units   No. Observations:                  225
 Model:                 ARIMA(1, 1, 1)   Log Likelihood               -1616.638
-Date:                Tue, 25 Aug 2026   AIC                           3239.275
-Time:                        23:51:25   BIC                           3249.510
+Date:                Thu, 27 Aug 2026   AIC                           3239.275
+Time:                        14:07:27   BIC                           3249.510
 Sample:                    01-31-2011   HQIC                          3243.407
                          - 05-18-2015                                         
 Covariance Type:                  opg                                         
@@ -2493,7 +2493,7 @@ Covariance Type:                  opg
 <section id="step-4-break-it-the-horizon-trap" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Step 4 — Break it: the horizon trap</h1>
 <p>Now the same model, evaluated a different way.</p>
-<div id="c5959710" class="cell" data-execution_count="7">
+<div id="9960320d" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>errs <span class="op">=</span> []</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>vals <span class="op">=</span> y.values</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">104</span>, <span class="bu">len</span>(vals) <span class="op">-</span> <span class="dv">1</span>):</span>
@@ -2516,7 +2516,7 @@ single-split 52-step RMSE: 569</code></pre>
 <h1 data-number="7"><span class="header-section-number">7</span> Step 5 — Granger causality, and the trap in it</h1>
 <p>Does the food aisle help predict the household aisle?</p>
 <p><code>grangercausalitytests</code> prints four test variants for every lag up to <code>maxlag</code> — a wall of output you did not ask for. The helper below silences it and pulls out the single F-test.</p>
-<div id="56f96205" class="cell" data-execution_count="8">
+<div id="78766a95" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>food <span class="op">=</span> get_series(<span class="st">&quot;CA_1&quot;</span>, <span class="st">&quot;FOODS&quot;</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>pair <span class="op">=</span> pd.concat([y.rename(<span class="st">&quot;household&quot;</span>), food.rename(<span class="st">&quot;food&quot;</span>)], axis<span class="op">=</span><span class="dv">1</span>).diff().dropna()</span>
@@ -2536,7 +2536,7 @@ single-split 52-step RMSE: 569</code></pre>
 </div>
 <p>Note the argument order: the <strong>second</strong> argument is the candidate cause. Getting this backwards is the single most common mistake with this function.</p>
 <p><strong>Your turn:</strong> run the other direction and report both F-statistics.</p>
-<div id="d7fa44e7" class="cell" data-execution_count="9">
+<div id="a7f45c2c" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment, then swap the two arguments ----</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># granger(___, ___)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -2546,7 +2546,7 @@ single-split 52-step RMSE: 569</code></pre>
 <h1 data-number="8"><span class="header-section-number">8</span> Step 6 — The same test on macro data, and why the sample matters</h1>
 <p>Step 5 used two aisles of one store. Now the question from the lecture slide: <strong>does unemployment Granger-cause retail sales?</strong></p>
 <p>Run <code>python scripts/prep_fred.py</code> once before class — it caches three FRED series to <code>data/processed/fred_monthly.csv</code>, so this step needs no network and no API key.</p>
-<div id="792c4a1a" class="cell" data-execution_count="10">
+<div id="83f8e126" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fred <span class="op">=</span> pd.read_csv(data_path(<span class="st">&quot;fred_monthly.csv&quot;</span>), parse_dates<span class="op">=</span>[<span class="st">&quot;date&quot;</span>]).set_index(<span class="st">&quot;date&quot;</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Both series are already stationary transforms:</span></span>
@@ -2572,7 +2572,7 @@ single-split 52-step RMSE: 569</code></pre>
 </div>
 <p>Both directions are significant, and unemployment looks like the stronger driver. That matches the story everyone expects: people lose jobs, people stop spending.</p>
 <p><strong>Now drop the COVID window and run it again.</strong></p>
-<div id="e4995ad7" class="cell" data-execution_count="11">
+<div id="7071e87a" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ex_covid <span class="op">=</span> macro[(macro.index <span class="op">&lt;</span> <span class="st">&quot;2020-02-01&quot;</span>) <span class="op">|</span> (macro.index <span class="op">&gt;</span> <span class="st">&quot;2021-06-01&quot;</span>)]</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Excluding Feb 2020 - Jun 2021 (</span><span class="sc">{</span><span class="bu">len</span>(ex_covid)<span class="sc">}</span><span class="ss"> months)&quot;</span>)</span>
@@ -2585,7 +2585,7 @@ single-split 52-step RMSE: 569</code></pre>
 </div>
 </div>
 <p><strong>Your turn:</strong> restrict the sample to everything <em>before</em> February 2020 and run both directions once more.</p>
-<div id="b863ec31" class="cell" data-execution_count="12">
+<div id="4c268c64" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the filter ----</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pre_covid = macro[___]                     # &lt;- rows with index &lt; &quot;2020-02-01&quot;</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>

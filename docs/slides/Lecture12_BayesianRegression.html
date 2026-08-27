@@ -1095,9 +1095,6 @@ Department of Economics
 <li>Course Synthesis and Next Steps</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="bayesian-linear-regression" class="title-slide slide level1 center">
 <h1>Bayesian Linear Regression</h1>
@@ -1131,9 +1128,6 @@ Department of Economics
 <span id="cb1-9"><a href></a>    idata <span class="op">=</span> pm.sample(<span class="dv">1000</span>, tune<span class="op">=</span><span class="dv">1500</span>, chains<span class="op">=</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Do not standardize log price</strong> — with both in logs <code>b_price</code> is an <strong>elasticity</strong>, percent change in demand per percent change in price. Standardizing rescales it to “per SD” and destroys that reading. <code>lpc</code> is log price centred within series, which fixed ESS 184 <span class="math inline">\(\rightarrow\)</span> 3,097.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="reading-the-posterior" class="title-slide slide level1 center">
@@ -1206,9 +1200,6 @@ Department of Economics
 <p><strong>Two findings, and a p-value conflates them.</strong> “Significant” reports only the direction. The question the business asks — <em>how big?</em> — gets the answer 46/54.</p>
 </div>
 <p><span class="neutral smaller">Posterior mass inside a range of negligible values is a <strong>ROPE</strong> — region of practical equivalence.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="causal-structure-and-dags" class="title-slide slide level1 center">
@@ -1288,9 +1279,6 @@ Department of Economics
 <p>With an elasticity near <span class="math inline">\(-0.493\)</span>, a 5% price rise implies roughly a <strong>2.4% fall in units</strong>, 94% of the posterior between <span class="math inline">\(-2.9\%\)</span> and <span class="math inline">\(-1.9\%\)</span> — so you can report the pessimistic end too.</p>
 <p><strong>Then the decision follows.</strong> Revenue rises if the volume loss is smaller than the price gain: here <span class="math inline">\(+2.5\%\)</span> on average, and <span class="math inline">\(P(\text{revenue rises}) = 1.00\)</span> across every posterior sample. Note this holds <em>even though</em> the elasticity might be past <span class="math inline">\(-0.5\)</span>.</p>
 <p><span class="neutral smaller">Valid only to the extent the DAG is — this is a causal claim about intervening on price.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="course-synthesis-and-next-steps" class="title-slide slide level1 center">

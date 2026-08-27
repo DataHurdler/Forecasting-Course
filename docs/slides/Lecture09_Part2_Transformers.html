@@ -1096,9 +1096,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="what-recurrence-could-not-do" class="title-slide slide level1 center">
 <h1>What Recurrence Could Not Do</h1>
@@ -1112,9 +1109,6 @@ Department of Economics
 <div class="keybox">
 <p><strong>Attention removes both at once.</strong> Let every position look directly at every other position, in one operation. No compression through intermediate states, and no ordering constraint on the computation.</p>
 </div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="the-attention-mechanism" class="title-slide slide level1 center">
@@ -1152,9 +1146,6 @@ Department of Economics
 <p>Each head can specialize. In a forecasting model one head might track weekly position, another the annual cycle, another the effect of promotional flags — all attending over the same window at once.</p>
 <p><strong>The cost is not what you would guess.</strong> Each head works in a lower-dimensional subspace of size <span class="math inline">\(d_{\text{model}}/h\)</span>, so eight heads cost about the same as one head at full width. You buy the diversity nearly for free.</p>
 <p><span class="neutral smaller">Our model below uses <code>nhead=4</code> with <code>d_model=64</code> — four heads of 16 dimensions each.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="the-transformer-encoder" class="title-slide slide level1 center">
@@ -1209,9 +1200,6 @@ Department of Economics
 <div class="warningbox">
 <p>Every one of those advantages is about <strong>large data and long sequences</strong>. Hold that thought against a 26-week window and 5,940 training examples.</p>
 </div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="transformers-for-time-series" class="title-slide slide level1 center">
@@ -1330,9 +1318,6 @@ Department of Economics
 </tbody>
 </table>
 <p><span class="key-result"><strong>292 RMSE</strong></span> — dropping it below even the 1D CNN. That gap is the price of permutation invariance, and the reason the sinusoids exist.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways" class="title-slide slide level1 center">

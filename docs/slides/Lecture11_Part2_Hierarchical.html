@@ -1096,9 +1096,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="which-series-may-be-pooled" class="title-slide slide level1 center">
 <h1>Which Series May Be Pooled</h1>
@@ -1179,9 +1176,6 @@ Department of Economics
 </tbody>
 </table>
 <p><strong>You have used both already without naming them.</strong> Homework 3’s random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modelling decision and lets the data settle it.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="partial-pooling" class="title-slide slide level1 center">
@@ -1223,9 +1217,6 @@ Department of Economics
 <p><strong>This is regularization again, for the sixth time.</strong> A hierarchical prior shrinks per-group estimates toward a common value exactly as Ridge shrinks coefficients toward zero — and here the shrinkage strength <span class="math inline">\(\sigma_b\)</span> is <em>estimated</em> rather than tuned by cross-validation.</p>
 </div>
 <p><span class="neutral smaller">GAM smoothing penalty (L3) <span class="math inline">\(\rightarrow\)</span> tree pruning (L4) <span class="math inline">\(\rightarrow\)</span> <code>reg_lambda</code> (L5) <span class="math inline">\(\rightarrow\)</span> Ridge and LASSO (L6) <span class="math inline">\(\rightarrow\)</span> weight decay (L7) <span class="math inline">\(\rightarrow\)</span> hierarchical priors (today).</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="fitting-it-and-the-trap" class="title-slide slide level1 center">
@@ -1288,9 +1279,6 @@ Department of Economics
 <p><strong>Why:</strong> when <span class="math inline">\(\sigma_b\)</span> is small, the <span class="math inline">\(b_j\)</span> must crowd into a narrow band, and the posterior takes on a funnel shape — wide where <span class="math inline">\(\sigma_b\)</span> is large, pinched where it is small. A sampler tuned for the wide part cannot navigate the neck, and reports divergences.</p>
 <p><strong>Note which alarm actually fired.</strong> <span class="math inline">\(\hat{R}\)</span> and ESS <em>both pass</em> — on those two numbers you would have shipped it. Only the divergence count objects. On hierarchical models divergences are the sensitive instrument; do not wait for <span class="math inline">\(\hat{R}\)</span> to tell you.</p>
 <p><span class="neutral smaller">BMCP §4.6.1, <em>Posterior Geometry Matters</em> — the single most common failure in applied hierarchical modelling.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="reading-the-result" class="title-slide slide level1 center">
@@ -1390,9 +1378,6 @@ Department of Economics
 <p><strong>It does not license the store-level policy the unpooled fit suggested.</strong> An analyst reading the unpooled numbers would report uplifts from <span class="math inline">\(5\%\)</span> to <span class="math inline">\(40\%\)</span> and stock accordingly. The held-out weeks say that range was mostly noise — but <span class="math inline">\(\sigma_b = 0.065\)</span> says it is not <em>all</em> noise either.</p>
 </div>
 <p><strong>The defensible recommendation:</strong> plan on an 8% FOODS uplift everywhere, allow real but modest store variation around it, and do not act on a store’s own estimate until that store has the weeks to support one.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways" class="title-slide slide level1 center">

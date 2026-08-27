@@ -1096,9 +1096,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="where-the-last-two-lectures-ran-out" class="title-slide slide level1 center">
 <h1>Where the Last Two Lectures Ran Out</h1>
@@ -1119,9 +1116,6 @@ Department of Economics
 <p>At each step it does two things: update the summary using the new input <em>and</em> the previous summary, then optionally emit an output. The same weights are used at every step, which is weight sharing again — along time rather than along space.</p>
 <p><strong>The consequence worth sitting with.</strong> There is no fixed window. In principle <span class="math inline">\(\mathbf{h}_t\)</span> encodes the entire history <span class="math inline">\(x_1, \ldots, x_t\)</span>, so the architecture imposes no limit on how far back the model can look.</p>
 <p><strong>In principle.</strong> Most of this lecture is about the gap between that promise and what a recurrent network actually delivers — and about the architecture built to close it.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="the-vanilla-rnn" class="title-slide slide level1 center">
@@ -1191,9 +1185,6 @@ Department of Economics
 </table>
 <p><strong>The promise from two slides ago fails in practice.</strong> A vanilla RNN <em>can</em> in principle encode arbitrarily long history, but the gradient that would teach it to do so has vanished long before it reaches back that far. In practice these networks learn dependencies of roughly ten steps.</p>
 <p><strong>Bengio and colleagues</strong> proved this is not an optimization bug to be tuned away — it is inherent to the architecture. Which is why the fix had to be a different architecture.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="lstm-long-short-term-memory" class="title-slide slide level1 center">
@@ -1262,9 +1253,6 @@ Department of Economics
 <p><strong>You have seen this fix before.</strong> It is the ResNet skip connection from Lecture 8 — <span class="math inline">\(\mathbf{y} = \mathcal{F}(\mathbf{x}) + \mathbf{x}\)</span> — solving the same problem in the same way. Give the gradient an additive path home and depth stops destroying it.</p>
 </div>
 <p>LSTM (1997) predates ResNet (2015) by eighteen years — the idea was rediscovered for depth after being invented for time.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="in-pytorch-and-does-it-work" class="title-slide slide level1 center">
@@ -1380,9 +1368,6 @@ Department of Economics
 <div class="keybox">
 <p>LSTMs were built for <strong>sequence modelling</strong> — language, speech, long dependency chains — not short forecasting windows. Fit the architecture to the problem.</p>
 </div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways" class="title-slide slide level1 center">

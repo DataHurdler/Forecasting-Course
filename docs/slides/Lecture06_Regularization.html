@@ -1096,9 +1096,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="the-problem-too-many-predictors" class="title-slide slide level1 center">
 <h1>The Problem: Too Many Predictors</h1>
@@ -1217,9 +1214,6 @@ Department of Economics
 <p><code>make_pipeline</code> is the part that matters: it keeps standardization <em>inside</em> each CV fold. Scale on the full sample and you have leaked the validation set into training, and your CV error is optimistic.</p>
 <p><code>l1_ratio</code> is <span class="math inline">\(\alpha\)</span>, the Ridge/LASSO mix; the <code>...CV</code> variants tune <span class="math inline">\(\lambda\)</span> for you.</p>
 <p><span class="neutral smaller"><code>sklearn</code> calls the penalty <code>alpha</code>, not <code>lambda</code>.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways-and-roadmap" class="title-slide slide level1 center">
