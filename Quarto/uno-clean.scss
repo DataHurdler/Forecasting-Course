@@ -705,8 +705,12 @@ $selection-bg: $light-bg !default;
   p   { margin: 0.2em 0; }
 }
 
-// 0.5em rendered at 12px, the smallest text in the deck by some margin.
-.references { font-size: 0.72em; line-height: 1.45; }
+// Quarto always emits the references slide as `.smaller .scrollable`, so an em
+// value here MULTIPLIES with .smaller's 85%: the old 0.5em landed at 24 x .85 x
+// .5 = 10px, and 0.72em only reached 15px. Both rules below target ~20px at the
+// 24px root -- the second divides out the wrapper (0.85 x 0.98 = 0.83).
+.references      { font-size: 0.83em; line-height: 1.45; }
+.smaller .references { font-size: 0.98em; }
 
 // ==============================================================================
 // NAVIGATION
