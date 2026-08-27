@@ -30,8 +30,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 3. VAR Models
 4. Key Takeaways
 
----
-
 # Stationarity and Differencing
 
 Before fitting any model, the series must have a stable mean and variance.
@@ -217,8 +215,6 @@ Read them together and they identify the model:
 
 Read the pair, never one alone. The [sharp cut-off]{.positive} tells you the order; the *slow decay* tells you which side it belongs on. Dashed lines are the significance bands — spikes inside them are noise, not signal.
 
----
-
 # ARIMA Models
 
 Combine differencing with AR and MA components into one unified model.
@@ -260,8 +256,6 @@ The useful mental model is **two ARIMA models running at different time scales**
 4. Minimize AIC, then check the residual ACF with a Ljung-Box test
 
 [For monthly retail data with trend and December seasonality, SARIMA(1,1,1)(0,1,1)[12] is a strong starting point — and a good default to beat before trying anything more elaborate.]{.neutral .smaller}
-
----
 
 # VAR Models
 

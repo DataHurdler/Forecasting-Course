@@ -30,8 +30,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 3. Implementing Decision Trees in Python
 4. Limitations and Preview: Ensembles
 
----
-
 # Why Go Beyond Linear Models?
 
 Real-world relationships are often nonlinear, involve interactions, and shift with context.
@@ -86,8 +84,6 @@ $$\text{Expected MSE} = \underbrace{\text{Bias}^2}_{\text{systematic error}} + \
 ::::
 
 **Goal:** find the complexity that balances the two — which you can only see *out-of-sample*.
-
----
 
 # How Decision Trees Work
 
@@ -175,8 +171,6 @@ $$\underbrace{\textstyle\sum_{\text{leaves}} \text{SSE}}_{\text{fit}} \;+\; \und
 
 [**You have seen this before** --- it is the GAM smoothing penalty from Lecture 3, and it returns in Lecture 6 as Ridge and LASSO. Three model families, one idea, and $\alpha$ chosen the same way each time: by cross-validation.]{.key-result}
 
----
-
 # Implementing Decision Trees in Python
 
 One class, a few hyperparameters, interpretable results.
@@ -254,8 +248,6 @@ Explaining a Prediction to a Manager
 Produce the path with `sklearn.tree.plot_tree(tree)` or `export_text(tree, feature_names=[...])`.
 
 [This is where business buy-in comes from — a manager can check that the tree is splitting on variables they consider sensible.]{.neutral .smaller}
-
----
 
 # Limitations and Preview: Ensembles
 

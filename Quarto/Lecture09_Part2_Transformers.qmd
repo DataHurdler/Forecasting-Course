@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. Transformers for Time Series
 5. Key Takeaways
 
----
-
 # What Recurrence Could Not Do
 
 Two constraints that are built into reading a sequence one step at a time.
@@ -50,8 +48,6 @@ Part 1 ended with a working recurrent forecaster. Both of its remaining problems
 ::: {.keybox}
 **Attention removes both at once.** Let every position look directly at every other position, in one operation. No compression through intermediate states, and no ordering constraint on the computation.
 :::
-
----
 
 # The Attention Mechanism
 
@@ -108,8 +104,6 @@ Each head can specialize. In a forecasting model one head might track weekly pos
 
 [Our model below uses `nhead=4` with `d_model=64` — four heads of 16 dimensions each.]{.neutral .smaller}
 
----
-
 # The Transformer Encoder
 
 Attention, plus the three pieces that make it trainable.
@@ -162,8 +156,6 @@ Three properties, in the order they mattered commercially.
 ::: {.warningbox}
 Every one of those advantages is about **large data and long sequences**. Hold that thought against a 26-week window and 5,940 training examples.
 :::
-
----
 
 # Transformers for Time Series
 
@@ -233,8 +225,6 @@ Every advantage on the "why Transformers took over" slide is an advantage *at sc
 | Transformer **without** positional encoding | 1,282 |
 
 [**292 RMSE**]{.key-result} — dropping it below even the 1D CNN. That gap is the price of permutation invariance, and the reason the sinusoids exist.
-
----
 
 # Key Takeaways
 

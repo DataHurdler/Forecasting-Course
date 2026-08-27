@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. PyTorch Implementation
 5. Key Takeaways
 
----
-
 # From Trees to Neural Networks
 
 Trees predict in steps. Networks predict in curves — and that difference buys less than you would expect on tabular data, and everything on sequences.
@@ -87,8 +85,6 @@ Insert a nonlinearity between the layers and the picture changes completely. The
 
 **Read that claim carefully.** It says a network *can* represent the function — not that your optimizer will find it, that you have the data to identify it, or that it will generalize. Existence is not estimation, the same gap as between the optimal tree and the greedy one CART builds.
 
----
-
 # Feedforward Networks
 
 Stack layers of neurons, and each layer learns a higher-level representation of the one below it.
@@ -126,8 +122,6 @@ Take a network for our weekly panel: 46 engineered features in, two hidden layer
 
 Lecture 6 called sixty predictors on a hundred and fifty observations a crisis. This is far past that ratio, and networks train here routinely. What makes it survivable is not the architecture but the regularization, next.
 
----
-
 # Training: Loss and Backpropagation
 
 Compute the error, propagate it backward, adjust every weight by its share of the blame. Repeat.
@@ -164,8 +158,6 @@ Twenty-two thousand parameters on five thousand rows will memorize the training 
 | Early stopping | Watch validation loss each epoch; stop when it has not improved for $k$ epochs, and keep the weights from the *best* epoch, not the last. |
 
 [**That is the fifth appearance of one idea.**]{.hi} The GAM smoothing penalty in Lecture 3, cost-complexity pruning in Lecture 4, `reg_lambda` on leaf weights in Lecture 5, Ridge and LASSO in Lecture 6 — and now weight decay. Fit against complexity, one parameter setting the exchange rate, chosen by validation.
-
----
 
 # PyTorch Implementation
 
@@ -247,8 +239,6 @@ for epoch in range(n_epochs):
 Every PyTorch training loop is those four lines with more around them.
 
 **The one that bites:** forget `zero_grad()` and PyTorch *accumulates* gradients rather than replacing them. No error, no warning — just a model that trains badly.
-
----
 
 # Key Takeaways
 

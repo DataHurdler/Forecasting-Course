@@ -30,8 +30,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 3. 1D CNNs for Time Series
 4. Key Takeaways
 
----
-
 # Convolution and Pooling
 
 Two ideas — look locally, and reuse what you learn everywhere.
@@ -81,8 +79,6 @@ Two things are bought. **Fewer parameters downstream**, because later layers see
 
 Hold that objection. We measure exactly what it costs later in this lecture.
 
----
-
 # The Architecture Lineage
 
 Twenty years of image models, and the three ideas that outlived them.
@@ -126,8 +122,6 @@ These architectures were built for images, on problems that look nothing like we
 | **Learned features** | You stop hand-engineering lag windows and let filters find the local shapes that matter. |
 
 **One idea does not transfer, and it is the one we flagged:** pooling for translation invariance. An image classifier should not care where the cat is. A forecaster usually should care where the spike was.
-
----
 
 # 1D CNNs for Time Series
 
@@ -192,8 +186,6 @@ Fitted on our weekly panel — 26-week windows, four channels, 30 store-category
 [**Every CNN variant loses to a 46-coefficient linear model**]{.key-result} — a seven-week receptive field cannot see the annual lag LASSO was handed directly.
 
 And swapping average pooling for `Flatten`, which keeps *where* each pattern occurred, is worth about **500 RMSE** — three seeds each, against a spread of about 80.
-
----
 
 # Key Takeaways
 

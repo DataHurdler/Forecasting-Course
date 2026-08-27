@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. pyGAM for General Additive Modeling
 5. Key Takeaways
 
----
-
 # Motivation: Beyond Linear, Without Black Boxes
 
 We want flexibility to capture nonlinear relationships while still being able to *explain* what the model is doing.
@@ -78,8 +76,6 @@ In a GAM, $y = f_1(x_1) + f_2(x_2) + \varepsilon$, so the marginal effect of $x_
 
 **That is why you can plot each variable's effect separately and hand the plot to a stakeholder.**
 :::
-
----
 
 # GAM Structure and Smoothing
 
@@ -139,8 +135,6 @@ The two extremes are worth holding in mind. As **$\lambda \to 0$** the penalty v
 
 [**Splines** are how $f(x)$ is represented: piecewise polynomials joined smoothly at **knot** points.]{.neutral .smaller}
 
----
-
 # Prophet for Time Series GAMs
 
 Facebook's Prophet decomposes a time series into trend, seasonality, and holiday effects using a GAM.
@@ -182,8 +176,6 @@ m.plot_components(forecast)
 `plot_components` is the call that matters here: it draws the trend with its changepoints, the yearly wave, and the day-of-week pattern as separate panels — the additive structure made visible.
 
 **Reach for Prophet** on seasonal series with known holiday effects, especially when someone will ask you to explain the forecast. **Reach for pyGAM** when you have many correlated external predictors instead.
-
----
 
 # pyGAM for General Additive Modeling
 
@@ -233,8 +225,6 @@ Watch the **bands** as much as the curve — they widen where the data thin out,
 ::: {.keybox}
 The output is a sentence someone can act on: *"as unemployment rises from 5% to 10%, predicted sales fall by $X$% — and the decline steepens past 8%."* No linear model could tell them that second clause.
 :::
-
----
 
 # Key Takeaways and Roadmap
 

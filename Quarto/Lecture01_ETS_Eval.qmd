@@ -30,8 +30,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 3. Forecast Evaluation
 4. Course Roadmap
 
----
-
 # Why Forecasting Matters
 
 Every business decision made today depends on expectations about tomorrow.
@@ -102,8 +100,6 @@ Before presenting any forecast model, check that it beats a **naive benchmark**.
 | Drift | $\hat{y}_{t+h\|t} = y_t + h\hat{c}$ | Trend, no season |
 
 [This is not a formality. In the M4 Competition many machine learning models *failed* to beat simple exponential smoothing [@Makridakis2020].]{.neutral .smaller}
-
----
 
 # Exponential Smoothing
 
@@ -234,8 +230,6 @@ That gives 15 valid combinations, and the ones we have just built are among them
 
 **Automatic selection:** fit all 15 and pick the minimum AIC. In Python, `statsmodels.tsa.exponential_smoothing.ets.ETSModel`.
 
----
-
 # Forecast Evaluation
 
 Forecasting without evaluation is not science — it is storytelling.
@@ -285,8 +279,6 @@ flowchart LR
 ::: {.warningbox}
 **Never randomly shuffle time series observations.** Use `TimeSeriesSplit` in scikit-learn, never `KFold`. Shuffling lets future data train the model — data leakage that makes results look excellent and forecast badly.
 :::
-
----
 
 # Course Roadmap
 

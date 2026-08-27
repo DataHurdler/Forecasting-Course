@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. Doing It Honestly
 5. Where to Go Next
 
----
-
 # What We Built
 
 Four parts, twelve lectures, one dataset — and a scoreboard nobody would have predicted in Week 1.
@@ -70,8 +68,6 @@ Every model in this course, on the M5 weekly panel — same 30 series, same held
 | Seasonal naive | 2,152 | every week |
 
 **The ordering is not the one anyone predicts in Week 1.** A 46-coefficient linear model is at the top. The two architectures with the most attention behind them — the LSTM and the Transformer — finished fifth and sixth of eight, behind a plain RNN with a fraction of their parameters.
-
----
 
 # What the Results Taught
 
@@ -127,8 +123,6 @@ Five of those six tune that parameter by cross-validation. The sixth — the hie
 
 **This is what to remember when the tools change.** The libraries in this course will be replaced. The trade between fit and complexity will not.
 
----
-
 # Choosing a Method
 
 ---
@@ -146,8 +140,6 @@ Five of those six tune that parameter by cross-validation. The sixth — the hie
 | The decision needs a probability | Bayesian, for the predictive distribution |
 
 "Regularized regression first" is not a concession — it won our largest comparison and its coefficients can be read aloud. And the last row is the only one where the *question* changes rather than the accuracy.
-
----
 
 # Doing It Honestly
 
@@ -214,8 +206,6 @@ The final project asks for exactly the report on the previous slide, on data of 
 | **A methods reflection** | Which model won, and what about *your* data made it win. This is where the course is actually assessed. |
 
 **The last row is not a formality.** Every scoreboard in this course came with a reason, and a project that reports a ranking without one has done the computation but not the work.
-
----
 
 # Where to Go Next
 

@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. In PyTorch, and Does It Work
 5. Key Takeaways
 
----
-
 # Where the Last Two Lectures Ran Out
 
 Two architectures, two different ways of failing to see time.
@@ -62,8 +60,6 @@ At each step it does two things: update the summary using the new input *and* th
 **The consequence worth sitting with.** There is no fixed window. In principle $\mathbf{h}_t$ encodes the entire history $x_1, \ldots, x_t$, so the architecture imposes no limit on how far back the model can look.
 
 **In principle.** Most of this lecture is about the gap between that promise and what a recurrent network actually delivers — and about the architecture built to close it.
-
----
 
 # The Vanilla RNN
 
@@ -120,8 +116,6 @@ Put numbers on it. Suppose each backward step multiplies the gradient by a facto
 
 **Bengio and colleagues** proved this is not an optimization bug to be tuned away — it is inherent to the architecture. Which is why the fix had to be a different architecture.
 
----
-
 # LSTM: Long Short-Term Memory
 
 Add a memory that information passes through rather than being recomputed at every step.
@@ -175,8 +169,6 @@ Compare with the vanilla RNN, where every backward step multiplies by $\mathbf{W
 :::
 
 LSTM (1997) predates ResNet (2015) by eighteen years — the idea was rediscovered for depth after being invented for time.
-
----
 
 # In PyTorch, and Does It Work
 
@@ -245,8 +237,6 @@ The gates buy nothing, and are not free: **17,985 parameters against 4,545**.
 ::: {.keybox}
 LSTMs were built for **sequence modelling** — language, speech, long dependency chains — not short forecasting windows. Fit the architecture to the problem.
 :::
-
----
 
 # Key Takeaways
 

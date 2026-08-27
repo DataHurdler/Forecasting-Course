@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. Reading the Result
 5. Key Takeaways
 
----
-
 # Which Series May Be Pooled
 
 Before you pool anything, ask what the groups have in common.
@@ -85,8 +83,6 @@ Within that exchangeable set there are two obvious approaches, and each fails in
 
 **You have used both already without naming them.** Homework 3's random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modelling decision and lets the data settle it.
 
----
-
 # Partial Pooling
 
 Let each series have its own effect — drawn from a shared distribution the data also estimates.
@@ -122,8 +118,6 @@ When a series has 8 observations, its unpooled estimate is mostly sampling noise
 :::
 
 [GAM smoothing penalty (L3) $\rightarrow$ tree pruning (L4) $\rightarrow$ `reg_lambda` (L5) $\rightarrow$ Ridge and LASSO (L6) $\rightarrow$ weight decay (L7) $\rightarrow$ hierarchical priors (today).]{.neutral .smaller}
-
----
 
 # Fitting It, and the Trap
 
@@ -172,8 +166,6 @@ The natural way to write the hierarchy is `b = pm.Normal("b", mu_b, sd_b, shape=
 **Note which alarm actually fired.** $\hat{R}$ and ESS *both pass* — on those two numbers you would have shipped it. Only the divergence count objects. On hierarchical models divergences are the sensitive instrument; do not wait for $\hat{R}$ to tell you.
 
 [BMCP §4.6.1, *Posterior Geometry Matters* — the single most common failure in applied hierarchical modelling.]{.neutral .smaller}
-
----
 
 # Reading the Result
 
@@ -228,8 +220,6 @@ In words: a SNAP week lifts FOODS units by roughly **8%**, and stores genuinely 
 :::
 
 **The defensible recommendation:** plan on an 8% FOODS uplift everywhere, allow real but modest store variation around it, and do not act on a store's own estimate until that store has the weeks to support one.
-
----
 
 # Key Takeaways
 

@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. Posterior Inference with PyMC
 5. Key Takeaways
 
----
-
 # Why Bayesian Thinking?
 
 A different answer to the question of what a forecast should tell you.
@@ -67,8 +65,6 @@ That is not a technicality. It is the difference between a sentence you can say 
 And because the answer is a full distribution, you can ask questions of it directly: *What is the probability the promotion lifts demand by more than 5%? What is the chance we stock out if we order 400 units?* Those are the questions a planner has, and a point estimate with a standard error does not answer them.
 
 [The cost is that you must state a prior, and defend it. That is the rest of this lecture.]{.neutral .smaller}
-
----
 
 # Bayes' Theorem
 
@@ -109,8 +105,6 @@ Take a concrete case: estimating a conversion rate $\theta$ from 200 trials.
 
 More data sharpens the likelihood, so the posterior moves toward it and the prior matters less. With little data the prior does most of the work — a feature when it is defensible, a problem when it is not.
 
----
-
 # Prior Distributions
 
 The part you have to justify, and the part people worry about.
@@ -144,8 +138,6 @@ The standard objection to Bayesian work is that the prior is arbitrary. The stan
 | **Flat / "uninformative"** | Sounds neutral, often is not, and can be improper. Avoid it as a reflex choice. |
 
 **The honest framing:** a prior is an assumption stated in public, where it can be argued with. Frequentist analyses contain assumptions too — functional form, variable selection, sampling scheme — they are just not written as distributions.
-
----
 
 # Posterior Inference with PyMC
 
@@ -232,8 +224,6 @@ az.plot_ppc(prior_pred, group="prior")
 ::: {.keybox}
 A prior predictive check is **model debugging** that costs two lines — and the habit most often skipped.
 :::
-
----
 
 # Key Takeaways
 

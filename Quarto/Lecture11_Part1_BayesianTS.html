@@ -1096,9 +1096,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="why-bayesian-time-series" class="title-slide slide level1 center">
 <h1>Why Bayesian Time Series</h1>
@@ -1137,9 +1134,6 @@ Department of Economics
 </table>
 <p>That third row is the one people underestimate. A prediction interval from ARIMA widens too, but according to a formula derived under assumptions you did not check. Here the widening is a consequence of the model you actually wrote down.</p>
 <p><strong>And the price:</strong> it is slower, it needs priors you have to defend, and — as we will see — it can fail silently in ways a least-squares fit cannot.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="the-structural-decomposition" class="title-slide slide level1 center">
@@ -1188,9 +1182,6 @@ Department of Economics
 <p><strong>You have met this exact device twice.</strong> It is how Prophet encodes seasonality in Lecture 3, and it is the Fourier feature block we engineered by hand for Homework 4. The difference now is that <span class="math inline">\(a_k\)</span> and <span class="math inline">\(b_k\)</span> come back as <em>distributions</em>.</p>
 </div>
 <p><span class="math inline">\(K\)</span> trades flexibility against overfitting, exactly like spline knots. We use <span class="math inline">\(K = 3\)</span> — six coefficients standing in for fifty-two.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="fitting-it-in-pymc" class="title-slide slide level1 center">
@@ -1238,7 +1229,7 @@ Department of Economics
 <tr class="even">
 <td>ESS (bulk)</td>
 <td style="text-align: right;">252</td>
-<td style="text-align: right;"><strong>2,617</strong></td>
+<td style="text-align: right;"><strong>2,376</strong></td>
 <td><span class="math inline">\(&gt; 400\)</span></td>
 </tr>
 <tr class="odd">
@@ -1253,9 +1244,6 @@ Department of Economics
 <div class="warningbox">
 <p><strong>The fix was reparameterization, not more samples.</strong> Writing the walk as <code>cumsum(z * sigma)</code> with <span class="math inline">\(z \sim \mathcal{N}(0,1)\)</span> — the <em>non-centred</em> form — gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will meet it again next week.</p>
 </div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="reading-the-forecast" class="title-slide slide level1 center">
@@ -1318,9 +1306,6 @@ Department of Economics
 </table>
 <p><strong>Passing the first does not excuse failing the second.</strong> A model saying “somewhere between 14,000 and 26,000” is telling the truth and helping nobody. The cause is structural — a level free to walk for 52 steps drifts, and the model says so. The fix is a model with a stronger opinion: a damped level, or covariates that pin it down.</p>
 <p><strong>But notice what just happened.</strong> We could <em>ask</em> whether the uncertainty was honest. For every point-forecast model in this course, that question had no answer.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways" class="title-slide slide level1 center">

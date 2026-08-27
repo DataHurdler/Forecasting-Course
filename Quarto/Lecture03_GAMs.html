@@ -1096,9 +1096,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="motivation-beyond-linear-without-black-boxes" class="title-slide slide level1 center">
 <h1>Motivation: Beyond Linear, Without Black Boxes</h1>
@@ -1137,9 +1134,6 @@ Department of Economics
 <p>In a GAM, <span class="math inline">\(y = f_1(x_1) + f_2(x_2) + \varepsilon\)</span>, so the marginal effect of <span class="math inline">\(x_1\)</span> is just <span class="math inline">\(f_1&#39;(x_1)\)</span> — a function of <span class="math inline">\(x_1\)</span> alone, whatever <span class="math inline">\(x_2\)</span> happens to be.</p>
 <p><strong>That is why you can plot each variable’s effect separately and hand the plot to a stakeholder.</strong></p>
 </div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="gam-structure-and-smoothing" class="title-slide slide level1 center">
@@ -1208,9 +1202,6 @@ Department of Economics
 <p>The second derivative <span class="math inline">\(f&#39;&#39;(x)\)</span> measures how fast the slope is changing, so a wiggly function accumulates a large integral and a smooth one accumulates a small one. The penalty therefore charges the model for wiggliness, and <span class="math inline">\(\lambda\)</span> sets the price.</p>
 <p>The two extremes are worth holding in mind. As <strong><span class="math inline">\(\lambda \to 0\)</span></strong> the penalty vanishes and the curve is free to chase every point — overfitting. As <strong><span class="math inline">\(\lambda \to \infty\)</span></strong> every <span class="math inline">\(f_j\)</span> is forced straight and the GAM collapses back into ordinary least squares. Everything useful happens in between, and <span class="math inline">\(\lambda\)</span> is chosen by <strong>cross-validation</strong> or GCV rather than by eye.</p>
 <p><span class="neutral smaller"><strong>Splines</strong> are how <span class="math inline">\(f(x)\)</span> is represented: piecewise polynomials joined smoothly at <strong>knot</strong> points.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="prophet-for-time-series-gams" class="title-slide slide level1 center">
@@ -1242,9 +1233,6 @@ Department of Economics
 </div>
 <p><code>plot_components</code> is the call that matters here: it draws the trend with its changepoints, the yearly wave, and the day-of-week pattern as separate panels — the additive structure made visible.</p>
 <p><strong>Reach for Prophet</strong> on seasonal series with known holiday effects, especially when someone will ask you to explain the forecast. <strong>Reach for pyGAM</strong> when you have many correlated external predictors instead.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="pygam-for-general-additive-modeling" class="title-slide slide level1 center">
@@ -1281,9 +1269,6 @@ Department of Economics
 <div class="keybox">
 <p>The output is a sentence someone can act on: <em>“as unemployment rises from 5% to 10%, predicted sales fall by <span class="math inline">\(X\)</span>% — and the decline steepens past 8%.”</em> No linear model could tell them that second clause.</p>
 </div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways-and-roadmap" class="title-slide slide level1 center">

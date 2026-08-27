@@ -1095,9 +1095,6 @@ Department of Economics
 <li>Key Takeaways</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="convolution-and-pooling" class="title-slide slide level1 center">
 <h1>Convolution and Pooling</h1>
@@ -1150,9 +1147,6 @@ Department of Economics
 <p><strong>Translation invariance is a feature for images and a problem for forecasting.</strong> If a demand spike moved three weeks later, that is not a nuisance to be smoothed away — it is the thing you are trying to predict. Pooling deliberately discards <em>where</em> in the window a pattern occurred, and for a time series the position is often the signal.</p>
 </div>
 <p>Hold that objection. We measure exactly what it costs later in this lecture.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="the-architecture-lineage" class="title-slide slide level1 center">
@@ -1199,9 +1193,6 @@ Department of Economics
 </tbody>
 </table>
 <p><strong>One idea does not transfer, and it is the one we flagged:</strong> pooling for translation invariance. An image classifier should not care where the cat is. A forecaster usually should care where the spike was.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="d-cnns-for-time-series" class="title-slide slide level1 center">
@@ -1287,9 +1278,6 @@ Department of Economics
 </table>
 <p><span class="key-result"><strong>Every CNN variant loses to a 46-coefficient linear model</strong></span> — a seven-week receptive field cannot see the annual lag LASSO was handed directly.</p>
 <p>And swapping average pooling for <code>Flatten</code>, which keeps <em>where</em> each pattern occurred, is worth about <strong>500 RMSE</strong> — three seeds each, against a spread of about 80.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="key-takeaways" class="title-slide slide level1 center">

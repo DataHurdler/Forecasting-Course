@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. In Practice
 5. Key Takeaways
 
----
-
 # The Problem: Too Many Predictors
 
 Feature engineering gives us more predictors than we can safely estimate. Something has to decide which ones survive.
@@ -194,8 +192,6 @@ model = make_pipeline(
 `l1_ratio` is $\alpha$, the Ridge/LASSO mix; the `...CV` variants tune $\lambda$ for you.
 
 [`sklearn` calls the penalty `alpha`, not `lambda`.]{.neutral .smaller}
-
----
 
 # Key Takeaways and Roadmap
 

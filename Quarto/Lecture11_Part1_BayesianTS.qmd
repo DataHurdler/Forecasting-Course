@@ -31,8 +31,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 4. Reading the Forecast
 5. Key Takeaways
 
----
-
 # Why Bayesian Time Series
 
 Not a more accurate forecast — a different deliverable.
@@ -64,8 +62,6 @@ A Bayesian time series model returns a **full predictive distribution for every 
 That third row is the one people underestimate. A prediction interval from ARIMA widens too, but according to a formula derived under assumptions you did not check. Here the widening is a consequence of the model you actually wrote down.
 
 **And the price:** it is slower, it needs priors you have to defend, and — as we will see — it can fail silently in ways a least-squares fit cannot.
-
----
 
 # The Structural Decomposition
 
@@ -120,8 +116,6 @@ $P$ is the period — for our weekly data, $P = 52$. $K$ is how many waves you a
 
 $K$ trades flexibility against overfitting, exactly like spline knots. We use $K = 3$ — six coefficients standing in for fifty-two.
 
----
-
 # Fitting It in PyMC
 
 The model in code, and the check you run before believing any of it.
@@ -168,8 +162,6 @@ Nothing crashed. The model returned a forecast, and the forecast looked reasonab
 **The fix was reparameterization, not more samples.** Writing the walk as `cumsum(z * sigma)` with $z \sim \mathcal{N}(0,1)$ — the *non-centred* form — gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will meet it again next week.
 :::
 
----
-
 # Reading the Forecast
 
 The point estimate, the interval, and whether either is any use.
@@ -205,8 +197,6 @@ Every forecast comes with a 94% predictive interval. Two questions about it, and
 **Passing the first does not excuse failing the second.** A model saying "somewhere between 14,000 and 26,000" is telling the truth and helping nobody. The cause is structural — a level free to walk for 52 steps drifts, and the model says so. The fix is a model with a stronger opinion: a damped level, or covariates that pin it down.
 
 **But notice what just happened.** We could *ask* whether the uncertainty was honest. For every point-forecast model in this course, that question had no answer.
-
----
 
 # Key Takeaways
 

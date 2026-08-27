@@ -33,8 +33,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 6. XGBoost
 7. Key Takeaways
 
----
-
 # From Single Trees to Ensembles
 
 Averaging many imperfect models can outperform any single model.
@@ -55,8 +53,6 @@ At a 1907 county fair, 800 people guessed the weight of an ox. No individual was
 The same principle transfers directly to models. A single decision tree is unstable and noisy — that was Lecture 4's closing complaint. Train many trees on different versions of the data and average them, and the noise largely cancels while the signal survives.
 
 **Ensembles work because independent errors cancel.** And that word is doing real work: the *more independent* the individual predictions, the more variance averaging removes. Hold onto it — the entire difference between bagging and random forests turns on it.
-
----
 
 # Bagging: Bootstrap Aggregating
 
@@ -98,8 +94,6 @@ Every one of those predictions came from a tree that never saw the observation �
 Below about 1,000 observations the OOB estimate gets noisy, because each observation is out-of-bag for too few trees. On a weekly business series — a few hundred rows — use proper walk-forward CV instead.
 :::
 
----
-
 # Random Forests: Decorrelating the Trees
 
 Restrict each split to a random subset of features so trees are less alike.
@@ -133,8 +127,6 @@ Sometimes the dominant feature is not in the candidate set, so the tree is force
 **Start with** `n_estimators=500`, `max_features='sqrt'`, `min_samples_leaf=5`, `oob_score=True`. Note how few genuinely need tuning — `max_features` is the dial controlling $\rho$, and the rest is close to fire-and-forget. That is most of why random forests make a good default.
 
 [Set `random_state=42`: a forest is random twice over, in the bootstrap samples and in the feature subsets.]{.neutral .smaller}
-
----
 
 # Feature Importance and Interpretation
 
@@ -191,8 +183,6 @@ The forest cuts RMSE roughly **28%** against a single deep tree, and is the firs
 
 [What changed is not a better model of the series but a richer feature set — lags, price, and SNAP days are information ETS and ARIMA never had.]{.neutral .smaller}
 
----
-
 # Gradient Boosting
 
 Instead of averaging independent trees, fit each new tree to the errors of all previous trees.
@@ -242,8 +232,6 @@ Final prediction: $\hat{y} = F_B(\mathbf{x})$
 The trees are deliberately **shallow** — depth 3 to 6 — because each one only has to capture a small piece of the remaining error. The ensemble converges slowly and on purpose.
 
 **The learning rate $\eta$ is the main dial.** Small values (0.01–0.1) take a tiny step per tree: slower, needs more trees, far more robust. Large values ($> 0.3$) move fast and risk overshooting. The reliable recipe is a small $\eta$, many trees, and **early stopping** — without which boosting will happily fit your noise.
-
----
 
 # XGBoost
 
@@ -299,8 +287,6 @@ model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
 **The validation set must respect time.** Build it with `TimeSeriesSplit` and hold out the final stretch as a true test set.
 
 [On macOS `xgboost` also needs OpenMP: `brew install libomp`, or the import fails.]{.neutral .smaller}
-
----
 
 # Key Takeaways and Roadmap
 

@@ -3506,9 +3506,6 @@ Department of Economics
 <li>Course Roadmap</li>
 </ol>
 </section>
-<section class="slide level2">
-
-</section>
 <section>
 <section id="why-forecasting-matters" class="title-slide slide level1 center">
 <h1>Why Forecasting Matters</h1>
@@ -3620,9 +3617,6 @@ Department of Economics
 </tbody>
 </table>
 <p><span class="neutral smaller">This is not a formality. In the M4 Competition many machine learning models <em>failed</em> to beat simple exponential smoothing <span class="citation" data-cites="Makridakis2020">(<a href="#/references" role="doc-biblioref" onclick>Makridakis et al. 2020</a>)</span>.</span></p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="exponential-smoothing" class="title-slide slide level1 center">
@@ -3763,9 +3757,6 @@ Department of Economics
 </table>
 <p>That gives 15 valid combinations, and the ones we have just built are among them: <strong>ETS(A,N,N)</strong> is SES, <strong>ETS(A,A,N)</strong> is Holt linear, <strong>ETS(A,A<sub>d</sub>,N)</strong> is Holt damped, <strong>ETS(A,A,A)</strong> is Holt-Winters additive, and <strong>ETS(A,A,M)</strong> is Holt-Winters multiplicative.</p>
 <p><strong>Automatic selection:</strong> fit all 15 and pick the minimum AIC. In Python, <code>statsmodels.tsa.exponential_smoothing.ets.ETSModel</code>.</p>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="forecast-evaluation" class="title-slide slide level1 center">
@@ -3809,9 +3800,6 @@ Department of Economics
 <div class="warningbox">
 <p><strong>Never randomly shuffle time series observations.</strong> Use <code>TimeSeriesSplit</code> in scikit-learn, never <code>KFold</code>. Shuffling lets future data train the model — data leakage that makes results look excellent and forecast badly.</p>
 </div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="course-roadmap" class="title-slide slide level1 center">

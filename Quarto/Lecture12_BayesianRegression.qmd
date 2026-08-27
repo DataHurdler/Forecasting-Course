@@ -30,8 +30,6 @@ csl: https://www.zotero.org/styles/chicago-author-date
 3. Causal Structure and DAGs
 4. Course Synthesis and Next Steps
 
----
-
 # Bayesian Linear Regression
 
 The same regression you already know — returning a distribution for every coefficient.
@@ -76,8 +74,6 @@ with pm.Model() as model:
 :::
 
 **Do not standardize log price** — with both in logs `b_price` is an **elasticity**, percent change in demand per percent change in price. Standardizing rescales it to "per SD" and destroys that reading. `lpc` is log price centred within series, which fixed ESS 184 $\rightarrow$ 3,097.
-
----
 
 # Reading the Posterior
 
@@ -126,8 +122,6 @@ On our fit, $P(\text{elasticity} < 0) = \mathbf{1.00}$ — the direction is not 
 :::
 
 [Posterior mass inside a range of negligible values is a **ROPE** — region of practical equivalence.]{.neutral .smaller}
-
----
 
 # Causal Structure and DAGs
 
@@ -192,8 +186,6 @@ With an elasticity near $-0.493$, a 5% price rise implies roughly a **2.4% fall 
 **Then the decision follows.** Revenue rises if the volume loss is smaller than the price gain: here $+2.5\%$ on average, and $P(\text{revenue rises}) = 1.00$ across every posterior sample. Note this holds *even though* the elasticity might be past $-0.5$.
 
 [Valid only to the extent the DAG is — this is a causal claim about intervening on price.]{.neutral .smaller}
-
----
 
 # Course Synthesis and Next Steps
 
