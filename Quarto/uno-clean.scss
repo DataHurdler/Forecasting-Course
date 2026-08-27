@@ -461,7 +461,9 @@ $selection-bg: $light-bg !default;
   margin: auto;
   border-collapse: collapse;
   border-spacing: 0;
-  font-size: 0.8em;
+  // 0.8em rendered at 19px on the 1280x720 canvas -- readable on a laptop, not
+  // from the back of a room, and it left short table slides half empty.
+  font-size: 0.95em;
 }
 
 .reveal table th,
@@ -703,7 +705,8 @@ $selection-bg: $light-bg !default;
   p   { margin: 0.2em 0; }
 }
 
-.references { font-size: 0.5em; line-height: 1.4; }
+// 0.5em rendered at 12px, the smallest text in the deck by some margin.
+.references { font-size: 0.72em; line-height: 1.45; }
 
 // ==============================================================================
 // NAVIGATION
