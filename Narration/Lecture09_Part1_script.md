@@ -439,60 +439,141 @@ strongest result deep learning gets on our data.
 
 *(Beat.)*
 
-And the second reading. **The LSTM lost to the vanilla RNN.**
+And the second reading. **The LSTM lost to the vanilla RNN** — at a fixed thirty-epoch budget.
 
-That is not a typo, and it is the most useful line on the slide. Next slide.
+That is not a typo. Hold onto the qualifier, though, because the next three slides are about what
+that line does and does not mean.
 
 ---
 
-# ▶ SLIDE 17 — Why the More Sophisticated Model Lost
-
-First — is it a fluke of one setting? No. We ran it at three window lengths.
+# ▶ SLIDE 17 — Why the Gated Model Lost at 30 Epochs
 
 *(Walk the table.)*
 
 Thirteen weeks: RNN eight seventy-eight, LSTM nine ninety. Twenty-six weeks: eight forty-two
 against nine eighty-seven. Fifty-two weeks: eight-oh-five against nine ninety-eight.
 
-The RNN wins at every window length we tried.
+The RNN wins at all three window lengths.
 
 **[pause]**
 
-So why? And the answer is not "LSTMs are bad."
+Now, be careful about how much that buys us. Three windows rules out a fluke of one *window*. It
+does not rule out much else — all three rows are the same thirty series, the same split, the same
+recency structure. It is one finding measured three ways, not three independent tests. Say that
+out loud to the room; it is the kind of distinction that separates a result from a slogan.
 
-An LSTM solves a problem **this data does not have**. Gating preserves information across *long*
-dependency chains — that's what it's for, that's what it was invented for. Weekly demand is
-dominated by the recent past. There is no long chain to preserve.
+*(Beat.)*
 
-*(Point at the trend in the table.)*
+The natural reading is: an LSTM solves a problem **this data does not have**. Gating preserves
+information across *long* dependency chains — that is what it was invented for — and weekly demand
+is dominated by the recent past. And the gates are not free: eighteen thousand parameters against
+four and a half thousand.
 
-And look at what happens as the window grows. The RNN *improves* — eight seventy-eight, down to
-eight forty-two, down to eight-oh-five. It's using the extra context. The LSTM stays flat, around
-nine ninety, at all three. The gates aren't helping it exploit the longer window; if anything
-they're getting in the way.
+*(Point at the warning box.)*
 
-The gates buy nothing here. And they are not free: **eighteen thousand parameters against four and
-a half thousand.** Four times the model, for a worse answer.
+**[pause]**
+
+But before we sign off on that, notice what we have *not* checked. Both models trained for thirty
+epochs, because thirty is what the training function defaults to. Nobody showed that thirty epochs
+is enough for **both** of them — and one of them has four times the parameters.
+
+A margin measured at one training budget is a claim about that budget.
+
+So the next two slides do the two things this table owes us: **was the comparison fair**, and
+**what in the data explains it**.
+
+---
+
+# ▶ SLIDE 18 — Check 1: Was It a Fair Fight?
+
+*(Table up. Take this one slowly — it reverses the previous slide.)*
+
+Same two models, twenty-six-week window. This time we vary the training budget and watch the
+margin.
+
+At ten epochs, the LSTM is **ahead** by ninety-seven. At thirty — our setting — the RNN is ahead
+by a hundred and forty-five. At sixty, ninety-eight. At a hundred, the gap is **minus nine**.
+
+**[pause]** — *let that sit.*
+
+Read the shape of it. The gap is **largest at exactly the budget we chose**. Not near the largest:
+the largest anywhere in the range we looked at.
+
+*(Point at the two rows.)*
+
+And look at the curves separately, because they are different shapes. The RNN is finished by about
+epoch forty-five — eight twenty-eight, eight thirty-three, eight thirty. Flat. The LSTM is still
+coming down at a hundred: nine eighty-seven, nine twenty-six, eight twenty-one. It has not turned
+over. **We ran out of patience, not the model.**
+
+**[pause]**
+
+So the honest verdict is not "the LSTM loses." It is three things.
+
+At a fixed thirty-epoch budget, the RNN wins by a wide margin. Given enough epochs, the two
+**tie**. And the RNN gets to its best answer roughly **three times faster on a quarter of the
+parameters** — which is a real advantage, and worth having, and is an *optimization* advantage
+rather than a verdict about gating.
+
+*(Beat.)*
+
+I want to be direct about what happened here. The first version of this slide deck did not have
+this check, and the previous slide's table was presented as an architecture result. It is not one.
+It took varying a parameter nobody thinks of as part of the experiment to find that out — which is
+the same lesson as the seeds in Lecture 7, one level up.
+
+---
+
+# ▶ SLIDE 19 — Check 2: What in the Data Explains It
+
+*(Three numbered points. This is the transferable slide.)*
+
+Second check. Gating pays off when a value has to survive many steps that would otherwise
+overwrite it. Does this panel have anything like that? Three measurements say no.
+
+**One. Most of the variance is not sequential at all.** Ninety-one percent of the variation in
+weekly units is *between* series — which store, which category — and nine percent is within a
+series over time. The main thing a model has to get right is the level of the series in front of
+it, and the last few weeks tell you that. No memory mechanism required.
+
+**[pause]**
+
+**Two. The series are smooth** — and this one is counter-intuitive, so take it slowly.
+Within-series autocorrelation is point eight three at lag one, and still point four three at lag
+fifty-two. That *looks* like long memory, and it is actually the reason long memory is
+unnecessary. Because neighbouring weeks are nearly the same number, the recent past is a
+**sufficient statistic** for the distant past. Nothing has to be carried across the gap, because
+the gap was filled in continuously along the way.
+
+Gating earns its keep when something must survive steps that would overwrite it. Here nothing
+overwrites anything.
+
+**Three. Nothing in the inputs arrives early.** SNAP days correlate about point one four with
+units in the same week, and essentially zero at every lead. Event days are flat everywhere,
+including at zero. There is no **announcement** structure in this data — nothing shows up at time
+*t* that has to be stored until *t* plus *k*. That is the textbook use for a forget gate and an
+input gate, and this panel does not contain one instance of it.
 
 *(Point at the key box.)*
 
 **[pause]**
 
-LSTMs were built for **sequence modelling** — language, speech, long dependency chains. Not
-twenty-six-week forecasting windows.
+And this is the part to carry out of the lecture — not the answer, the three questions. Before you
+reach for a gated model, or an attention model, on your own series: how much of my variance is
+cross-sectional rather than sequential? Is my series smooth enough that recent values already
+summarize the old ones? Does anything in my inputs *lead* the target?
 
-Fit the architecture to the problem. That sentence is the whole course in six words, and this is
-the cleanest example of it we have.
+If the answers look like this panel's, the extra machinery has nothing to do.
 
 ---
 
-# ▶ SLIDE 18 — Section divider: Key Takeaways
+# ▶ SLIDE 20 — Section divider: Key Takeaways
 
 What recurrence buys, what it costs, and what is still missing.
 
 ---
 
-# ▶ SLIDE 19 — RNN and LSTM in Context
+# ▶ SLIDE 21 — RNN and LSTM in Context
 
 *(Table first, then the two paragraphs.)*
 
@@ -538,7 +619,7 @@ other position in a single operation.
 
 ---
 
-# ▶ SLIDE 20 — Lecture 9 Part 1: Key Takeaways
+# ▶ SLIDE 22 — Lecture 9 Part 1: Key Takeaways
 
 One. A recurrent network reads a sequence in order and carries a hidden state. Weights are shared
 across time, so window length costs no parameters.
@@ -555,7 +636,8 @@ Four. Three gates: forget what's stale, input what's new, output what's relevant
 Five. On our panel, both recurrent models beat every CNN variant, on four raw channels. And both
 still lose to a forty-six-coefficient LASSO.
 
-And six. The LSTM lost to the vanilla RNN at all three window lengths. Gating solves long-range
+And six. The LSTM lost to the vanilla RNN at a thirty-epoch budget, at all three window lengths —
+and tied once both reached convergence. Gating solves long-range
 forgetting; a twenty-six-week window doesn't suffer from it. So the gates bought four times the
 parameters and nothing else. **Fit the architecture to the problem.**
 
@@ -565,6 +647,6 @@ Next week: attention and Transformers. Reading the whole sequence at once.
 
 ---
 
-# ▶ SLIDE 21 — References
+# ▶ SLIDE 23 — References
 
 *(Advance and close. No narration needed.)*

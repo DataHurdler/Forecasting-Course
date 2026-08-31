@@ -87,7 +87,7 @@
   \textbf{The ordering is not the one anyone predicts in Week 1.} A 46-coefficient linear model
   is at the top. The two architectures with the most attention behind them --- the LSTM and the
   Transformer --- finished fifth and sixth of eight, behind a plain RNN with a fraction of their
-  parameters.
+  parameters, at the training budget each was measured at.
 \end{frame}
 
 % =============================================================================
@@ -128,8 +128,9 @@
     {\small
     \begin{tabular}{p{3.6cm}p{8.7cm}}
       \toprule
-      \textbf{LSTM lost to a plain RNN} & At three window lengths. Gating fixes long-range
-      forgetting; a 26-week window does not suffer from it. Four times the parameters, no gain. \\[3pt]
+      \textbf{LSTM lost to a plain RNN} & At three window lengths, \emph{at a fixed 30-epoch
+      budget} --- they tie by 100. Gating fixes long-range forgetting; 91\% of this panel's
+      variance is between-series, so there is little to forget. \\[3pt]
       \textbf{Transformer lost to an RNN} & With 15$\times$ the parameters. Its advantages are
       advantages \emph{at scale}, and 5{,}940 windows is not scale. \\[3pt]
       \textbf{CNNs lost to LASSO} & A seven-week receptive field cannot see an annual lag. \\[3pt]
@@ -274,6 +275,38 @@
   \textbf{Only the last row has a diagnostic.} The first three were caught by held-out data, by a
   DAG drawn before the model, and by asking what one unit of a variable means --- none of which
   any library will run for you.
+\end{frame}
+
+% --- Slide: the day every model fails ----------------------------------------------
+\begin{frame}{The Day Every Model in This Course Fails}
+  Every 25 December the stores close and recorded sales are \textbf{exactly zero} --- five times
+  in our sample, against a daily average near 2{,}800.
+  \begin{center}
+    {\small
+    \begin{tabular}{lrrrr}
+      \toprule
+      \textbf{25 Dec} & \textbf{2012} & \textbf{2013} & \textbf{2014} & \textbf{2015} \\
+      \midrule
+      Actual & 0 & 0 & 0 & 0 \\
+      Seasonal naive & 2{,}230 & 2{,}045 & 2{,}485 & 2{,}365 \\
+      \bottomrule
+    \end{tabular}
+    }
+  \end{center}
+
+  \vspace{-0.15cm}
+  Four days --- \textbf{0.25\%} of the evaluation window --- carry \textbf{4.6\%} of its squared
+  error, eighteen times their share.
+
+  \vspace{0.05cm}
+  \textbf{The information was never missing.} \texttt{is\_event} fires on \textbf{158} days, of
+  which \textbf{5} are closures: the feature cannot tell ``the doors are locked'' from an ordinary
+  Super Bowl, so no model learned the difference.
+
+  \begin{keybox}
+    Knowable years ahead, and every method still failed --- because the \emph{encoding} discarded
+    the distinction, not because the model was misspecified.
+  \end{keybox}
 \end{frame}
 
 % --- Slide: what to report ---------------------------------------------------------

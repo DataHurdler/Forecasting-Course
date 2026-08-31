@@ -336,24 +336,28 @@ And on our data it produces this.
 
 *(Walk the table.)*
 
-Divergences: **forty-three**, where we want zero.
+Divergences: **one hundred twenty-seven**, where we want zero.
 
-R-hat: one-point-oh-oh-three. **Passes.**
+R-hat: one-point-oh-four-four. **Fails**, but only just enough to argue about.
 
-ESS: nine hundred sixty-six. **Passes.**
+ESS: four hundred thirteen. **Passes** — barely, thirteen over the line.
 
 **[pause]**
 
-*(This is the inversion. Emphasize it.)*
+*(This is the point of the slide. Take it slowly.)*
 
-Stop and look at that column again, because it inverts what you learned last week.
+Look at those three numbers again, because they do not fail in the same way.
 
-Last week, R-hat caught our failure. This week, **R-hat and ESS both pass.** On those two numbers
-alone you would have shipped this model without hesitation.
+ESS clears its threshold. You would not look twice at four hundred thirteen. R-hat is over the
+line at one-point-oh-four-four — and be honest about what happens in practice when a number is a
+little over a threshold: people run it again, or say it is close enough, or quietly widen the
+threshold.
 
-Only the divergence count objects.
+**One hundred twenty-seven divergences against a threshold of exactly zero admits none of that.**
+There is no version of "close to zero" that gets you to a hundred and twenty-seven.
 
-So the rule to carry forward: on hierarchical models, **divergences are the sensitive instrument.**
+So the rule to carry forward: on hierarchical models, **divergences fire first and least
+ambiguously.** Do not wait for R-hat to decide for you.
 Do not wait for R-hat to tell you something is wrong. It may never say so.
 
 *(Point at the explanation.)*
@@ -542,9 +546,9 @@ weeks it was **two point six times** more accurate.
 Five. This is regularization for the sixth time, and the only version where the shrinkage strength
 is estimated rather than tuned.
 
-And six. **Write it non-centred.** The obvious form gave forty-three divergences; the
-reparameterized form gave zero. Same model, different geometry — and divergences were the *only*
-diagnostic that objected.
+And six. **Write it non-centred.** The obvious form gave a hundred and twenty-seven divergences;
+the reparameterized form gave one. Same model, different geometry — and divergences objected
+loudest, against a threshold that allows no argument.
 
 **[pause]**
 

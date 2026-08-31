@@ -118,7 +118,7 @@ b = idata.posterior["b_price"].values.ravel()
 ```
 :::
 
-On our fit, $P(\text{elasticity} < 0) = \mathbf{1.00}$ — the direction is not in doubt. But $P(\text{elasticity} < -0.5) = \mathbf{0.46}$: the data cannot settle whether demand is elastic or inelastic.
+On our fit, $P(\text{elasticity} < 0) = \mathbf{1.00}$ — the direction is not in doubt. But $P(\text{elasticity} < -0.5) = \mathbf{0.446}$: the data cannot settle whether demand is elastic or inelastic.
 
 ::: {.keybox}
 **Two findings, and a p-value conflates them.** "Significant" reports only the direction. The question the business asks — *how big?* — gets the answer 46/54.

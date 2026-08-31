@@ -216,9 +216,9 @@
       \toprule
       & \textbf{Centred} & \textbf{Non-centred} & \textbf{Want} \\
       \midrule
-      Divergences & \textbf{43} & \textbf{0} & 0 \\
-      $\hat{R}$ & 1.003 & 1.003 & $< 1.01$ \\
-      ESS (bulk) & 966 & 1{,}719 & $> 400$ \\
+      Divergences & \textbf{127} & \textbf{1} & 0 \\
+      $\hat{R}$ & \textbf{1.044} & 1.002 & $< 1.01$ \\
+      ESS (bulk) & 413 & 1{,}728 & $> 400$ \\
       \bottomrule
     \end{tabular}
     }
@@ -229,10 +229,10 @@
   posterior takes on a funnel shape --- wide where $\sigma_b$ is large, pinched where it is
   small. A sampler tuned for the wide part cannot navigate the neck, and reports divergences.
 
-  \vspace{0.1cm}
-  \textbf{Note which alarm actually fired.} $\hat{R}$ and ESS \emph{both pass} --- on those two
-  numbers you would have shipped it. Only the divergence count objects. On hierarchical models
-  divergences are the sensitive instrument; do not wait for $\hat{R}$ to tell you.
+  \vspace{0.05cm}
+  \textbf{The alarms do not fail alike.} ESS passes at 413; $\hat{R}$ fails at 1.044, the sort of
+  near-miss people talk themselves out of. \textbf{127 divergences against a threshold of zero
+  admits no such conversation.}
 
   \vspace{0.02cm}
   \muted{\footnotesize\itshape BMCP §4.6.1, \emph{Posterior Geometry Matters} --- the single most
@@ -264,7 +264,7 @@
   \end{center}
 
   \vspace{-0.05cm}
-  \textbf{The data-poor series moved 8.1 times further toward the group mean than the data-rich
+  \textbf{The data-poor series moved 8.2 times further toward the group mean than the data-rich
   ones.} Nobody told the model which series were thin. It inferred that from how much each series
   had to say.
 
@@ -295,7 +295,7 @@
       TX\_3\_FOODS & 0.219 & 0.091 & 0.072 \\
       WI\_2\_FOODS & 0.338 & 0.103 & 0.207 \\
       \midrule
-      \textbf{RMSE against truth} & \textbf{0.126} & \textbf{0.048} & --- \\
+      \textbf{RMSE against truth} & \textbf{0.126} & \textbf{0.049} & --- \\
       \bottomrule
     \end{tabular}
     }
@@ -313,8 +313,8 @@
 
 % --- Slide: the business answer ---------------------------------------------
 \begin{frame}{What the Model Actually Concluded}
-  The estimated hierarchy: $\mu_b = 0.078$ with a 94\% HDI of $[0.017,\ 0.150]$, and
-  $\sigma_b = 0.065$.
+  The estimated hierarchy: $\mu_b = 0.077$ with a 94\% HDI of $[0.016,\ 0.150]$, and
+  $\sigma_b = 0.066$.
 
   \vspace{0.1cm}
   In words: a SNAP week lifts FOODS units by roughly \textbf{8\%}, and stores genuinely differ
@@ -324,7 +324,7 @@
   \begin{warningbox}
     \textbf{It does not license the store-level policy the unpooled fit suggested.} An analyst
     reading the unpooled numbers would report uplifts from $5\%$ to $40\%$ and stock accordingly.
-    The held-out weeks say that range was mostly noise --- but $\sigma_b = 0.065$ says it is not
+    The held-out weeks say that range was mostly noise --- but $\sigma_b = 0.066$ says it is not
     \emph{all} noise either.
   \end{warningbox}
 
@@ -362,9 +362,8 @@
       \item This is \textbf{regularization for the sixth time} --- and the only version where the
             shrinkage strength is estimated rather than tuned.
 
-      \item \textbf{Write it non-centred.} The obvious form gave 43 divergences; the
-            reparameterized form gave zero. Same model, different geometry --- and divergences
-            were the \emph{only} diagnostic that objected.
+      \item \textbf{Write it non-centred.} The obvious form gave 127 divergences, the
+            reparameterized form 1 --- same model, different geometry.
     \end{enumerate}
     }
   \end{keybox}

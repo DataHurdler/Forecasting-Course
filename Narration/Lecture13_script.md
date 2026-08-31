@@ -346,7 +346,67 @@ weeks of this course have been aimed at the second one.
 
 ---
 
-# ▶ SLIDE 15 — What a Defensible Forecast Report Contains
+# ▶ SLIDE 15 — The Day Every Model in This Course Fails
+
+*(Table up. This is the last new result of the course — give it room.)*
+
+One more failure, and it is not on the previous slide's list because it is not a mistake anybody
+made. It is a limit.
+
+Every twenty-fifth of December, the stores close. Recorded sales are **exactly zero** — five times
+in our sample, against a daily average near twenty-eight hundred.
+
+*(Walk the row.)*
+
+And the seasonal-naive benchmark, on those four evaluable days, predicts twenty-two thirty,
+twenty forty-five, twenty-four eighty-five, twenty-three sixty-five. Wrong by a hundred percent of
+the true value, every time, on a date known years in advance.
+
+**[pause]**
+
+Now the number that makes this more than an anecdote. Those four days are **one quarter of one
+percent** of the evaluation window, and they carry **four point six percent** of its squared
+error. Eighteen times their share. Drop four days out of fifteen hundred and the benchmark's RMSE
+falls from 537 to 525 — without changing a single thing about the model.
+
+*(Beat.)*
+
+So why did nobody catch it? Not for want of information.
+
+`is_event` fires on **158** days in this data. **Five** of them are closures. Every model in this
+course — the trees that split on it, the networks that took it as a channel, the Bayesian
+regressions that gave it a coefficient — saw a flag that lumps a locked front door together with a
+hundred and fifty-three Super Bowls and Easters.
+
+The feature could not express the difference, so no model could learn it.
+
+**[pause]**
+
+*(Point at the key box.)*
+
+And that is the honest shape of this failure. It was knowable years ahead. Nothing was missing
+from the world; something was missing from the **encoding**. The model was not misspecified — it
+was asked a question in a vocabulary that had no word for "closed."
+
+*(Beat — then the harder case.)*
+
+The harder case is a shock nobody could have known about at all. On the sixteenth of April 2016 a
+magnitude 7.8 earthquake struck Ecuador, and sales at a large grocery chain there spiked for weeks
+as people bought water and relief supplies. A forecast made on the fifteenth — by any method in
+this course — is catastrophically wrong for the following month. Not because the model was bad,
+but because the future stopped resembling the past, which is the one assumption every method here
+shares.
+
+That dataset is available if your project wants a real structural break rather than a simulated
+one.
+
+**[pause]**
+
+Knowing where the whole toolkit stops working is part of knowing how to use it.
+
+---
+
+# ▶ SLIDE 16 — What a Defensible Forecast Report Contains
 
 So what does good work actually look like when you hand it to someone?
 
@@ -383,7 +443,7 @@ not for getting the flattering number.
 
 ---
 
-# ▶ SLIDE 16 — Where You Do This Yourself
+# ▶ SLIDE 17 — Where You Do This Yourself
 
 Which brings us to the final project, because it asks for exactly the report on the previous slide,
 on data of your choosing.
@@ -416,11 +476,11 @@ A project that reports a ranking without a reason has done the computation but n
 
 ---
 
-# ▶ SLIDE 17 — Section divider: Where to Go Next
+# ▶ SLIDE 18 — Section divider: Where to Go Next
 
 ---
 
-# ▶ SLIDE 18 — What This Course Did Not Cover
+# ▶ SLIDE 19 — What This Course Did Not Cover
 
 Some honest gaps, so you know what you don't know.
 
@@ -457,7 +517,7 @@ Detecting that early is its own field, and it's worth knowing that field exists.
 
 ---
 
-# ▶ SLIDE 19 — Closing
+# ▶ SLIDE 20 — Closing
 
 *(Seven points. Steady pace. This is the last thing they hear.)*
 
@@ -491,6 +551,6 @@ Thank you — and good luck with the project.
 
 ---
 
-# ▶ SLIDE 20 — References
+# ▶ SLIDE 21 — References
 
 *(Advance and close. No narration needed.)*

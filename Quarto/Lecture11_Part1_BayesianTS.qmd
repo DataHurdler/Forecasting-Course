@@ -177,7 +177,7 @@ CA_1 FOODS, 52 weeks held out, forecast from the fitted model.
 
 | Model | Test RMSE |
 |---|---:|
-| Bayesian structural TS | **1,587** |
+| Bayesian structural TS | **1,589** |
 | Seasonal naive (same week last year) | 1,660 |
 
 **It beats the benchmark by about 4%.** That is a real improvement and a small one, and after nine weeks of this course you should be suspicious of anyone who reports it as a triumph.

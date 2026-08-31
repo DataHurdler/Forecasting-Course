@@ -70,7 +70,7 @@ Every model in this course, on the M5 weekly panel — same 30 series, same held
 | 1D CNN, flatten head | 1,032 | Lecture 8 |
 | Seasonal naive | 2,152 | every week |
 
-**The ordering is not the one anyone predicts in Week 1.** A 46-coefficient linear model is at the top. The two architectures with the most attention behind them — the LSTM and the Transformer — finished fifth and sixth of eight, behind a plain RNN with a fraction of their parameters.
+**The ordering is not the one anyone predicts in Week 1.** A 46-coefficient linear model is at the top. The two architectures with the most attention behind them — the LSTM and the Transformer — finished fifth and sixth of eight, behind a plain RNN with a fraction of their parameters — at the training budget each was measured at, which Lecture 9 Part 1 shows is part of the claim.
 
 # What the Results Taught
 
@@ -98,7 +98,7 @@ Four times this course, the more advanced method lost — and each time for a re
 
 | | |
 |---|---|
-| **LSTM lost to a plain RNN** | At three window lengths. Gating fixes long-range forgetting; a 26-week window does not suffer from it. Four times the parameters, no gain. |
+| **LSTM lost to a plain RNN** | At three window lengths, *at a fixed 30-epoch budget* — they tie by 100. Gating fixes long-range forgetting; 91% of this panel's variance is between-series, so there is little to forget. |
 | **Transformer lost to an RNN** | With 15$\times$ the parameters. Its advantages are advantages *at scale*, and 5,940 windows is not scale. |
 | **CNNs lost to LASSO** | A seven-week receptive field cannot see an annual lag. |
 | **Tuning made XGBoost worse** | Nine fits, and the defaults were three RMSE better. |
@@ -177,6 +177,25 @@ Harder, and more common in professional work. Here **nothing is wrong with the p
 | Ignoring $\hat{R}$ and divergences | Our first two Bayesian fits returned reasonable-looking forecasts while failing convergence outright. |
 
 **Only the last row has a diagnostic.** The first three were caught by held-out data, by a DAG drawn before the model, and by asking what one unit of a variable means — none of which any library will run for you.
+
+---
+
+## The Day Every Model in This Course Fails
+
+Every 25 December the stores close and recorded sales are **exactly zero** — five times in our sample, against a daily average near 2,800.
+
+| 25 Dec | 2012 | 2013 | 2014 | 2015 |
+|---|---:|---:|---:|---:|
+| Actual | 0 | 0 | 0 | 0 |
+| Seasonal naive | 2,230 | 2,045 | 2,485 | 2,365 |
+
+Four days — **0.25%** of the evaluation window — carry **4.6%** of its squared error, eighteen times their share. Drop them and the benchmark's RMSE falls from 537 to 525 without a single modelling change.
+
+**The information was never missing.** `is_event` fires on **158** days, of which **5** are closures: the feature cannot tell "the doors are locked" from an ordinary Super Bowl, so no model learned the difference.
+
+::: {.keybox}
+Knowable years ahead, and every method still failed — because the *encoding* discarded the distinction, not because the model was misspecified. The harder case is a shock nobody could have known at all: the Favorita earthquake of 16 April 2016 is one, and that dataset is available for final projects.
+:::
 
 ---
 
