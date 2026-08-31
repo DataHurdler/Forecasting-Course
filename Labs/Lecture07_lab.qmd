@@ -6,7 +6,7 @@ format:
     theme: cosmo
     toc: true
     toc-depth: 2
-    number-sections: true
+    number-sections: false
     code-fold: false
     self-contained: true
 execute:
@@ -247,7 +247,7 @@ Without `zero_grad()`, PyTorch **accumulates** gradients across batches instead 
 so every update uses a sum of all gradients seen so far in that epoch.
 
 No exception. No warning. Just a model that trains badly — and note *how* badly. The broken
-version lands around **7,400**, which is more than three times worse than the seasonal-naive
+version lands at **7,325**, which is more than three times worse than the seasonal-naive
 benchmark of 2,152. A one-line omission turned a working model into something far worse than
 predicting last year's value.
 

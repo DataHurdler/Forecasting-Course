@@ -6,7 +6,7 @@ format:
     theme: cosmo
     toc: true
     toc-depth: 2
-    number-sections: true
+    number-sections: false
     code-fold: false
     self-contained: true
 execute:
@@ -168,11 +168,16 @@ sg       = post["sigma"].values.ravel()
 D = len(lev_last)
 actual = test.units.values
 
+# The POINT forecast is identical for both methods, and not approximately so:
+# propagating the level adds zero-mean steps, so E[level] is unchanged. Only the
+# spread differs. Compute the point forecast once, from the deterministic part.
+point = (lev_last[:, None] + b @ X_te.T).mean(0) * y_sd + y_mu
+rmse_point = float(np.sqrt(np.mean((actual - point) ** 2)))
+
 def score(draws, label):
-    pred = draws.mean(0) * y_sd + y_mu
     lo, hi = np.percentile(draws, [3, 97], axis=0) * y_sd + y_mu
     return {"method": label,
-            "RMSE": round(float(np.sqrt(np.mean((actual - pred)**2)))),
+            "RMSE": round(rmse_point),
             "coverage_%": round(100*float(np.mean((actual >= lo) & (actual <= hi)))),
             "mean_width": round(float(np.mean(hi - lo)))}
 
@@ -192,7 +197,9 @@ print(pd.DataFrame([score(draws_a, "level held constant"),
 ::: {.callout-important}
 ## The theoretically correct choice calibrated worse. Work out why.
 
-The point forecasts barely differ. The **intervals** differ enormously — and not in the direction
+The two methods have the **same point forecast** — not nearly the same, exactly the same, because
+propagating the level adds steps with mean zero. So RMSE cannot distinguish them, and everything
+that separates them lives in the **interval** — which differs enormously, and not in the direction
 you would predict.
 
 Propagating the walk is the defensible choice: the level genuinely does keep drifting, and freezing

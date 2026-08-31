@@ -6,7 +6,7 @@ format:
     theme: cosmo
     toc: true
     toc-depth: 2
-    number-sections: true
+    number-sections: false
     code-fold: false
     self-contained: true
 execute:
@@ -17,9 +17,10 @@ execute:
 
 # What we are doing
 
-At the end of Lab 4 you built a Random Forest by accident. You drew twenty bootstrap samples, fitted
-a tree to each, averaged the predictions, and the RMSE fell from about 324 to 266 — with nothing
-tuned and no new information added.
+At the end of Lab 4 you built a bagged ensemble by accident. You drew twenty bootstrap samples,
+fitted a tree to each, averaged the predictions, and the RMSE fell from about 324 to 266 — with
+nothing tuned and no new information added. What you did not do is the one thing that turns
+bagging into a Random Forest.
 
 Today we do that properly, then find out what else the real algorithm does, then replace averaging
 with something better.
@@ -202,7 +203,8 @@ how much worse the forecast gets. That is directly interpretable in a way MDI is
 
 - one lag that MDI ranks *above* `units_lag1`, while permutation ranks it far below
 - `snap`, which MDI places near the bottom and permutation places near the top
-- `avg_price`, which MDI gives a non-trivial score and permutation scores at essentially zero
+- `avg_price` against `is_event`: MDI ranks the price column *above* the event flag, while
+  permutation scores price at exactly zero and the event flag at 22 units of RMSE
 
 **Your turn:** plot the two rankings side by side as horizontal bar charts so the disagreements
 are visible at a glance.
@@ -222,8 +224,12 @@ are visible at a glance.
 A forest builds many trees **in parallel** and averages them. Boosting builds them **in sequence**,
 each one fitted to what the previous ones got wrong.
 
+The first four rows hold the learning rate fixed and add rounds — the same experiment you ran on
+the forest in Step 2. The last two change the rate instead.
+
 ```{python}
-for lr, n in [(0.3, 100), (0.1, 100), (0.1, 300), (0.05, 1000)]:
+for lr, n in [(0.1, 100), (0.1, 300), (0.1, 1000), (0.1, 3000),
+              (0.3, 100), (0.05, 1000)]:
     m = xgb.XGBRegressor(n_estimators=n, learning_rate=lr, max_depth=4,
                          subsample=0.8, colsample_bytree=0.8,
                          random_state=RANDOM_STATE).fit(X_train, y_train)
@@ -240,10 +246,23 @@ scoreboard["XGBoost (lr=0.1, 100 trees)"] = rmse(y_test, best.predict(X_test))
 print(pd.Series(scoreboard).round(0).astype(int).sort_values(ascending=False).to_string())
 ```
 
-**Look at the `lr=0.3` row against the others.** Its training error is the lowest of the four and
-its test error is the worst. Adding trees to a *forest* was safe; adding correction steps that are
-each too large is not. That asymmetry is the practical difference between the two ensembles, and it
-is why boosting has a learning rate at all.
+**Read the first four rows as a curve, then compare it with Step 2.** Training error falls to
+zero. Test error bottoms out around 300 rounds and then **climbs back up** — 3,000 rounds is worse
+than 100. In Step 2 you added trees to a forest all the way to 600 and it never once hurt.
+
+That is the practical difference between the two ensembles. A forest's trees are fitted
+independently and averaged, so extra ones can only sharpen the average. Boosting's trees are
+fitted to the previous ensemble's *residuals*, so extra ones keep going — eventually correcting
+noise. `n_estimators` is a free choice in a forest and a tuning parameter in boosting.
+
+The last two rows say the obvious complement: a big rate with few rounds and a small rate with
+many land in much the same place, because roughly it is the product that sets the budget. What
+you cannot do is set a rate and then let the rounds run.
+
+Note which configuration we put on the scoreboard below — `lr=0.1, n=100`, the conventional
+default, **not** the row with the best test RMSE. Picking the winner out of a column computed on
+the test set is the mistake Lecture 1 warned about, and it does not stop being a mistake because
+the grid is small.
 
 ---
 

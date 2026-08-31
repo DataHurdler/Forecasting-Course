@@ -6,7 +6,7 @@ format:
     theme: cosmo
     toc: true
     toc-depth: 2
-    number-sections: true
+    number-sections: false
     code-fold: false
     self-contained: true
 execute:
@@ -23,11 +23,15 @@ flattened it and lost the ordering; the CNN kept ordering but could only see sev
 A recurrent network has neither limit. It reads the sequence in order and carries a hidden state,
 so in principle nothing stops it using the whole window.
 
-Today you build two of them — a plain RNN and an LSTM — and find out that the more sophisticated
-one loses. Understanding *why* is the point, and it is the most transferable thing in this lab.
+Today you build two of them — a plain RNN and an LSTM — and find that at the training budget
+anyone would have used, the more sophisticated one loses badly. Then you vary the budget and the
+result changes. Working out which claim the evidence actually supports, and why, is the point of
+the lab, and it is the most transferable thing in it.
 
-**Time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
-`data/processed/m5_weekly.csv`. Fits here are quick — about six seconds each.
+**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+`data/processed/m5_weekly.csv`. Most fits are quick — about six seconds each. The exception is
+**Step 4**, which trains four models to 100 epochs and takes two to three minutes; start it and
+read the text underneath while it runs.
 
 ---
 
@@ -169,14 +173,17 @@ print(pd.DataFrame(rows).to_string(index=False))
 ::: {.callout-important}
 ## Read the columns in this order
 
-**The winner column first.** The plain RNN wins at every window length. This is not a close call
-and not a seed artifact — the run-to-run spreads are small next to the gaps.
-
-**Then the two trends.** The RNN gets *better* as the window grows. The LSTM stays flat. The
-plain recurrence is using the extra history; the gated one is not.
+**The winner column first.** At this training budget, on this panel, the plain RNN wins at
+every window length. That part is not a seed artifact — the run-to-run spreads (3 to 33) are tiny
+next to the gaps (112 to 193).
 
 **Then the parameter count.** The model that lost has four times as many parameters as the model
 that won.
+
+**Then be suspicious.** Both models trained for exactly 30 epochs, because that is what `train()`
+defaults to. Nothing above establishes that 30 epochs is enough for *both* of them — and a model
+with four times the parameters is not obviously finished learning at the same point as the
+smaller one. Step 4 checks, and the answer is not the one this table implies.
 :::
 
 **Your turn:** compute the gap at each window and say whether it is closing or widening.
@@ -190,7 +197,95 @@ that won.
 
 ---
 
-# Step 4 — Why the fancier model lost
+# Step 4 — Was that a fair fight?
+
+Step 3 compared two models at **one** training budget. Lab 7 taught you not to trust a comparison
+run at one seed; this is the same objection one level up. An LSTM has four times the parameters,
+and bigger models generally take longer to converge.
+
+So train both to 100 epochs, and record the test RMSE along the way instead of only at the end.
+
+```{python}
+CKPT = [10, 20, 30, 45, 60, 80, 100]
+
+def curve(kind, W, seed):
+    """Train once to 100 epochs, scoring the test set at each checkpoint."""
+    Xtr, Ytr, Xte, Yte, ym, ys = DATA[W]
+    torch.manual_seed(seed)
+    model = Recurrent(kind)
+    opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    lossfn = nn.MSELoss()
+    loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(Xtr, Ytr), batch_size=128, shuffle=False)
+    out = {}
+    for ep in range(1, max(CKPT) + 1):
+        model.train()
+        for xb, yb in loader:
+            opt.zero_grad(); lossfn(model(xb), yb).backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0); opt.step()
+        if ep in CKPT:
+            model.eval()
+            with torch.no_grad():
+                out[ep] = rmse(Yte, model(Xte).numpy() * ys + ym)
+    return out
+
+paths = {}
+for kind in ("rnn", "lstm"):
+    runs = [curve(kind, 26, s) for s in (1, 2)]        # fit each seed ONCE
+    paths[kind] = [np.mean([r[e] for r in runs]) for e in CKPT]
+
+table = pd.DataFrame({"epochs": CKPT,
+                      "RNN":  [round(v) for v in paths["rnn"]],
+                      "LSTM": [round(v) for v in paths["lstm"]]})
+table["gap"] = table.LSTM - table.RNN
+print(table.to_string(index=False))
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(6.5, 3.4))
+ax.plot(CKPT, paths["rnn"],  marker="o", label="vanilla RNN")
+ax.plot(CKPT, paths["lstm"], marker="o", label="LSTM")
+ax.axvline(30, ls="--", lw=1, color="grey")
+ax.set_xlabel("epochs"); ax.set_ylabel("test RMSE"); ax.legend()
+ax.set_title("Step 3 measured at the dashed line", fontsize=9)
+plt.tight_layout()
+```
+
+::: {.callout-important}
+## The gap is largest at exactly the budget we used
+
+Read the `gap` column downwards. It is **negative at 10 epochs** — the LSTM is ahead early — then
+peaks at **30**, the setting Step 3 used, and shrinks at every checkpoint after until the two
+models are level.
+
+Look at the shapes, not just the endpoint. The RNN is finished by about epoch 45 and flat
+thereafter. The LSTM is **still improving at 100 epochs**; its curve has not turned over. We ran
+out of patience, not the model.
+
+So the honest verdict is **not** "the LSTM loses." It is:
+
+- at a fixed 30-epoch budget the RNN is far ahead — and 30 epochs is the point of its *maximum*
+  advantage anywhere in this range;
+- given enough epochs the two are **tied**;
+- the RNN reaches its best score about three times faster, on a quarter of the parameters.
+
+That last line is a real advantage and worth having. It is simply a different claim from the one
+the Step 3 table appears to make — and you could not have told the two apart without varying the
+budget.
+:::
+
+**Your turn:** the run-to-run spread in Step 3 was roughly 20 RMSE. From which checkpoint on is
+the gap smaller than that?
+
+```{python}
+# ---- your turn: uncomment and fill in ----
+# noise = ___                       # <- the seed spread from Step 3
+# print(table[table.gap.abs() < noise].epochs.tolist())
+```
+
+---
+
+# Step 5 — Why the gates buy nothing here
 
 The LSTM's gates exist to solve one problem: in a plain RNN, gradients shrink as they propagate
 backward, so signal from far in the past never reaches the weights. Put a number on it.
@@ -205,24 +300,86 @@ for factor in (0.7, 0.9):
 
 At 0.7 per step the signal is essentially gone by 26 steps. **That is the problem gating fixes.**
 
-Now ask whether this dataset has that problem. Weekly retail demand is dominated by what happened
-recently — last week, four weeks ago, the same week last year. Those are exactly the dependencies
-a plain recurrence carries without help.
+Two things about that table before we go on. At a shrink factor of 0.7 the signal is gone by 26
+steps. At **0.9** it is still 0.065 at 26 steps and 0.004 at 52 — small, but not zero. Vanishing
+gradients are a matter of degree and of *sequence length*, and 26 weeks is short.
 
-> **So the gates solve something real, on data that does not have it — and charge four times the
-> parameters for the service.**
+Now stop asserting and go measure whether this dataset has the problem gating solves. Three
+questions, three numbers.
+
+```{python}
+w = weekly.assign(series=weekly.store_id + "_" + weekly.cat_id)
+w["level"] = w.groupby("series").units.transform("mean")
+w["dev"]   = w.units - w.level
+
+grand = w.units.mean()
+btw = ((w.level - grand) ** 2).sum() / ((w.units - grand) ** 2).sum()
+print(f"1. between-series share of total variance : {btw:.1%}")
+
+print("\n2. within-series autocorrelation of units")
+for lag in (1, 4, 13, 26, 52):
+    a = w.groupby("series").dev.apply(lambda x: x.autocorr(lag)).mean()
+    print(f"      lag {lag:>2}: {a:+.3f}")
+
+print("\n3. does a flag at t predict units at t+k?")
+for ch in ("snap_days", "event_days"):
+    cells = []
+    for k in (0, 1, 2, 4):
+        c = w.groupby("series").apply(lambda g: g[ch].corr(g.dev.shift(-k))).mean()
+        cells.append(f"t+{k}: {c:+.3f}")
+    print(f"      {ch:<11} " + "   ".join(cells))
+```
+
+::: {.callout-important}
+## Three reasons the gates have nothing to do
+
+**1. Most of the variance is not sequential at all.** About **91%** of the variation in weekly
+units is *between* series — which store, which category — and only 9% is within a series over
+time. The single biggest thing a model must get right is the level of the series in front of it,
+and that is readable from the most recent few weeks. No memory mechanism is needed for it.
+
+**2. The series are smooth, which is the opposite of needing memory.** Within-series
+autocorrelation is **0.83 at lag 1** and still **0.43 at lag 52**. That looks like long memory and
+is in fact the reason long memory is unnecessary: because neighbouring weeks are nearly the same
+number, *the recent past is a sufficient statistic for the distant past.* Nothing has to be
+carried across the gap, because the gap has been filled in continuously along the way. Gating pays
+off when a value must survive many steps that would otherwise **overwrite** it — and here nothing
+overwrites anything.
+
+**3. Nothing in the inputs arrives early.** `snap_days` correlates **+0.14** with units in the
+same week and essentially zero at every lead; `event_days` is flat at every horizon including
+zero. There is no *announcement* structure in this data — nothing shows up at time $t$ that must
+be stored until $t+k$. That is the canonical use for a forget gate and an input gate, and this
+panel does not contain one instance of it.
+
+**So the gates solve something real, on data that does not have it.** They charge four times the
+parameters and — as Step 4 showed — roughly three times the epochs for the service, and at
+convergence they return a tie.
+:::
+
+**The transferable part** is the three questions, not the answer. Before reaching for a gated or
+attention-based model on your own series, ask: how much of my variance is cross-sectional rather
+than sequential? Is my series smooth enough that recent values already summarise old ones? Does
+anything in my inputs *lead* the target? If the answers look like this panel's, the extra
+machinery has nothing to do.
 
 ---
 
 # Before you leave
 
-> **Discuss (the result):** Your table says the simpler model wins. Describe a forecasting problem
-> where you would expect the LSTM to win instead — be specific about what property of the data
-> would change the answer.
+> **Discuss (the result):** Using the three diagnostics from Step 5, describe a forecasting
+> problem where you would expect the LSTM to beat the RNN outright. Be specific: what would the
+> between-series share look like, what would the autocorrelation look like, and what would have to
+> be true of the exogenous inputs?
 >
-> **Discuss (the practice):** Suppose you had run only `W=26`, one seed, and the LSTM had happened
-> to come out ahead. Given Lab 7, what would you have needed to do before reporting that an LSTM
-> beats an RNN on this data?
+> **Discuss (the budget):** Step 3 and Step 4 support different claims from the same two models on
+> the same data. State the strongest claim you would be willing to publish, in one sentence — and
+> say what a reader would need to be told alongside it for the sentence to be honest.
+>
+> **Discuss (the practice):** You have now been caught twice: once by seeds in Lab 7, once by the
+> training budget here. Both times a comparison looked settled and was not. What is the general
+> form of that mistake, and what would you check the next time you see two models compared in a
+> table?
 >
 > **Discuss (for Homework 5):** Part 2 asks you to fit an RNN, an LSTM and a Transformer, and to
 > explain where the extra LSTM parameters go and whether they bought anything. You now have the

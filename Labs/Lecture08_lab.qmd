@@ -6,7 +6,7 @@ format:
     theme: cosmo
     toc: true
     toc-depth: 2
-    number-sections: true
+    number-sections: false
     code-fold: false
     self-contained: true
 execute:
@@ -35,8 +35,9 @@ run tells you nothing.
 ::: {.callout-note}
 ## Two cells here are slow
 
-Steps 3 and 4 each train several networks, and take roughly two minutes apiece on a laptop. Start
-the cell, read the text underneath it while it runs, and do not assume it has hung.
+Steps 3 and 4 each train several networks — about four minutes and about three minutes
+respectively on a laptop. Start the cell, read the text underneath it while it runs, and do not
+assume it has hung.
 :::
 
 ---
@@ -208,23 +209,28 @@ Now the experiment Step 1 set up. Keep the architecture fixed and vary only the 
 ```{python}
 rows = []
 for W in (13, 26, 52):
-    # W=26 was already fitted in Step 3 -- reuse it rather than paying twice
-    runs = head_runs["flatten"][:2] if W == 26 else [train(make_cnn(W, "flatten", s), W) for s in (1, 2)]
+    # W=26 was already fitted in Step 3 -- reuse those three rather than paying twice
+    runs = head_runs["flatten"] if W == 26 else [train(make_cnn(W, "flatten", s), W) for s in (1, 2, 3)]
     n_par = sum(p.numel() for p in make_cnn(W, "flatten", 1).parameters())
     rows.append({"window": W, "receptive_field": receptive_field([5,3]),
                  "parameters": n_par, "mean_RMSE": round(np.mean(runs)),
-                 "sd": round(np.std(runs))})
+                 "sd": round(np.std(runs)), "runs": [round(r) for r in runs]})
 print(pd.DataFrame(rows).to_string(index=False))
 ```
 
 ::: {.callout-important}
 ## The result runs the wrong way, and that is the lesson
 
-A longer window does not help. It **hurts**, monotonically.
+A longer window does not help. Read the **ends** of the table, not the middle.
+
+13 weeks and 26 weeks sit inside each other's run-to-run spread — a 52-point gap against a
+standard deviation of 80. That is exactly the kind of difference Lab 7 taught you not to trust,
+and you should not trust it here either. But 52 weeks is **123 RMSE worse than 13 weeks**, a gap
+no seed accounts for: the worst 13-week run still beats the best 52-week run.
 
 The receptive field is stuck at seven weeks no matter how much history you supply. What a longer
-window *does* add is parameters — the flatten layer grows with `W` — so you get more capacity to
-overfit and no additional context to justify it.
+window *does* add is parameters — the flatten layer grows with `W`, from 7,329 to 9,825 — so you
+get more capacity to overfit and no additional context to justify it.
 
 **More data into the model is not more information out of it**, unless the architecture can reach
 it.

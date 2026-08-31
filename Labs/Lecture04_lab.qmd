@@ -6,7 +6,7 @@ format:
     theme: cosmo
     toc: true
     toc-depth: 2
-    number-sections: true
+    number-sections: false
     code-fold: false
     self-contained: true
 execute:
@@ -199,9 +199,11 @@ print(f"RMSE of the 20 trees averaged together  : {averaged:,.0f}")
 print(f"improvement: {100*(single-averaged)/single:.0f}%")
 ```
 
-You just built a small Random Forest by hand. Nothing was tuned and no new information was added
-— the gain came entirely from averaging away the disagreement you measured above. That is next
-week's lecture in three lines.
+You just built a **bagged ensemble** by hand — bootstrap aggregating, in three lines. Nothing was
+tuned and no new information was added; the gain came entirely from averaging away the disagreement
+you measured above. It is not yet a Random Forest: a forest adds one more idea, which is to stop
+every tree from looking at `dow` first. Twenty trees that agree perfectly on their root are twenty
+trees making correlated mistakes. That is next week.
 
 ---
 
