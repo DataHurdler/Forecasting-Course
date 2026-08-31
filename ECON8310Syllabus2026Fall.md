@@ -168,7 +168,7 @@ Beyond the AI tools described in the next section:
 ## AI Use Policy
 This is the fuller delineation promised above.
 
-This course explicitly permits and encourages the use of AI assistants for homework. **Any tool is fine** — Codex, GitHub Copilot, ChatGPT, Claude, Gemini — in an editor or in a browser tab. Use what you have.
+This course explicitly permits and encourages the use of AI assistants for homework. **Any tool is fine** — ChatGPT, Claude, Gemini, GitHub Copilot, Codex — in an editor or in a browser tab. Use what you have. *(Note: UNO's ChatGPT Edu workspace does not include Codex, so the assignments are written for any assistant rather than a specific one.)*
 
 If your tool cannot run code or write files, you will copy code across, run it yourself, and paste results back. That is a perfectly good way to take this course, and arguably a better one: you will see every error message with your own eyes.
 

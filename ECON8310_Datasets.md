@@ -22,7 +22,7 @@ itself part of the skill this course is teaching.
 | **M5 / Walmart** | Throughout — the spine | Five years of daily store-item sales with prices, holidays, and a real store/category hierarchy |
 | **FRED** macro series | Lecture 2 | Gives a case where the causal *direction* is defensible — unemployment moves retail spending, not the reverse |
 | **Electricity demand** | Lecture 3 | Half-hourly data has daily, weekly *and* yearly cycles at once. Retail has one |
-| **Favorita** (Ecuador) | Week 16, and available for final projects | A dated exogenous shock — every method we learn fails on the same month |
+| **Favorita** (Ecuador) | Optional, for final projects | A rich second panel with promotions, holidays and an oil price — and a documented natural experiment |
 
 ---
 
@@ -49,6 +49,13 @@ assignment; it writes the processed files the homework expects.
 | Sales | Daily units sold per item, per store |
 | `calendar` | Dates, weekday, month, year, plus event/holiday flags and a SNAP benefits indicator |
 | `sell_prices` | Weekly price per item per store |
+
+**The shock it already contains.** On **25 December**, every year, the stores are shut and
+recorded sales are **exactly zero** — five occurrences in the sample, against a daily average of
+about 2,800 units. The seasonal-naive benchmark predicts roughly 2,300 on those days, so it is
+wrong by 100% of the true value on a date known years in advance. The `is_event` flag fires on
+**158** days, of which only **5** are closures, so the feature every model in this course relies
+on cannot distinguish "the doors are locked" from an ordinary Super Bowl. We use this in Week 16.
 
 **Why it can carry the whole course.**
 
@@ -121,7 +128,7 @@ it exists.
 
 ---
 
-## 4. Favorita — Week 16, and final projects
+## 4. Favorita — optional, for final projects
 
 **What it is.** Daily sales for Corporación Favorita, a large Ecuadorian grocery chain,
 covering 2013 to 2017. It includes promotions, store metadata, national holidays, and — because
@@ -130,18 +137,20 @@ Ecuador's economy is oil-dependent — a daily **oil price**.
 **Where to get it.** [Kaggle: Corporación Favorita Grocery Sales Forecasting](https://www.kaggle.com/c/favorita-grocery-sales-forecasting).
 This one does require a Kaggle account.
 
-**Why we need it and M5 cannot substitute.** On **16 April 2016**, a magnitude 7.8 earthquake
-struck Ecuador. Sales spiked for weeks afterward as people bought water and relief supplies.
-The competition organizers documented this in the data description, so it is not something you
-have to reverse-engineer.
+**What makes it interesting.** On **16 April 2016**, a magnitude 7.8 earthquake struck Ecuador.
+Sales spiked for weeks afterward as people bought water and relief supplies, and the competition
+organizers documented it in the data description, so it is not something you have to
+reverse-engineer.
 
-We close the semester there, and the reason is worth stating plainly. A forecast made on
-15 April 2016 — by exponential smoothing, by ARIMA, by XGBoost, by an LSTM, by a Bayesian
-model, by anything in this course — is catastrophically wrong for the following month. Not
-because the model was badly specified. Because the future stopped resembling the past, and
-every method in this course assumes it does not.
+A forecast made on 15 April 2016 — by exponential smoothing, by ARIMA, by XGBoost, by an LSTM,
+by anything in this course — is catastrophically wrong for the following month. Not because the
+model was badly specified, but because the future stopped resembling the past, and every method
+here assumes it does not. If your project wants to study a genuine structural break rather than
+simulate one, this is the cleanest one available.
 
-Knowing where the whole toolkit stops working is part of knowing how to use it.
+*(We make the related point in Week 16 without leaving the spine dataset — see the Christmas
+closures in §1, where a **known, dated** event defeats every model in the course. Favorita's
+earthquake is the harder case: an event nobody could have known about at all.)*
 
 **For final projects.** Favorita is also a good project dataset if your group wants one
 ready-made: it is rich enough for serious work and different enough from the spine that you

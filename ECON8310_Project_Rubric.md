@@ -42,6 +42,25 @@ One to two pages. The purpose is to catch a doomed project while there is still 
 **Common ways to lose points here:** a question that no decision follows from; a dataset you have
 not yet opened; three methods from a single part of the course; no benchmark named.
 
+### Choosing a dataset
+
+**Bring your own if you have one.** A series you care about — from work, from a public agency, from
+a hobby — almost always produces a better project, because you can tell when an answer is
+implausible and a stranger's dataset gives you no such instinct.
+
+**If you do not have one, use Favorita.** Daily sales for Corporación Favorita, a large Ecuadorian
+grocery chain, 2013–2017, with promotions, store metadata, national holidays and a daily oil price:
+[Kaggle: Corporación Favorita Grocery Sales Forecasting](https://www.kaggle.com/c/favorita-grocery-sales-forecasting)
+(a Kaggle account is required). It is rich enough for serious work and different enough from the
+M5 spine that you cannot reuse lecture code unchanged — which is the point. It also contains a
+documented natural experiment: the magnitude 7.8 earthquake of **16 April 2016**, after which sales
+spiked for weeks. A group that wants to study a genuine structural break rather than simulate one
+has a clean case waiting.
+
+**What you may not use:** the M5 weekly panel exactly as the homework uses it. Reframing it — a
+different aggregation, a different question, a different horizon — is fine and sometimes strong.
+Re-running Homework 4 is not a project.
+
 ---
 
 ## 3. In-Class Presentation — 25 points
