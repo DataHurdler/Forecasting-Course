@@ -52,6 +52,9 @@ TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
 # The published course URL lives in ONE place: scripts/course_url.txt
 python scripts/set_course_url.py                       # show it + where it appears
 python scripts/set_course_url.py https://new.host/path/ # rewrite all of them, then re-render
+# It spans BOTH repos: 3 documents here + 3 in the student repo (README, assignments/README,
+# STUDENT_QUICKSTART). The student repo is found via $FORECASTING_ENV_REPO or a sibling
+# Forecasting-Env directory; if neither exists the script says so loudly rather than skipping.
 
 # Publish to GitHub Pages (docs/). Targets: all | slides | labs | homework | docs | LectureNN
 ./scripts/sync_to_docs.sh            # everything -- slow, labs fit real models
@@ -191,7 +194,7 @@ template-maintenance gates that this course repo does not satisfy.
 `python scripts/check_mirror_parity.py`.
 **Site status:** `docs/` carries all 16 weeks plus finals week — slides (HTML only -- PDFs are deliberately not published), 14 labs,
 11 homework submissions, and the syllabus, datasets guide and project rubric as HTML.
-**Note:** The pre-redesign lecture set (Lecture01_Intro through Lecture12_Capstone) was removed in the Fall 2026 cleanup; it remains recoverable from git history. Its lab notebooks (`scripts/Lecture*.ipynb`) and QA reports (`quality_reports/`) were deliberately kept — the notebooks are the only worked Python in the repo outside Homework/.
+**Note:** The pre-redesign lecture set (Lecture01_Intro through Lecture12_Capstone) was removed in the Fall 2026 cleanup; it remains recoverable from git history. Its QA reports were kept in `quality_reports/`. Its lab notebooks (`scripts/Lecture*.ipynb`) were **deleted 2026-08-31**: they had been kept as "the only worked Python outside Homework/", which stopped being true once the 14 executable labs landed, and their filenames collided with the current numbering (`Lecture10_NeuralNets.ipynb` beside a Lecture 10 that is Bayesian Foundations). They loaded `statsmodels` toy data, never the course datasets. Recoverable from git history.
 
 | Lecture | Beamer | Quarto | Key Content |
 |---------|--------|--------|-------------|
@@ -203,13 +206,13 @@ template-maintenance gates that this course repo does not satisfy.
 | 6: Regularization & Model Selection | `Lecture06_Regularization.tex` ✓ | `Lecture06_Regularization.qmd` ✓ | Subset selection vs shrinkage, Ridge, LASSO, Elastic Net, l1/l2 geometry, regularization paths, choosing λ by walk-forward CV. |
 | 7: Introduction to Neural Networks | `Lecture07_NeuralNets.tex` ✓ | `Lecture07_NeuralNets.qmd` ✓ | Neurons, activations, FFN layers, MSE loss, backprop, Adam, dropout, PyTorch Dataset/DataLoader/training loop. |
 | 8: CNN Architectures | `Lecture08_CNNs.tex` ✓ | `Lecture08_CNNs.qmd` ✓ | Convolution, pooling, LeNet→VGG→Inception→ResNet, residual connections, 1D CNN for time series. |
-| 9 Part 1: RNNs & LSTMs (Wk 9) | `Lecture09_Part1_RNN_LSTM.tex` ✓ | `Lecture09_Part1_RNN_LSTM.qmd` ✓ | Recurrence, BPTT, vanishing gradients, LSTM gates, cell state as additive path. Measured: the vanilla RNN beats the LSTM at all three windows (842 vs 987 at 26 weeks). |
+| 9 Part 1: RNNs & LSTMs (Wk 9) | `Lecture09_Part1_RNN_LSTM.tex` ✓ | `Lecture09_Part1_RNN_LSTM.qmd` ✓ | Recurrence, BPTT, vanishing gradients, LSTM gates, cell state as additive path. Measured: at a fixed 30-epoch budget the vanilla RNN beats the LSTM at all three windows (842 vs 987 at 26 weeks) — but the two tie by 100 epochs (830 vs 821), and 91% of the panel's variance is between-series. Two added frames (Checks 1 and 2) teach the budget dependence and the three data diagnostics. |
 | 9 Part 2: Transformers (Wk 10) | `Lecture09_Part2_Transformers.tex` ✓ | `Lecture09_Part2_Transformers.qmd` ✓ | Scaled dot-product attention, multi-head, encoder block, positional encoding (measured: 990 with, 1,282 without — a 292 penalty). Ties the LSTM; loses to the vanilla RNN. |
 | 10: Bayesian Statistics I — Foundations | `Lecture10_BayesianFoundations.tex` ✓ | `Lecture10_BayesianFoundations.qmd` ✓ | Frequentist vs Bayesian, Bayes' theorem, priors (Beta/Normal/Exponential), MCMC/NUTS, PyMC, prior predictive checks. |
-| 11 Part 1: Bayesian TS (Wk 12) | `Lecture11_Part1_BayesianTS.tex` ✓ | `Lecture11_Part1_BayesianTS.qmd` ✓ | Structural decomposition, local level, Fourier seasonality. Measured: RMSE 1,587 vs naive 1,660; 94% interval 100% covered but ±30% wide. |
-| 11 Part 2: Hierarchical (Wk 13) | `Lecture11_Part2_Hierarchical.tex` ✓ | `Lecture11_Part2_Hierarchical.qmd` ✓ | **Exchangeability first** (the ten FOODS series), then complete/no/partial pooling, non-centred parameterization. Measured: thin series shrink 8.1× more; held-out RMSE 0.126 → 0.048; 43 divergences → 0. |
+| 11 Part 1: Bayesian TS (Wk 12) | `Lecture11_Part1_BayesianTS.tex` ✓ | `Lecture11_Part1_BayesianTS.qmd` ✓ | Structural decomposition, local level, Fourier seasonality. Measured: RMSE 1,589 vs naive 1,660; 94% interval 100% covered but ±30% wide. |
+| 11 Part 2: Hierarchical (Wk 13) | `Lecture11_Part2_Hierarchical.tex` ✓ | `Lecture11_Part2_Hierarchical.qmd` ✓ | **Exchangeability first** (the ten FOODS series), then complete/no/partial pooling, non-centred parameterization. Measured: thin series shrink 8.2× more; held-out RMSE 0.126 → 0.049; 127 divergences → 1 (R-hat 1.044 → 1.002). |
 | 12: Bayesian Statistics III — Linear Regression | `Lecture12_BayesianRegression.tex` ✓ | `Lecture12_BayesianRegression.qmd` ✓ | Bayesian linear regression, posterior coefficient distributions, HDI, DAGs, scenario analysis, course method map. |
-| 13: Synthesis *(Wk 16, no lab)* | `Lecture13_Synthesis.tex` ✓ | `Lecture13_Synthesis.qmd` ✓ | Course-wide scoreboard, the three lessons the measurements taught, method-choice guide, a two-part silent-failure catalogue (pipeline bugs vs. correct code / wrong answer), and the final-project frame. |
+| 13: Synthesis *(Wk 16, no lab)* | `Lecture13_Synthesis.tex` ✓ | `Lecture13_Synthesis.qmd` ✓ | Course-wide scoreboard, the three lessons the measurements taught, method-choice guide, a two-part silent-failure catalogue (pipeline bugs vs. correct code / wrong answer), the Christmas-closure limit (0.25% of days, 4.6% of squared error), and the final-project frame. |
 
 ---
 
@@ -217,8 +220,11 @@ template-maintenance gates that this course repo does not satisfy.
 
 **Dataset architecture:** see
 [`quality_reports/decisions/ADR-0001-course-dataset-architecture.md`](quality_reports/decisions/ADR-0001-course-dataset-architecture.md).
-**M5/Walmart** is the spine, supplemented by FRED (L02 VAR/Granger), electricity demand
-(L03 multiple seasonality), and Favorita (Week 16 shock cameo + project seed). The migration off
+**M5/Walmart** is the spine, supplemented by FRED (L02 VAR/Granger) and electricity demand
+(L03 multiple seasonality). **Favorita is project-only** as of 2026-08-31 — there is no
+`prep_favorita.py` and Week 16 does not use it. The Week 16 shock cameo is built on M5's own
+Christmas closures (units = 0 on 25 Dec, five years; `is_event` fires on 158 days of which 5
+are closures), which needs no second dataset. The migration off
 Rossmann is **complete** — no Rossmann reference remains in `Homework/` or `Labs/`.
 
 **Status:** All 11 submissions written and rendering. Each part's checklist states its own prompt
@@ -229,7 +235,7 @@ budget, and the folder stem is also the commit-message prefix and the key in the
 `python scripts/prep_fred.py` → `fred_monthly.csv` (L02 Granger; no API key)
 `python scripts/prep_electricity.py` → `electricity_daily.csv`, `electricity_hourly.csv` (L03 GAMs)
 **Format:** Quarto `.qmd` (students render to HTML). Each assignment includes an initial Codex prompt and per-question prompt budgets.
-**Student repo:** https://github.com/DataHurdler/Forecasting-Env (Codex workflows, submission structure, validation script).
+**Student repo:** https://github.com/DataHurdler/forecasting-env (Codex workflows, submission structure, validation script). Assignment `.qmd` files are authored in `Homework/` here and **copied** to that repo's `assignments/` — keep them in sync.
 
 | HW | File | Lectures | Dataset | Prompt Budget | Key Tasks |
 |----|------|----------|---------|---------------|-----------|
