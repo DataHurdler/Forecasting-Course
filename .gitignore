@@ -71,6 +71,10 @@ scripts/R/_outputs/
 # renders them during gating). Published HTML lives in docs/, never here.
 # Quarto/*.html is TRACKED here (docs/ is synced from it by scripts/sync_to_docs.sh)
 Quarto/*_files/
+# Quarto leaves these beside a lab when a figure is written to disk rather than
+# embedded; they are render byproducts, regenerated on every render.
+Labs/*_files/
+Homework/*_files/
 
 # stray 0-byte file from a shell redirect typo
 null
