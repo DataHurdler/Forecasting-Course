@@ -67,10 +67,12 @@ TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode LectureNN_Tit
 ./scripts/sync_to_docs.sh LectureNN_Title
 ```
 
-**Homework data** (run once; requires the Rossmann Store Sales files in `data/raw/`):
+**Course data** (run once each, from the repository root):
 
 ```bash
-python scripts/prep_rossmann.py
+python scripts/prep_m5.py           # the spine: m5_weekly.csv, m5_daily.csv
+python scripts/prep_fred.py         # macro series for Lecture 2
+python scripts/prep_electricity.py  # multi-seasonal demand for Lecture 3
 ```
 
 **Quality score:**
