@@ -2317,13 +2317,13 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">1</span> What we are doing</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2</span> Setup</a></li>
-  <li><a href="#step-1-fit-it-the-obvious-way" id="toc-step-1-fit-it-the-obvious-way" class="nav-link" data-scroll-target="#step-1-fit-it-the-obvious-way"><span class="header-section-number">3</span> Step 1 — Fit it the obvious way</a></li>
-  <li><a href="#step-2-reparameterize" id="toc-step-2-reparameterize" class="nav-link" data-scroll-target="#step-2-reparameterize"><span class="header-section-number">4</span> Step 2 — Reparameterize</a></li>
-  <li><a href="#step-3-forecast-two-ways" id="toc-step-3-forecast-two-ways" class="nav-link" data-scroll-target="#step-3-forecast-two-ways"><span class="header-section-number">5</span> Step 3 — Forecast, two ways</a></li>
-  <li><a href="#step-4-calibrated-is-not-the-same-as-useful" id="toc-step-4-calibrated-is-not-the-same-as-useful" class="nav-link" data-scroll-target="#step-4-calibrated-is-not-the-same-as-useful"><span class="header-section-number">6</span> Step 4 — Calibrated is not the same as useful</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">7</span> Before you leave</a></li>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing">What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#step-1-fit-it-the-obvious-way" id="toc-step-1-fit-it-the-obvious-way" class="nav-link" data-scroll-target="#step-1-fit-it-the-obvious-way">Step 1 — Fit it the obvious way</a></li>
+  <li><a href="#step-2-reparameterize" id="toc-step-2-reparameterize" class="nav-link" data-scroll-target="#step-2-reparameterize">Step 2 — Reparameterize</a></li>
+  <li><a href="#step-3-forecast-two-ways" id="toc-step-3-forecast-two-ways" class="nav-link" data-scroll-target="#step-3-forecast-two-ways">Step 3 — Forecast, two ways</a></li>
+  <li><a href="#step-4-calibrated-is-not-the-same-as-useful" id="toc-step-4-calibrated-is-not-the-same-as-useful" class="nav-link" data-scroll-target="#step-4-calibrated-is-not-the-same-as-useful">Step 4 — Calibrated is not the same as useful</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave">Before you leave</a></li>
   </ul>
 </nav>
 </div>
@@ -2349,17 +2349,17 @@ window.Quarto = {
 </header>
 
 
-<section id="what-we-are-doing" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> What we are doing</h1>
+<section id="what-we-are-doing" class="level1">
+<h1>What we are doing</h1>
 <p>A structural model writes a series as parts you can name — a level that drifts, a seasonal shape, and noise — and puts a prior on each. The output is not a forecast line but a distribution for every future week.</p>
 <p>Today you will build one, hit a failure the diagnostics catch, fix it — and then find that the <em>correct</em> way to forecast produces a worse-calibrated interval than the shortcut.</p>
 <p>That last result is not a mistake in the lab. It is the model telling you something, and working out what takes the rest of the session.</p>
 <p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pymc</code>, <code>arviz</code>, and <code>data/processed/m5_weekly.csv</code>. Sampling takes about 20 seconds per fit.</p>
 <hr>
 </section>
-<section id="setup" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
-<div id="83732cf9" class="cell" data-execution_count="1">
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div id="e835a942" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2404,10 +2404,10 @@ window.Quarto = {
 </div>
 <hr>
 </section>
-<section id="step-1-fit-it-the-obvious-way" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Step 1 — Fit it the obvious way</h1>
+<section id="step-1-fit-it-the-obvious-way" class="level1">
+<h1>Step 1 — Fit it the obvious way</h1>
 <p>The model is a drifting level plus seasonality. PyMC has a distribution for a random walk, so the natural thing is to use it.</p>
-<div id="cee33ee8" class="cell" data-execution_count="2">
+<div id="1bea733b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> centred:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">&quot;sigma_level&quot;</span>, <span class="fl">10.0</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    level <span class="op">=</span> pm.GaussianRandomWalk(<span class="st">&quot;level&quot;</span>, sigma<span class="op">=</span>sigma_level, shape<span class="op">=</span>n)</span>
@@ -2431,10 +2431,10 @@ divergences  0</code></pre>
 <p><strong>It did not converge.</strong> No exception, a forecast is available, and the diagnostics are the only thing telling you not to use it. Note that <code>target_accept</code> is already at 0.95 — this is not fixed by asking the sampler to try harder.</p>
 <hr>
 </section>
-<section id="step-2-reparameterize" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Step 2 — Reparameterize</h1>
+<section id="step-2-reparameterize" class="level1">
+<h1>Step 2 — Reparameterize</h1>
 <p>The problem is the <em>shape</em> of the posterior, not the model. Write the walk as a cumulative sum of standard Normal draws scaled by <code>sigma_level</code>, and the sampler gets a geometry it can navigate.</p>
-<div id="59a9753b" class="cell" data-execution_count="3">
+<div id="aa671c07" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">&quot;sigma_level&quot;</span>, <span class="fl">10.0</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> pm.Normal(<span class="st">&quot;z&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>n)                              <span class="co"># standard normal</span></span>
@@ -2457,7 +2457,7 @@ divergences  0</code></pre>
 </div>
 <p><strong>Same model, same data, same priors.</strong> <code>cumsum(z * sigma)</code> and <code>GaussianRandomWalk(sigma=sigma)</code> describe the identical distribution — only the coordinates the sampler explores have changed.</p>
 <p>Look at the components it recovered:</p>
-<div id="c0fe4ef9" class="cell" data-execution_count="4">
+<div id="a5cb1ff6" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>lev <span class="op">=</span> idata.posterior[<span class="st">&quot;level&quot;</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, n).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sea <span class="op">=</span> (idata.posterior[<span class="st">&quot;beta&quot;</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span><span class="op">*</span>K) <span class="op">@</span> X_tr.T).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2478,12 +2478,12 @@ divergences  0</code></pre>
 </div>
 <hr>
 </section>
-<section id="step-3-forecast-two-ways" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Step 3 — Forecast, two ways</h1>
+<section id="step-3-forecast-two-ways" class="level1">
+<h1>Step 3 — Forecast, two ways</h1>
 <p>To forecast you need the level at each future week. There are two candidates, and one of them is theoretically right.</p>
 <p><strong>Held constant:</strong> carry the last estimated level forward unchanged. Simple, and it asserts the level stops drifting the moment your data ends — which is not what the model says.</p>
 <p><strong>Propagated:</strong> let the level keep random-walking forward, exactly as it did in-sample. This is what the fitted model actually implies.</p>
-<div id="370dda36" class="cell" data-execution_count="5">
+<div id="068cad5a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>post <span class="op">=</span> idata.posterior</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>lev_last <span class="op">=</span> post[<span class="st">&quot;level&quot;</span>].values[:, :, <span class="op">-</span><span class="dv">1</span>].ravel()</span>
@@ -2493,29 +2493,34 @@ divergences  0</code></pre>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> <span class="bu">len</span>(lev_last)</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> test.units.values</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(draws, label):</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> draws.mean(<span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(draws, [<span class="dv">3</span>, <span class="dv">97</span>], axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;method&quot;</span>: label,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;RMSE&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(np.sqrt(np.mean((actual <span class="op">-</span> pred)<span class="op">**</span><span class="dv">2</span>)))),</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;coverage_%&quot;</span>: <span class="bu">round</span>(<span class="dv">100</span><span class="op">*</span><span class="bu">float</span>(np.mean((actual <span class="op">&gt;=</span> lo) <span class="op">&amp;</span> (actual <span class="op">&lt;=</span> hi)))),</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;mean_width&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(np.mean(hi <span class="op">-</span> lo)))}</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) level held constant at its last value  -- the tempting shortcut</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>mu_a <span class="op">=</span> lev_last[:, <span class="va">None</span>] <span class="op">+</span> b <span class="op">@</span> X_te.T</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>draws_a <span class="op">=</span> mu_a <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>mu_a.shape) <span class="op">*</span> sg[:, <span class="va">None</span>]</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) level keeps random-walking into the future -- what the model actually says</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>steps <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>(D, N_TEST)) <span class="op">*</span> sl[:, <span class="va">None</span>]</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>mu_b <span class="op">=</span> lev_last[:, <span class="va">None</span>] <span class="op">+</span> np.cumsum(steps, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">+</span> b <span class="op">@</span> X_te.T</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>draws_b <span class="op">=</span> mu_b <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>mu_b.shape) <span class="op">*</span> sg[:, <span class="va">None</span>]</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># The POINT forecast is identical for both methods, and not approximately so:</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># propagating the level adds zero-mean steps, so E[level] is unchanged. Only the</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># spread differs. Compute the point forecast once, from the deterministic part.</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>point <span class="op">=</span> (lev_last[:, <span class="va">None</span>] <span class="op">+</span> b <span class="op">@</span> X_te.T).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>rmse_point <span class="op">=</span> <span class="bu">float</span>(np.sqrt(np.mean((actual <span class="op">-</span> point) <span class="op">**</span> <span class="dv">2</span>)))</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(draws, label):</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(draws, [<span class="dv">3</span>, <span class="dv">97</span>], axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;method&quot;</span>: label,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;RMSE&quot;</span>: <span class="bu">round</span>(rmse_point),</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;coverage_%&quot;</span>: <span class="bu">round</span>(<span class="dv">100</span><span class="op">*</span><span class="bu">float</span>(np.mean((actual <span class="op">&gt;=</span> lo) <span class="op">&amp;</span> (actual <span class="op">&lt;=</span> hi)))),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;mean_width&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(np.mean(hi <span class="op">-</span> lo)))}</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) level held constant at its last value  -- the tempting shortcut</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>mu_a <span class="op">=</span> lev_last[:, <span class="va">None</span>] <span class="op">+</span> b <span class="op">@</span> X_te.T</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>draws_a <span class="op">=</span> mu_a <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>mu_a.shape) <span class="op">*</span> sg[:, <span class="va">None</span>]</span>
 <span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame([score(draws_a, <span class="st">&quot;level held constant&quot;</span>),</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>                    score(draws_b, <span class="st">&quot;level propagated&quot;</span>)]).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) level keeps random-walking into the future -- what the model actually says</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>steps <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>(D, N_TEST)) <span class="op">*</span> sl[:, <span class="va">None</span>]</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>mu_b <span class="op">=</span> lev_last[:, <span class="va">None</span>] <span class="op">+</span> np.cumsum(steps, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">+</span> b <span class="op">@</span> X_te.T</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>draws_b <span class="op">=</span> mu_b <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>mu_b.shape) <span class="op">*</span> sg[:, <span class="va">None</span>]</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame([score(draws_a, <span class="st">&quot;level held constant&quot;</span>),</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>                    score(draws_b, <span class="st">&quot;level propagated&quot;</span>)]).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>             method  RMSE  coverage_%  mean_width
-level held constant  1585          96        6340
-   level propagated  1578         100       11667</code></pre>
+level held constant  1589          96        6340
+   level propagated  1589         100       11667</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -2528,7 +2533,7 @@ The theoretically correct choice calibrated worse. Work out why.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The point forecasts barely differ. The <strong>intervals</strong> differ enormously — and not in the direction you would predict.</p>
+<p>The two methods have the <strong>same point forecast</strong> — not nearly the same, exactly the same, because propagating the level adds steps with mean zero. So RMSE cannot distinguish them, and everything that separates them lives in the <strong>interval</strong> — which differs enormously, and not in the direction you would predict.</p>
 <p>Propagating the walk is the defensible choice: the level genuinely does keep drifting, and freezing it asserts a certainty the model does not have. Yet the propagated interval <strong>over-covers</strong>, while the frozen one lands close to its nominal 94%.</p>
 <p>Over-covering means too wide. Over 52 weeks the propagated level accumulates roughly <span class="math inline">\(\sqrt{52}\,\sigma_{\text{level}}\)</span> of drift, so if <span class="math inline">\(\sigma_{\text{level}}\)</span> is too large the interval inflates fast.</p>
 <p><strong>And there is good reason to think it is too large.</strong> The random walk is the most flexible part of this model. Anything the Fourier terms fail to capture — a promotion, a holiday shift, an outlier — gets absorbed into the level, inflating <span class="math inline">\(\sigma_{\text{level}}\)</span> beyond genuine drift.</p>
@@ -2536,7 +2541,7 @@ The theoretically correct choice calibrated worse. Work out why.
 </div>
 </div>
 <p><strong>Your turn:</strong> check the size of the estimated drift against the noise it is competing with.</p>
-<div id="b7fb2a5d" class="cell" data-execution_count="6">
+<div id="06642641" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(az.summary(idata, var_names=[___, ___],        # &lt;- the two scale parameters</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                  ci_kind=&quot;hdi&quot;, ci_prob=0.94).round(4).to_string())</span></span>
@@ -2545,7 +2550,7 @@ The theoretically correct choice calibrated worse. Work out why.
 </div>
 <hr>
 <p><strong>Now split coverage by horizon</strong>, which is where the difference actually shows.</p>
-<div id="79689e9a" class="cell" data-execution_count="7">
+<div id="807b0363" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> by_horizon(draws, label):</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(draws, [<span class="dv">3</span>, <span class="dv">97</span>], axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    inside <span class="op">=</span> (actual <span class="op">&gt;=</span> lo) <span class="op">&amp;</span> (actual <span class="op">&lt;=</span> hi)</span>
@@ -2569,10 +2574,10 @@ level held constant 100% / 6,255   92% / 6,537  100% / 6,027
 <p>That is the real distinction, and it is structural rather than a matter of which scored better here: <strong>one of these models knows that forecasting further ahead is harder, and the other does not.</strong> On this series, at this horizon, that ignorance happened not to cost anything. On a series with a genuinely drifting level it would.</p>
 <hr>
 </section>
-<section id="step-4-calibrated-is-not-the-same-as-useful" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Step 4 — Calibrated is not the same as useful</h1>
+<section id="step-4-calibrated-is-not-the-same-as-useful" class="level1">
+<h1>Step 4 — Calibrated is not the same as useful</h1>
 <p>Take the propagated version — the one the model implies — and ask two separate questions of it.</p>
-<div id="b88b2ba2" class="cell" data-execution_count="8">
+<div id="e994ff2b" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> score(draws_b, <span class="st">&quot;level propagated&quot;</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;coverage      </span><span class="sc">{</span>res[<span class="st">&#39;coverage_%&#39;</span>]<span class="sc">}</span><span class="ss">%   against a nominal 94%&quot;</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;mean width    </span><span class="sc">{</span>res[<span class="st">&#39;mean_width&#39;</span>]<span class="sc">:,}</span><span class="ss"> units&quot;</span>)</span>
@@ -2583,14 +2588,14 @@ level held constant 100% / 6,255   92% / 6,537  100% / 6,027
 <pre><code>coverage      100%   against a nominal 94%
 mean width    11,667 units
               = 59% of average weekly units
-RMSE          1,578
+RMSE          1,589
 seasonal naive  1,660</code></pre>
 </div>
 </div>
 <p><strong>Question one: is it calibrated?</strong> Compare coverage against 94%.</p>
 <p><strong>Question two: is it useful?</strong> Compare the width against the size of the thing you are forecasting, and ask whether you would place an inventory order against it.</p>
 <p><strong>Your turn:</strong> state, in one sentence each, your answer to both — and whether passing the first excuses failing the second.</p>
-<div id="8067cfe2" class="cell" data-execution_count="9">
+<div id="1ea47504" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and answer in the strings ----</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># calibrated = &quot;...&quot;</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># useful     = &quot;...&quot;</span></span>
@@ -2598,8 +2603,8 @@ seasonal naive  1,660</code></pre>
 </div>
 <hr>
 </section>
-<section id="before-you-leave" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Before you leave</h1>
+<section id="before-you-leave" class="level1">
+<h1>Before you leave</h1>
 <blockquote class="blockquote">
 <p><strong>Discuss (the two problems):</strong> The convergence failure was caught by a diagnostic. The over-wide interval was not — it needed a held-out set and a coverage calculation. What is the structural difference between the two, and what habit catches the second kind?</p>
 <p><strong>Discuss (the payoff):</strong> The point forecast beat seasonal naive by only a few percent. Given that, what did fitting this model actually buy — and name a business question it can answer that XGBoost from Homework 4 cannot.</p>

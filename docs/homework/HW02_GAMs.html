@@ -2179,18 +2179,18 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
-  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="header-section-number">2</span> Dataset</a></li>
-  <li><a href="#initial-prompt-for-codex" id="toc-initial-prompt-for-codex" class="nav-link" data-scroll-target="#initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</a></li>
-  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">4</span> Questions</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a></li>
+  <li><a href="#initial-prompt-for-your-ai-assistant" id="toc-initial-prompt-for-your-ai-assistant" class="nav-link" data-scroll-target="#initial-prompt-for-your-ai-assistant">Initial Prompt for Your AI Assistant</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions">Questions</a>
   <ul class="collapse">
-  <li><a href="#q1-prophet-fit-and-decompose" id="toc-q1-prophet-fit-and-decompose" class="nav-link" data-scroll-target="#q1-prophet-fit-and-decompose"><span class="header-section-number">4.1</span> Q1 — Prophet: Fit and Decompose</a></li>
-  <li><a href="#q2-prophet-adding-regressors" id="toc-q2-prophet-adding-regressors" class="nav-link" data-scroll-target="#q2-prophet-adding-regressors"><span class="header-section-number">4.2</span> Q2 — Prophet: Adding Regressors</a></li>
-  <li><a href="#q3-pygam" id="toc-q3-pygam" class="nav-link" data-scroll-target="#q3-pygam"><span class="header-section-number">4.3</span> Q3 — pyGAM</a></li>
-  <li><a href="#q4-model-comparison" id="toc-q4-model-comparison" class="nav-link" data-scroll-target="#q4-model-comparison"><span class="header-section-number">4.4</span> Q4 — Model Comparison</a></li>
-  <li><a href="#q5-reflection" id="toc-q5-reflection" class="nav-link" data-scroll-target="#q5-reflection"><span class="header-section-number">4.5</span> Q5 — Reflection</a></li>
+  <li><a href="#q1-prophet-fit-and-decompose" id="toc-q1-prophet-fit-and-decompose" class="nav-link" data-scroll-target="#q1-prophet-fit-and-decompose">Q1 — Prophet: Fit and Decompose</a></li>
+  <li><a href="#q2-prophet-adding-regressors" id="toc-q2-prophet-adding-regressors" class="nav-link" data-scroll-target="#q2-prophet-adding-regressors">Q2 — Prophet: Adding Regressors</a></li>
+  <li><a href="#q3-pygam" id="toc-q3-pygam" class="nav-link" data-scroll-target="#q3-pygam">Q3 — pyGAM</a></li>
+  <li><a href="#q4-model-comparison" id="toc-q4-model-comparison" class="nav-link" data-scroll-target="#q4-model-comparison">Q4 — Model Comparison</a></li>
+  <li><a href="#q5-reflection" id="toc-q5-reflection" class="nav-link" data-scroll-target="#q5-reflection">Q5 — Reflection</a></li>
   </ul></li>
-  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">5</span> Submission Checklist</a></li>
+  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist">Submission Checklist</a></li>
   </ul>
 </nav>
 </div>
@@ -2222,8 +2222,8 @@ vertical-align: -.125em;
 </header>
 
 
-<section id="overview" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
+<section id="overview" class="level1">
+<h1>Overview</h1>
 <p>Generalized Additive Models (GAMs) extend linear regression by replacing straight-line effects with flexible smooth functions — one per predictor — that are then added together to produce a forecast. This structure preserves interpretability (you can inspect each component individually) while capturing nonlinear patterns that fixed-slope models miss. Prophet, developed at Meta, applies exactly this idea to time series by decomposing a signal into trend, seasonality, and user-defined regressor effects. This assignment applies both Prophet and pyGAM to daily Walmart sales and benchmarks them against a seasonal-naive baseline and against your ARIMA/ETS results from Homework 1.</p>
 <p><strong>Learning objectives.</strong> By the end of this assignment you will be able to:</p>
 <ul>
@@ -2234,12 +2234,12 @@ vertical-align: -.125em;
 </ul>
 <hr>
 </section>
-<section id="dataset" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Dataset</h1>
+<section id="dataset" class="level1">
+<h1>Dataset</h1>
 <p>This homework switches from weekly to <strong>daily</strong> data. Prophet and pyGAM both benefit from finer time granularity: daily data expose intra-week patterns that are averaged away in weekly aggregates, and Prophet’s changepoint detection is more reliable with a denser observation grid.</p>
 <p>You will work with <strong>store CA_1, FOODS category</strong> — 1,941 daily observations from the M5/Walmart data. Note that this is the same store and category you used in Homework 1 Part 1, but at daily rather than weekly frequency, so you can compare directly against what you already fitted.</p>
 <p>The preprocessed file is <code>data/processed/m5_daily.csv</code>. If it does not exist, run <code>python scripts/prep_m5.py</code> once from the repository root.</p>
-<div id="350822af" class="cell" data-execution_count="1">
+<div id="aefd4637" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2338,27 +2338,28 @@ Your numbers will not match mine, and that is fine
 <p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
 </div>
 </div>
-<section id="one-data-quirk-to-find-before-you-model" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="one-data-quirk-to-find-before-you-model"><span class="header-section-number">2.1</span> One data quirk to find before you model</h2>
+<section id="one-data-quirk-to-find-before-you-model" class="level2">
+<h2 class="anchored" data-anchor-id="one-data-quirk-to-find-before-you-model">One data quirk to find before you model</h2>
 <p>Run <code>daily[daily.units == 0]</code> before you fit anything. There are exactly five such days, and they are not missing data — they are real zeros with a real cause. Identify the cause, and decide (and state in Q1) whether you leave them in, drop them, or handle them another way. Whatever you choose, Prophet will do something with them, so choose deliberately.</p>
 </section>
 </div>
 </div>
 <hr>
 </section>
-<section id="initial-prompt-for-codex" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Initial Prompt for Codex</h1>
+<section id="initial-prompt-for-your-ai-assistant" class="level1">
+<h1>Initial Prompt for Your AI Assistant</h1>
+<p><em>Any assistant works — ChatGPT, Claude, Gemini, or Copilot, in an editor or in a browser tab. Paste the block below as your <strong>first</strong> message, before you ask anything else.</em></p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Initial Prompt for Codex
+Initial Prompt for Your AI Assistant
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
+<p>Paste the block below as the very first message in your assistant session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
 <pre><code>I am working on Homework 2 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
 Dataset: M5/Walmart — daily data for store CA_1, FOODS category, at `data/processed/m5_daily.csv`. Columns: date, store_id, cat_id, units (target), avg_price, snap (1 if SNAP benefits disbursable that day), is_event (1 if a calendar event), wday, month, year, and lagged units (units_lag1, units_lag7, units_lag14, units_lag28, units_lag365).
@@ -2391,10 +2392,10 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 </div>
 <hr>
 </section>
-<section id="questions" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Questions</h1>
-<section id="q1-prophet-fit-and-decompose" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="q1-prophet-fit-and-decompose"><span class="header-section-number">4.1</span> Q1 — Prophet: Fit and Decompose</h2>
+<section id="questions" class="level1">
+<h1>Questions</h1>
+<section id="q1-prophet-fit-and-decompose" class="level2">
+<h2 class="anchored" data-anchor-id="q1-prophet-fit-and-decompose">Q1 — Prophet: Fit and Decompose</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>Prophet requires the input dataframe to have exactly two columns: <code>ds</code> (the date) and <code>y</code> (the target variable). The starter code below performs that rename and defines the train/test split. Using that split, fit a Prophet model with the settings listed below, generate a forecast over the test period, and produce both plots described.</p>
 <p><strong>Model settings:</strong></p>
@@ -2408,7 +2409,7 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 <li>Forecast plot with uncertainty bands (use Prophet’s built-in <code>plot()</code> method)</li>
 <li>Component decomposition plot showing trend, weekly seasonality, and yearly seasonality (use <code>plot_components()</code>)</li>
 </ol>
-<div id="a202655b" class="cell" data-execution_count="2">
+<div id="7afd761f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prophet requires columns named &#39;ds&#39; (date) and &#39;y&#39; (target)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>prophet_df <span class="op">=</span> daily[[<span class="st">&quot;date&quot;</span>, <span class="st">&quot;units&quot;</span>]].rename(columns<span class="op">=</span>{<span class="st">&quot;date&quot;</span>: <span class="st">&quot;ds&quot;</span>, <span class="st">&quot;units&quot;</span>: <span class="st">&quot;y&quot;</span>})</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2429,8 +2430,8 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 </blockquote>
 <hr>
 </section>
-<section id="q2-prophet-adding-regressors" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="q2-prophet-adding-regressors"><span class="header-section-number">4.2</span> Q2 — Prophet: Adding Regressors</h2>
+<section id="q2-prophet-adding-regressors" class="level2">
+<h2 class="anchored" data-anchor-id="q2-prophet-adding-regressors">Q2 — Prophet: Adding Regressors</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>External regressors allow Prophet to attribute part of the sales signal to known business drivers rather than absorbing them into the trend or seasonality components. The starter code below prepares a dataframe that includes <code>snap</code> and <code>is_event</code> alongside the required <code>ds</code> and <code>y</code> columns.</p>
 <p><strong>(a)</strong> Add <code>snap</code> and <code>is_event</code> as additional regressors using <code>add_regressor()</code>, then re-fit on the same training set. Compute test RMSE for this model and for the baseline from Q1. Present both in a small summary table.</p>
@@ -2448,7 +2449,7 @@ Why SNAP is the interesting one
 <p>SNAP (the Supplemental Nutrition Assistance Program) benefits are disbursed on fixed calendar days that vary by state. California’s schedule puts them on roughly the first ten days of each month. This is a <strong>known, published, future-dated schedule</strong> — you always know next year’s SNAP days in advance. That is what makes it usable as a forecasting regressor, and it is the property you should look for when someone proposes a predictor.</p>
 </div>
 </div>
-<div id="5fca9a86" class="cell" data-execution_count="3">
+<div id="7e48e0bc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add regressor columns to the dataframe before fitting</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>prophet_reg_df <span class="op">=</span> daily[[<span class="st">&quot;date&quot;</span>, <span class="st">&quot;units&quot;</span>, <span class="st">&quot;snap&quot;</span>, <span class="st">&quot;is_event&quot;</span>]].rename(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">&quot;date&quot;</span>: <span class="st">&quot;ds&quot;</span>, <span class="st">&quot;units&quot;</span>: <span class="st">&quot;y&quot;</span>}</span>
@@ -2463,8 +2464,8 @@ Why SNAP is the interesting one
 </blockquote>
 <hr>
 </section>
-<section id="q3-pygam" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="q3-pygam"><span class="header-section-number">4.3</span> Q3 — pyGAM</h2>
+<section id="q3-pygam" class="level2">
+<h2 class="anchored" data-anchor-id="q3-pygam">Q3 — pyGAM</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>pyGAM fits an additive model directly on a feature matrix rather than on a time index, which makes it easy to include calendar-derived features and binary indicators side by side. The starter code below derives <code>day_of_year</code> and <code>day_of_week</code> from the <code>date</code> column and constructs training and test arrays.</p>
 <p>Fit a <code>LinearGAM</code> with the following four terms:</p>
@@ -2512,7 +2513,7 @@ Why SNAP is the interesting one
 </table>
 <p>Two of those choices are deliberate and you should be able to defend them. <strong><code>basis=&quot;cp&quot;</code></strong> makes the spline <em>cyclic</em>, so the fitted curve meets itself at the year boundary instead of being free to jump between December 31 and January 1. And <strong><code>f(1)</code> rather than <code>s(1)</code></strong>: day of week takes seven discrete values with no meaningful “between,” so a factor term is the honest choice — a smooth spline would interpolate a fractional Wednesday-and-a-half.</p>
 <p>After fitting, compute test RMSE. Then plot the partial dependence curves for <code>day_of_year</code> and <code>day_of_week</code> using the model’s <code>plot_partial_dependence()</code> method or by calling <code>partial_dependence()</code> manually.</p>
-<div id="02810283" class="cell" data-execution_count="4">
+<div id="80dfda5e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, l, f</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">&quot;day_of_year&quot;</span>] <span class="op">=</span> daily[<span class="st">&quot;date&quot;</span>].dt.dayofyear</span>
@@ -2531,8 +2532,8 @@ Why SNAP is the interesting one
 </blockquote>
 <hr>
 </section>
-<section id="q4-model-comparison" class="level2" data-number="4.4">
-<h2 data-number="4.4" class="anchored" data-anchor-id="q4-model-comparison"><span class="header-section-number">4.4</span> Q4 — Model Comparison</h2>
+<section id="q4-model-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="q4-model-comparison">Q4 — Model Comparison</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>Collect the test-set RMSE values from Q1, Q2, and Q3 into the summary table below. Fill in the best RMSE you recorded from Homework 1 in the final row.</p>
 <table class="caption-top table">
@@ -2578,7 +2579,7 @@ Why SNAP is the interesting one
 </table>
 <p>Compute the seasonal-naive benchmark yourself: predict each test day using the value 364 days earlier (364 rather than 365 keeps the day of week aligned). A model that cannot beat this is not earning its complexity.</p>
 <p>Then produce a single figure showing actual versus predicted for the three fitted models over the test period, with distinct colors and a legend.</p>
-<div id="dced5ca3" class="cell" data-execution_count="5">
+<div id="9367aee2" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the seasonal-naive benchmark, then collect RMSE values from Q1, Q2, Q3</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot actual vs predicted for the test period for Prophet (both variants) and pyGAM</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a single figure with distinct colors and a legend</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2601,8 +2602,8 @@ Comparing against Homework 1 honestly
 </blockquote>
 <hr>
 </section>
-<section id="q5-reflection" class="level2" data-number="4.5">
-<h2 data-number="4.5" class="anchored" data-anchor-id="q5-reflection"><span class="header-section-number">4.5</span> Q5 — Reflection</h2>
+<section id="q5-reflection" class="level2">
+<h2 class="anchored" data-anchor-id="q5-reflection">Q5 — Reflection</h2>
 <p><em>(Suggested prompts: 0 — write yourself)</em></p>
 <p>No code required for this question. Write 150–200 words in response to the following scenario.</p>
 <p>You are presenting to a Walmart regional operations team that currently forecasts store-level demand with a simple 4-week moving average. Explain why a GAM-based approach (Prophet or pyGAM) would be an upgrade. Identify at least two specific insights from your component plots that you would put in front of this audience — one of them should be the SNAP effect, stated as a number with its operational implication. Close by disclosing at least one meaningful limitation of GAMs the team should understand before adopting the approach.</p>
@@ -2612,15 +2613,15 @@ Comparing against Homework 1 honestly
 <hr>
 </section>
 </section>
-<section id="submission-checklist" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Submission Checklist</h1>
+<section id="submission-checklist" class="level1">
+<h1>Submission Checklist</h1>
 <p>Before submitting, confirm each item below is complete.</p>
 <ul class="task-list">
 <li><label><input type="checkbox">All code cells run without errors from a clean kernel restart</label></li>
-<li><label><input type="checkbox">Written responses completed in your own words (not copied from Codex output)</label></li>
+<li><label><input type="checkbox">Written responses completed in your own words (not copied from your assistant’s output)</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in your submission folder</label></li>
 <li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with 10 or fewer entries</label></li>
-<li><label><input type="checkbox">One git commit per Codex prompt, with message format <code>hw02 prompt &lt;id&gt;: &lt;summary&gt;</code></label></li>
+<li><label><input type="checkbox">One git commit per prompt, with message format <code>hw02 prompt &lt;id&gt;: &lt;summary&gt;</code></label></li>
 <li><label><input type="checkbox"><code>REPORT.md</code> containing a plain-English business recommendation (one paragraph)</label></li>
 </ul>
 </section>

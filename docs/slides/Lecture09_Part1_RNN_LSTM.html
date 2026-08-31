@@ -1128,7 +1128,8 @@ Department of Economics
 <div class="definitionbox-title">
 <p>The recurrence</p>
 </div>
-<p><span class="math display">\[\mathbf{h}_t = \tanh\!\left(\mathbf{W}_h \mathbf{h}_{t-1} + \mathbf{W}_x \mathbf{x}_t + \mathbf{b}\right), \qquad \hat{y}_t = \mathbf{W}_y \mathbf{h}_t + \mathbf{b}_y\]</span></p>
+<p><span class="math display">\[\mathbf{h}_t = \tanh\!\left(\mathbf{W}_h \mathbf{h}_{t-1} + \mathbf{W}_x \mathbf{x}_t + \mathbf{b}\right),
+\qquad \hat{y}_t = \mathbf{W}_y \mathbf{h}_t + \mathbf{b}_y\]</span></p>
 <p><span class="math inline">\(\mathbf{W}_h\)</span>, <span class="math inline">\(\mathbf{W}_x\)</span>, <span class="math inline">\(\mathbf{W}_y\)</span> are the <em>same</em> matrices at every step.</p>
 </div>
 <p>Read the first equation in words: the new summary is a squashed mix of the old summary and the new observation. That is the entire model.</p>
@@ -1215,7 +1216,8 @@ Department of Economics
 </tbody>
 </table>
 <p>The memory update itself is the line that matters:</p>
-<p><span class="math display">\[\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} \;+\; \mathbf{i}_t \odot \tilde{\mathbf{c}}_t, \qquad \mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t)\]</span></p>
+<p><span class="math display">\[\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} \;+\; \mathbf{i}_t \odot \tilde{\mathbf{c}}_t,
+\qquad \mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t)\]</span></p>
 <p>Each gate is a sigmoid, so it outputs between 0 and 1 — a soft switch the network learns.</p>
 </section>
 <section id="what-the-gates-are-doing-in-plain-terms" class="slide level2">
@@ -1328,11 +1330,11 @@ Department of Economics
 </tbody>
 </table>
 <p><span class="key-result"><strong>Recurrence beats convolution decisively</strong></span> — and it did so on <em>four raw channels</em> with no lag engineering at all, against 46 hand-built features for LASSO. That is the case for reading a sequence in order, in one line.</p>
-<p><strong>And the LSTM lost to the vanilla RNN.</strong> That is not a typo, and it is the most useful result on this slide.</p>
+<p><strong>And the LSTM lost to the vanilla RNN</strong> — at a fixed 30-epoch budget. That is not a typo, and the next three slides are about what it does and does not mean.</p>
 </section>
-<section id="why-the-more-sophisticated-model-lost" class="slide level2">
-<h2>Why the More Sophisticated Model Lost</h2>
-<p>The result holds at more than one window length, so it is not a fluke of one setting:</p>
+<section id="why-the-gated-model-lost-at-30-epochs" class="slide level2">
+<h2>Why the Gated Model Lost at 30 Epochs</h2>
+<p>The result holds at all three window lengths. That rules out a fluke of one <em>window</em> — though all three rows share one panel and one split, so it is one finding measured three ways, not three independent tests:</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -1363,10 +1365,62 @@ Department of Economics
 </tr>
 </tbody>
 </table>
-<p><strong>An LSTM solves a problem this data does not have.</strong> Gating preserves information across <em>long</em> dependency chains, and weekly demand is dominated by the recent past. Note too that the RNN <em>improves</em> as the window grows (878 to 805) while the LSTM stays flat — the plain recurrence uses the extra context, the gated one does not.</p>
-<p>The gates buy nothing, and are not free: <strong>17,985 parameters against 4,545</strong>.</p>
+<p><strong>An LSTM solves a problem this data does not have.</strong> Gating preserves information across <em>long</em> dependency chains, and weekly demand is dominated by the recent past.</p>
+<p>The gates are not free: <strong>17,985 parameters against 4,545</strong>. But before concluding that they bought nothing, a table like this one owes two checks — <strong>was the comparison fair</strong>, and <strong>what in the data explains it</strong>. The next two slides run both.</p>
+<div class="warningbox">
+<p>A margin measured at one training budget is a claim about that budget. We chose 30 epochs because it is the default, not because it was shown to be enough for both models.</p>
+</div>
+</section>
+<section id="check-1-was-it-a-fair-fight" class="slide level2">
+<h2>Check 1: Was It a Fair Fight?</h2>
+<p>An LSTM carries four times the parameters. Bigger models converge slower. So vary the <strong>training budget</strong> and watch the margin, at the 26-week window:</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Epochs</th>
+<th style="text-align: right;">10</th>
+<th style="text-align: right;">30</th>
+<th style="text-align: right;">60</th>
+<th style="text-align: right;">100</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Vanilla RNN</td>
+<td style="text-align: right;">1,099</td>
+<td style="text-align: right;"><strong>842</strong></td>
+<td style="text-align: right;">828</td>
+<td style="text-align: right;">830</td>
+</tr>
+<tr class="even">
+<td>LSTM</td>
+<td style="text-align: right;">1,002</td>
+<td style="text-align: right;">987</td>
+<td style="text-align: right;">926</td>
+<td style="text-align: right;"><strong>821</strong></td>
+</tr>
+<tr class="odd">
+<td>Gap (LSTM − RNN)</td>
+<td style="text-align: right;">−97</td>
+<td style="text-align: right;">+145</td>
+<td style="text-align: right;">+98</td>
+<td style="text-align: right;">−9</td>
+</tr>
+</tbody>
+</table>
+<p>The gap is <strong>largest at exactly the budget we used</strong>, and it closes at every checkpoint after it. The RNN is flat from about epoch 45; the LSTM is <em>still improving</em> at 100 — we ran out of patience, not the model.</p>
 <div class="keybox">
-<p>LSTMs were built for <strong>sequence modelling</strong> — language, speech, long dependency chains — not short forecasting windows. Fit the architecture to the problem.</p>
+<p>At a fixed 30-epoch budget the RNN wins by a wide margin. At convergence the two <strong>tie</strong>. The RNN’s genuine advantage is that it gets there roughly <strong>three times faster on a quarter of the parameters</strong> — an optimization advantage, not a verdict on gating.</p>
+</div>
+</section>
+<section id="check-2-what-in-the-data-explains-it" class="slide level2">
+<h2>Check 2: What in the Data Explains It</h2>
+<p>Gating pays when a value must survive many steps that would otherwise overwrite it. Three measurements say this panel has no such structure.</p>
+<p><strong>1. Most variance is not sequential.</strong> <strong>91%</strong> of the variation in weekly units is <em>between</em> series — which store, which category — and 9% is within a series over time. The main task is reading the level, and the last few weeks give you that.</p>
+<p><strong>2. The series are smooth.</strong> Within-series autocorrelation is <strong>0.83</strong> at lag 1 and still <strong>0.43</strong> at lag 52. That is why long memory is unnecessary rather than why it is needed: the recent past is a <em>sufficient statistic</em> for the distant past. Nothing must be carried across a gap, because the gap was filled in continuously.</p>
+<p><strong>3. Nothing in the inputs arrives early.</strong> <code>snap_days</code> correlates +0.14 with units in the same week and ≈ 0 at every lead; <code>event_days</code> is flat everywhere. No <em>announcement</em> structure — and that is precisely what a forget gate is for.</p>
+<div class="keybox">
+<p>Ask these three of your own series before reaching for a gated model: how much of my variance is cross-sectional? Is my series smooth enough that recent values already summarize old ones? Does anything in my inputs <strong>lead</strong> the target?</p>
 </div>
 </section></section>
 <section>
@@ -1425,7 +1479,7 @@ Department of Economics
 <li><p>An <strong>LSTM</strong> adds a cell state updated <strong>additively</strong>. Addition preserves gradients where multiplication destroys them — the ResNet fix, eighteen years earlier.</p></li>
 <li><p>Three gates: <strong>forget</strong> what is stale, <strong>input</strong> what is new, <strong>output</strong> what is relevant now.</p></li>
 <li><p>On our panel both recurrent models <strong>beat every CNN variant</strong> on four raw channels — and both still lose to a 46-coefficient LASSO.</p></li>
-<li><p>The <strong>LSTM lost to the vanilla RNN</strong>, at all three window lengths. Gating solves long-range forgetting; a 26-week window does not suffer from it, so the gates only bought four times the parameters. <strong>Fit the architecture to the problem.</strong></p></li>
+<li><p>The <strong>LSTM lost to the vanilla RNN at a 30-epoch budget</strong>, at all three window lengths — but the two <strong>tie</strong> once both are trained to convergence, and 91% of this panel’s variance is cross-sectional anyway. Gating solves long-range forgetting; this data does not suffer from it. <strong>Fit the architecture to the problem — and check that a margin survives the budget you measured it at.</strong></p></li>
 </ol>
 </div>
 <p><span class="neutral">Next week: attention and Transformers — reading the whole sequence at once.</span></p>

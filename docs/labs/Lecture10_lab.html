@@ -2317,14 +2317,14 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">1</span> What we are doing</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2</span> Setup</a></li>
-  <li><a href="#step-1-check-the-prior-before-you-use-it" id="toc-step-1-check-the-prior-before-you-use-it" class="nav-link" data-scroll-target="#step-1-check-the-prior-before-you-use-it"><span class="header-section-number">3</span> Step 1 — Check the prior before you use it</a></li>
-  <li><a href="#step-2-fit-it" id="toc-step-2-fit-it" class="nav-link" data-scroll-target="#step-2-fit-it"><span class="header-section-number">4</span> Step 2 — Fit it</a></li>
-  <li><a href="#step-3-did-the-sampler-work" id="toc-step-3-did-the-sampler-work" class="nav-link" data-scroll-target="#step-3-did-the-sampler-work"><span class="header-section-number">5</span> Step 3 — Did the sampler work?</a></li>
-  <li><a href="#step-4-ask-the-posterior-a-question" id="toc-step-4-ask-the-posterior-a-question" class="nav-link" data-scroll-target="#step-4-ask-the-posterior-a-question"><span class="header-section-number">6</span> Step 4 — Ask the posterior a question</a></li>
-  <li><a href="#step-5-how-much-did-the-prior-matter" id="toc-step-5-how-much-did-the-prior-matter" class="nav-link" data-scroll-target="#step-5-how-much-did-the-prior-matter"><span class="header-section-number">7</span> Step 5 — How much did the prior matter?</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">8</span> Before you leave</a></li>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing">What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#step-1-check-the-prior-before-you-use-it" id="toc-step-1-check-the-prior-before-you-use-it" class="nav-link" data-scroll-target="#step-1-check-the-prior-before-you-use-it">Step 1 — Check the prior before you use it</a></li>
+  <li><a href="#step-2-fit-it" id="toc-step-2-fit-it" class="nav-link" data-scroll-target="#step-2-fit-it">Step 2 — Fit it</a></li>
+  <li><a href="#step-3-did-the-sampler-work" id="toc-step-3-did-the-sampler-work" class="nav-link" data-scroll-target="#step-3-did-the-sampler-work">Step 3 — Did the sampler work?</a></li>
+  <li><a href="#step-4-ask-the-posterior-a-question" id="toc-step-4-ask-the-posterior-a-question" class="nav-link" data-scroll-target="#step-4-ask-the-posterior-a-question">Step 4 — Ask the posterior a question</a></li>
+  <li><a href="#step-5-how-much-did-the-prior-matter" id="toc-step-5-how-much-did-the-prior-matter" class="nav-link" data-scroll-target="#step-5-how-much-did-the-prior-matter">Step 5 — How much did the prior matter?</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave">Before you leave</a></li>
   </ul>
 </nav>
 </div>
@@ -2350,16 +2350,16 @@ window.Quarto = {
 </header>
 
 
-<section id="what-we-are-doing" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> What we are doing</h1>
+<section id="what-we-are-doing" class="level1">
+<h1>What we are doing</h1>
 <p>Every model so far returned a number. Today’s returns a <strong>distribution</strong>, and the work shifts accordingly: less about fitting, more about deciding what you believe beforehand and checking whether the machinery actually worked.</p>
 <p>The question is small on purpose so the workflow stays visible: <strong>what fraction of weeks are high-SNAP weeks at CA_1 FOODS?</strong> You will state a prior, check it before looking at the data, fit the model, verify the sampler, and then ask the posterior questions no point estimate can answer.</p>
 <p><strong>Time:</strong> ~35 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pymc</code>, <code>arviz</code>, and <code>data/processed/m5_weekly.csv</code>. Each fit takes about ten seconds.</p>
 <hr>
 </section>
-<section id="setup" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
-<div id="a0c29d54" class="cell" data-execution_count="1">
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div id="7e87aeaf" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2408,11 +2408,11 @@ ArviZ changed its default interval
 </div>
 <hr>
 </section>
-<section id="step-1-check-the-prior-before-you-use-it" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Step 1 — Check the prior before you use it</h1>
+<section id="step-1-check-the-prior-before-you-use-it" class="level1">
+<h1>Step 1 — Check the prior before you use it</h1>
 <p>We will model the count of high-SNAP weeks as Beta-Binomial. Start with <code>Beta(2, 2)</code> — weakly informative, centred at 0.5.</p>
 <p><strong>Before fitting anything</strong>, ask what that prior alone implies about the data.</p>
-<div id="48dad17a" class="cell" data-execution_count="2">
+<div id="77f429a2" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> pm.Beta(<span class="st">&quot;theta&quot;</span>, alpha<span class="op">=</span><span class="dv">2</span>, beta<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    obs   <span class="op">=</span> pm.Binomial(<span class="st">&quot;obs&quot;</span>, n<span class="op">=</span>N_WEEKS, p<span class="op">=</span>theta, observed<span class="op">=</span>N_HIGH)</span>
@@ -2440,9 +2440,9 @@ ArviZ changed its default interval
 <p>But is it <em>good</em>? SNAP is disbursed on a published calendar. We are not genuinely ignorant here, and a prior that entertains “every week is a high-SNAP week” is entertaining something we know is false.</p>
 <hr>
 </section>
-<section id="step-2-fit-it" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Step 2 — Fit it</h1>
-<div id="37daa3fe" class="cell" data-execution_count="3">
+<section id="step-2-fit-it" class="level1">
+<h1>Step 2 — Fit it</h1>
+<div id="0ebb25ea" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, chains<span class="op">=</span><span class="dv">4</span>, progressbar<span class="op">=</span><span class="va">False</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2456,10 +2456,10 @@ theta  0.2628  0.026     0.22     0.31     3686     5175  1.00   0.00043  0.0003
 <p>The posterior mean sits between the prior mean of 0.5 and the observed proportion — much closer to the data, because 277 observations carry far more weight than a <code>Beta(2, 2)</code> prior.</p>
 <hr>
 </section>
-<section id="step-3-did-the-sampler-work" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Step 3 — Did the sampler work?</h1>
+<section id="step-3-did-the-sampler-work" class="level1">
+<h1>Step 3 — Did the sampler work?</h1>
 <p>MCMC always returns samples. Whether they came from the posterior is a separate question, and one you are expected to answer every time.</p>
-<div id="f5daaf6b" class="cell" data-execution_count="4">
+<div id="88104fe7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(idata.sample_stats.diverging.<span class="bu">sum</span>())</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;R-hat        </span><span class="sc">{</span>summary<span class="sc">.</span>r_hat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.3f}</span><span class="ss">    (want &lt; 1.01)&quot;</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;ESS (bulk)   </span><span class="sc">{</span>summary<span class="sc">.</span>ess_bulk<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">      (want &gt; 400)&quot;</span>)</span>
@@ -2484,10 +2484,10 @@ divergences  0        (want 0)</code></pre>
 <p>If the chains had separated, <span class="math inline">\(\hat{R}\)</span> would exceed 1.01 and nothing downstream would mean anything.</p>
 <hr>
 </section>
-<section id="step-4-ask-the-posterior-a-question" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Step 4 — Ask the posterior a question</h1>
+<section id="step-4-ask-the-posterior-a-question" class="level1">
+<h1>Step 4 — Ask the posterior a question</h1>
 <p>The posterior is a set of samples, so any question about <span class="math inline">\(\theta\)</span> is answered by counting.</p>
-<div id="fa1223f7" class="cell" data-execution_count="5">
+<div id="06dba8e5" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> idata.posterior[<span class="st">&quot;theta&quot;</span>].values.ravel()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;P(theta &gt; 0.30)          = </span><span class="sc">{</span>(theta <span class="op">&gt;</span> <span class="fl">0.30</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
@@ -2502,10 +2502,10 @@ P(0.24 &lt; theta &lt; 0.28)   = 0.558
 <p><strong>Say the first line out loud as a sentence a manager would understand.</strong> Then notice you cannot say anything of that form from a confidence interval — a frequentist 94% interval is a statement about the procedure, not about <span class="math inline">\(\theta\)</span>.</p>
 <hr>
 </section>
-<section id="step-5-how-much-did-the-prior-matter" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Step 5 — How much did the prior matter?</h1>
+<section id="step-5-how-much-did-the-prior-matter" class="level1">
+<h1>Step 5 — How much did the prior matter?</h1>
 <p>The honest objection to Bayesian work is that the prior is arbitrary. Test how much it moves the answer.</p>
-<div id="1e826831" class="cell" data-execution_count="6">
+<div id="4f8cc46e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, b, label <span class="kw">in</span> [(<span class="dv">2</span>, <span class="dv">2</span>, <span class="st">&quot;Beta(2,2) — weak, centred 0.5&quot;</span>),</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">5</span>, <span class="dv">15</span>, <span class="st">&quot;Beta(5,15) — informed, centred 0.25&quot;</span>),</span>
@@ -2541,7 +2541,7 @@ With enough data the prior stops mattering
 </div>
 </div>
 <p><strong>Your turn:</strong> re-run the badly-wrong prior against only the <strong>first 10 weeks</strong> of data and report how far the posterior moves.</p>
-<div id="05152ab4" class="cell" data-execution_count="7">
+<div id="6e2f09e0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># n_small, k_small = 10, int((ca1.snap_days &gt;= 5).head(10).sum())</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># with pm.Model():</span></span>
@@ -2552,8 +2552,8 @@ With enough data the prior stops mattering
 </div>
 <hr>
 </section>
-<section id="before-you-leave" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Before you leave</h1>
+<section id="before-you-leave" class="level1">
+<h1>Before you leave</h1>
 <blockquote class="blockquote">
 <p><strong>Discuss (the prior):</strong> Your Step 5 table says a deliberately wrong prior barely changed the answer. Under what circumstances would you <em>not</em> be reassured by that, and what would you check?</p>
 <p><strong>Discuss (the check):</strong> You verified <span class="math inline">\(\hat{R}\)</span>, ESS and divergences before reading any result. Name the equivalent check you have been doing all semester for a non-Bayesian model, and say which is easier to skip.</p>

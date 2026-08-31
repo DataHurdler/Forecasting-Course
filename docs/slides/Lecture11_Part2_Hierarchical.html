@@ -1258,26 +1258,26 @@ Department of Economics
 <tbody>
 <tr class="odd">
 <td>Divergences</td>
-<td style="text-align: right;"><strong>43</strong></td>
-<td style="text-align: right;"><strong>0</strong></td>
+<td style="text-align: right;"><strong>127</strong></td>
+<td style="text-align: right;"><strong>1</strong></td>
 <td>0</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(\hat{R}\)</span></td>
-<td style="text-align: right;">1.003</td>
-<td style="text-align: right;">1.003</td>
+<td style="text-align: right;"><strong>1.044</strong></td>
+<td style="text-align: right;">1.002</td>
 <td><span class="math inline">\(&lt; 1.01\)</span></td>
 </tr>
 <tr class="odd">
 <td>ESS (bulk)</td>
-<td style="text-align: right;">966</td>
-<td style="text-align: right;">1,719</td>
+<td style="text-align: right;">413</td>
+<td style="text-align: right;">1,728</td>
 <td><span class="math inline">\(&gt; 400\)</span></td>
 </tr>
 </tbody>
 </table>
 <p><strong>Why:</strong> when <span class="math inline">\(\sigma_b\)</span> is small, the <span class="math inline">\(b_j\)</span> must crowd into a narrow band, and the posterior takes on a funnel shape — wide where <span class="math inline">\(\sigma_b\)</span> is large, pinched where it is small. A sampler tuned for the wide part cannot navigate the neck, and reports divergences.</p>
-<p><strong>Note which alarm actually fired.</strong> <span class="math inline">\(\hat{R}\)</span> and ESS <em>both pass</em> — on those two numbers you would have shipped it. Only the divergence count objects. On hierarchical models divergences are the sensitive instrument; do not wait for <span class="math inline">\(\hat{R}\)</span> to tell you.</p>
+<p><strong>Note how the alarms differ in kind.</strong> ESS <em>passes</em> — 413, just over the line, and you would not look twice. <span class="math inline">\(\hat{R}\)</span> at 1.044 fails, but it is the sort of near-miss people talk themselves out of. <strong>127 divergences against a threshold of exactly zero admits no such conversation.</strong> On hierarchical models divergences fire first and least ambiguously; do not wait for <span class="math inline">\(\hat{R}\)</span> to decide for you.</p>
 <p><span class="neutral smaller">BMCP §4.6.1, <em>Posterior Geometry Matters</em> — the single most common failure in applied hierarchical modelling.</span></p>
 </section></section>
 <section>
@@ -1312,7 +1312,7 @@ Department of Economics
 </tr>
 </tbody>
 </table>
-<p><span class="key-result"><strong>The data-poor series moved 8.1 times further toward the group mean than the data-rich ones.</strong></span> Nobody told the model which series were thin. It inferred that from how much each series had to say.</p>
+<p><span class="key-result"><strong>The data-poor series moved 8.2 times further toward the group mean than the data-rich ones.</strong></span> Nobody told the model which series were thin. It inferred that from how much each series had to say.</p>
 <p>Read the two right-hand columns together. The thin series’ apparent spread of <span class="math inline">\(0.108\)</span> nearly vanishes, while the full series <strong>keep most of theirs</strong> (<span class="math inline">\(0.055 \rightarrow 0.037\)</span>). The hierarchy did not flatten everything: it discarded spread that 8 weeks could not support and kept spread that 277 weeks could.</p>
 <p><strong>That is the claim to be sceptical of, so the next slide tests it.</strong></p>
 </section>
@@ -1362,7 +1362,7 @@ Department of Economics
 <tr class="even">
 <td><strong>RMSE against truth</strong></td>
 <td style="text-align: right;"><strong>0.126</strong></td>
-<td style="text-align: right;"><strong>0.048</strong></td>
+<td style="text-align: right;"><strong>0.049</strong></td>
 <td style="text-align: right;">—</td>
 </tr>
 </tbody>
@@ -1372,10 +1372,10 @@ Department of Economics
 </section>
 <section id="what-the-model-actually-concluded" class="slide level2">
 <h2>What the Model Actually Concluded</h2>
-<p>The estimated hierarchy: <span class="math inline">\(\mu_b = 0.078\)</span> with a 94% HDI of <span class="math inline">\([0.017,\ 0.150]\)</span>, and <span class="math inline">\(\sigma_b = 0.065\)</span>.</p>
+<p>The estimated hierarchy: <span class="math inline">\(\mu_b = 0.077\)</span> with a 94% HDI of <span class="math inline">\([0.016,\ 0.150]\)</span>, and <span class="math inline">\(\sigma_b = 0.066\)</span>.</p>
 <p>In words: a SNAP week lifts FOODS units by roughly <strong>8%</strong>, and stores genuinely differ around that by about <strong>7 percentage points</strong>. Both numbers are answers, and the second one is the one no point estimate would have given you.</p>
 <div class="warningbox">
-<p><strong>It does not license the store-level policy the unpooled fit suggested.</strong> An analyst reading the unpooled numbers would report uplifts from <span class="math inline">\(5\%\)</span> to <span class="math inline">\(40\%\)</span> and stock accordingly. The held-out weeks say that range was mostly noise — but <span class="math inline">\(\sigma_b = 0.065\)</span> says it is not <em>all</em> noise either.</p>
+<p><strong>It does not license the store-level policy the unpooled fit suggested.</strong> An analyst reading the unpooled numbers would report uplifts from <span class="math inline">\(5\%\)</span> to <span class="math inline">\(40\%\)</span> and stock accordingly. The held-out weeks say that range was mostly noise — but <span class="math inline">\(\sigma_b = 0.066\)</span> says it is not <em>all</em> noise either.</p>
 </div>
 <p><strong>The defensible recommendation:</strong> plan on an 8% FOODS uplift everywhere, allow real but modest store variation around it, and do not act on a store’s own estimate until that store has the weeks to support one.</p>
 </section></section>
@@ -1393,7 +1393,7 @@ Department of Economics
 <li><p><strong>Partial pooling</strong> gives each group its own parameter drawn from a shared distribution, and estimates how much groups genuinely differ.</p></li>
 <li><p><strong>Shrinkage is automatic and proportionate.</strong> Our thin series moved <strong>8.1<span class="math inline">\(\times\)</span></strong> further toward the group mean than data-rich ones, with nobody specifying that — and on held-out weeks it was <strong>2.6<span class="math inline">\(\times\)</span></strong> more accurate.</p></li>
 <li><p>This is <strong>regularization for the sixth time</strong> — and the only version where the shrinkage strength is estimated rather than tuned.</p></li>
-<li><p><strong>Write it non-centred.</strong> The obvious form gave 43 divergences; the reparameterized form gave zero. Same model, different geometry — and divergences were the <em>only</em> diagnostic that objected.</p></li>
+<li><p><strong>Write it non-centred.</strong> The obvious form gave 127 divergences; the reparameterized form gave 1. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p></li>
 </ol>
 </div>
 <p><span class="neutral">Next: Bayesian linear regression — coefficients as distributions, and what you can ask them.</span></p>

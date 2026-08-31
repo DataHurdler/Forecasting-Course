@@ -2318,16 +2318,16 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
-  <li><a href="#dataset-and-split" id="toc-dataset-and-split" class="nav-link" data-scroll-target="#dataset-and-split"><span class="header-section-number">2</span> Dataset and Split</a></li>
-  <li><a href="#initial-prompt-for-codex" id="toc-initial-prompt-for-codex" class="nav-link" data-scroll-target="#initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</a></li>
-  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">4</span> Questions</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#dataset-and-split" id="toc-dataset-and-split" class="nav-link" data-scroll-target="#dataset-and-split">Dataset and Split</a></li>
+  <li><a href="#initial-prompt-for-your-ai-assistant" id="toc-initial-prompt-for-your-ai-assistant" class="nav-link" data-scroll-target="#initial-prompt-for-your-ai-assistant">Initial Prompt for Your AI Assistant</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions">Questions</a>
   <ul class="collapse">
-  <li><a href="#q3-arima" id="toc-q3-arima" class="nav-link" data-scroll-target="#q3-arima"><span class="header-section-number">4.1</span> Q3 — ARIMA</a></li>
-  <li><a href="#q4-var-and-granger-causality" id="toc-q4-var-and-granger-causality" class="nav-link" data-scroll-target="#q4-var-and-granger-causality"><span class="header-section-number">4.2</span> Q4 — VAR and Granger Causality</a></li>
-  <li><a href="#q5-method-comparison" id="toc-q5-method-comparison" class="nav-link" data-scroll-target="#q5-method-comparison"><span class="header-section-number">4.3</span> Q5 — Method Comparison</a></li>
+  <li><a href="#q3-arima" id="toc-q3-arima" class="nav-link" data-scroll-target="#q3-arima">Q3 — ARIMA</a></li>
+  <li><a href="#q4-var-and-granger-causality" id="toc-q4-var-and-granger-causality" class="nav-link" data-scroll-target="#q4-var-and-granger-causality">Q4 — VAR and Granger Causality</a></li>
+  <li><a href="#q5-method-comparison" id="toc-q5-method-comparison" class="nav-link" data-scroll-target="#q5-method-comparison">Q5 — Method Comparison</a></li>
   </ul></li>
-  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">5</span> Submission Checklist</a></li>
+  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist">Submission Checklist</a></li>
   </ul>
 </nav>
 </div>
@@ -2359,8 +2359,8 @@ window.Quarto = {
 </header>
 
 
-<section id="overview" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
+<section id="overview" class="level1">
+<h1>Overview</h1>
 <p>This is <strong>Part 2</strong> of Homework 1, due before class in Week 3. It assumes you have submitted Part 1 (exponential smoothing) and that you have your Part 1 accuracy table available — Q5 asks you to compare against it.</p>
 <p>Part 2 covers ARIMA-based models and their multivariate extension, Vector Autoregression. Where exponential smoothing summarizes the past through a smoothed level, ARIMA models the correlation structure of the series directly, and VAR lets two series inform each other.</p>
 <p><strong>Learning objectives.</strong> By the end of Part 2 you will be able to:</p>
@@ -2372,10 +2372,10 @@ window.Quarto = {
 </ul>
 <hr>
 </section>
-<section id="dataset-and-split" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Dataset and Split</h1>
+<section id="dataset-and-split" class="level1">
+<h1>Dataset and Split</h1>
 <p>Same M5 weekly panel as Part 1, and <strong>the same train/test split</strong>, so your Part 2 numbers are directly comparable to Part 1.</p>
-<div id="efe359b5" class="cell" data-execution_count="1">
+<div id="c5502ea2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2414,8 +2414,9 @@ window.Quarto = {
 </div>
 <hr>
 </section>
-<section id="initial-prompt-for-codex" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Initial Prompt for Codex</h1>
+<section id="initial-prompt-for-your-ai-assistant" class="level1">
+<h1>Initial Prompt for Your AI Assistant</h1>
+<p><em>Any assistant works — ChatGPT, Claude, Gemini, or Copilot, in an editor or in a browser tab. Paste the block below as your <strong>first</strong> message, before you ask anything else.</em></p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -2442,9 +2443,9 @@ Your numbers will not match mine, and that is fine
 <p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
 </div>
 </div>
-<section id="initial-prompt-for-codex-1" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="initial-prompt-for-codex-1"><span class="header-section-number">3.1</span> Initial Prompt for Codex</h2>
-<p>Start a <strong>new</strong> Codex session for Part 2 and paste the block below as the very first message. It does <strong>not</strong> count against your Part 2 budget.</p>
+<section id="initial-prompt-for-your-ai-assistant-1" class="level2">
+<h2 class="anchored" data-anchor-id="initial-prompt-for-your-ai-assistant-1">Initial Prompt for Your AI Assistant</h2>
+<p>Start a <strong>new</strong> assistant session for Part 2 and paste the block below as the very first message. It does <strong>not</strong> count against your Part 2 budget.</p>
 <pre><code>I am working on Homework 1, Part 2 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
 Dataset: M5 / Walmart weekly sales, prepared at `data/processed/m5_weekly.csv`. Columns: store_id (10 Walmart stores across CA, TX, WI), cat_id (FOODS, HOBBIES, HOUSEHOLD), state_id, week_start, units, avg_price, snap_days, event_days, and lag features. There are 30 store-category series, each with 277 weekly observations covering January 2011 to May 2016.
@@ -2478,10 +2479,10 @@ Confirm by responding with: HW01P2_CONTEXT_ACK</code></pre>
 </div>
 <hr>
 </section>
-<section id="questions" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Questions</h1>
-<section id="q3-arima" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="q3-arima"><span class="header-section-number">4.1</span> Q3 — ARIMA</h2>
+<section id="questions" class="level1">
+<h1>Questions</h1>
+<section id="q3-arima" class="level2">
+<h2 class="anchored" data-anchor-id="q3-arima">Q3 — ARIMA</h2>
 <p><em>(Suggested prompts: 3)</em></p>
 <p>Work through the following steps for the CA_1 FOODS series.</p>
 <p><strong>(a)</strong> Run the Augmented Dickey-Fuller test. Report the test statistic, p-value, and your conclusion about stationarity. If differencing is needed, apply it and re-test.</p>
@@ -2503,7 +2504,7 @@ This one is not clean, and that is the point
 <p><strong>(b)</strong> Plot the ACF and PACF of the (possibly differenced) series. Based on the plots, propose an ARIMA(<span class="math inline">\(p, d, q\)</span>) order and explain your reasoning. Compare what you see against the four reference patterns from Lecture 2 — which one does this series most resemble?</p>
 <p><strong>(c)</strong> Fit your chosen ARIMA model on <code>train</code>. Report the AIC and compute the forecast RMSE on <code>test</code>.</p>
 <p><strong>(d)</strong> Implement walk-forward cross-validation: use an expanding window with a minimum training length of 104 weeks, re-fit your ARIMA at each step, and produce a 1-step-ahead forecast. Report the mean RMSE across all steps.</p>
-<div id="4ee1d8ae" class="cell" data-execution_count="2">
+<div id="b1494fdf" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) ADF test</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) ACF and PACF plots</span></span>
@@ -2517,15 +2518,15 @@ This one is not clean, and that is the point
 </blockquote>
 <hr>
 </section>
-<section id="q4-var-and-granger-causality" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="q4-var-and-granger-causality"><span class="header-section-number">4.2</span> Q4 — VAR and Granger Causality</h2>
+<section id="q4-var-and-granger-causality" class="level2">
+<h2 class="anchored" data-anchor-id="q4-var-and-granger-causality">Q4 — VAR and Granger Causality</h2>
 <p><em>(Suggested prompts: 3)</em></p>
 <p>This question extends the analysis to two stores in the same state: <strong>CA_1</strong> and <strong>CA_3</strong>, both FOODS.</p>
 <p><strong>(a)</strong> Test whether CA_3 FOODS Granger-causes CA_1 FOODS at lag 4 using <code>grangercausalitytests</code>. Report the F-statistic and p-value for that lag.</p>
 <p>Use <strong>the transformation you justified in Q3(a)</strong> — levels if you concluded the series is stationary, differences if you concluded it has a unit root. State which you used and why. Lecture 2 covered both hazards: regressing non-stationary series gives you spurious results, and differencing an already-stationary series induces autocorrelation you then have to model away.</p>
 <p><strong>(b)</strong> Fit a VAR(4) on the training window of both series — same transformation as in (a) — using <code>statsmodels.tsa.api.VAR</code>. Forecast the next 4 weeks. Plot actual versus forecast for CA_1 only.</p>
 <p><strong>(c)</strong> Report the contemporaneous correlation between the two series’ weekly changes.</p>
-<div id="a09bd4fc" class="cell" data-execution_count="3">
+<div id="7a48c2cc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ca3 <span class="op">=</span> (weekly[(weekly.store_id <span class="op">==</span> <span class="st">&quot;CA_3&quot;</span>) <span class="op">&amp;</span> (weekly.cat_id <span class="op">==</span> <span class="st">&quot;FOODS&quot;</span>)]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>       .set_index(<span class="st">&quot;week_start&quot;</span>)[<span class="st">&quot;units&quot;</span>].sort_index())</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2543,8 +2544,8 @@ This one is not clean, and that is the point
 </blockquote>
 <hr>
 </section>
-<section id="q5-method-comparison" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="q5-method-comparison"><span class="header-section-number">4.3</span> Q5 — Method Comparison</h2>
+<section id="q5-method-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="q5-method-comparison">Q5 — Method Comparison</h2>
 <p><em>(Suggested prompts: 0 — write yourself)</em></p>
 <p>No code required for this question. Write your answer directly below in 150–200 words.</p>
 <p>You are a demand planner at Walmart responsible for producing 52-week store-category sales forecasts, updated monthly, across all 30 series in this dataset. Drawing on your results from Part 1 and from Q3–Q4, answer the following:</p>
@@ -2555,15 +2556,15 @@ This one is not clean, and that is the point
 <hr>
 </section>
 </section>
-<section id="submission-checklist" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Submission Checklist</h1>
+<section id="submission-checklist" class="level1">
+<h1>Submission Checklist</h1>
 <p>Before submitting Part 2, confirm each item below.</p>
 <ul class="task-list">
 <li><label><input type="checkbox">All code cells run without errors from top to bottom (Kernel → Restart &amp; Run All)</label></li>
 <li><label><input type="checkbox">Written responses are completed in your own words — AI-generated prose is not accepted for written sections</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> is saved in your Part 2 submission folder</label></li>
-<li><label><input type="checkbox"><code>PROMPT_LOG.md</code> is complete with <strong>8 or fewer</strong> entries (one entry per Codex prompt sent)</label></li>
-<li><label><input type="checkbox">One git commit per Codex prompt used, following the format: <code>hw01_part2 prompt &lt;id&gt;: &lt;one-line summary&gt;</code></label></li>
+<li><label><input type="checkbox"><code>PROMPT_LOG.md</code> is complete with <strong>8 or fewer</strong> entries (one entry per prompt sent)</label></li>
+<li><label><input type="checkbox">One git commit per prompt used, following the format: <code>hw01_part2 prompt &lt;id&gt;: &lt;one-line summary&gt;</code></label></li>
 <li><label><input type="checkbox"><code>REPORT.md</code> included with a final business recommendation (3–5 sentences) addressed to a non-technical manager, drawing on <strong>both</strong> parts of Homework 1</label></li>
 </ul>
 </section>

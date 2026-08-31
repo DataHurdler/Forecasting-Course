@@ -2179,19 +2179,19 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
-  <li><a href="#dataset-and-feature-engineering" id="toc-dataset-and-feature-engineering" class="nav-link" data-scroll-target="#dataset-and-feature-engineering"><span class="header-section-number">2</span> Dataset and Feature Engineering</a></li>
-  <li><a href="#initial-prompt-for-codex" id="toc-initial-prompt-for-codex" class="nav-link" data-scroll-target="#initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</a></li>
-  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">4</span> Questions</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#dataset-and-feature-engineering" id="toc-dataset-and-feature-engineering" class="nav-link" data-scroll-target="#dataset-and-feature-engineering">Dataset and Feature Engineering</a></li>
+  <li><a href="#initial-prompt-for-your-ai-assistant" id="toc-initial-prompt-for-your-ai-assistant" class="nav-link" data-scroll-target="#initial-prompt-for-your-ai-assistant">Initial Prompt for Your AI Assistant</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions">Questions</a>
   <ul class="collapse">
-  <li><a href="#q1-traintest-split" id="toc-q1-traintest-split" class="nav-link" data-scroll-target="#q1-traintest-split"><span class="header-section-number">4.1</span> Q1 — Train/Test Split</a></li>
-  <li><a href="#q2-decision-tree" id="toc-q2-decision-tree" class="nav-link" data-scroll-target="#q2-decision-tree"><span class="header-section-number">4.2</span> Q2 — Decision Tree</a></li>
-  <li><a href="#q3-random-forest" id="toc-q3-random-forest" class="nav-link" data-scroll-target="#q3-random-forest"><span class="header-section-number">4.3</span> Q3 — Random Forest</a></li>
-  <li><a href="#q4-mdi-vs-permutation-importance" id="toc-q4-mdi-vs-permutation-importance" class="nav-link" data-scroll-target="#q4-mdi-vs-permutation-importance"><span class="header-section-number">4.4</span> Q4 — MDI vs Permutation Importance</a></li>
-  <li><a href="#q5-walk-forward-cross-validation" id="toc-q5-walk-forward-cross-validation" class="nav-link" data-scroll-target="#q5-walk-forward-cross-validation"><span class="header-section-number">4.5</span> Q5 — Walk-Forward Cross-Validation</a></li>
-  <li><a href="#q6-business-memo" id="toc-q6-business-memo" class="nav-link" data-scroll-target="#q6-business-memo"><span class="header-section-number">4.6</span> Q6 — Business Memo</a></li>
+  <li><a href="#q1-traintest-split" id="toc-q1-traintest-split" class="nav-link" data-scroll-target="#q1-traintest-split">Q1 — Train/Test Split</a></li>
+  <li><a href="#q2-decision-tree" id="toc-q2-decision-tree" class="nav-link" data-scroll-target="#q2-decision-tree">Q2 — Decision Tree</a></li>
+  <li><a href="#q3-random-forest" id="toc-q3-random-forest" class="nav-link" data-scroll-target="#q3-random-forest">Q3 — Random Forest</a></li>
+  <li><a href="#q4-mdi-vs-permutation-importance" id="toc-q4-mdi-vs-permutation-importance" class="nav-link" data-scroll-target="#q4-mdi-vs-permutation-importance">Q4 — MDI vs Permutation Importance</a></li>
+  <li><a href="#q5-walk-forward-cross-validation" id="toc-q5-walk-forward-cross-validation" class="nav-link" data-scroll-target="#q5-walk-forward-cross-validation">Q5 — Walk-Forward Cross-Validation</a></li>
+  <li><a href="#q6-business-memo" id="toc-q6-business-memo" class="nav-link" data-scroll-target="#q6-business-memo">Q6 — Business Memo</a></li>
   </ul></li>
-  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">5</span> Submission Checklist</a></li>
+  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist">Submission Checklist</a></li>
   </ul>
 </nav>
 </div>
@@ -2223,8 +2223,8 @@ vertical-align: -.125em;
 </header>
 
 
-<section id="overview" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
+<section id="overview" class="level1">
+<h1>Overview</h1>
 <p>This homework shifts from time series methods to machine learning approaches for forecasting. Decision trees and random forests reframe the problem as supervised learning: rather than modeling a single series through time, each store-category-week row becomes an independent training example, and lagged unit sales carry the temporal information that would otherwise live inside a model like ARIMA or ETS. These methods require no stationarity assumptions and discover nonlinear interactions automatically — for example, the effect of a SNAP benefit week may differ sharply between food and hobby categories, and a tree will split on both features without any manual interaction term.</p>
 <p><strong>Learning objectives.</strong> By the end of this assignment you will be able to:</p>
 <ul>
@@ -2236,11 +2236,11 @@ vertical-align: -.125em;
 </ul>
 <hr>
 </section>
-<section id="dataset-and-feature-engineering" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Dataset and Feature Engineering</h1>
+<section id="dataset-and-feature-engineering" class="level1">
+<h1>Dataset and Feature Engineering</h1>
 <p>Unlike ETS and ARIMA, which model one series at a time and require careful handling of seasonality and trend, tree-based models can use <strong>all 30 series simultaneously</strong>. The M5 extract holds 10 Walmart stores across 3 states, each with 3 product categories — 30 store-category series in all. Each store-category-week is a row in a flat table; the lag features encode how <em>that particular series</em> was performing recently. The model learns general rules that hold across series rather than fitting a separate process to each.</p>
 <p>The preprocessed file is <code>data/processed/m5_weekly.csv</code>. If it does not exist, run <code>python scripts/prep_m5.py</code> once from the repository root.</p>
-<div id="b5c47b91" class="cell" data-execution_count="1">
+<div id="8b98f503" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2330,8 +2330,9 @@ vertical-align: -.125em;
 </table>
 <hr>
 </section>
-<section id="initial-prompt-for-codex" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Initial Prompt for Codex</h1>
+<section id="initial-prompt-for-your-ai-assistant" class="level1">
+<h1>Initial Prompt for Your AI Assistant</h1>
+<p><em>Any assistant works — ChatGPT, Claude, Gemini, or Copilot, in an editor or in a browser tab. Paste the block below as your <strong>first</strong> message, before you ask anything else.</em></p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -2358,9 +2359,9 @@ Your numbers will not match mine, and that is fine
 <p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
 </div>
 </div>
-<section id="initial-prompt-for-codex-1" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="initial-prompt-for-codex-1"><span class="header-section-number">3.1</span> Initial Prompt for Codex</h2>
-<p>Paste the block below as the very first message in your Codex session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
+<section id="initial-prompt-for-your-ai-assistant-1" class="level2">
+<h2 class="anchored" data-anchor-id="initial-prompt-for-your-ai-assistant-1">Initial Prompt for Your AI Assistant</h2>
+<p>Paste the block below as the very first message in your assistant session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
 <pre><code>I am working on Homework 3 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
 
 Dataset: M5/Walmart — weekly aggregated, 30 store-category series (10 stores across CA/TX/WI, 3 categories each), at `data/processed/m5_weekly.csv`. Columns: store_id, cat_id, state_id, week_start, units (target), avg_price, snap_days, event_days, and lagged units (units_lag1 through units_lag4, units_lag52).
@@ -2394,13 +2395,13 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 </div>
 <hr>
 </section>
-<section id="questions" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Questions</h1>
-<section id="q1-traintest-split" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="q1-traintest-split"><span class="header-section-number">4.1</span> Q1 — Train/Test Split</h2>
+<section id="questions" class="level1">
+<h1>Questions</h1>
+<section id="q1-traintest-split" class="level2">
+<h2 class="anchored" data-anchor-id="q1-traintest-split">Q1 — Train/Test Split</h2>
 <p><em>(Suggested prompts: 1)</em></p>
 <p>Time series data has a natural arrow of time: the past is used to predict the future. The starter code below defines a temporal cutoff. Using that cutoff, create <code>X_train</code>, <code>X_test</code>, <code>y_train</code>, and <code>y_test</code>. Print the number of rows in each split and the date range covered by each.</p>
-<div id="173a5277" class="cell" data-execution_count="2">
+<div id="a0712d80" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cutoff <span class="op">=</span> pd.Timestamp(<span class="st">&quot;2015-05-17&quot;</span>)     <span class="co"># holds out the final ~53 weeks</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create train and test splits using the cutoff date</span></span>
@@ -2412,8 +2413,8 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 </blockquote>
 <hr>
 </section>
-<section id="q2-decision-tree" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="q2-decision-tree"><span class="header-section-number">4.2</span> Q2 — Decision Tree</h2>
+<section id="q2-decision-tree" class="level2">
+<h2 class="anchored" data-anchor-id="q2-decision-tree">Q2 — Decision Tree</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>Decision trees partition the feature space by asking a sequence of yes/no questions. A shallow tree (small <code>max_depth</code>) generalizes broadly but may miss important patterns; a deep tree fits the training data closely but risks overfitting. This question asks you to see both sides of that trade-off directly.</p>
 <p><strong>(a)</strong> Fit a <code>DecisionTreeRegressor</code> with <code>max_depth=3</code> and <code>random_state=42</code> on the training set.</p>
@@ -2421,7 +2422,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <p><strong>(c)</strong> Report test RMSE and the top 5 features by impurity-based importance. Present the importances as a horizontal bar chart, sorted descending.</p>
 <p><strong>(d)</strong> Re-fit with <code>max_depth=10</code>. How does test RMSE change? Does the deeper tree help or hurt on the test set?</p>
 <p>The <code>FEATURES</code> and <code>TARGET</code> variables, and the train/test arrays from Q1, are already defined.</p>
-<div id="24082ac8" class="cell" data-execution_count="3">
+<div id="321213ce" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Fit DecisionTreeRegressor with max_depth=3</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Visualize the tree with plot_tree</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (c) Report test RMSE and top 5 feature importances</span></span>
@@ -2432,15 +2433,15 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 </blockquote>
 <hr>
 </section>
-<section id="q3-random-forest" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="q3-random-forest"><span class="header-section-number">4.3</span> Q3 — Random Forest</h2>
+<section id="q3-random-forest" class="level2">
+<h2 class="anchored" data-anchor-id="q3-random-forest">Q3 — Random Forest</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>A Random Forest grows many decision trees on bootstrap samples of the data and averages their predictions. By training each tree on a different random subset of rows — and considering only a random subset of features at each split — the ensemble reduces the variance that makes individual deep trees unreliable. One by-product of bootstrap sampling is that roughly one-third of the training rows are left out of each tree: these out-of-bag (OOB) samples can be used to produce an internal validation score without touching the held-out test set.</p>
 <p>Fit a <code>RandomForestRegressor</code> with <code>n_estimators=200</code>, <code>max_features=&quot;sqrt&quot;</code>, <code>oob_score=True</code>, <code>random_state=42</code>, and <code>n_jobs=-1</code> (uses all cores; the fit takes a few seconds).</p>
 <p><strong>(a)</strong> The <code>oob_score_</code> attribute returns an R² value, not RMSE. Convert it to an approximate RMSE using the training target values, and report this OOB RMSE.</p>
 <p><strong>(b)</strong> Report the test RMSE. Compare it to the depth-3 and depth-10 Decision Trees from Q2, and to the seasonal-naive benchmark from Q1.</p>
 <p><strong>(c)</strong> Plot the MDI feature importances as a horizontal bar chart, sorted descending, showing all features.</p>
-<div id="7122d2c5" class="cell" data-execution_count="4">
+<div id="494857d3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit RandomForestRegressor with n_estimators=200, max_features=&quot;sqrt&quot;, oob_score=True</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Convert oob_score_ (R²) to OOB RMSE</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Compute and report test RMSE, compare to Q2</span></span>
@@ -2451,13 +2452,13 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 </blockquote>
 <hr>
 </section>
-<section id="q4-mdi-vs-permutation-importance" class="level2" data-number="4.4">
-<h2 data-number="4.4" class="anchored" data-anchor-id="q4-mdi-vs-permutation-importance"><span class="header-section-number">4.4</span> Q4 — MDI vs Permutation Importance</h2>
+<section id="q4-mdi-vs-permutation-importance" class="level2">
+<h2 class="anchored" data-anchor-id="q4-mdi-vs-permutation-importance">Q4 — MDI vs Permutation Importance</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>MDI importance measures how much each feature reduces impurity across all trees in the forest. It is fast to compute because it is a by-product of training, but it has a known bias: features with many distinct numeric values tend to receive inflated importance scores simply because they offer the splitter more places to cut, not because they carry more information.</p>
 <p>Permutation importance avoids this bias by directly measuring how much accuracy degrades when a single feature’s values are randomly shuffled on the test set. A feature that matters will cause a large increase in RMSE when shuffled; a redundant or spurious one will cause almost none.</p>
 <p><strong>(a) Plant two controls.</strong> Add two columns of pure noise to the modeling table — one continuous, one binary — and refit the forest with them included:</p>
-<div id="40aeb12c" class="cell" data-execution_count="5">
+<div id="39fe074d" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;noise_continuous&quot;</span>] <span class="op">=</span> rng.rand(<span class="bu">len</span>(df))          <span class="co"># uniform on [0, 1)</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&quot;noise_binary&quot;</span>] <span class="op">=</span> rng.randint(<span class="dv">0</span>, <span class="dv">2</span>, <span class="bu">len</span>(df))     <span class="co"># 0 or 1</span></span>
@@ -2470,7 +2471,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <p><strong>(b)</strong> Compute permutation importance on the test set with <code>n_repeats=10</code>, <code>random_state=42</code>, and <code>scoring=&quot;neg_root_mean_squared_error&quot;</code> so the result is in units rather than R².</p>
 <p><strong>(c)</strong> Build a comparison table for the two noise columns and three real features of your choice, showing MDI and permutation importance side by side. Then report <strong>where <code>noise_continuous</code> ranks by MDI</strong> out of all features, and where <code>noise_binary</code> ranks.</p>
 <p><strong>(d)</strong> Produce the side-by-side bar charts: top-10 features by MDI, and top-10 by permutation importance, in one figure.</p>
-<div id="e82f58ab" class="cell" data-execution_count="6">
+<div id="92c06522" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.inspection <span class="im">import</span> permutation_importance</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) permutation importance on the test set, scored in RMSE units</span></span>
@@ -2484,8 +2485,8 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 </blockquote>
 <hr>
 </section>
-<section id="q5-walk-forward-cross-validation" class="level2" data-number="4.5">
-<h2 data-number="4.5" class="anchored" data-anchor-id="q5-walk-forward-cross-validation"><span class="header-section-number">4.5</span> Q5 — Walk-Forward Cross-Validation</h2>
+<section id="q5-walk-forward-cross-validation" class="level2">
+<h2 class="anchored" data-anchor-id="q5-walk-forward-cross-validation">Q5 — Walk-Forward Cross-Validation</h2>
 <p><em>(Suggested prompts: 2)</em></p>
 <p>A single train/test split gives one estimate of generalization error. Walk-forward cross-validation produces multiple estimates by repeatedly expanding the training window and forecasting the next block of weeks. This is the supervised-learning analogue of the rolling-origin evaluation you used for ARIMA in Homework 1, and it guards against the possibility that the single test period happens to be unusually easy or hard to forecast.</p>
 <p>The starter code below defines the sequence of cutoff dates. For each cutoff:</p>
@@ -2496,7 +2497,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <li>Compute RMSE for each model on the forecast window</li>
 </ol>
 <p>Report the mean RMSE across all CV rounds for each model, and plot the per-round RMSE for both models on a single figure. Add the seasonal-naive benchmark from Q1 as a horizontal reference line.</p>
-<div id="1f66576a" class="cell" data-execution_count="7">
+<div id="a42ff647" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cutoffs <span class="op">=</span> pd.date_range(<span class="st">&quot;2014-01-05&quot;</span>, <span class="st">&quot;2015-05-17&quot;</span>, freq<span class="op">=</span><span class="st">&quot;13W&quot;</span>)   <span class="co"># 6 rounds</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(cutoffs)<span class="sc">}</span><span class="ss"> CV rounds:&quot;</span>, [<span class="bu">str</span>(c.date()) <span class="cf">for</span> c <span class="kw">in</span> cutoffs])</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2514,8 +2515,8 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 </blockquote>
 <hr>
 </section>
-<section id="q6-business-memo" class="level2" data-number="4.6">
-<h2 data-number="4.6" class="anchored" data-anchor-id="q6-business-memo"><span class="header-section-number">4.6</span> Q6 — Business Memo</h2>
+<section id="q6-business-memo" class="level2">
+<h2 class="anchored" data-anchor-id="q6-business-memo">Q6 — Business Memo</h2>
 <p><em>(Suggested prompts: 0 — write yourself)</em></p>
 <p>No code required for this question.</p>
 <p>You are presenting to a Walmart regional analytics team. They currently plan inventory with a single national uplift factor for SNAP weeks — every store receives the same expected lift, regardless of state, store, or product category. Your Random Forest was trained on all 30 store-category series and includes <code>snap_days</code> alongside store, state, and category identifiers.</p>
@@ -2531,15 +2532,15 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <hr>
 </section>
 </section>
-<section id="submission-checklist" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Submission Checklist</h1>
+<section id="submission-checklist" class="level1">
+<h1>Submission Checklist</h1>
 <p>Before submitting, confirm each item below is complete.</p>
 <ul class="task-list">
 <li><label><input type="checkbox">All code cells run without errors from a clean kernel restart</label></li>
-<li><label><input type="checkbox">Written responses completed in your own words (not copied from Codex output)</label></li>
+<li><label><input type="checkbox">Written responses completed in your own words (not copied from your assistant’s output)</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in your submission folder</label></li>
 <li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with 12 or fewer entries</label></li>
-<li><label><input type="checkbox">One git commit per Codex prompt, with message format <code>hw03 prompt &lt;id&gt;: &lt;summary&gt;</code></label></li>
+<li><label><input type="checkbox">One git commit per prompt, with message format <code>hw03 prompt &lt;id&gt;: &lt;summary&gt;</code></label></li>
 <li><label><input type="checkbox"><code>REPORT.md</code> containing a plain-English business recommendation (one paragraph)</label></li>
 </ul>
 </section>

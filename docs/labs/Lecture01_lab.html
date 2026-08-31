@@ -2317,15 +2317,15 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">1</span> What we are doing</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2</span> Setup</a></li>
-  <li><a href="#step-1-look-at-it-first" id="toc-step-1-look-at-it-first" class="nav-link" data-scroll-target="#step-1-look-at-it-first"><span class="header-section-number">3</span> Step 1 — Look at it first</a></li>
-  <li><a href="#step-2-establish-the-benchmark" id="toc-step-2-establish-the-benchmark" class="nav-link" data-scroll-target="#step-2-establish-the-benchmark"><span class="header-section-number">4</span> Step 2 — Establish the benchmark</a></li>
-  <li><a href="#step-3-fit-the-three-models" id="toc-step-3-fit-the-three-models" class="nav-link" data-scroll-target="#step-3-fit-the-three-models"><span class="header-section-number">5</span> Step 3 — Fit the three models</a></li>
-  <li><a href="#step-4-compare-honestly" id="toc-step-4-compare-honestly" class="nav-link" data-scroll-target="#step-4-compare-honestly"><span class="header-section-number">6</span> Step 4 — Compare honestly</a></li>
-  <li><a href="#step-5-break-it-then-fix-it" id="toc-step-5-break-it-then-fix-it" class="nav-link" data-scroll-target="#step-5-break-it-then-fix-it"><span class="header-section-number">7</span> Step 5 — Break it, then fix it</a></li>
-  <li><a href="#step-6-same-store.-different-aisle.-opposite-answer." id="toc-step-6-same-store.-different-aisle.-opposite-answer." class="nav-link" data-scroll-target="#step-6-same-store.-different-aisle.-opposite-answer."><span class="header-section-number">8</span> Step 6 — Same store. Different aisle. Opposite answer.</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">9</span> Before you leave</a></li>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing">What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#step-1-look-at-it-first" id="toc-step-1-look-at-it-first" class="nav-link" data-scroll-target="#step-1-look-at-it-first">Step 1 — Look at it first</a></li>
+  <li><a href="#step-2-establish-the-benchmark" id="toc-step-2-establish-the-benchmark" class="nav-link" data-scroll-target="#step-2-establish-the-benchmark">Step 2 — Establish the benchmark</a></li>
+  <li><a href="#step-3-fit-the-three-models" id="toc-step-3-fit-the-three-models" class="nav-link" data-scroll-target="#step-3-fit-the-three-models">Step 3 — Fit the three models</a></li>
+  <li><a href="#step-4-compare-honestly" id="toc-step-4-compare-honestly" class="nav-link" data-scroll-target="#step-4-compare-honestly">Step 4 — Compare honestly</a></li>
+  <li><a href="#step-5-break-it-then-fix-it" id="toc-step-5-break-it-then-fix-it" class="nav-link" data-scroll-target="#step-5-break-it-then-fix-it">Step 5 — Break it, then fix it</a></li>
+  <li><a href="#step-6-same-store.-different-aisle.-opposite-answer." id="toc-step-6-same-store.-different-aisle.-opposite-answer." class="nav-link" data-scroll-target="#step-6-same-store.-different-aisle.-opposite-answer.">Step 6 — Same store. Different aisle. Opposite answer.</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave">Before you leave</a></li>
   </ul>
 </nav>
 </div>
@@ -2351,17 +2351,17 @@ window.Quarto = {
 </header>
 
 
-<section id="what-we-are-doing" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> What we are doing</h1>
+<section id="what-we-are-doing" class="level1">
+<h1>What we are doing</h1>
 <p>Lecture 1 made a claim that sounded like housekeeping: <strong>always beat a benchmark first</strong>. In the next 35 minutes you are going to test that claim on a real Walmart series, and then watch it fail on a different one.</p>
 <p>The business question: you are forecasting weekly HOUSEHOLD-goods demand at store TX_1 to set inventory a year out. Which method should you actually ship?</p>
 <p><strong>Time:</strong> ~35 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>statsmodels</code>, and <code>data/processed/m5_weekly.csv</code> (run <code>python scripts/prep_m5.py</code> if it is missing).</p>
 <hr>
 </section>
-<section id="setup" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
+<section id="setup" class="level1">
+<h1>Setup</h1>
 <p>Nothing to fill in here — run it and move on.</p>
-<div id="92ada923" class="cell" data-execution_count="1">
+<div id="ddb99543" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2400,10 +2400,10 @@ window.Quarto = {
 </div>
 <hr>
 </section>
-<section id="step-1-look-at-it-first" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Step 1 — Look at it first</h1>
+<section id="step-1-look-at-it-first" class="level1">
+<h1>Step 1 — Look at it first</h1>
 <p>Never fit anything before you have seen the series.</p>
-<div id="faa290f7" class="cell" data-execution_count="2">
+<div id="99eb17d0" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.5</span>))</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax.plot(train.index, train.values, label<span class="op">=</span><span class="st">&quot;train&quot;</span>, lw<span class="op">=</span><span class="fl">1.4</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, test.values, label<span class="op">=</span><span class="st">&quot;test (held out)&quot;</span>, lw<span class="op">=</span><span class="fl">1.4</span>)</span>
@@ -2420,10 +2420,10 @@ window.Quarto = {
 <p><strong>Notice:</strong> the series roughly doubles over five years, and the level is still moving at the end. Hold that thought — it is the whole lab.</p>
 <hr>
 </section>
-<section id="step-2-establish-the-benchmark" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Step 2 — Establish the benchmark</h1>
+<section id="step-2-establish-the-benchmark" class="level1">
+<h1>Step 2 — Establish the benchmark</h1>
 <p>Before any model, the thing to beat. <strong>Seasonal naive</strong> says: this week next year looks like this week last year.</p>
-<div id="26db1697" class="cell" data-execution_count="3">
+<div id="51e7e51d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rmse(actual, pred):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.sqrt(np.mean((np.asarray(actual) <span class="op">-</span> np.asarray(pred)) <span class="op">**</span> <span class="dv">2</span>)))</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2441,10 +2441,10 @@ window.Quarto = {
 <p><strong>Your turn:</strong> before running anything else, write down a number — what RMSE do you think a proper exponential smoothing model will get? You will check it in Step 4.</p>
 <hr>
 </section>
-<section id="step-3-fit-the-three-models" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Step 3 — Fit the three models</h1>
+<section id="step-3-fit-the-three-models" class="level1">
+<h1>Step 3 — Fit the three models</h1>
 <p>All three calls come straight from Lecture 1. Run this, then <strong>predict the ordering before you look at Step 4</strong> — write your guess down.</p>
-<div id="b37171b5" class="cell" data-execution_count="4">
+<div id="a7114636" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SES — level only.</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ses_fit <span class="op">=</span> SimpleExpSmoothing(train).fit()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>results[<span class="st">&quot;SES&quot;</span>] <span class="op">=</span> (rmse(test, ses_fit.forecast(N_TEST)),</span>
@@ -2476,9 +2476,9 @@ One constraint to respect
 </div>
 <hr>
 </section>
-<section id="step-4-compare-honestly" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Step 4 — Compare honestly</h1>
-<div id="fee18d69" class="cell" data-execution_count="5">
+<section id="step-4-compare-honestly" class="level1">
+<h1>Step 4 — Compare honestly</h1>
+<div id="3a11aad9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> (pd.DataFrame(results, index<span class="op">=</span>[<span class="st">&quot;RMSE&quot;</span>, <span class="st">&quot;MAE&quot;</span>]).T</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>         .sort_values(<span class="st">&quot;RMSE&quot;</span>).<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tbl.to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2493,10 +2493,10 @@ Holt            1166  1029</code></pre>
 <p><strong>Discuss with the person next to you, before reading on:</strong> did any model beat the benchmark? By how much? And was it the model you expected in Step 2?</p>
 <hr>
 </section>
-<section id="step-5-break-it-then-fix-it" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Step 5 — Break it, then fix it</h1>
+<section id="step-5-break-it-then-fix-it" class="level1">
+<h1>Step 5 — Break it, then fix it</h1>
 <p>Look at where Holt’s forecast goes.</p>
-<div id="9fbdce9d" class="cell" data-execution_count="6">
+<div id="98ae2cdd" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.5</span>))</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, test.values, label<span class="op">=</span><span class="st">&quot;actual&quot;</span>, lw<span class="op">=</span><span class="fl">1.6</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, ses_fit.forecast(N_TEST), label<span class="op">=</span><span class="st">&quot;SES&quot;</span>, ls<span class="op">=</span><span class="st">&quot;--&quot;</span>)</span>
@@ -2512,7 +2512,7 @@ Holt            1166  1029</code></pre>
 </div>
 <p>Lecture 1 warned that undamped linear extrapolation gets unrealistic past about six periods. You are forecasting <strong>52</strong>.</p>
 <p><strong>Your turn:</strong> refit Holt with a damped trend and add it to the table. One keyword argument.</p>
-<div id="afec4743" class="cell" data-execution_count="7">
+<div id="fe8fc06c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the one keyword argument ----</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># holt_damped = Holt(train, ___).fit()             # &lt;- damped_trend=True</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
@@ -2526,10 +2526,10 @@ Holt            1166  1029</code></pre>
 <p>Report the value of <span class="math inline">\(\phi\)</span>. What does it mean that it came out below 1?</p>
 <hr>
 </section>
-<section id="step-6-same-store.-different-aisle.-opposite-answer." class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Step 6 — Same store. Different aisle. Opposite answer.</h1>
+<section id="step-6-same-store.-different-aisle.-opposite-answer." class="level1">
+<h1>Step 6 — Same store. Different aisle. Opposite answer.</h1>
 <p>Change one word — <code>HOUSEHOLD</code> becomes <code>FOODS</code>. Same store, same code, same horizon.</p>
-<div id="cfe1d29b" class="cell" data-execution_count="8">
+<div id="5b9b1df3" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>y2 <span class="op">=</span> get_series(<span class="st">&quot;TX_1&quot;</span>, <span class="st">&quot;FOODS&quot;</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>train2, test2 <span class="op">=</span> y2.iloc[:<span class="op">-</span>N_TEST], y2.iloc[<span class="op">-</span>N_TEST:]</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2548,8 +2548,8 @@ TX_1 FOODS   SES            RMSE 1,474</code></pre>
 <p>So it is not the store, and it is not the method. It is whether the level moved.</p>
 <hr>
 </section>
-<section id="before-you-leave" class="level1" data-number="9">
-<h1 data-number="9"><span class="header-section-number">9</span> Before you leave</h1>
+<section id="before-you-leave" class="level1">
+<h1>Before you leave</h1>
 <blockquote class="blockquote">
 <p><strong>Discuss:</strong> You now have two series where the best method is different. You are responsible for all 30 series in this dataset and you have to pick <strong>one</strong> approach to run in production every month.</p>
 <p>What do you actually do — and what would you need to measure to decide? “Fit everything and pick the winner per series” is an answer, but say what it costs you.</p>

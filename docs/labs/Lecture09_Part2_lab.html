@@ -2317,13 +2317,13 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">1</span> What we are doing</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2</span> Setup</a></li>
-  <li><a href="#step-1-positional-encoding-before-the-model" id="toc-step-1-positional-encoding-before-the-model" class="nav-link" data-scroll-target="#step-1-positional-encoding-before-the-model"><span class="header-section-number">3</span> Step 1 — Positional encoding, before the model</a></li>
-  <li><a href="#step-2-build-the-encoder" id="toc-step-2-build-the-encoder" class="nav-link" data-scroll-target="#step-2-build-the-encoder"><span class="header-section-number">4</span> Step 2 — Build the encoder</a></li>
-  <li><a href="#step-3-delete-the-line" id="toc-step-3-delete-the-line" class="nav-link" data-scroll-target="#step-3-delete-the-line"><span class="header-section-number">5</span> Step 3 — Delete the line</a></li>
-  <li><a href="#step-4-where-attention-lands" id="toc-step-4-where-attention-lands" class="nav-link" data-scroll-target="#step-4-where-attention-lands"><span class="header-section-number">6</span> Step 4 — Where attention lands</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">7</span> Before you leave</a></li>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing">What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#step-1-positional-encoding-before-the-model" id="toc-step-1-positional-encoding-before-the-model" class="nav-link" data-scroll-target="#step-1-positional-encoding-before-the-model">Step 1 — Positional encoding, before the model</a></li>
+  <li><a href="#step-2-build-the-encoder" id="toc-step-2-build-the-encoder" class="nav-link" data-scroll-target="#step-2-build-the-encoder">Step 2 — Build the encoder</a></li>
+  <li><a href="#step-3-delete-the-line" id="toc-step-3-delete-the-line" class="nav-link" data-scroll-target="#step-3-delete-the-line">Step 3 — Delete the line</a></li>
+  <li><a href="#step-4-where-attention-lands" id="toc-step-4-where-attention-lands" class="nav-link" data-scroll-target="#step-4-where-attention-lands">Step 4 — Where attention lands</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave">Before you leave</a></li>
   </ul>
 </nav>
 </div>
@@ -2349,8 +2349,8 @@ window.Quarto = {
 </header>
 
 
-<section id="what-we-are-doing" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> What we are doing</h1>
+<section id="what-we-are-doing" class="level1">
+<h1>What we are doing</h1>
 <p>Last week’s recurrent models read the window one step at a time. Attention does not: every position looks at every other position at once, so week 3 reaches week 50 in a single operation rather than through forty-seven state updates.</p>
 <p>Today you build a Transformer encoder, then delete one line from it and watch it fall apart. That line is the one PyTorch does not add for you, and forgetting it is the most common way this architecture fails silently.</p>
 <p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>torch</code>, and <code>data/processed/m5_weekly.csv</code>.</p>
@@ -2369,9 +2369,9 @@ This lab is slow
 </div>
 <hr>
 </section>
-<section id="setup" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
-<div id="6b0a0405" class="cell" data-execution_count="1">
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div id="56670860" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2416,11 +2416,11 @@ This lab is slow
 </div>
 <hr>
 </section>
-<section id="step-1-positional-encoding-before-the-model" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Step 1 — Positional encoding, before the model</h1>
+<section id="step-1-positional-encoding-before-the-model" class="level1">
+<h1>Step 1 — Positional encoding, before the model</h1>
 <p>Attention computes a <strong>weighted average</strong> over positions. Averaging does not care about order: shuffle the input and every attention output is unchanged.</p>
 <p>So position has to be added to the input itself. The standard device is a set of sinusoids of different frequencies.</p>
-<div id="29665770" class="cell" data-execution_count="2">
+<div id="7dd25e0b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sinusoidal(seq_len, d_model):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pe <span class="op">=</span> torch.zeros(seq_len, d_model)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> torch.arange(seq_len).unsqueeze(<span class="dv">1</span>).<span class="bu">float</span>()</span>
@@ -2445,9 +2445,9 @@ This lab is slow
 <p><strong>Read the picture.</strong> Every column — every week — has a distinct pattern down the dimensions, so the model can tell positions apart. Nearby columns look similar, so it can also learn <em>relative</em> distance rather than only absolute index.</p>
 <hr>
 </section>
-<section id="step-2-build-the-encoder" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Step 2 — Build the encoder</h1>
-<div id="0925ea6f" class="cell" data-execution_count="3">
+<section id="step-2-build-the-encoder" class="level1">
+<h1>Step 2 — Build the encoder</h1>
+<div id="ce88851e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TransformerForecaster(nn.Module):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_channels<span class="op">=</span><span class="dv">4</span>, d_model<span class="op">=</span><span class="dv">64</span>, nhead<span class="op">=</span><span class="dv">4</span>, layers<span class="op">=</span><span class="dv">2</span>, use_pe<span class="op">=</span><span class="va">True</span>):</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
@@ -2493,10 +2493,10 @@ This lab is slow
 <p><strong>Note the parameter count</strong> against last week’s models: the RNN had 4,545 and won.</p>
 <hr>
 </section>
-<section id="step-3-delete-the-line" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Step 3 — Delete the line</h1>
+<section id="step-3-delete-the-line" class="level1">
+<h1>Step 3 — Delete the line</h1>
 <p>Same model, same data, same seeds — <code>use_pe=False</code> removes the single addition in <code>forward</code>.</p>
-<div id="b71d2feb" class="cell" data-execution_count="4">
+<div id="599cdee9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> use_pe <span class="kw">in</span> (<span class="va">True</span>, <span class="va">False</span>):</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    runs <span class="op">=</span> [train(use_pe, s)[<span class="dv">0</span>] <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>)]</span>
@@ -2526,7 +2526,7 @@ Nothing raised an exception
 </div>
 </div>
 <p><strong>Your turn:</strong> express the penalty as a percentage of the with-encoding RMSE.</p>
-<div id="5faf3739" class="cell" data-execution_count="5">
+<div id="7b54c3ab" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.DataFrame(rows)</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># penalty = ___ - ___</span></span>
@@ -2535,9 +2535,9 @@ Nothing raised an exception
 </div>
 <hr>
 </section>
-<section id="step-4-where-attention-lands" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Step 4 — Where attention lands</h1>
-<div id="e177a1c7" class="cell" data-execution_count="6">
+<section id="step-4-where-attention-lands" class="level1">
+<h1>Step 4 — Where attention lands</h1>
+<div id="9eda38ba" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>board <span class="op">=</span> {</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;LASSO, 46 features (HW4)&quot;</span>: <span class="dv">744</span>,</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;XGBoost (HW4)&quot;</span>: <span class="dv">781</span>,</span>
@@ -2562,8 +2562,8 @@ Seasonal naive              2152</code></pre>
 <p><strong>Every advantage attention has is an advantage at scale.</strong> Parallel computation across positions matters when a sequence is thousands of steps and a corpus is billions of tokens. Direct long-range paths matter when the signal genuinely sits far back. Neither describes 5,900 windows of weekly retail demand.</p>
 <hr>
 </section>
-<section id="before-you-leave" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Before you leave</h1>
+<section id="before-you-leave" class="level1">
+<h1>Before you leave</h1>
 <blockquote class="blockquote">
 <p><strong>Discuss (the missing line):</strong> You have now met three failures that produce a plausible number and no error — <code>KFold</code> on a time series, a forgotten <code>zero_grad()</code>, and a missing positional encoding. What do the three have in common, and what practice would catch all of them?</p>
 <p><strong>Discuss (the architecture):</strong> Describe a forecasting problem where you would expect the Transformer to beat everything else here. Be specific about sequence length and data volume.</p>

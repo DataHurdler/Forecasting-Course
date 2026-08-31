@@ -2179,16 +2179,16 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
-  <li><a href="#dataset-and-setup" id="toc-dataset-and-setup" class="nav-link" data-scroll-target="#dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</a></li>
-  <li><a href="#initial-prompt-for-codex" id="toc-initial-prompt-for-codex" class="nav-link" data-scroll-target="#initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</a></li>
-  <li><a href="#part-c-comparison" id="toc-part-c-comparison" class="nav-link" data-scroll-target="#part-c-comparison"><span class="header-section-number">4</span> Part C: Comparison</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#dataset-and-setup" id="toc-dataset-and-setup" class="nav-link" data-scroll-target="#dataset-and-setup">Dataset and Setup</a></li>
+  <li><a href="#initial-prompt-for-your-ai-assistant" id="toc-initial-prompt-for-your-ai-assistant" class="nav-link" data-scroll-target="#initial-prompt-for-your-ai-assistant">Initial Prompt for Your AI Assistant</a></li>
+  <li><a href="#part-c-comparison" id="toc-part-c-comparison" class="nav-link" data-scroll-target="#part-c-comparison">Part C: Comparison</a>
   <ul class="collapse">
-  <li><a href="#q1-architecture-comparison-suggested-prompts-2" id="toc-q1-architecture-comparison-suggested-prompts-2" class="nav-link" data-scroll-target="#q1-architecture-comparison-suggested-prompts-2"><span class="header-section-number">4.1</span> Q1 — Architecture Comparison <em>(Suggested prompts: 2)</em></a></li>
-  <li><a href="#q2-full-course-comparison-suggested-prompts-1" id="toc-q2-full-course-comparison-suggested-prompts-1" class="nav-link" data-scroll-target="#q2-full-course-comparison-suggested-prompts-1"><span class="header-section-number">4.2</span> Q2 — Full Course Comparison <em>(Suggested prompts: 1)</em></a></li>
-  <li><a href="#q3-reflection-suggested-prompts-0-write-yourself" id="toc-q3-reflection-suggested-prompts-0-write-yourself" class="nav-link" data-scroll-target="#q3-reflection-suggested-prompts-0-write-yourself"><span class="header-section-number">4.3</span> Q3 — Reflection <em>(Suggested prompts: 0 — write yourself)</em></a></li>
+  <li><a href="#q1-architecture-comparison-suggested-prompts-2" id="toc-q1-architecture-comparison-suggested-prompts-2" class="nav-link" data-scroll-target="#q1-architecture-comparison-suggested-prompts-2">Q1 — Architecture Comparison <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q2-full-course-comparison-suggested-prompts-1" id="toc-q2-full-course-comparison-suggested-prompts-1" class="nav-link" data-scroll-target="#q2-full-course-comparison-suggested-prompts-1">Q2 — Full Course Comparison <em>(Suggested prompts: 1)</em></a></li>
+  <li><a href="#q3-reflection-suggested-prompts-0-write-yourself" id="toc-q3-reflection-suggested-prompts-0-write-yourself" class="nav-link" data-scroll-target="#q3-reflection-suggested-prompts-0-write-yourself">Q3 — Reflection <em>(Suggested prompts: 0 — write yourself)</em></a></li>
   </ul></li>
-  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">5</span> Submission Checklist</a></li>
+  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist">Submission Checklist</a></li>
   </ul>
 </nav>
 </div>
@@ -2240,15 +2240,15 @@ Your numbers will not match mine, and that is fine
 <p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
 </div>
 </div>
-<section id="overview" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1</span> Overview</h2>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>This part continues Homework 5. See Part 1 for the full framing.</p>
 <hr>
 </section>
-<section id="dataset-and-setup" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">2</span> Dataset and Setup</h2>
+<section id="dataset-and-setup" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-and-setup">Dataset and Setup</h2>
 <p>We construct fixed-length sliding windows over each store-category series. Each input is a window of past weeks; the target is the next week’s units. <strong>Part A</strong> (FFN, CNN) uses a 26-week window; <strong>Part B</strong> (RNN, LSTM, Transformer) uses 52 weeks, so the sequence models get a full annual cycle.</p>
-<div id="ae16de84" class="cell" data-execution_count="1">
+<div id="6103549f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2309,19 +2309,20 @@ Two mistakes that will not raise an error
 </div>
 <hr>
 </section>
-<section id="initial-prompt-for-codex" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="initial-prompt-for-codex"><span class="header-section-number">3</span> Initial Prompt for Codex</h2>
+<section id="initial-prompt-for-your-ai-assistant" class="level2">
+<h2 class="anchored" data-anchor-id="initial-prompt-for-your-ai-assistant">Initial Prompt for Your AI Assistant</h2>
+<p><em>Any assistant works — ChatGPT, Claude, Gemini, or Copilot, in an editor or in a browser tab. Paste the block below as your <strong>first</strong> message, before you ask anything else.</em></p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Initial Prompt for Codex
+Initial Prompt for Your AI Assistant
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Paste the following as your first message to Codex. Save it as <code>INITIAL_PROMPT.md</code> in your submission folder.</p>
+<p>Paste the following as your first message to your assistant. Save it as <code>INITIAL_PROMPT.md</code> in your submission folder.</p>
 <pre><code>I am working on Homework 5 Part 3 for ECON 8310: Business Forecasting at the
 University of Nebraska at Omaha.
 
@@ -2362,10 +2363,10 @@ Confirm by responding with: HW05P3_CONTEXT_ACK</code></pre>
 </div>
 <hr>
 </section>
-<section id="part-c-comparison" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="part-c-comparison"><span class="header-section-number">4</span> Part C: Comparison</h2>
-<section id="q1-architecture-comparison-suggested-prompts-2" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="q1-architecture-comparison-suggested-prompts-2"><span class="header-section-number">4.1</span> Q1 — Architecture Comparison <em>(Suggested prompts: 2)</em></h3>
+<section id="part-c-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="part-c-comparison">Part C: Comparison</h2>
+<section id="q1-architecture-comparison-suggested-prompts-2" class="level3">
+<h3 class="anchored" data-anchor-id="q1-architecture-comparison-suggested-prompts-2">Q1 — Architecture Comparison <em>(Suggested prompts: 2)</em></h3>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -2415,7 +2416,7 @@ Confirm by responding with: HW05P3_CONTEXT_ACK</code></pre>
 </tbody>
 </table>
 <p>Plot actual vs predicted for one series over the test period, all five neural models on one axes.</p>
-<div id="37a4e7a2" class="cell" data-execution_count="2">
+<div id="31935b10" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparison table and actual-vs-predicted plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -2428,7 +2429,7 @@ Do not assume an ordering
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Earlier versions of this assignment asked whether your results matched a “theoretical expectation” that sequence models beat convolutional ones, which beat feedforward ones. <strong>That expectation is not what Lecture 9 found.</strong> On this panel the vanilla RNN beat both the LSTM and the Transformer, and every neural model lost to a regularized linear model.</p>
+<p>Earlier versions of this assignment asked whether your results matched a “theoretical expectation” that sequence models beat convolutional ones, which beat feedforward ones. <strong>That expectation is not what Lecture 9 found.</strong> On this panel, at a fixed training budget, the vanilla RNN beat both the LSTM and the Transformer — and every neural model lost to a regularized linear model. Note the qualifier: Lecture 9 Part 1 also showed the RNN’s margin over the LSTM shrinking to nothing once both are trained to convergence, so <em>how long you trained</em> is part of any ranking you report.</p>
 <p>Report your ranking, whatever it is, and explain it in terms of <em>this</em> problem: window length, the amount of training data, and where the predictive signal actually sits.</p>
 </div>
 </div>
@@ -2437,8 +2438,8 @@ Do not assume an ordering
 </blockquote>
 <hr>
 </section>
-<section id="q2-full-course-comparison-suggested-prompts-1" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="q2-full-course-comparison-suggested-prompts-1"><span class="header-section-number">4.2</span> Q2 — Full Course Comparison <em>(Suggested prompts: 1)</em></h3>
+<section id="q2-full-course-comparison-suggested-prompts-1" class="level3">
+<h3 class="anchored" data-anchor-id="q2-full-course-comparison-suggested-prompts-1">Q2 — Full Course Comparison <em>(Suggested prompts: 1)</em></h3>
 <p>Build the complete comparison spanning every homework. Fill in from your own records.</p>
 <table class="caption-top table">
 <thead>
@@ -2515,8 +2516,8 @@ Only compare what is comparable
 </blockquote>
 <hr>
 </section>
-<section id="q3-reflection-suggested-prompts-0-write-yourself" class="level3" data-number="4.3">
-<h3 data-number="4.3" class="anchored" data-anchor-id="q3-reflection-suggested-prompts-0-write-yourself"><span class="header-section-number">4.3</span> Q3 — Reflection <em>(Suggested prompts: 0 — write yourself)</em></h3>
+<section id="q3-reflection-suggested-prompts-0-write-yourself" class="level3">
+<h3 class="anchored" data-anchor-id="q3-reflection-suggested-prompts-0-write-yourself">Q3 — Reflection <em>(Suggested prompts: 0 — write yourself)</em></h3>
 <p>No code required. In 200–250 words: Looking at the full comparison table, reflect on the arc of methods in this course.</p>
 <p>Answer all three:</p>
 <ol type="1">
@@ -2530,14 +2531,14 @@ Only compare what is comparable
 <hr>
 </section>
 </section>
-<section id="submission-checklist" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="submission-checklist"><span class="header-section-number">5</span> Submission Checklist</h2>
+<section id="submission-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="submission-checklist">Submission Checklist</h2>
 <ul class="task-list">
 <li><label><input type="checkbox">All code cells run without errors from top to bottom</label></li>
 <li><label><input type="checkbox">Written responses completed in your own words</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in <code>submissions/hw05_part3_&lt;your_name&gt;/</code></label></li>
 <li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with <strong>3 or fewer</strong> entries for Part 3</label></li>
-<li><label><input type="checkbox">One git commit per Codex prompt (<code>hw05_part3 prompt &lt;id&gt;: &lt;short summary&gt;</code>)</label></li>
+<li><label><input type="checkbox">One git commit per prompt (<code>hw05_part3 prompt &lt;id&gt;: &lt;short summary&gt;</code>)</label></li>
 <li><label><input type="checkbox"><code>REPORT.md</code> with a clear business recommendation</label></li>
 </ul>
 </section>

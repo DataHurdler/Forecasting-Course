@@ -1130,7 +1130,7 @@ Department of Economics
 </tr>
 </tbody>
 </table>
-<p><strong>The ordering is not the one anyone predicts in Week 1.</strong> A 46-coefficient linear model is at the top. The two architectures with the most attention behind them — the LSTM and the Transformer — finished fifth and sixth of eight, behind a plain RNN with a fraction of their parameters.</p>
+<p><strong>The ordering is not the one anyone predicts in Week 1.</strong> A 46-coefficient linear model is at the top. The two architectures with the most attention behind them — the LSTM and the Transformer — finished fifth and sixth of eight, behind a plain RNN with a fraction of their parameters — at the training budget each was measured at, which Lecture 9 Part 1 shows is part of the claim.</p>
 </section></section>
 <section>
 <section id="what-the-results-taught" class="title-slide slide level1 center">
@@ -1157,7 +1157,7 @@ Department of Economics
 <tbody>
 <tr class="odd">
 <td><strong>LSTM lost to a plain RNN</strong></td>
-<td>At three window lengths. Gating fixes long-range forgetting; a 26-week window does not suffer from it. Four times the parameters, no gain.</td>
+<td>At three window lengths, <em>at a fixed 30-epoch budget</em> — they tie by 100. Gating fixes long-range forgetting; 91% of this panel’s variance is between-series, so there is little to forget.</td>
 </tr>
 <tr class="even">
 <td><strong>Transformer lost to an RNN</strong></td>
@@ -1336,6 +1336,42 @@ Department of Economics
 </tbody>
 </table>
 <p><strong>Only the last row has a diagnostic.</strong> The first three were caught by held-out data, by a DAG drawn before the model, and by asking what one unit of a variable means — none of which any library will run for you.</p>
+</section>
+<section id="the-day-every-model-in-this-course-fails" class="slide level2">
+<h2>The Day Every Model in This Course Fails</h2>
+<p>Every 25 December the stores close and recorded sales are <strong>exactly zero</strong> — five times in our sample, against a daily average near 2,800.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>25 Dec</th>
+<th style="text-align: right;">2012</th>
+<th style="text-align: right;">2013</th>
+<th style="text-align: right;">2014</th>
+<th style="text-align: right;">2015</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Actual</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td>Seasonal naive</td>
+<td style="text-align: right;">2,230</td>
+<td style="text-align: right;">2,045</td>
+<td style="text-align: right;">2,485</td>
+<td style="text-align: right;">2,365</td>
+</tr>
+</tbody>
+</table>
+<p>Four days — <strong>0.25%</strong> of the evaluation window — carry <strong>4.6%</strong> of its squared error, eighteen times their share. Drop them and the benchmark’s RMSE falls from 537 to 525 without a single modelling change.</p>
+<p><strong>The information was never missing.</strong> <code>is_event</code> fires on <strong>158</strong> days, of which <strong>5</strong> are closures: the feature cannot tell “the doors are locked” from an ordinary Super Bowl, so no model learned the difference.</p>
+<div class="keybox">
+<p>Knowable years ahead, and every method still failed — because the <em>encoding</em> discarded the distinction, not because the model was misspecified. The harder case is a shock nobody could have known at all: the Favorita earthquake of 16 April 2016 is one, and that dataset is available for final projects.</p>
+</div>
 </section>
 <section id="what-a-defensible-forecast-report-contains" class="slide level2">
 <h2>What a Defensible Forecast Report Contains</h2>

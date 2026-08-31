@@ -2178,14 +2178,14 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">1</span> What we are doing</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2</span> Setup</a></li>
-  <li><a href="#step-1-from-a-panel-to-windows" id="toc-step-1-from-a-panel-to-windows" class="nav-link" data-scroll-target="#step-1-from-a-panel-to-windows"><span class="header-section-number">3</span> Step 1 — From a panel to windows</a></li>
-  <li><a href="#step-2-train-a-network" id="toc-step-2-train-a-network" class="nav-link" data-scroll-target="#step-2-train-a-network"><span class="header-section-number">4</span> Step 2 — Train a network</a></li>
-  <li><a href="#step-3-run-it-again" id="toc-step-3-run-it-again" class="nav-link" data-scroll-target="#step-3-run-it-again"><span class="header-section-number">5</span> Step 3 — Run it again</a></li>
-  <li><a href="#step-4-so-how-would-you-compare-two-settings" id="toc-step-4-so-how-would-you-compare-two-settings" class="nav-link" data-scroll-target="#step-4-so-how-would-you-compare-two-settings"><span class="header-section-number">6</span> Step 4 — So how would you compare two settings?</a></li>
-  <li><a href="#step-5-break-it-on-purpose" id="toc-step-5-break-it-on-purpose" class="nav-link" data-scroll-target="#step-5-break-it-on-purpose"><span class="header-section-number">7</span> Step 5 — Break it on purpose</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">8</span> Before you leave</a></li>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing">What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#step-1-from-a-panel-to-windows" id="toc-step-1-from-a-panel-to-windows" class="nav-link" data-scroll-target="#step-1-from-a-panel-to-windows">Step 1 — From a panel to windows</a></li>
+  <li><a href="#step-2-train-a-network" id="toc-step-2-train-a-network" class="nav-link" data-scroll-target="#step-2-train-a-network">Step 2 — Train a network</a></li>
+  <li><a href="#step-3-run-it-again" id="toc-step-3-run-it-again" class="nav-link" data-scroll-target="#step-3-run-it-again">Step 3 — Run it again</a></li>
+  <li><a href="#step-4-so-how-would-you-compare-two-settings" id="toc-step-4-so-how-would-you-compare-two-settings" class="nav-link" data-scroll-target="#step-4-so-how-would-you-compare-two-settings">Step 4 — So how would you compare two settings?</a></li>
+  <li><a href="#step-5-break-it-on-purpose" id="toc-step-5-break-it-on-purpose" class="nav-link" data-scroll-target="#step-5-break-it-on-purpose">Step 5 — Break it on purpose</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave">Before you leave</a></li>
   </ul>
 </nav>
 </div>
@@ -2211,17 +2211,17 @@ vertical-align: -.125em;
 </header>
 
 
-<section id="what-we-are-doing" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> What we are doing</h1>
+<section id="what-we-are-doing" class="level1">
+<h1>What we are doing</h1>
 <p>Two things today, and the second matters more than the first.</p>
 <p><strong>First</strong>, you will build the machinery Homework 5 needs: turning a panel of 30 series into windowed training examples, and training a feedforward network on them. That scaffolding is the part of Homework 5 most likely to eat an evening, so we do it together.</p>
 <p><strong>Second</strong>, you will train the same model several times and discover that it gives you a different answer every time. Then you will find out how large that variation is, and what it means for every neural network result you will ever read — including your own.</p>
 <p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>torch</code>, and <code>data/processed/m5_weekly.csv</code>.</p>
 <hr>
 </section>
-<section id="setup" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
-<div id="aa487cf0" class="cell" data-execution_count="1">
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div id="973cc6dd" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2257,11 +2257,11 @@ vertical-align: -.125em;
 </div>
 <hr>
 </section>
-<section id="step-1-from-a-panel-to-windows" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Step 1 — From a panel to windows</h1>
+<section id="step-1-from-a-panel-to-windows" class="level1">
+<h1>Step 1 — From a panel to windows</h1>
 <p>A network cannot read a dataframe. It needs a stack of fixed-size examples.</p>
 <p>For each series, slide a 26-week window along the history: the window is the input, the units in the following week is the target.</p>
-<div id="d018a106" class="cell" data-execution_count="2">
+<div id="98bf5993" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>X, Y, D <span class="op">=</span> [], [], []</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _, g <span class="kw">in</span> weekly.groupby([<span class="st">&quot;store_id&quot;</span>, <span class="st">&quot;cat_id&quot;</span>]):</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> g[CHANNELS].values.astype(<span class="st">&quot;float32&quot;</span>)</span>
@@ -2283,7 +2283,7 @@ train 5,940   test 1,590</code></pre>
 </div>
 <p><strong>Notice the window count is far larger than the row count.</strong> Every week is the end of one window and the interior of twenty-five others, so 8,310 rows become ~7,500 overlapping examples. That overlap is why the effective sample size is much smaller than it looks.</p>
 <p>Now standardize — <strong>using training statistics only</strong>.</p>
-<div id="842efa37" class="cell" data-execution_count="3">
+<div id="afe36161" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mu <span class="op">=</span> X[train_mask].mean(axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), keepdims<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sd <span class="op">=</span> X[train_mask].std(axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-8</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>y_mu, y_sd <span class="op">=</span> Y[train_mask].mean(), Y[train_mask].std()</span>
@@ -2303,9 +2303,9 @@ train 5,940   test 1,590</code></pre>
 <p><strong>This block is what Homework 5 Part 1 Q1 asks for.</strong> Keep it.</p>
 <hr>
 </section>
-<section id="step-2-train-a-network" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Step 2 — Train a network</h1>
-<div id="dc9dca00" class="cell" data-execution_count="4">
+<section id="step-2-train-a-network" class="level1">
+<h1>Step 2 — Train a network</h1>
+<div id="d1b503ed" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_model(n_features, seed):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    torch.manual_seed(seed)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
@@ -2340,10 +2340,10 @@ test RMSE:  1,109</code></pre>
 <p><strong>Compare that RMSE against your records.</strong> XGBoost managed 781 on this panel in Homework 4, and a 46-coefficient LASSO managed 744. Your network has around 22,000 parameters.</p>
 <hr>
 </section>
-<section id="step-3-run-it-again" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Step 3 — Run it again</h1>
+<section id="step-3-run-it-again" class="level1">
+<h1>Step 3 — Run it again</h1>
 <p>Same code, same data, same settings. Only the random seed changes.</p>
-<div id="e82b4895" class="cell" data-execution_count="5">
+<div id="8cbc84cd" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> seed <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;seed </span><span class="sc">{</span>seed<span class="sc">}</span><span class="ss">:  test RMSE </span><span class="sc">{</span>train(make_model(X_tr.shape[<span class="dv">1</span>], seed))<span class="sc">:,.0f}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2355,10 +2355,10 @@ seed 3:  test RMSE 946</code></pre>
 <p><strong>Say out loud what just happened</strong>, because it is the point of the lab. Nothing about the problem changed. The differences you see come entirely from random weight initialization and dropout.</p>
 <hr>
 </section>
-<section id="step-4-so-how-would-you-compare-two-settings" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Step 4 — So how would you compare two settings?</h1>
+<section id="step-4-so-how-would-you-compare-two-settings" class="level1">
+<h1>Step 4 — So how would you compare two settings?</h1>
 <p>Here is the trap. Suppose you want to know whether weight decay helps. You try three values, train once each, and pick the winner.</p>
-<div id="dceaf57f" class="cell" data-execution_count="6">
+<div id="6abe646e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> {wd: train(make_model(X_tr.shape[<span class="dv">1</span>], seed<span class="op">=</span><span class="dv">1</span>), weight_decay<span class="op">=</span>wd)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>          <span class="cf">for</span> wd <span class="kw">in</span> (<span class="fl">0.0</span>, <span class="fl">1e-4</span>, <span class="fl">1e-2</span>)}</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> wd, r <span class="kw">in</span> single.items():</span>
@@ -2370,7 +2370,7 @@ weight_decay=0.01    test RMSE 1,142</code></pre>
 </div>
 </div>
 <p>Now do it honestly — <strong>five seeds per setting</strong>, and look at the spread as well as the mean.</p>
-<div id="75b796da" class="cell" data-execution_count="7">
+<div id="83aa0c0b" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> wd <span class="kw">in</span> (<span class="fl">0.0</span>, <span class="fl">1e-4</span>, <span class="fl">1e-2</span>):</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    runs <span class="op">=</span> [train(make_model(X_tr.shape[<span class="dv">1</span>], s), weight_decay<span class="op">=</span>wd) <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)]</span>
@@ -2400,17 +2400,17 @@ Compare the two tables before you go on
 </div>
 </div>
 <p><strong>Your turn:</strong> using your own two tables, state the smallest RMSE difference you would be willing to call real.</p>
-<div id="212c3845" class="cell" data-execution_count="8">
+<div id="fccbc820" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># spread = ___                      # &lt;- a number from your five-seed table</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f&quot;differences smaller than about {spread:,.0f} RMSE are not evidence&quot;)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 </section>
-<section id="step-5-break-it-on-purpose" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Step 5 — Break it on purpose</h1>
+<section id="step-5-break-it-on-purpose" class="level1">
+<h1>Step 5 — Break it on purpose</h1>
 <p>One line, no error message.</p>
-<div id="b01095a0" class="cell" data-execution_count="9">
+<div id="dd7454b1" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_broken(model, epochs<span class="op">=</span><span class="dv">60</span>, lr<span class="op">=</span><span class="fl">5e-4</span>):</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    opt <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span>lr)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    lossfn <span class="op">=</span> nn.MSELoss()</span>
@@ -2434,11 +2434,11 @@ without zero_grad():  7,325</code></pre>
 </div>
 </div>
 <p>Without <code>zero_grad()</code>, PyTorch <strong>accumulates</strong> gradients across batches instead of replacing them, so every update uses a sum of all gradients seen so far in that epoch.</p>
-<p>No exception. No warning. Just a model that trains badly — and note <em>how</em> badly. The broken version lands around <strong>7,400</strong>, which is more than three times worse than the seasonal-naive benchmark of 2,152. A one-line omission turned a working model into something far worse than predicting last year’s value.</p>
+<p>No exception. No warning. Just a model that trains badly — and note <em>how</em> badly. The broken version lands at <strong>7,325</strong>, which is more than three times worse than the seasonal-naive benchmark of 2,152. A one-line omission turned a working model into something far worse than predicting last year’s value.</p>
 <hr>
 </section>
-<section id="before-you-leave" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Before you leave</h1>
+<section id="before-you-leave" class="level1">
+<h1>Before you leave</h1>
 <blockquote class="blockquote">
 <p><strong>Discuss (the seeds):</strong> You now know a single training run tells you very little. But papers, blog posts and vendor benchmarks routinely report exactly one. When you read “our model achieves RMSE 1,050,” what should you want to know before believing it beats a baseline at 1,100?</p>
 <p><strong>Discuss (the comparison):</strong> Your network has roughly 22,000 parameters and lost to a 46-coefficient LASSO from Homework 4. Give one reason that is not simply “neural networks need more data” — think about what the FFN can and cannot see in a flattened window.</p>

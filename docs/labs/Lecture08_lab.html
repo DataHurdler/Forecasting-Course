@@ -2317,14 +2317,14 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">1</span> What we are doing</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2</span> Setup</a></li>
-  <li><a href="#step-1-how-far-back-can-the-filter-see" id="toc-step-1-how-far-back-can-the-filter-see" class="nav-link" data-scroll-target="#step-1-how-far-back-can-the-filter-see"><span class="header-section-number">3</span> Step 1 — How far back can the filter see?</a></li>
-  <li><a href="#step-2-build-the-cnn" id="toc-step-2-build-the-cnn" class="nav-link" data-scroll-target="#step-2-build-the-cnn"><span class="header-section-number">4</span> Step 2 — Build the CNN</a></li>
-  <li><a href="#step-3-does-pooling-belong-here" id="toc-step-3-does-pooling-belong-here" class="nav-link" data-scroll-target="#step-3-does-pooling-belong-here"><span class="header-section-number">5</span> Step 3 — Does pooling belong here?</a></li>
-  <li><a href="#step-4-a-longer-window-the-same-receptive-field" id="toc-step-4-a-longer-window-the-same-receptive-field" class="nav-link" data-scroll-target="#step-4-a-longer-window-the-same-receptive-field"><span class="header-section-number">6</span> Step 4 — A longer window, the same receptive field</a></li>
-  <li><a href="#step-5-where-does-it-land" id="toc-step-5-where-does-it-land" class="nav-link" data-scroll-target="#step-5-where-does-it-land"><span class="header-section-number">7</span> Step 5 — Where does it land?</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">8</span> Before you leave</a></li>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing">What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#step-1-how-far-back-can-the-filter-see" id="toc-step-1-how-far-back-can-the-filter-see" class="nav-link" data-scroll-target="#step-1-how-far-back-can-the-filter-see">Step 1 — How far back can the filter see?</a></li>
+  <li><a href="#step-2-build-the-cnn" id="toc-step-2-build-the-cnn" class="nav-link" data-scroll-target="#step-2-build-the-cnn">Step 2 — Build the CNN</a></li>
+  <li><a href="#step-3-does-pooling-belong-here" id="toc-step-3-does-pooling-belong-here" class="nav-link" data-scroll-target="#step-3-does-pooling-belong-here">Step 3 — Does pooling belong here?</a></li>
+  <li><a href="#step-4-a-longer-window-the-same-receptive-field" id="toc-step-4-a-longer-window-the-same-receptive-field" class="nav-link" data-scroll-target="#step-4-a-longer-window-the-same-receptive-field">Step 4 — A longer window, the same receptive field</a></li>
+  <li><a href="#step-5-where-does-it-land" id="toc-step-5-where-does-it-land" class="nav-link" data-scroll-target="#step-5-where-does-it-land">Step 5 — Where does it land?</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave">Before you leave</a></li>
   </ul>
 </nav>
 </div>
@@ -2350,8 +2350,8 @@ window.Quarto = {
 </header>
 
 
-<section id="what-we-are-doing" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> What we are doing</h1>
+<section id="what-we-are-doing" class="level1">
+<h1>What we are doing</h1>
 <p>Last week you flattened a 26-week window into a vector of 104 numbers and fed it to a network. That model had no idea the window was ordered — week 1 and week 26 were just positions in a list.</p>
 <p>A convolution does know. It slides a filter along the time axis and looks for local shapes.</p>
 <p>Today you will build one, and then find out <strong>how far back it can actually see</strong> — which is considerably less than the window you hand it, and is the single most useful thing to understand about this architecture.</p>
@@ -2367,15 +2367,15 @@ Two cells here are slow
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Steps 3 and 4 each train several networks, and take roughly two minutes apiece on a laptop. Start the cell, read the text underneath it while it runs, and do not assume it has hung.</p>
+<p>Steps 3 and 4 each train several networks — about four minutes and about three minutes respectively on a laptop. Start the cell, read the text underneath it while it runs, and do not assume it has hung.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="setup" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
+<section id="setup" class="level1">
+<h1>Setup</h1>
 <p>Same windowing as Lab 7, with one change that matters.</p>
-<div id="2ee36504" class="cell" data-execution_count="1">
+<div id="e06144b2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2438,15 +2438,15 @@ The transpose that bites everyone
 </div>
 <hr>
 </section>
-<section id="step-1-how-far-back-can-the-filter-see" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Step 1 — How far back can the filter see?</h1>
+<section id="step-1-how-far-back-can-the-filter-see" class="level1">
+<h1>Step 1 — How far back can the filter see?</h1>
 <p>Before building anything, work this out on paper.</p>
 <p>Our network is <code>Conv1d(4, 32, kernel_size=5)</code> then <code>Conv1d(32, 64, kernel_size=3)</code>.</p>
 <ul>
 <li>A neuron in <strong>layer 1</strong> sees <strong>5</strong> consecutive weeks.</li>
 <li>A neuron in <strong>layer 2</strong> sees 3 layer-1 neurons — which between them span <span class="math inline">\(3 + (5 - 1) = \mathbf{7}\)</span> weeks.</li>
 </ul>
-<div id="9930a0eb" class="cell" data-execution_count="2">
+<div id="aadbf880" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> receptive_field(kernels):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    rf <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">reversed</span>(kernels):</span>
@@ -2466,9 +2466,9 @@ kernels (5, 3, 3, 3)-&gt; receptive field 11 weeks</code></pre>
 <p><strong>Hold that fact.</strong> Step 4 tests what it costs.</p>
 <hr>
 </section>
-<section id="step-2-build-the-cnn" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Step 2 — Build the CNN</h1>
-<div id="b2f18aa9" class="cell" data-execution_count="3">
+<section id="step-2-build-the-cnn" class="level1">
+<h1>Step 2 — Build the CNN</h1>
+<div id="579a74f3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> conv_out_len(W):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W <span class="op">-</span> <span class="dv">4</span> <span class="op">-</span> <span class="dv">2</span>          <span class="co"># kernel 5, then kernel 3, no padding</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2507,11 +2507,11 @@ test RMSE:  980</code></pre>
 </div>
 <hr>
 </section>
-<section id="step-3-does-pooling-belong-here" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Step 3 — Does pooling belong here?</h1>
+<section id="step-3-does-pooling-belong-here" class="level1">
+<h1>Step 3 — Does pooling belong here?</h1>
 <p>Lecture 8 argued that pooling buys <strong>translation invariance</strong> — an image classifier should not care where in the frame the cat is — and that a forecaster usually <em>should</em> care where the spike was.</p>
 <p>Test it. Three heads, three seeds each, because of last week.</p>
-<div id="394c5091" class="cell" data-execution_count="4">
+<div id="fef8c8a5" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>head_runs <span class="op">=</span> {}</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> head <span class="kw">in</span> (<span class="st">&quot;flatten&quot;</span>, <span class="st">&quot;maxpool&quot;</span>, <span class="st">&quot;avgpool&quot;</span>):</span>
@@ -2534,24 +2534,24 @@ avgpool  1534  81 [1643, 1448, 1509]</code></pre>
 </blockquote>
 <hr>
 </section>
-<section id="step-4-a-longer-window-the-same-receptive-field" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Step 4 — A longer window, the same receptive field</h1>
+<section id="step-4-a-longer-window-the-same-receptive-field" class="level1">
+<h1>Step 4 — A longer window, the same receptive field</h1>
 <p>Now the experiment Step 1 set up. Keep the architecture fixed and vary only the window.</p>
-<div id="3214f9da" class="cell" data-execution_count="5">
+<div id="d943b6c3" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W <span class="kw">in</span> (<span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># W=26 was already fitted in Step 3 -- reuse it rather than paying twice</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    runs <span class="op">=</span> head_runs[<span class="st">&quot;flatten&quot;</span>][:<span class="dv">2</span>] <span class="cf">if</span> W <span class="op">==</span> <span class="dv">26</span> <span class="cf">else</span> [train(make_cnn(W, <span class="st">&quot;flatten&quot;</span>, s), W) <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>)]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># W=26 was already fitted in Step 3 -- reuse those three rather than paying twice</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    runs <span class="op">=</span> head_runs[<span class="st">&quot;flatten&quot;</span>] <span class="cf">if</span> W <span class="op">==</span> <span class="dv">26</span> <span class="cf">else</span> [train(make_cnn(W, <span class="st">&quot;flatten&quot;</span>, s), W) <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)]</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    n_par <span class="op">=</span> <span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> make_cnn(W, <span class="st">&quot;flatten&quot;</span>, <span class="dv">1</span>).parameters())</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    rows.append({<span class="st">&quot;window&quot;</span>: W, <span class="st">&quot;receptive_field&quot;</span>: receptive_field([<span class="dv">5</span>,<span class="dv">3</span>]),</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;parameters&quot;</span>: n_par, <span class="st">&quot;mean_RMSE&quot;</span>: <span class="bu">round</span>(np.mean(runs)),</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;sd&quot;</span>: <span class="bu">round</span>(np.std(runs))})</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;sd&quot;</span>: <span class="bu">round</span>(np.std(runs)), <span class="st">&quot;runs&quot;</span>: [<span class="bu">round</span>(r) <span class="cf">for</span> r <span class="kw">in</span> runs]})</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame(rows).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> window  receptive_field  parameters  mean_RMSE  sd
-     13                7        7329        999  40
-     26                7        8161       1063  83
-     52                7        9825       1090  21</code></pre>
+<pre><code> window  receptive_field  parameters  mean_RMSE  sd               runs
+     13                7        7329        980  42   [1039, 960, 943]
+     26                7        8161       1032  80   [980, 1145, 972]
+     52                7        9825       1103  26 [1111, 1068, 1131]</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -2564,13 +2564,14 @@ The result runs the wrong way, and that is the lesson
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>A longer window does not help. It <strong>hurts</strong>, monotonically.</p>
-<p>The receptive field is stuck at seven weeks no matter how much history you supply. What a longer window <em>does</em> add is parameters — the flatten layer grows with <code>W</code> — so you get more capacity to overfit and no additional context to justify it.</p>
+<p>A longer window does not help. Read the <strong>ends</strong> of the table, not the middle.</p>
+<p>13 weeks and 26 weeks sit inside each other’s run-to-run spread — a 52-point gap against a standard deviation of 80. That is exactly the kind of difference Lab 7 taught you not to trust, and you should not trust it here either. But 52 weeks is <strong>123 RMSE worse than 13 weeks</strong>, a gap no seed accounts for: the worst 13-week run still beats the best 52-week run.</p>
+<p>The receptive field is stuck at seven weeks no matter how much history you supply. What a longer window <em>does</em> add is parameters — the flatten layer grows with <code>W</code>, from 7,329 to 9,825 — so you get more capacity to overfit and no additional context to justify it.</p>
 <p><strong>More data into the model is not more information out of it</strong>, unless the architecture can reach it.</p>
 </div>
 </div>
 <p><strong>Your turn:</strong> using <code>receptive_field()</code>, find how many kernel-3 layers you would need to stack after the first kernel-5 layer to actually span 52 weeks.</p>
-<div id="d3cd88c5" class="cell" data-execution_count="6">
+<div id="4608efe6" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># k = [5]</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># while receptive_field(k) &lt; 52:</span></span>
@@ -2579,9 +2580,9 @@ The result runs the wrong way, and that is the lesson
 </div>
 <hr>
 </section>
-<section id="step-5-where-does-it-land" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Step 5 — Where does it land?</h1>
-<div id="b7d875e6" class="cell" data-execution_count="7">
+<section id="step-5-where-does-it-land" class="level1">
+<h1>Step 5 — Where does it land?</h1>
+<div id="f2f0626d" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>board <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;LASSO, 46 features (HW4)&quot;</span>: <span class="dv">744</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;XGBoost (HW4)&quot;</span>: <span class="dv">781</span>,</span>
@@ -2601,8 +2602,8 @@ Seasonal naive                   2152</code></pre>
 <p>The CNN is competitive with the feedforward network and well behind both tabular models — on a problem where the useful signal sits at lags the filter cannot reach.</p>
 <hr>
 </section>
-<section id="before-you-leave" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Before you leave</h1>
+<section id="before-you-leave" class="level1">
+<h1>Before you leave</h1>
 <blockquote class="blockquote">
 <p><strong>Discuss (the architecture):</strong> You have now seen two ways to fail to use a 52-week window: the FFN flattens it and loses the ordering, the CNN preserves ordering but can only see seven weeks at a time. Describe, without naming an architecture, what a model would need in order to use the whole window properly.</p>
 <p><strong>Discuss (the practice):</strong> Step 4’s result — longer window, worse forecast — is the kind of thing a practitioner discovers after a week of tuning. What one calculation, done in Step 1, would have predicted it?</p>

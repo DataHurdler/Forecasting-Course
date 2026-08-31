@@ -2178,13 +2178,13 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">1</span> What we are doing</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2</span> Setup</a></li>
-  <li><a href="#step-1-fit-a-tree-and-read-it-out-loud" id="toc-step-1-fit-a-tree-and-read-it-out-loud" class="nav-link" data-scroll-target="#step-1-fit-a-tree-and-read-it-out-loud"><span class="header-section-number">3</span> Step 1 — Fit a tree and read it out loud</a></li>
-  <li><a href="#step-2-watch-the-biasvariance-tradeoff-happen" id="toc-step-2-watch-the-biasvariance-tradeoff-happen" class="nav-link" data-scroll-target="#step-2-watch-the-biasvariance-tradeoff-happen"><span class="header-section-number">4</span> Step 2 — Watch the bias–variance tradeoff happen</a></li>
-  <li><a href="#step-3-why-one-tree-is-not-enough" id="toc-step-3-why-one-tree-is-not-enough" class="nav-link" data-scroll-target="#step-3-why-one-tree-is-not-enough"><span class="header-section-number">5</span> Step 3 — Why one tree is not enough</a></li>
-  <li><a href="#step-4-where-trees-reliably-fail" id="toc-step-4-where-trees-reliably-fail" class="nav-link" data-scroll-target="#step-4-where-trees-reliably-fail"><span class="header-section-number">6</span> Step 4 — Where trees reliably fail</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">7</span> Before you leave</a></li>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing">What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#step-1-fit-a-tree-and-read-it-out-loud" id="toc-step-1-fit-a-tree-and-read-it-out-loud" class="nav-link" data-scroll-target="#step-1-fit-a-tree-and-read-it-out-loud">Step 1 — Fit a tree and read it out loud</a></li>
+  <li><a href="#step-2-watch-the-biasvariance-tradeoff-happen" id="toc-step-2-watch-the-biasvariance-tradeoff-happen" class="nav-link" data-scroll-target="#step-2-watch-the-biasvariance-tradeoff-happen">Step 2 — Watch the bias–variance tradeoff happen</a></li>
+  <li><a href="#step-3-why-one-tree-is-not-enough" id="toc-step-3-why-one-tree-is-not-enough" class="nav-link" data-scroll-target="#step-3-why-one-tree-is-not-enough">Step 3 — Why one tree is not enough</a></li>
+  <li><a href="#step-4-where-trees-reliably-fail" id="toc-step-4-where-trees-reliably-fail" class="nav-link" data-scroll-target="#step-4-where-trees-reliably-fail">Step 4 — Where trees reliably fail</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave">Before you leave</a></li>
   </ul>
 </nav>
 </div>
@@ -2210,17 +2210,17 @@ vertical-align: -.125em;
 </header>
 
 
-<section id="what-we-are-doing" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> What we are doing</h1>
+<section id="what-we-are-doing" class="level1">
+<h1>What we are doing</h1>
 <p>Today the course changes character. Everything so far specified a structure and estimated it. A tree is handed a pile of features and finds the structure itself.</p>
 <p>We use <strong>the same series you just forecast in Homework 2</strong> — daily units for CA_1 FOODS. Same store, same aisle, same target. Last week you fitted a GAM to it. Today you fit a tree, and the comparison is the point: you will be able to say what each method bought you on identical data.</p>
 <p>By the end you will have done four things: read a fitted tree out loud, watched the bias–variance tradeoff happen in a table, discovered why a single tree is unstable, and found the one place trees reliably fail.</p>
 <p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>scikit-learn</code>, and <code>data/processed/m5_daily.csv</code> (run <code>python scripts/prep_m5.py</code> if it is missing).</p>
 <hr>
 </section>
-<section id="setup" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
-<div id="52d5a27b" class="cell" data-execution_count="1">
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div id="7de4cbee" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2270,10 +2270,10 @@ benchmark (same day last year): RMSE 625</code></pre>
 <p><strong>Notice what just happened to the data.</strong> There is no date index in <code>X_train</code>. Every row is an independent example, and everything the model knows about time is sitting in the lag columns. That reframing — a time series becomes a flat table — is what lets every method from here to Lecture 9 be applied to forecasting at all.</p>
 <hr>
 </section>
-<section id="step-1-fit-a-tree-and-read-it-out-loud" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Step 1 — Fit a tree and read it out loud</h1>
+<section id="step-1-fit-a-tree-and-read-it-out-loud" class="level1">
+<h1>Step 1 — Fit a tree and read it out loud</h1>
 <p>Start deliberately shallow, because a depth-3 tree is small enough to read.</p>
-<div id="d81658a1" class="cell" data-execution_count="2">
+<div id="32000ef9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tree3 <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">3</span>, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(export_text(tree3, feature_names<span class="op">=</span>FEATURES, decimals<span class="op">=</span><span class="dv">0</span>))</span>
@@ -2306,7 +2306,7 @@ benchmark (same day last year): RMSE 625</code></pre>
 test RMSE: 337</code></pre>
 </div>
 </div>
-<div id="555c39c1" class="cell" data-execution_count="3">
+<div id="7faa0469" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>plot_tree(tree3, feature_names<span class="op">=</span>FEATURES, filled<span class="op">=</span><span class="va">True</span>, rounded<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">7</span>, ax<span class="op">=</span>ax)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2320,7 +2320,7 @@ test RMSE: 337</code></pre>
 </div>
 <p><strong>Read the root split aloud to the person next to you</strong>, in business language — not <code>dow &lt;= 4.50</code> but what that <em>means</em> about this store.</p>
 <p>Then look at the importances:</p>
-<div id="5cac6423" class="cell" data-execution_count="4">
+<div id="3c2dfca3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>imp <span class="op">=</span> pd.Series(tree3.feature_importances_, index<span class="op">=</span>FEATURES).sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imp[imp <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">round</span>(<span class="dv">3</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2347,10 +2347,10 @@ Compare this with the lecture slide
 </div>
 <hr>
 </section>
-<section id="step-2-watch-the-biasvariance-tradeoff-happen" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Step 2 — Watch the bias–variance tradeoff happen</h1>
+<section id="step-2-watch-the-biasvariance-tradeoff-happen" class="level1">
+<h1>Step 2 — Watch the bias–variance tradeoff happen</h1>
 <p>Lecture 4 drew this as a curve. Now produce it.</p>
-<div id="8a801b22" class="cell" data-execution_count="5">
+<div id="146ea8d5" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> depth <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="va">None</span>]:</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span>depth, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
@@ -2372,7 +2372,7 @@ Compare this with the lecture slide
  None    1200           0        406</code></pre>
 </div>
 </div>
-<div id="76388206" class="cell" data-execution_count="6">
+<div id="42e1ccf3" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.train_RMSE, marker<span class="op">=</span><span class="st">&quot;o&quot;</span>, label<span class="op">=</span><span class="st">&quot;train&quot;</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.test_RMSE,  marker<span class="op">=</span><span class="st">&quot;o&quot;</span>, label<span class="op">=</span><span class="st">&quot;test&quot;</span>)</span>
@@ -2391,10 +2391,10 @@ Compare this with the lecture slide
 <p>The gap between those two curves is overfitting, drawn to scale.</p>
 <hr>
 </section>
-<section id="step-3-why-one-tree-is-not-enough" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Step 3 — Why one tree is not enough</h1>
+<section id="step-3-why-one-tree-is-not-enough" class="level1">
+<h1>Step 3 — Why one tree is not enough</h1>
 <p>Lecture 4 claimed a tree is unstable: change the data slightly and the structure changes. Test it properly, using bootstrap resamples — draw a sample of the same size <em>with replacement</em>, refit, and repeat.</p>
-<div id="c7f1c2ad" class="cell" data-execution_count="7">
+<div id="6279bba2" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>roots, preds <span class="op">=</span> {}, []</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2422,7 +2422,7 @@ per-day spread of predictions across the 20 trees:
 </div>
 <p>The root may well be stable — one feature can be dominant enough that every resample finds it first. <strong>That is not the same as the tree being stable.</strong> Look at the spread of predictions: on a typical day the twenty trees disagree by a meaningful margin, and on the worst day they disagree enormously. All that disagreement lives <em>below</em> the root.</p>
 <p>Now the payoff, and it is one line:</p>
-<div id="d5d6e6e8" class="cell" data-execution_count="8">
+<div id="e13eb98e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> np.mean([rmse(y_test, p) <span class="cf">for</span> p <span class="kw">in</span> P])</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>averaged <span class="op">=</span> rmse(y_test, P.mean(<span class="dv">0</span>))</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2435,13 +2435,13 @@ RMSE of the 20 trees averaged together  : 266
 improvement: 18%</code></pre>
 </div>
 </div>
-<p>You just built a small Random Forest by hand. Nothing was tuned and no new information was added — the gain came entirely from averaging away the disagreement you measured above. That is next week’s lecture in three lines.</p>
+<p>You just built a <strong>bagged ensemble</strong> by hand — bootstrap aggregating, in three lines. Nothing was tuned and no new information was added; the gain came entirely from averaging away the disagreement you measured above. It is not yet a Random Forest: a forest adds one more idea, which is to stop every tree from looking at <code>dow</code> first. Twenty trees that agree perfectly on their root are twenty trees making correlated mistakes. That is next week.</p>
 <hr>
 </section>
-<section id="step-4-where-trees-reliably-fail" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Step 4 — Where trees reliably fail</h1>
+<section id="step-4-where-trees-reliably-fail" class="level1">
+<h1>Step 4 — Where trees reliably fail</h1>
 <p>A tree predicts the <strong>mean of the training rows in a leaf</strong>. So every prediction it can ever make is an average of values it has already seen.</p>
-<div id="2b6ea861" class="cell" data-execution_count="9">
+<div id="c93da09e" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>full <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> full.predict(X_test)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2453,7 +2453,7 @@ prediction range      : [0, 4,527]</code></pre>
 </div>
 </div>
 <p>The predictions cannot leave the training range — not “usually do not,” <em>cannot</em>. Now watch what that does at the extremes.</p>
-<div id="8123498e" class="cell" data-execution_count="10">
+<div id="1d6da8d3" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>hi <span class="op">=</span> y_test <span class="op">&gt;</span> np.percentile(y_test, <span class="dv">90</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>lo <span class="op">=</span> y_test <span class="op">&lt;</span> np.percentile(y_test, <span class="dv">10</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2467,7 +2467,7 @@ quietest 10% of test days (n=37): actual 2,030   predicted 2,237   over by  207<
 </div>
 </div>
 <p><strong>Your turn:</strong> the two errors above point in opposite directions. Plot predicted against actual for the test set, add the 45-degree line, and see the shape this produces.</p>
-<div id="2331a054" class="cell" data-execution_count="11">
+<div id="c07ad915" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the two blanks ----</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, ax = plt.subplots(figsize=(4.5, 4.5))</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.scatter(___, ___, s=6, alpha=0.4)          # &lt;- actual on x, predicted on y</span></span>
@@ -2478,8 +2478,8 @@ quietest 10% of test days (n=37): actual 2,030   predicted 2,237   over by  207<
 </div>
 <hr>
 </section>
-<section id="before-you-leave" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Before you leave</h1>
+<section id="before-you-leave" class="level1">
+<h1>Before you leave</h1>
 <p>You should have found that the tree systematically under-predicts the busiest days and over-predicts the quietest ones, and that averaging twenty unstable trees beat any one of them.</p>
 <blockquote class="blockquote">
 <p><strong>Discuss (the failure):</strong> A tree pulls its predictions toward the middle at both ends. Give the mechanical reason — think about what a leaf prediction actually is.</p>

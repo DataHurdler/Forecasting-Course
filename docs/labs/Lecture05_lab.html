@@ -2178,15 +2178,15 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">1</span> What we are doing</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2</span> Setup</a></li>
-  <li><a href="#step-1-the-real-thing" id="toc-step-1-the-real-thing" class="nav-link" data-scroll-target="#step-1-the-real-thing"><span class="header-section-number">3</span> Step 1 — The real thing</a></li>
-  <li><a href="#step-2-how-many-trees-is-enough" id="toc-step-2-how-many-trees-is-enough" class="nav-link" data-scroll-target="#step-2-how-many-trees-is-enough"><span class="header-section-number">4</span> Step 2 — How many trees is enough?</a></li>
-  <li><a href="#step-3-the-random-in-random-forest" id="toc-step-3-the-random-in-random-forest" class="nav-link" data-scroll-target="#step-3-the-random-in-random-forest"><span class="header-section-number">5</span> Step 3 — The “random” in Random Forest</a></li>
-  <li><a href="#step-4-validation-for-free" id="toc-step-4-validation-for-free" class="nav-link" data-scroll-target="#step-4-validation-for-free"><span class="header-section-number">6</span> Step 4 — Validation for free</a></li>
-  <li><a href="#step-5-two-importances-two-different-answers" id="toc-step-5-two-importances-two-different-answers" class="nav-link" data-scroll-target="#step-5-two-importances-two-different-answers"><span class="header-section-number">7</span> Step 5 — Two importances, two different answers</a></li>
-  <li><a href="#step-6-stop-averaging.-start-correcting." id="toc-step-6-stop-averaging.-start-correcting." class="nav-link" data-scroll-target="#step-6-stop-averaging.-start-correcting."><span class="header-section-number">8</span> Step 6 — Stop averaging. Start correcting.</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">9</span> Before you leave</a></li>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing">What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#step-1-the-real-thing" id="toc-step-1-the-real-thing" class="nav-link" data-scroll-target="#step-1-the-real-thing">Step 1 — The real thing</a></li>
+  <li><a href="#step-2-how-many-trees-is-enough" id="toc-step-2-how-many-trees-is-enough" class="nav-link" data-scroll-target="#step-2-how-many-trees-is-enough">Step 2 — How many trees is enough?</a></li>
+  <li><a href="#step-3-the-random-in-random-forest" id="toc-step-3-the-random-in-random-forest" class="nav-link" data-scroll-target="#step-3-the-random-in-random-forest">Step 3 — The “random” in Random Forest</a></li>
+  <li><a href="#step-4-validation-for-free" id="toc-step-4-validation-for-free" class="nav-link" data-scroll-target="#step-4-validation-for-free">Step 4 — Validation for free</a></li>
+  <li><a href="#step-5-two-importances-two-different-answers" id="toc-step-5-two-importances-two-different-answers" class="nav-link" data-scroll-target="#step-5-two-importances-two-different-answers">Step 5 — Two importances, two different answers</a></li>
+  <li><a href="#step-6-stop-averaging.-start-correcting." id="toc-step-6-stop-averaging.-start-correcting." class="nav-link" data-scroll-target="#step-6-stop-averaging.-start-correcting.">Step 6 — Stop averaging. Start correcting.</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave">Before you leave</a></li>
   </ul>
 </nav>
 </div>
@@ -2212,17 +2212,17 @@ vertical-align: -.125em;
 </header>
 
 
-<section id="what-we-are-doing" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> What we are doing</h1>
-<p>At the end of Lab 4 you built a Random Forest by accident. You drew twenty bootstrap samples, fitted a tree to each, averaged the predictions, and the RMSE fell from about 324 to 266 — with nothing tuned and no new information added.</p>
+<section id="what-we-are-doing" class="level1">
+<h1>What we are doing</h1>
+<p>At the end of Lab 4 you built a bagged ensemble by accident. You drew twenty bootstrap samples, fitted a tree to each, averaged the predictions, and the RMSE fell from about 324 to 266 — with nothing tuned and no new information added. What you did not do is the one thing that turns bagging into a Random Forest.</p>
 <p>Today we do that properly, then find out what else the real algorithm does, then replace averaging with something better.</p>
 <p>Same series throughout: daily units for CA_1 FOODS. You have now fitted a GAM to it (Homework 2) and a single tree (Lab 4), so every number today lands on a scale you already know.</p>
 <p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>scikit-learn</code>, <code>xgboost</code>, and <code>data/processed/m5_daily.csv</code>.</p>
 <hr>
 </section>
-<section id="setup" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Setup</h1>
-<div id="e3232bc8" class="cell" data-execution_count="1">
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div id="9b925097" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2276,9 +2276,9 @@ Single tree (Lab 4)                     324
 </div>
 <hr>
 </section>
-<section id="step-1-the-real-thing" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Step 1 — The real thing</h1>
-<div id="63634a60" class="cell" data-execution_count="2">
+<section id="step-1-the-real-thing" class="level1">
+<h1>Step 1 — The real thing</h1>
+<div id="06fb4f8e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>rf.fit(X_train, y_train)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2291,10 +2291,10 @@ Single tree (Lab 4)                     324
 <p>Better than your hand-built version, and much better than one tree. Two differences account for it: more trees, and a second source of randomness we are about to meet.</p>
 <hr>
 </section>
-<section id="step-2-how-many-trees-is-enough" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Step 2 — How many trees is enough?</h1>
+<section id="step-2-how-many-trees-is-enough" class="level1">
+<h1>Step 2 — How many trees is enough?</h1>
 <p>The usual worry about a big model is overfitting. Adding trees to a forest is the rare knob where that worry does not apply — but it does stop paying.</p>
-<div id="e4a2e8c7" class="cell" data-execution_count="3">
+<div id="fcf150f8" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> [<span class="dv">5</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">300</span>, <span class="dv">600</span>]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>curve <span class="op">=</span> []</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> counts:</span>
@@ -2327,11 +2327,11 @@ Single tree (Lab 4)                     324
 <p><strong>Say what the curve does after about fifty trees</strong>, and what that means for how you would spend a compute budget. More trees never <em>hurt</em> accuracy — but every one costs time to fit and to predict.</p>
 <hr>
 </section>
-<section id="step-3-the-random-in-random-forest" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Step 3 — The “random” in Random Forest</h1>
+<section id="step-3-the-random-in-random-forest" class="level1">
+<h1>Step 3 — The “random” in Random Forest</h1>
 <p>Bagging alone gives every tree a different sample of <em>rows</em>. A Random Forest also gives each split a different random subset of <em>columns</em> — <code>max_features</code>. Lecture 5 argued this decorrelates the trees, so their errors cancel more completely when averaged.</p>
 <p>Test it.</p>
-<div id="5b5aa4d8" class="cell" data-execution_count="4">
+<div id="734f97d9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> mf <span class="kw">in</span> [<span class="va">None</span>, <span class="fl">0.6</span>, <span class="st">&quot;sqrt&quot;</span>, <span class="fl">0.2</span>]:</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, max_features<span class="op">=</span>mf,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                              random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>).fit(X_train, y_train)</span>
@@ -2361,10 +2361,10 @@ The textbook rule does not win here, and you should know why
 </div>
 <hr>
 </section>
-<section id="step-4-validation-for-free" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Step 4 — Validation for free</h1>
+<section id="step-4-validation-for-free" class="level1">
+<h1>Step 4 — Validation for free</h1>
 <p>Each bootstrap sample leaves out about a third of the rows. Those out-of-bag rows never trained that tree, so they can score it — a validation estimate with no holdout set.</p>
-<div id="db18a450" class="cell" data-execution_count="5">
+<div id="15e426f6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rf_oob <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, oob_score<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                               random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>).fit(X_train, y_train)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2381,9 +2381,9 @@ test RMSE: 248</code></pre>
 <p><strong>Compare the two numbers and account for the gap.</strong> The OOB estimate is computed on training-period rows scattered through 2012–2015; the test RMSE is a solid block of the final year. Which one would you quote to someone asking how the model will do next month, and why?</p>
 <hr>
 </section>
-<section id="step-5-two-importances-two-different-answers" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Step 5 — Two importances, two different answers</h1>
-<div id="091a3130" class="cell" data-execution_count="6">
+<section id="step-5-two-importances-two-different-answers" class="level1">
+<h1>Step 5 — Two importances, two different answers</h1>
+<div id="47c68579" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mdi <span class="op">=</span> pd.Series(rf.feature_importances_, index<span class="op">=</span>FEATURES)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>perm <span class="op">=</span> permutation_importance(rf, X_test, y_test, n_repeats<span class="op">=</span><span class="dv">10</span>,</span>
@@ -2414,10 +2414,10 @@ is_event      0.012               22.3        10          6</code></pre>
 <ul>
 <li>one lag that MDI ranks <em>above</em> <code>units_lag1</code>, while permutation ranks it far below</li>
 <li><code>snap</code>, which MDI places near the bottom and permutation places near the top</li>
-<li><code>avg_price</code>, which MDI gives a non-trivial score and permutation scores at essentially zero</li>
+<li><code>avg_price</code> against <code>is_event</code>: MDI ranks the price column <em>above</em> the event flag, while permutation scores price at exactly zero and the event flag at 22 units of RMSE</li>
 </ul>
 <p><strong>Your turn:</strong> plot the two rankings side by side as horizontal bar charts so the disagreements are visible at a glance.</p>
-<div id="18f41b75" class="cell" data-execution_count="7">
+<div id="df7a82ae" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the two blanks ----</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, axes = plt.subplots(1, 2, figsize=(11, 3.5))</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># mdi.sort_values().plot.barh(ax=axes[0], title=&quot;MDI (impurity)&quot;)</span></span>
@@ -2426,24 +2426,28 @@ is_event      0.012               22.3        10          6</code></pre>
 </div>
 <hr>
 </section>
-<section id="step-6-stop-averaging.-start-correcting." class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Step 6 — Stop averaging. Start correcting.</h1>
+<section id="step-6-stop-averaging.-start-correcting." class="level1">
+<h1>Step 6 — Stop averaging. Start correcting.</h1>
 <p>A forest builds many trees <strong>in parallel</strong> and averages them. Boosting builds them <strong>in sequence</strong>, each one fitted to what the previous ones got wrong.</p>
-<div id="bf149dfb" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr, n <span class="kw">in</span> [(<span class="fl">0.3</span>, <span class="dv">100</span>), (<span class="fl">0.1</span>, <span class="dv">100</span>), (<span class="fl">0.1</span>, <span class="dv">300</span>), (<span class="fl">0.05</span>, <span class="dv">1000</span>)]:</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span>n, learning_rate<span class="op">=</span>lr, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                         subsample<span class="op">=</span><span class="fl">0.8</span>, colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                         random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;  lr=</span><span class="sc">{</span>lr<span class="sc">:&lt;5}</span><span class="ss"> n=</span><span class="sc">{</span>n<span class="sc">:&lt;5}</span><span class="ss"> train </span><span class="sc">{</span>rmse(y_train, m.predict(X_train))<span class="sc">:5,.0f}</span><span class="ss">&quot;</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f&quot;   test </span><span class="sc">{</span>rmse(y_test, m.predict(X_test))<span class="sc">:5,.0f}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The first four rows hold the learning rate fixed and add rounds — the same experiment you ran on the forest in Step 2. The last two change the rate instead.</p>
+<div id="13973672" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr, n <span class="kw">in</span> [(<span class="fl">0.1</span>, <span class="dv">100</span>), (<span class="fl">0.1</span>, <span class="dv">300</span>), (<span class="fl">0.1</span>, <span class="dv">1000</span>), (<span class="fl">0.1</span>, <span class="dv">3000</span>),</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>              (<span class="fl">0.3</span>, <span class="dv">100</span>), (<span class="fl">0.05</span>, <span class="dv">1000</span>)]:</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span>n, learning_rate<span class="op">=</span>lr, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                         subsample<span class="op">=</span><span class="fl">0.8</span>, colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                         random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;  lr=</span><span class="sc">{</span>lr<span class="sc">:&lt;5}</span><span class="ss"> n=</span><span class="sc">{</span>n<span class="sc">:&lt;5}</span><span class="ss"> train </span><span class="sc">{</span>rmse(y_train, m.predict(X_train))<span class="sc">:5,.0f}</span><span class="ss">&quot;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f&quot;   test </span><span class="sc">{</span>rmse(y_test, m.predict(X_test))<span class="sc">:5,.0f}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  lr=0.3   n=100   train    95   test   238
-  lr=0.1   n=100   train   171   test   244
+<pre><code>  lr=0.1   n=100   train   171   test   244
   lr=0.1   n=300   train    95   test   243
+  lr=0.1   n=1000  train    19   test   250
+  lr=0.1   n=3000  train     0   test   253
+  lr=0.3   n=100   train    95   test   238
   lr=0.05  n=1000  train    54   test   239</code></pre>
 </div>
 </div>
-<div id="45e49dd2" class="cell" data-execution_count="9">
+<div id="198e1852" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>best <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span><span class="dv">100</span>, learning_rate<span class="op">=</span><span class="fl">0.1</span>, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                        subsample<span class="op">=</span><span class="fl">0.8</span>, colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                        random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
@@ -2458,11 +2462,14 @@ Random Forest (300 trees)            248
 XGBoost (lr=0.1, 100 trees)          244</code></pre>
 </div>
 </div>
-<p><strong>Look at the <code>lr=0.3</code> row against the others.</strong> Its training error is the lowest of the four and its test error is the worst. Adding trees to a <em>forest</em> was safe; adding correction steps that are each too large is not. That asymmetry is the practical difference between the two ensembles, and it is why boosting has a learning rate at all.</p>
+<p><strong>Read the first four rows as a curve, then compare it with Step 2.</strong> Training error falls to zero. Test error bottoms out around 300 rounds and then <strong>climbs back up</strong> — 3,000 rounds is worse than 100. In Step 2 you added trees to a forest all the way to 600 and it never once hurt.</p>
+<p>That is the practical difference between the two ensembles. A forest’s trees are fitted independently and averaged, so extra ones can only sharpen the average. Boosting’s trees are fitted to the previous ensemble’s <em>residuals</em>, so extra ones keep going — eventually correcting noise. <code>n_estimators</code> is a free choice in a forest and a tuning parameter in boosting.</p>
+<p>The last two rows say the obvious complement: a big rate with few rounds and a small rate with many land in much the same place, because roughly it is the product that sets the budget. What you cannot do is set a rate and then let the rounds run.</p>
+<p>Note which configuration we put on the scoreboard below — <code>lr=0.1, n=100</code>, the conventional default, <strong>not</strong> the row with the best test RMSE. Picking the winner out of a column computed on the test set is the mistake Lecture 1 warned about, and it does not stop being a mistake because the grid is small.</p>
 <hr>
 </section>
-<section id="before-you-leave" class="level1" data-number="9">
-<h1 data-number="9"><span class="header-section-number">9</span> Before you leave</h1>
+<section id="before-you-leave" class="level1">
+<h1>Before you leave</h1>
 <p>Your scoreboard should run from a benchmark near 625 down to roughly 245, across five models fitted to one series.</p>
 <blockquote class="blockquote">
 <p><strong>Discuss (the ranking):</strong> Boosting beat the forest here. Name one property of <em>this</em> dataset that favors boosting, and one situation where you would still reach for the forest first — thinking about tuning effort and about what happens when nobody retunes the model for a year.</p>

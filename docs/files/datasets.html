@@ -44,9 +44,9 @@ id="toc-fred-macro-series-lecture-2">2. FRED macro series — Lecture
 <li><a href="#electricity-demand-lecture-3"
 id="toc-electricity-demand-lecture-3">3. Electricity demand — Lecture
 3</a></li>
-<li><a href="#favorita-week-16-and-final-projects"
-id="toc-favorita-week-16-and-final-projects">4. Favorita — Week 16, and
-final projects</a></li>
+<li><a href="#favorita-optional-for-final-projects"
+id="toc-favorita-optional-for-final-projects">4. Favorita — optional,
+for final projects</a></li>
 <li><a href="#getting-set-up" id="toc-getting-set-up">Getting set
 up</a></li>
 </ul></li>
@@ -105,9 +105,9 @@ once. Retail has one</td>
 </tr>
 <tr>
 <td><strong>Favorita</strong> (Ecuador)</td>
-<td>Week 16, and available for final projects</td>
-<td>A dated exogenous shock — every method we learn fails on the same
-month</td>
+<td>Optional, for final projects</td>
+<td>A rich second panel with promotions, holidays and an oil price — and
+a documented natural experiment</td>
 </tr>
 </tbody>
 </table>
@@ -162,6 +162,16 @@ benefits indicator</td>
 </tr>
 </tbody>
 </table>
+<p><strong>The shock it already contains.</strong> On <strong>25
+December</strong>, every year, the stores are shut and recorded sales
+are <strong>exactly zero</strong> — five occurrences in the sample,
+against a daily average of about 2,800 units. The seasonal-naive
+benchmark predicts roughly 2,300 on those days, so it is wrong by 100%
+of the true value on a date known years in advance. The
+<code>is_event</code> flag fires on <strong>158</strong> days, of which
+only <strong>5</strong> are closures, so the feature every model in this
+course relies on cannot distinguish “the doors are locked” from an
+ordinary Super Bowl. We use this in Week 16.</p>
 <p><strong>Why it can carry the whole course.</strong></p>
 <ul>
 <li><strong>Lecture 1 (ETS).</strong> Aggregated to weekly it gives ~277
@@ -245,8 +255,8 @@ precisely what a smooth term in a GAM captures and a linear model
 cannot. Retail data would let you fit the method; electricity lets you
 see why it exists.</p>
 <hr />
-<h2 id="favorita-week-16-and-final-projects">4. Favorita — Week 16, and
-final projects</h2>
+<h2 id="favorita-optional-for-final-projects">4. Favorita — optional,
+for final projects</h2>
 <p><strong>What it is.</strong> Daily sales for Corporación Favorita, a
 large Ecuadorian grocery chain, covering 2013 to 2017. It includes
 promotions, store metadata, national holidays, and — because Ecuador’s
@@ -255,19 +265,23 @@ economy is oil-dependent — a daily <strong>oil price</strong>.</p>
 href="https://www.kaggle.com/c/favorita-grocery-sales-forecasting">Kaggle:
 Corporación Favorita Grocery Sales Forecasting</a>. This one does
 require a Kaggle account.</p>
-<p><strong>Why we need it and M5 cannot substitute.</strong> On
-<strong>16 April 2016</strong>, a magnitude 7.8 earthquake struck
-Ecuador. Sales spiked for weeks afterward as people bought water and
-relief supplies. The competition organizers documented this in the data
-description, so it is not something you have to reverse-engineer.</p>
-<p>We close the semester there, and the reason is worth stating plainly.
-A forecast made on 15 April 2016 — by exponential smoothing, by ARIMA,
-by XGBoost, by an LSTM, by a Bayesian model, by anything in this course
-— is catastrophically wrong for the following month. Not because the
-model was badly specified. Because the future stopped resembling the
-past, and every method in this course assumes it does not.</p>
-<p>Knowing where the whole toolkit stops working is part of knowing how
-to use it.</p>
+<p><strong>What makes it interesting.</strong> On <strong>16 April
+2016</strong>, a magnitude 7.8 earthquake struck Ecuador. Sales spiked
+for weeks afterward as people bought water and relief supplies, and the
+competition organizers documented it in the data description, so it is
+not something you have to reverse-engineer.</p>
+<p>A forecast made on 15 April 2016 — by exponential smoothing, by
+ARIMA, by XGBoost, by an LSTM, by anything in this course — is
+catastrophically wrong for the following month. Not because the model
+was badly specified, but because the future stopped resembling the past,
+and every method here assumes it does not. If your project wants to
+study a genuine structural break rather than simulate one, this is the
+cleanest one available.</p>
+<p><em>(We make the related point in Week 16 without leaving the spine
+dataset — see the Christmas closures in §1, where a <strong>known,
+dated</strong> event defeats every model in the course. Favorita’s
+earthquake is the harder case: an event nobody could have known about at
+all.)</em></p>
 <p><strong>For final projects.</strong> Favorita is also a good project
 dataset if your group wants one ready-made: it is rich enough for
 serious work and different enough from the spine that you cannot reuse
