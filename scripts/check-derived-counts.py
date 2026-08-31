@@ -312,15 +312,21 @@ _CL_CURRENT = changelog_current_release()
 
 # (label, claimed-value regex, surfaces to scan, actual count)
 CHECKS = [
+    # REMOVED 2026-08-31 (ECON 8310 course repo): the "translation phases" and
+    # "research-agent laws" rows gated counts that NO surface here states. The
+    # course README and CLAUDE.md were rewritten for the course and make no such
+    # claim; the only surviving mention is a historical CHANGELOG line that must
+    # not be edited. Per this file's own doctrine a row with no required surface
+    # "can never go red and is not a gate", so keeping them was decorative.
+    # Restore them if a surface ever states either count again.
     # Phrasings verified against the actual surfaces 2026-08-21. If you reword a
     # claim, update the pattern here too — an unmatched pattern reports nothing,
     # which is indistinguishable from a claim that is correct.
-    ("econ journal profiles", r'top-(\d+) journal profiles',      ["README.md", "guide/workflow-guide.qmd"], n_econ_journals()),
+    ("econ journal profiles", r'top-(\d+) journal profiles',      [OPT("README.md", "course repo rewrote this surface for ECON 8310; it no longer states the template's inventory"), "guide/workflow-guide.qmd"], n_econ_journals()),
     ("TikZ snippets",         r'(\d+) production-ready',       ["guide/workflow-guide.qmd"], n_tikz()),
     # guide/workflow-guide.qmd shows the translate-to-quarto phases as an ASCII
     # tree ("Phase 1-3 ... Phase 10-11") and never states an "N translation
     # phases" total, so it is scanned but not required to match.
-    ("translation phases",    r'(\d+) translation phases',       ["README.md", OPT("guide/workflow-guide.qmd", "shows the phases as a tree, states no total")], n_translate_phases()),
     # The 7-vs-8 drift cluster: seven separate surfaces claimed the wrong gate
     # count after gate 8 landed. Counted from backtest.sh itself.
     # CLAUDE.md names the gate suite ("the full backtest gate suite") but states
@@ -354,10 +360,9 @@ CHECKS = [
     # r13: the three multi-instance surfaces declare HOW MANY sites they carry
     # (README.md "ten gates" + "10 checkers"; docs/index.html twice; the guide
     # three times), so rewording one of them is as loud as rewording the last.
-    ("backtest gates",        r'(?i)\b' + _NUM + r' (?:gates|checkers)\b', [REQ("README.md", 2), REQ("docs/index.html", 2), OPT("CLAUDE.md", "names the gate suite, states no count"), REQ("guide/workflow-guide.qmd", 3), OPT(".claude/skills/vaccinate/evals/README.md", "refers to the suite by path, states no count"), ".claude/skills/commit/SKILL.md", ".github/CONTRIBUTING.md", "scripts/backtest.sh"], n_gates()),
+    ("backtest gates",        r'(?i)\b' + _NUM + r' (?:gates|checkers)\b', [OPT("README.md", "course repo rewrote this surface for ECON 8310; it no longer states the template's inventory"), OPT("docs/index.html", "course repo rewrote this surface for ECON 8310; it no longer states the template's inventory — the course landing page"), OPT("CLAUDE.md", "names the gate suite, states no count"), REQ("guide/workflow-guide.qmd", 3), OPT(".claude/skills/vaccinate/evals/README.md", "refers to the suite by path, states no count"), ".claude/skills/commit/SKILL.md", OPT(".github/CONTRIBUTING.md", "course repo rewrote this surface for ECON 8310; it no longer states the template's inventory"), "scripts/backtest.sh"], n_gates()),
     # CLAUDE.md's law count was hand-edited 17 -> 21 and nothing recomputed it,
     # so "99 laws" would have left every gate green. Counted from the laws file.
-    ("research-agent laws",   r'(\d+) laws\b',                   ["CLAUDE.md"], n_laws()),
     # The count two bullets ABOVE the law count in the same CLAUDE.md paragraph,
     # gated for the same reason and counted the same way — see n_rungs(). The
     # guide states it once more; CHANGELOG.md states it inside the FROZEN
@@ -365,7 +370,7 @@ CHECKS = [
     # a line number, because that pointer had already drifted once) and is
     # deliberately not a surface (see
     # changelog_current_release() for why history is never dragged to today).
-    ("verification rungs",    r'(?i)\bthe ' + _NUM + r' rungs\b', ["CLAUDE.md", "guide/workflow-guide.qmd", "docs/workflow-guide.html"], n_rungs()),
+    ("verification rungs",    r'(?i)\bthe ' + _NUM + r' rungs\b', [OPT("CLAUDE.md", "course repo rewrote this surface for ECON 8310; it no longer states the template's inventory"), "guide/workflow-guide.qmd", OPT("docs/workflow-guide.html", "unpublished from the course site in aea188b6 (2026-08-26)")], n_rungs()),
     ("seven-pass lenses",     r'(\d+) forked subagents',         [".claude/skills/seven-pass-review/SKILL.md"], n_seven_pass()),
     # The hook-battery case count drifted twice (12→16→…) because prose was
     # edited in parallel with case additions. Anchored on the vignette's own
@@ -422,7 +427,7 @@ CHECKS = [
     # could go stale the moment Pattern 20 landed — sequentiality still passes
     # on 1..20. Anchored on the vignette's own "is a reference shelf" tail, and
     # the count is spelled out, which words_to_int already handles.
-    ("workflow patterns",     r'(?i)' + _NUM + r' patterns is a reference shelf', ["guide/workflow-guide.qmd", "docs/workflow-guide.html"], n_patterns()),
+    ("workflow patterns",     r'(?i)' + _NUM + r' patterns is a reference shelf', ["guide/workflow-guide.qmd", OPT("docs/workflow-guide.html", "unpublished from the course site in aea188b6 (2026-08-26)")], n_patterns()),
     # --- the current release's inventory line (r10) ---------------------------
     # CHANGELOG.md's `**Inventory at release: N skills, N agents, N rules,
     # N hooks, N gates**` publishes five counts of this repository's own

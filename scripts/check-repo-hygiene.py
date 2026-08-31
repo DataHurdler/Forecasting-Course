@@ -23,11 +23,30 @@ ROOT_ALLOW = {
     # Written by /voice-profile at the root (the skill documents this location);
     # an author's voice profile is a legitimate committed artifact.
     "voice-profile.md",
+
+    # --- ECON 8310 course repository ---
+    # Student-facing documents. They live at the root deliberately: students are
+    # pointed at raw GitHub URLs for them, and scripts/set_course_url.py rewrites
+    # the published course URL inside all three.
+    "ECON8310Syllabus2026Fall.md",
+    "ECON8310_Datasets.md",
+    "ECON8310_Project_Rubric.md",
+    # Pinned environment (2026-08-25). requirements.txt is the full teaching
+    # environment; requirements-core.txt is the subset that installs without a
+    # compiler. Both are read by validate-setup.sh and quoted in the syllabus.
+    "requirements.txt",
+    "requirements-core.txt",
 }
 ROOT_ALLOW_DIRS = {
     ".claude", ".git", ".github", ".githooks", ".vscode", "Figures", "Preambles",
     "Quarto", "Slides", "docs", "explorations", "guide", "master_supporting_docs",
     "quality_reports", "scripts", "templates",
+    # --- ECON 8310 course repository ---
+    # Labs/ in-class exercises, Homework/ assignments, Narration/ recording
+    # scripts, data/ the prepared datasets every lab and assignment reads. These
+    # are the course's primary artifacts; they are peers of Slides/ and Quarto/,
+    # not clutter.
+    "Homework", "Labs", "Narration", "data",
 }
 
 # Names that mean "I was experimenting". These must not live in tracked source.
@@ -77,6 +96,14 @@ def main():
         # explorations/ is the sandbox BY DESIGN — its own protocol permits
         # versioned and dated filenames there (exploration-folder-protocol.md).
         if f.startswith("explorations/"):
+            continue
+        # quality_reports/ is the historical record: session logs, plans, merge
+        # and QA reports. progress-reports.md says these are never edited, so a
+        # name like Lecture01_qa_final.md cannot be "fixed" by renaming without
+        # destroying the record it names. The '_final' there means the final QA
+        # ROUND, not version 2 of a file — the sense the pattern is hunting for
+        # does not arise in a directory nothing is ever revised in.
+        if f.startswith("quality_reports/"):
             continue
         # sibling-required numbered-duplicate check
         m2 = re.match(r'^(.*) \d+(\.[a-z0-9]+)$', base, re.I)

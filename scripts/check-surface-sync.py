@@ -50,9 +50,10 @@ SURFACES = [
     REPO / "README.md",
     REPO / "CLAUDE.md",
     REPO / "guide/workflow-guide.qmd",
-    REPO / "docs/workflow-guide.html",
+    # docs/workflow-guide.html moved to OPTIONAL_SURFACES below when the course
+    # site stopped publishing it; it is still scanned whenever it is present.
     # The render that lands beside the .qmd. It is byte-identical to the docs/
-    # copy above (`cmp` clean at 2026-08-23) but was NOT scanned, so eleven
+    # copy (`cmp` clean at 2026-08-23) but was NOT scanned, so eleven
     # inventory sites in it — the same eleven the docs/ copy is gated on — took
     # a planted 99 with both gates green during the 76-site sweep. Cheap to
     # close, and it keeps the pair from diverging silently if one is re-rendered
@@ -70,6 +71,29 @@ SURFACES = [
     # gate is the r1 failure re-armed, so the file is a scanned surface now.
     REPO / ".claude/skills/commit/SKILL.md",
 ]
+
+# Surfaces that MAY be absent because someone deliberately removed them, mapped
+# to the reason. They are scanned EXACTLY like SURFACES when present — the
+# invariant this gate exists to protect is "if a claim site exists, it is
+# scanned", not "this particular path must exist" — and their absence is
+# reported as a note rather than an error.
+#
+# docs/workflow-guide.html: unpublished from the course site in aea188b6
+# (2026-08-26, "Unpublish the Claude Code workflow guide"). A course website
+# should not ship the template's own workflow documentation. No coverage was
+# lost: guide/workflow-guide.html is the byte-identical sibling and is still
+# gated above, so the eleven inventory sites the docs/ copy carried are still
+# scanned. If the file is ever republished it is scanned again automatically,
+# with no edit here.
+OPTIONAL_SURFACES = {
+    REPO / "docs/workflow-guide.html":
+        "unpublished from the course site in aea188b6 (2026-08-26)",
+}
+
+
+def active_surfaces() -> list[Path]:
+    """Required surfaces, plus any optional ones that are actually present."""
+    return SURFACES + [p for p in OPTIONAL_SURFACES if p.exists()]
 
 # Phrasings that assert THIS TEMPLATE's counts. We deliberately require
 # compound patterns (multiple counts in the same line) or a highly specific
@@ -281,13 +305,19 @@ def main() -> int:
             print(f"ERROR: surface file missing: {rel(p)}", file=sys.stderr)
         return 2
 
+    for p, why in OPTIONAL_SURFACES.items():
+        if not p.exists():
+            print(f"note: optional surface absent: {rel(p)} — {why}")
+
+    scanned = active_surfaces()
+
     print("Ground truth (counted from disk):")
     for k, v in GROUND_TRUTH.items():
         print(f"  {k:<8} {v}")
     print()
 
     per_file: dict[Path, list[tuple[int, str, int, str]]] = {}
-    for path in SURFACES:
+    for path in scanned:
         per_file[path] = scan_file(path)
 
     for path, hits in per_file.items():
@@ -303,7 +333,7 @@ def main() -> int:
 
     # Enumerative-table row-count assertions (marker-driven).
     table_hits = 0
-    for path in SURFACES:
+    for path in scanned:
         for lineno, kind, count, raw in scan_tables(path):
             table_hits += 1
             if kind not in GROUND_TRUTH:
@@ -341,7 +371,7 @@ def main() -> int:
 
     total_assertions = sum(len(v) for v in per_file.values())
     print(f"All {total_assertions} count assertions + {table_hits} enumerative-"
-          f"table row counts match ground truth across {len(SURFACES)} surfaces.")
+          f"table row counts match ground truth across {len(scanned)} surfaces.")
     return 0
 
 
