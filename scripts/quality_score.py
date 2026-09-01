@@ -17,6 +17,8 @@ import sys
 import os
 import argparse
 import subprocess
+import tempfile
+import shutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import re
@@ -108,18 +110,55 @@ class IssueDetector:
         None (could-not-verify: timed out or tool missing — NOT a quality failure)."""
         limit = _timeout("QUALITY_QUARTO_TIMEOUT", 120)
         try:
-            # Run from the file's parent directory with just the filename,
-            # so relative paths inside the .qmd (themes, includes) resolve.
-            result = subprocess.run(
-                ['quarto', 'render', filepath.name, '--to', 'html'],
-                capture_output=True,
-                text=True,
-                timeout=limit,
-                cwd=filepath.parent
-            )
-            if result.returncode != 0:
-                return False, result.stderr
-            return True, ""
+            # Run from the file's parent directory with just the filename, so
+            # relative paths inside the .qmd (themes, includes) resolve.
+            #
+            # This check only needs the RETURN CODE, but `quarto render` has a
+            # side effect: it writes the rendered deck beside the source, and the
+            # render it produces here lacks the project settings sync_to_docs.sh
+            # applies — a 4.3 MB self-contained deck is silently replaced by a
+            # ~40 KB one that fetches its JS and CSS from the network. That is how
+            # Lecture11_Part1, Lecture11_Part2 and Lecture12 came to be committed
+            # degraded on 2026-08-31.
+            #
+            # `--output-dir` is NOT the fix: it RELOCATES the output, so the
+            # existing mirror is removed rather than left alone (measured — it
+            # deleted Lecture12's 4,357 KB mirror outright, and left a stray
+            # .gitignore behind). So snapshot the artifacts, render, restore.
+            sibling = filepath.with_suffix('.html')
+            supporting = filepath.parent / f"{filepath.stem}_files"
+            with tempfile.TemporaryDirectory(prefix="qscore-keep-") as keep:
+                saved_html = None
+                if sibling.exists():
+                    saved_html = Path(keep) / sibling.name
+                    shutil.copy2(sibling, saved_html)
+                saved_dir = None
+                if supporting.is_dir():
+                    saved_dir = Path(keep) / supporting.name
+                    shutil.copytree(supporting, saved_dir)
+                try:
+                    result = subprocess.run(
+                        ['quarto', 'render', filepath.name, '--to', 'html'],
+                        capture_output=True,
+                        text=True,
+                        timeout=limit,
+                        cwd=filepath.parent
+                    )
+                finally:
+                    # Restore whatever was there before, whatever the render did.
+                    if saved_html is not None:
+                        shutil.copy2(saved_html, sibling)
+                    elif sibling.exists():
+                        sibling.unlink()
+                    if saved_dir is not None:
+                        if supporting.exists():
+                            shutil.rmtree(supporting)
+                        shutil.copytree(saved_dir, supporting)
+                    elif supporting.is_dir():
+                        shutil.rmtree(supporting)
+                if result.returncode != 0:
+                    return False, result.stderr
+                return True, ""
         except subprocess.TimeoutExpired:
             return None, f"compilation not verified — render exceeded {limit}s (raise QUALITY_QUARTO_TIMEOUT for large decks)"
         except FileNotFoundError:
@@ -310,6 +349,36 @@ class IssueDetector:
         return issues
 
     @staticmethod
+    def compile_evidence(filepath: Path) -> Optional[Dict]:
+        """What the LaTeX compiler actually reported, if a fresh log exists.
+
+        The line-length checks below are a PROXY for overflow. The compiler
+        measures it exactly and writes the answer to a .log next to the .tex, so
+        when that log is newer than the source we use it and ignore the proxy.
+
+        This matters: a 165-character source line inside a wrapping p{10.2cm}
+        column, or a display-math block broken at \\qquad, is not a 165-character
+        rendered line. On 2026-08-31 the proxy scored Lecture09_Part1 at 70/100
+        and blocked a commit over five such lines in a deck the compiler reported
+        with ZERO overfull boxes.
+
+        Returns None when no fresh log exists (fall back to the proxy), else
+        {'hbox': n, 'vbox': n, 'lines': [...]}.
+        """
+        log = filepath.with_suffix('.log')
+        if not log.exists() or log.stat().st_mtime < filepath.stat().st_mtime:
+            return None
+        try:
+            text = log.read_text(encoding='utf-8', errors='replace')
+        except OSError:
+            return None
+        hbox = len(re.findall(r'Overfull \\hbox', text))
+        vbox = len(re.findall(r'Overfull \\vbox', text))
+        # hbox warnings say "at lines 40--42"; vbox says "detected at line 128".
+        lines = [int(n) for n in re.findall(r'Overfull \\[hv]box .*?at lines? (\d+)', text)]
+        return {'hbox': hbox, 'vbox': vbox, 'lines': sorted(set(lines))}
+
+    @staticmethod
     def check_overfull_hbox_risk(content: str) -> List[int]:
         """Detect lines in LaTeX source likely to cause overfull hbox.
 
@@ -421,9 +490,15 @@ class QualityScorer:
             self.unverified.append(error)
 
         # Check equation overflow (heuristic)
+        # For .qmd there is no compiler log to defer to — RevealJS overflow is a
+        # CSS question, not a measured one — so this stays a heuristic and is
+        # scored as MAJOR rather than CRITICAL. Blocking a commit on a proxy that
+        # cannot distinguish a wrapped source line from a real overflow is what
+        # scored Lecture09_Part1 at 60/100 on 2026-08-31 for two display-math
+        # blocks that render correctly.
         equation_overflows = IssueDetector.check_equation_overflow(content)
         for line in equation_overflows:
-            self.issues['critical'].append({
+            self.issues['major'].append({
                 'type': 'equation_overflow',
                 'description': f'Potential equation overflow at line {line}',
                 'details': 'Single equation line >120 chars may overflow slide',
@@ -546,27 +621,46 @@ class QualityScorer:
             })
             self.score -= 15
 
-        # Check for lines likely to cause overfull hbox
-        overfull_lines = IssueDetector.check_overfull_hbox_risk(content)
-        for line in overfull_lines:
-            self.issues['critical'].append({
-                'type': 'overfull_hbox',
-                'description': f'Potential overfull hbox at line {line}',
-                'details': 'Line >120 chars inside frame may overflow slide width',
-                'points': 10
-            })
-            self.score -= 10
-
-        # Check equation overflow (same heuristic as Quarto)
-        equation_overflows = IssueDetector.check_equation_overflow(content)
-        for line_num in equation_overflows:
-            self.issues['critical'].append({
-                'type': 'overfull_hbox',
-                'description': f'Potential equation overflow at line {line_num}',
-                'details': 'Single equation line >120 chars likely to overflow',
-                'points': 10
-            })
-            self.score -= 10
+        # Overflow: use the compiler's verdict when a fresh .log exists, and the
+        # source-length proxy only when it does not. The proxy cannot tell a long
+        # source line from a long RENDERED line, and wrapped table cells and
+        # display math routinely make it lie.
+        evidence = IssueDetector.compile_evidence(self.filepath)
+        if evidence is not None:
+            for line in evidence['lines']:
+                self.issues['critical'].append({
+                    'type': 'overfull_hbox',
+                    'description': f'Overfull box at line {line}',
+                    'details': 'Reported by the compiler in the .log, not inferred',
+                    'points': 10
+                })
+                self.score -= 10
+            unlocated = (evidence['hbox'] + evidence['vbox']) - len(evidence['lines'])
+            for _ in range(max(0, unlocated)):
+                self.issues['critical'].append({
+                    'type': 'overfull_hbox',
+                    'description': 'Overfull box reported by the compiler',
+                    'details': 'Present in the .log without a line number',
+                    'points': 10
+                })
+                self.score -= 10
+        else:
+            for line in IssueDetector.check_overfull_hbox_risk(content):
+                self.issues['major'].append({
+                    'type': 'text_overflow',
+                    'description': f'Long source line at {line} (no fresh .log to check)',
+                    'details': 'Proxy only — compile the deck for a real answer',
+                    'points': 5
+                })
+                self.score -= 5
+            for line_num in IssueDetector.check_equation_overflow(content):
+                self.issues['major'].append({
+                    'type': 'text_overflow',
+                    'description': f'Long equation line at {line_num} (no fresh .log)',
+                    'details': 'Proxy only — compile the deck for a real answer',
+                    'points': 5
+                })
+                self.score -= 5
 
         self.score = max(0, self.score)
         return self._generate_report()
