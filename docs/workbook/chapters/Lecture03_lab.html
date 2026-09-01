@@ -376,7 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">3.2</span> Setup</h2>
-<div id="8ffcfd4c" class="cell" data-execution_count="1">
+<div id="99a25a59" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -401,40 +401,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> pd.read_csv(data_path(<span class="st">"electricity_daily.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"date"</span>])</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>hourly <span class="op">=</span> pd.read_csv(data_path(<span class="st">"electricity_hourly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"datetime"</span>])</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Five and a half years is plenty of yearly cycles and keeps every fit under a second.</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> daily[daily.date <span class="op">&gt;=</span> <span class="st">"2013-01-01"</span>].reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>SPLIT <span class="op">=</span> <span class="st">"2017-08-01"</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> daily[daily.date <span class="op">&lt;</span> SPLIT], daily[daily.date <span class="op">&gt;=</span> SPLIT]</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> <span class="kw">lambda</span> a, b: <span class="bu">float</span>(np.sqrt(np.mean((np.asarray(a) <span class="op">-</span> np.asarray(b)) <span class="op">**</span> <span class="dv">2</span>)))</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>mae  <span class="op">=</span> <span class="kw">lambda</span> a, b: <span class="bu">float</span>(np.mean(np.<span class="bu">abs</span>(np.asarray(a) <span class="op">-</span> np.asarray(b))))</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> {}</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(daily)<span class="sc">}</span><span class="ss"> days — train </span><span class="sc">{</span><span class="bu">len</span>(train)<span class="sc">}</span><span class="ss">, test </span><span class="sc">{</span><span class="bu">len</span>(test)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"test window: </span><span class="sc">{</span>test<span class="sc">.</span>date<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:</span><span class="op">%</span>Y<span class="op">-%</span>m<span class="op">-%</span>d<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>test<span class="sc">.</span>date<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:</span><span class="op">%</span>Y<span class="op">-%</span>m<span class="op">-%</span>d<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>2041 days — train 1673, test 368 test window: 2017-08-01 to 2018-08-03</p>
-<pre><code>
-Two notes. We trim to 2013 onward — five and a half years, which is plenty of annual cycles and
-keeps every fit under a second, because you're going to fit several. And we hold out just over a
-year, August 2017 through August 2018, so the test window contains a full summer *and* a full
-winter. That's deliberate. Holding out only six months of an annual cycle tells you almost
-nothing.
-
-The `logging` line silences Prophet, which is otherwise extremely chatty on every fit.
-
-:::
-
-## Five and a half years is plenty of yearly cycles and keeps every fit under a second.
-
-daily = daily[daily.date &gt;= "2013-01-01"].reset_index(drop=True)
-
-SPLIT = "2017-08-01"
-train, test = daily[daily.date &lt; SPLIT], daily[daily.date &gt;= SPLIT]
-
-rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
-mae  = lambda a, b: float(np.mean(np.abs(np.asarray(a) - np.asarray(b))))
-results = {}
-
-print(f"{len(daily)} days — train {len(train)}, test {len(test)}")
-print(f"test window: {test.date.min():%Y-%m-%d} to {test.date.max():%Y-%m-%d}")</code></pre>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>2041 days — train 1673, test 368
+test window: 2017-08-01 to 2018-08-03</code></pre>
+<p>Two notes. We trim to 2013 onward — five and a half years, which is plenty of annual cycles and keeps every fit under a second, because you’re going to fit several. And we hold out just over a year, August 2017 through August 2018, so the test window contains a full summer <em>and</em> a full winter. That’s deliberate. Holding out only six months of an annual cycle tells you almost nothing.</p>
+<p>The <code>logging</code> line silences Prophet, which is otherwise extremely chatty on every fit.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-1-three-cycles-one-series" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="step-1-three-cycles-one-series"><span class="header-section-number">3.3</span> Step 1 — Three cycles, one series</h2>
 <p>Before any model, look at the three periodicities separately.</p>
-<div id="a282b3ac" class="cell" data-execution_count="2">
+<div id="4f49567d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">3.2</span>))</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>hourly.groupby(<span class="st">"hour"</span>).mw.mean().plot(ax<span class="op">=</span>axes[<span class="dv">0</span>], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>)</span>
@@ -449,7 +453,7 @@ print(f"test window: {test.date.min():%Y-%m-%d} to {test.date.max():%Y-%m-%d}")<
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> axes: a.set_ylabel(<span class="st">"MW"</span>)</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="d6d53530" class="cell" data-execution_count="3">
+<div id="04cee53c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, g <span class="kw">in</span> [(<span class="st">"hour of day"</span>, hourly.groupby(<span class="st">"hour"</span>).mw.mean()),</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                 (<span class="st">"day of week"</span>, daily.groupby(<span class="st">"dow"</span>).mw_mean.mean()),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                 (<span class="st">"day of year"</span>, daily.groupby(<span class="st">"doy"</span>).mw_mean.mean())]:</span>
@@ -459,7 +463,7 @@ print(f"test window: {test.date.min():%Y-%m-%d} to {test.date.max():%Y-%m-%d}")<
 <p><strong>Notice:</strong> all three cycles are large — none is a rounding error you could ignore. This is the situation Lecture 3 said GAMs are for.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -468,7 +472,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Before any model, look at the three periodicities separately.</p>
 <p>Hour of day: demand bottoms out around four in the morning and peaks in the early evening, around hour nineteen. People wake up, go to work, come home, turn things on. Day of week: Monday highest, Sunday lowest. Commercial and industrial load.</p>
@@ -485,7 +489,7 @@ day of year    swing  44.7%   min 116   max 200</code></pre>
 <section id="step-2-the-annual-cycle-has-two-peaks" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="step-2-the-annual-cycle-has-two-peaks"><span class="header-section-number">3.4</span> Step 2 — The annual cycle has <em>two</em> peaks</h2>
 <p>Look again at the third panel. It does not look like a wave.</p>
-<div id="c06527f0" class="cell" data-execution_count="4">
+<div id="e2e90c11" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>doy <span class="op">=</span> daily.groupby(<span class="st">"doy"</span>).mw_mean.mean()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"January  (days 1-31)    </span><span class="sc">{</span>doy<span class="sc">.</span>loc[<span class="dv">1</span>:<span class="dv">31</span>]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> MW   &lt;- heating"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"April    (days 95-115)  </span><span class="sc">{</span>doy<span class="sc">.</span>loc[<span class="dv">95</span>:<span class="dv">115</span>]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> MW   &lt;- mild, nothing running"</span>)</span>
@@ -493,7 +497,7 @@ day of year    swing  44.7%   min 116   max 200</code></pre>
 </div>
 <p>Two peaks and two troughs per year, because heating and cooling are <em>both</em> electricity demand and they happen at opposite ends of the calendar.</p>
 <p>Now the consequence. Fit the annual shape with a single sine wave, then with two.</p>
-<div id="143a7801" class="cell" data-execution_count="5">
+<div id="9e4c5490" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.arange(<span class="bu">len</span>(doy))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>one <span class="op">=</span> np.c_[np.ones_like(t), np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>), np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>)]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>two <span class="op">=</span> np.c_[one,             np.sin(<span class="dv">4</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>), np.cos(<span class="dv">4</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>)]</span>
@@ -506,7 +510,7 @@ day of year    swing  44.7%   min 116   max 200</code></pre>
 <p>Prophet’s <code>yearly_seasonality</code> is exactly this idea with more terms: a Fourier series of order 10 by default, so 10 sine/cosine pairs. A <code>pyGAM</code> spline gets there differently — by bending freely — but solves the same problem.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -515,7 +519,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Look at that annual panel again. It does not look like a wave. It looks like a letter M.</p>
 <pre><code>January  (days 1-31)     34,403 MW   &lt;- heating
@@ -535,56 +539,27 @@ two harmonics    in-sample RMSE 1,348 MW</code></pre>
 <section id="step-3-prophet-and-an-honest-benchmark" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="step-3-prophet-and-an-honest-benchmark"><span class="header-section-number">3.5</span> Step 3 — Prophet, and an honest benchmark</h2>
 <p>Prophet wants two columns named <code>ds</code> and <code>y</code>. That is most of the API.</p>
-<div id="32395d40" class="cell" data-execution_count="6">
+<div id="e5463b19" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>Prophet wants two columns named `ds` <span class="kw">and</span> `y`. That <span class="kw">is</span> genuinely most of the API.</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Benchmark first, always: same day last year (364 days keeps the weekday aligned).</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>lookup <span class="op">=</span> daily.set_index(<span class="st">"date"</span>).mw_mean</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>sn <span class="op">=</span> [lookup.get(t <span class="op">-</span> pd.Timedelta(days<span class="op">=</span><span class="dv">364</span>), np.nan) <span class="cf">for</span> t <span class="kw">in</span> test.date]</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"Seasonal naive (364d)"</span>] <span class="op">=</span> (rmse(test.mw_mean, sn), mae(test.mw_mean, sn))</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>But benchmark first — always. Same day last year, <span class="kw">and</span> note it<span class="st">'s **364** days rather than 365,</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="er">which keeps the weekday aligned. Comparing a Tuesday to a Wednesday would hand the benchmark an</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>error that isn<span class="st">'t really about seasonality.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Prophet(yearly_seasonality<span class="op">=</span><span class="va">True</span>, weekly_seasonality<span class="op">=</span><span class="va">True</span>, daily_seasonality<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>m.fit(train.rename(columns<span class="op">=</span>{<span class="st">"date"</span>: <span class="st">"ds"</span>, <span class="st">"mw_mean"</span>: <span class="st">"y"</span>})[[<span class="st">"ds"</span>, <span class="st">"y"</span>]])</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>fc <span class="op">=</span> m.predict(test.rename(columns<span class="op">=</span>{<span class="st">"date"</span>: <span class="st">"ds"</span>})[[<span class="st">"ds"</span>]])</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"Prophet"</span>] <span class="op">=</span> (rmse(test.mw_mean, fc.yhat), mae(test.mw_mean, fc.yhat))</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, (r, a) <span class="kw">in</span> results.items():</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>k<span class="sc">:&lt;24}</span><span class="ss"> RMSE </span><span class="sc">{</span>r<span class="sc">:7,.0f}</span><span class="ss">   MAE </span><span class="sc">{</span>a<span class="sc">:7,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Seasonal naive (364d) RMSE 4,608 MAE 3,333 Prophet RMSE 3,935 MAE 3,001</p>
-<pre><code>
-Prophet beats the benchmark — about fifteen percent better on RMSE.
-
-One deliberate choice: `daily_seasonality=False`. The data is one row per day, so there is no
-within-day variation left to model. Leave it on and Prophet will happily fit a daily cycle to
-noise, and report it to you with a straight face.
-
-:::
-
-## Benchmark first, always: same day last year (364 days keeps the weekday aligned).
-
-lookup = daily.set_index("date").mw_mean
-sn = [lookup.get(t - pd.Timedelta(days=364), np.nan) for t in test.date]
-results["Seasonal naive (364d)"] = (rmse(test.mw_mean, sn), mae(test.mw_mean, sn))
-
-m = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False)
-m.fit(train.rename(columns={"date": "ds", "mw_mean": "y"})[["ds", "y"]])
-
-fc = m.predict(test.rename(columns={"date": "ds"})[["ds"]])
-results["Prophet"] = (rmse(test.mw_mean, fc.yhat), mae(test.mw_mean, fc.yhat))
-
-for k, (r, a) in results.items():
-    print(f"{k:&lt;24} RMSE {r:7,.0f}   MAE {a:7,.0f}")</code></pre>
 <p>We turned <code>daily_seasonality</code> off deliberately — the data is one row per day, so there is no within-day variation left to model. Leave it on and Prophet will happily fit noise.</p>
 <hr>
-</section>
-<section id="step-4-the-components-plot" class="level2" data-number="3.6">
-<h2 data-number="3.6" class="anchored" data-anchor-id="step-4-the-components-plot"><span class="header-section-number">3.6</span> Step 4 — The components plot</h2>
-<p>This is the payoff, and the reason Prophet gets used by people who will be questioned about their forecast.</p>
-<div id="1ce7914f" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>m.plot_components(fc)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Three panels, one per additive term, each on the scale of the original series. The trend, the weekly cycle, the yearly cycle — separately readable.</p>
-<p><strong>Notice</strong> the yearly panel reproduces the double peak from Step 2. Nobody told Prophet about heating and cooling; the Fourier series had enough terms to find the shape.</p>
-<hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -593,7 +568,38 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Prophet wants two columns named <code>ds</code> and <code>y</code>. That is genuinely most of the API.</p>
+<p>But benchmark first — always. Same day last year, and note it’s <strong>364</strong> days rather than 365, which keeps the weekday aligned. Comparing a Tuesday to a Wednesday would hand the benchmark an error that isn’t really about seasonality.</p>
+<pre><code>Seasonal naive (364d)    RMSE   4,608   MAE   3,333
+Prophet                  RMSE   3,935   MAE   3,001</code></pre>
+<p>Prophet beats the benchmark — about fifteen percent better on RMSE.</p>
+<p>One deliberate choice: <code>daily_seasonality=False</code>. The data is one row per day, so there is no within-day variation left to model. Leave it on and Prophet will happily fit a daily cycle to noise, and report it to you with a straight face.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4-the-components-plot" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="step-4-the-components-plot"><span class="header-section-number">3.6</span> Step 4 — The components plot</h2>
+<p>This is the payoff, and the reason Prophet gets used by people who will be questioned about their forecast.</p>
+<div id="627acc74" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>m.plot_components(fc)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Three panels, one per additive term, each on the scale of the original series. The trend, the weekly cycle, the yearly cycle — separately readable.</p>
+<p><strong>Notice</strong> the yearly panel reproduces the double peak from Step 2. Nobody told Prophet about heating and cooling; the Fourier series had enough terms to find the shape.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><em>(Screen: run <code>m.plot_components(fc)</code>.)</em></p>
 <p>This is the payoff, and it’s why Prophet gets used by people who have to defend a forecast in a meeting.</p>
@@ -609,126 +615,114 @@ Walkthrough
 <p>Step 2 argued this in-sample. Test it properly, on the holdout.</p>
 <p><code>yearly_seasonality</code> accepts an integer — the Fourier order — instead of <code>True</code>.</p>
 <p><strong>Your turn:</strong> fit a Prophet with the yearly order forced to <strong>1</strong> (a single harmonic) and add it to the results table.</p>
-<div id="f4adec0e" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>Step <span class="dv">2</span> made this argument <span class="kw">in</span><span class="op">-</span>sample, on the averaged annual profile. That<span class="st">'s suggestive, not</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="er">evidence. Test it properly, on the holdout. `yearly_seasonality` takes an integer — the Fourier order — instead of `True`.</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>tip}</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">## Try it</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>Pause here. Fit a Prophet <span class="cf">with</span> the yearly order forced to <span class="op">**</span><span class="dv">1</span><span class="op">**</span> — a single harmonic — <span class="kw">and</span> add it</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>to the results table. Everything <span class="cf">else</span> stays the same.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="dd348071" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the order ----</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># m1 = Prophet(yearly_seasonality=___, weekly_seasonality=True, daily_seasonality=False)</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># m1.fit(train.rename(columns={"date": "ds", "mw_mean": "y"})[["ds", "y"]])</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># fc1 = m1.predict(test.rename(columns={"date": "ds"})[["ds"]])</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># results["Prophet (yearly order=1)"] = (rmse(test.mw_mean, fc1.yhat),</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#                                        mae(test.mw_mean, fc1.yhat))</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"single harmonic RMSE {rmse(test.mw_mean, fc1.yhat):,.0f}")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>single harmonic RMSE 4,269</p>
-<pre><code>
-Four thousand two hundred and sixty-nine, against three thousand nine hundred and thirty-five for
-the full-order model. The holdout agrees with Step 2 — crippling the annual term costs you real
-accuracy out of sample, not just in-sample fit.
-
-But look where it lands relative to the benchmark. Seasonal naive was 4,608. The single-harmonic
-Prophet is 4,269 — it beats the benchmark by about seven percent, and that is *all* it beats it
-by.
-
-And here's the part worth stopping on. **On MAE, it loses to the benchmark outright** — 3,358
-against 3,333. Same two models, same holdout, opposite verdict depending on which error measure
-you quote.
-
-That is not a trick and it is not a bug. RMSE squares errors, so it punishes the occasional large
-miss; MAE treats all errors proportionally. A model can be better on one and worse on the other,
-and when a ranking flips between them the honest move is to say so rather than to quote the
-metric that flatters you.
-
-:::
-
-## ---- your turn: uncomment and fill in the order ----
-
-## m1 = Prophet(yearly_seasonality=___, weekly_seasonality=True, daily_seasonality=False)
-
-## m1.fit(train.rename(columns={"date": "ds", "mw_mean": "y"})[["ds", "y"]])
-
-#
-
-## fc1 = m1.predict(test.rename(columns={"date": "ds"})[["ds"]])
-
-## results["Prophet (yearly order=1)"] = (rmse(test.mw_mean, fc1.yhat),
-
-## mae(test.mw_mean, fc1.yhat))
-
-#
-
-## print(f"single harmonic RMSE {rmse(test.mw_mean, fc1.yhat):,.0f}")
-</code></pre>
 <p>Report both numbers. Does the holdout agree with what Step 2 predicted in-sample?</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Step 2 made this argument in-sample, on the averaged annual profile. That’s suggestive, not evidence. Test it properly, on the holdout. <code>yearly_seasonality</code> takes an integer — the Fourier order — instead of <code>True</code>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Pause here. Fit a Prophet with the yearly order forced to <strong>1</strong> — a single harmonic — and add it to the results table. Everything else stays the same.</p>
+<pre><code>single harmonic RMSE 4,269</code></pre>
+<p>Four thousand two hundred and sixty-nine, against three thousand nine hundred and thirty-five for the full-order model. The holdout agrees with Step 2 — crippling the annual term costs you real accuracy out of sample, not just in-sample fit.</p>
+<p>But look where it lands relative to the benchmark. Seasonal naive was 4,608. The single-harmonic Prophet is 4,269 — it beats the benchmark by about seven percent, and that is <em>all</em> it beats it by.</p>
+<p>And here’s the part worth stopping on. <strong>On MAE, it loses to the benchmark outright</strong> — 3,358 against 3,333. Same two models, same holdout, opposite verdict depending on which error measure you quote.</p>
+<p>That is not a trick and it is not a bug. RMSE squares errors, so it punishes the occasional large miss; MAE treats all errors proportionally. A model can be better on one and worse on the other, and when a ranking flips between them the honest move is to say so rather than to quote the metric that flatters you.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-6-pygam-and-reading-the-smooth-directly" class="level2" data-number="3.8">
 <h2 data-number="3.8" class="anchored" data-anchor-id="step-6-pygam-and-reading-the-smooth-directly"><span class="header-section-number">3.8</span> Step 6 — pyGAM, and reading the smooth directly</h2>
 <p>Prophet is a GAM with the time-series decisions made for you. <code>pyGAM</code> makes you state the terms, which is more work and more control.</p>
-<div id="53ab3cf8" class="cell" data-execution_count="9">
+<div id="604fc183" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, f</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>Prophet <span class="kw">is</span> a GAM <span class="cf">with</span> the time<span class="op">-</span>series decisions already made <span class="cf">for</span> you. pyGAM makes you state the</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>terms yourself — more work, more control.</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>Two terms only. A cyclic spline on day<span class="op">-</span>of<span class="op">-</span>year — `basis<span class="op">=</span><span class="st">"cp"</span>` <span class="kw">is</span> what makes December <span class="dv">31</span><span class="er">st</span> join</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>back up <span class="cf">with</span> January <span class="dv">1</span><span class="er">st</span>, so the smooth doesn<span class="st">'t have a discontinuity at the year boundary — and</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="er">day-of-week as a categorical factor. That's it. No trend term. No hourly anything.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># s(0) = cyclic spline on day-of-year (basis="cp" makes Dec 31 join Jan 1)</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># f(1) = day-of-week as a categorical factor</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>X_tr, X_te <span class="op">=</span> train[[<span class="st">"doy"</span>, <span class="st">"dow"</span>]].values, test[[<span class="st">"doy"</span>, <span class="st">"dow"</span>]].values</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>gam <span class="op">=</span> LinearGAM(s(<span class="dv">0</span>, n_splines<span class="op">=</span><span class="dv">20</span>, basis<span class="op">=</span><span class="st">"cp"</span>) <span class="op">+</span> f(<span class="dv">1</span>)).fit(X_tr, train.mw_mean.values)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"pyGAM (doy + dow)"</span>] <span class="op">=</span> (rmse(test.mw_mean, gam.predict(X_te)),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                                mae(test.mw_mean, gam.predict(X_te)))</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"effective degrees of freedom: </span><span class="sc">{</span>gam<span class="sc">.</span>statistics_[<span class="st">'edof'</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame(results, index<span class="op">=</span>[<span class="st">"RMSE"</span>, <span class="st">"MAE"</span>]).T</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        .sort_values(<span class="st">"RMSE"</span>).<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>effective degrees of freedom: 22.5</p>
-<pre><code>                      RMSE    MAE</code></pre>
-<p>pyGAM (doy + dow) 3444 2550 Prophet 3935 3001 Prophet (yearly order=1) 4269 3358 Seasonal naive (364d) 4608 3333</p>
-<pre><code>
-Every model beat the benchmark. The single-harmonic Prophet is the worst of the three, as Step 2
-predicted.
-
-And **pyGAM wins.** Thirty-four forty-four against Prophet's thirty-nine thirty-five — about
-twelve percent better, on both RMSE and MAE, using two terms against Prophet's three, with no
-trend component at all. That should bother you slightly, and we'll come back to it in the closing question. Now the partial dependence — the GAM equivalent of the components plot.
-
-**Say what the left panel means in words**, the way you'd say it to a grid operator: demand is
-high in January, falls through spring to a minimum around mid-April, climbs to an annual peak in
-mid-July, and falls again into autumn. The model learned the M shape directly from the data by
-bending, without being given a single Fourier term.
-
-And say the other thing too: **the confidence band widens where the data is thin.** Look at the
-edges. That widening is the model telling you where it is guessing, and a forecast that comes
-with an honest statement of its own uncertainty is worth more than a point estimate that doesn't.
-
-:::
-
-## s(0) = cyclic spline on day-of-year (basis="cp" makes Dec 31 join Jan 1)
-
-## f(1) = day-of-week as a categorical factor
-
-X_tr, X_te = train[["doy", "dow"]].values, test[["doy", "dow"]].values
-
-gam = LinearGAM(s(0, n_splines=20, basis="cp") + f(1)).fit(X_tr, train.mw_mean.values)
-results["pyGAM (doy + dow)"] = (rmse(test.mw_mean, gam.predict(X_te)),
-                                mae(test.mw_mean, gam.predict(X_te)))
-
-print(f"effective degrees of freedom: {gam.statistics_['edof']:.1f}")
-print(pd.DataFrame(results, index=["RMSE", "MAE"]).T
-        .sort_values("RMSE").round(0).astype(int).to_string())</code></pre>
 <p>Now the partial dependence — the GAM equivalent of the components plot.</p>
-<div id="e0d9ce98" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.2</span>))</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (ax, name) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(axes, [<span class="st">"day of year"</span>, <span class="st">"day of week"</span>])):</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    XX <span class="op">=</span> gam.generate_X_grid(term<span class="op">=</span>i)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    pdep, ci <span class="op">=</span> gam.partial_dependence(term<span class="op">=</span>i, X<span class="op">=</span>XX, width<span class="op">=</span><span class="fl">0.95</span>)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    ax.plot(XX[:, i], pdep)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    ax.plot(XX[:, i], ci, c<span class="op">=</span><span class="st">"grey"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    ax.set_title(name)<span class="op">;</span> ax.set_ylabel(<span class="st">"effect on MW"</span>)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="52c79d6a" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.2</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (ax, name) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(axes, [<span class="st">"day of year"</span>, <span class="st">"day of week"</span>])):</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    XX <span class="op">=</span> gam.generate_X_grid(term<span class="op">=</span>i)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    pdep, ci <span class="op">=</span> gam.partial_dependence(term<span class="op">=</span>i, X<span class="op">=</span>XX, width<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    ax.plot(XX[:, i], pdep)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    ax.plot(XX[:, i], ci, c<span class="op">=</span><span class="st">"grey"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    ax.set_title(name)<span class="op">;</span> ax.set_ylabel(<span class="st">"effect on MW"</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Read the left panel and say what it means in words</strong>, the way you would to a grid operator. The confidence band widens where the data is thin — say that too.</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Prophet is a GAM with the time-series decisions already made for you. pyGAM makes you state the terms yourself — more work, more control.</p>
+<p>Two terms only. A cyclic spline on day-of-year — <code>basis="cp"</code> is what makes December 31st join back up with January 1st, so the smooth doesn’t have a discontinuity at the year boundary — and day-of-week as a categorical factor. That’s it. No trend term. No hourly anything.</p>
+<pre><code>effective degrees of freedom: 22.5
+
+                          RMSE    MAE
+pyGAM (doy + dow)         3444   2550
+Prophet                   3935   3001
+Prophet (yearly order=1)  4269   3358
+Seasonal naive (364d)     4608   3333</code></pre>
+<p>Every model beat the benchmark. The single-harmonic Prophet is the worst of the three, as Step 2 predicted.</p>
+<p>And <strong>pyGAM wins.</strong> Thirty-four forty-four against Prophet’s thirty-nine thirty-five — about twelve percent better, on both RMSE and MAE, using two terms against Prophet’s three, with no trend component at all. That should bother you slightly, and we’ll come back to it in the closing question. Now the partial dependence — the GAM equivalent of the components plot.</p>
+<p><strong>Say what the left panel means in words</strong>, the way you’d say it to a grid operator: demand is high in January, falls through spring to a minimum around mid-April, climbs to an annual peak in mid-July, and falls again into autumn. The model learned the M shape directly from the data by bending, without being given a single Fourier term.</p>
+<p>And say the other thing too: <strong>the confidence band widens where the data is thin.</strong> Look at the edges. That widening is the model telling you where it is guessing, and a forecast that comes with an honest statement of its own uncertainty is worth more than a point estimate that doesn’t.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="before-you-leave" class="level2" data-number="3.9">
 <h2 data-number="3.9" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">3.9</span> Before you leave</h2>
@@ -742,7 +736,7 @@ print(pd.DataFrame(results, index=["RMSE", "MAE"]).T
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -751,7 +745,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

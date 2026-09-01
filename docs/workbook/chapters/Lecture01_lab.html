@@ -105,6 +105,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -337,21 +366,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#step-3-fit-the-three-models" id="toc-step-3-fit-the-three-models" class="nav-link" data-scroll-target="#step-3-fit-the-three-models"><span class="header-section-number">1.5</span> Step 3 — Fit the three models</a></li>
   <li><a href="#step-4-compare-honestly" id="toc-step-4-compare-honestly" class="nav-link" data-scroll-target="#step-4-compare-honestly"><span class="header-section-number">1.6</span> Step 4 — Compare honestly</a></li>
   <li><a href="#step-5-break-it-then-fix-it" id="toc-step-5-break-it-then-fix-it" class="nav-link" data-scroll-target="#step-5-break-it-then-fix-it"><span class="header-section-number">1.7</span> Step 5 — Break it, then fix it</a></li>
-  <li><a href="#your-turn-uncomment-and-fill-in-the-one-keyword-argument--" id="toc-your-turn-uncomment-and-fill-in-the-one-keyword-argument--" class="nav-link" data-scroll-target="#your-turn-uncomment-and-fill-in-the-one-keyword-argument--"><span class="header-section-number">1.8</span> —- your turn: uncomment and fill in the one keyword argument —-</a></li>
-  <li><a href="#holt_damped-holttrain-___.fit---damped_trendtrue" id="toc-holt_damped-holttrain-___.fit---damped_trendtrue" class="nav-link" data-scroll-target="#holt_damped-holttrain-___.fit---damped_trendtrue"><span class="header-section-number">1.9</span> holt_damped = Holt(train, ___).fit() # &lt;- damped_trend=True</a></li>
-  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><span class="header-section-number">2</span> </a>
-  <ul class="collapse">
-  <li><a href="#resultsholt-damped-rmsetest-holt_damped.forecastn_test" id="toc-resultsholt-damped-rmsetest-holt_damped.forecastn_test" class="nav-link" data-scroll-target="#resultsholt-damped-rmsetest-holt_damped.forecastn_test"><span class="header-section-number">2.1</span> results[“Holt (damped)”] = (rmse(test, holt_damped.forecast(N_TEST)),</a></li>
-  <li><a href="#maetest-holt_damped.forecastn_test" id="toc-maetest-holt_damped.forecastn_test" class="nav-link" data-scroll-target="#maetest-holt_damped.forecastn_test"><span class="header-section-number">2.2</span> mae(test, holt_damped.forecast(N_TEST)))</a></li>
-  </ul></li>
-  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1"><span class="header-section-number">3</span> </a>
-  <ul class="collapse">
-  <li><a href="#printpd.dataframeresults-indexrmse-mae.t" id="toc-printpd.dataframeresults-indexrmse-mae.t" class="nav-link" data-scroll-target="#printpd.dataframeresults-indexrmse-mae.t"><span class="header-section-number">3.1</span> print(pd.DataFrame(results, index=[“RMSE”, “MAE”]).T</a></li>
-  <li><a href="#sort_valuesrmse.round0.astypeint.to_string" id="toc-sort_valuesrmse.round0.astypeint.to_string" class="nav-link" data-scroll-target="#sort_valuesrmse.round0.astypeint.to_string"><span class="header-section-number">3.2</span> .sort_values(“RMSE”).round(0).astype(int).to_string())</a></li>
-  <li><a href="#printfestimated-phi-holt_damped.paramsdamping_trend.3f" id="toc-printfestimated-phi-holt_damped.paramsdamping_trend.3f" class="nav-link" data-scroll-target="#printfestimated-phi-holt_damped.paramsdamping_trend.3f"><span class="header-section-number">3.3</span> print(f”estimated phi: {holt_damped.params[‘damping_trend’]:.3f}“)</a></li>
-  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">3.4</span> Before you leave</a></li>
-  <li><a href="#what-your-run-should-produce" id="toc-what-your-run-should-produce" class="nav-link" data-scroll-target="#what-your-run-should-produce"><span class="header-section-number">3.5</span> What your run should produce</a></li>
-  </ul></li>
+  <li><a href="#step-6-same-store.-different-aisle.-opposite-answer." id="toc-step-6-same-store.-different-aisle.-opposite-answer." class="nav-link" data-scroll-target="#step-6-same-store.-different-aisle.-opposite-answer."><span class="header-section-number">1.8</span> Step 6 — Same store. Different aisle. Opposite answer.</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">1.9</span> Before you leave</a></li>
+  <li><a href="#what-your-run-should-produce" id="toc-what-your-run-should-produce" class="nav-link" data-scroll-target="#what-your-run-should-produce"><span class="header-section-number">1.10</span> What your run should produce</a></li>
   </ul>
 </nav>
     </div>
@@ -388,7 +405,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="setup" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">1.2</span> Setup</h2>
 <p>Nothing to fill in here — run it and move on.</p>
-<div id="5c209493" class="cell" data-execution_count="1">
+<div id="b41f73a0" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -427,7 +444,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-1-look-at-it-first" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="step-1-look-at-it-first"><span class="header-section-number">1.3</span> Step 1 — Look at it first</h2>
 <p>Never fit anything before you have seen the series.</p>
-<div id="11ae68ff" class="cell" data-execution_count="2">
+<div id="f8dc224a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.5</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ax.plot(train.index, train.values, label<span class="op">=</span><span class="st">"train"</span>, lw<span class="op">=</span><span class="fl">1.4</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, test.values, label<span class="op">=</span><span class="st">"test (held out)"</span>, lw<span class="op">=</span><span class="fl">1.4</span>)</span>
@@ -458,7 +475,7 @@ Walkthrough
 <section id="step-2-establish-the-benchmark" class="level2" data-number="1.4">
 <h2 data-number="1.4" class="anchored" data-anchor-id="step-2-establish-the-benchmark"><span class="header-section-number">1.4</span> Step 2 — Establish the benchmark</h2>
 <p>Before any model, the thing to beat. <strong>Seasonal naive</strong> says: this week next year looks like this week last year.</p>
-<div id="33ae012e" class="cell" data-execution_count="3">
+<div id="1ca7c474" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rmse(actual, pred):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.sqrt(np.mean((np.asarray(actual) <span class="op">-</span> np.asarray(pred)) <span class="op">**</span> <span class="dv">2</span>)))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -510,51 +527,22 @@ Try it
 <section id="step-3-fit-the-three-models" class="level2" data-number="1.5">
 <h2 data-number="1.5" class="anchored" data-anchor-id="step-3-fit-the-three-models"><span class="header-section-number">1.5</span> Step 3 — Fit the three models</h2>
 <p>All three calls come straight from Lecture 1. Run this, then <strong>predict the ordering before you look at Step 4</strong> — write your guess down.</p>
-<div id="20b6c1af" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">*</span>(Screen: run the three<span class="op">-</span>model cell. It takes a few seconds — Holt<span class="op">-</span>Winters <span class="kw">is</span> estimating <span class="dv">52</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>seasonal indices.)<span class="op">*</span> Three models, three lines, <span class="bu">all</span> straight <span class="im">from</span> Lecture <span class="fl">1.</span> SES — level only. No trend, no seasonality. The simplest thing that could work.</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>Holt — level plus trend. Undamped <span class="cf">for</span> now<span class="op">;</span> we come back to that <span class="kw">in</span> Step <span class="dv">5</span>, <span class="kw">and</span> the fact that</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>I<span class="st">'m flagging it should tell you something. Holt-Winters — level, trend, and seasonality, additive, period 52.</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="er">One constraint worth respecting. Holt-Winters estimates a seasonal index for every one of the</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="dv">52</span> weeks, <span class="kw">and</span> it needs two full cycles — <span class="dv">104</span> observations — just to initialize. You have <span class="dv">225</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>training weeks, so you<span class="st">'re fine. You will not always be fine. When you get to a series with three</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="er">years of weekly data and you're wondering why Holt-Winters won't fit, this is why.</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>tip}</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">## Try it</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>Before you scroll to Step <span class="dv">4</span>: predict the ordering. Which of these three wins, which comes last?</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>Write it down <span class="bu">next</span> to your number <span class="im">from</span> Step <span class="fl">2.</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>Most people rank them by sophistication — Holt<span class="op">-</span>Winters first, because it models the most.</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>See whether you did.</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co">## SES — level only.</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>ses_fit <span class="op">=</span> SimpleExpSmoothing(train).fit()</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"SES"</span>] <span class="op">=</span> (rmse(test, ses_fit.forecast(N_TEST)),</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>                  mae(test, ses_fit.forecast(N_TEST)))</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co">## Holt — level + trend. Undamped for now; we come back to damping in Step 5.</span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>holt_fit <span class="op">=</span> Holt(train).fit()</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"Holt"</span>] <span class="op">=</span> (rmse(test, holt_fit.forecast(N_TEST)),</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>                   mae(test, holt_fit.forecast(N_TEST)))</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co">## Holt-Winters — level + trend + seasonality, additive, period 52.</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>hw_fit <span class="op">=</span> ExponentialSmoothing(train, trend<span class="op">=</span><span class="st">"add"</span>,</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>                              seasonal<span class="op">=</span><span class="st">"add"</span>, seasonal_periods<span class="op">=</span><span class="dv">52</span>).fit()</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"Holt-Winters"</span>] <span class="op">=</span> (rmse(test, hw_fit.forecast(N_TEST)),</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>                           mae(test, hw_fit.forecast(N_TEST)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="90c450c7" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SES — level only.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ses_fit <span class="op">=</span> SimpleExpSmoothing(train).fit()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"SES"</span>] <span class="op">=</span> (rmse(test, ses_fit.forecast(N_TEST)),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                  mae(test, ses_fit.forecast(N_TEST)))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Holt — level + trend. Undamped for now; we come back to damping in Step 5.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>holt_fit <span class="op">=</span> Holt(train).fit()</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"Holt"</span>] <span class="op">=</span> (rmse(test, holt_fit.forecast(N_TEST)),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                   mae(test, holt_fit.forecast(N_TEST)))</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Holt-Winters — level + trend + seasonality, additive, period 52.</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>hw_fit <span class="op">=</span> ExponentialSmoothing(train, trend<span class="op">=</span><span class="st">"add"</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                              seasonal<span class="op">=</span><span class="st">"add"</span>, seasonal_periods<span class="op">=</span><span class="dv">52</span>).fit()</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"Holt-Winters"</span>] <span class="op">=</span> (rmse(test, hw_fit.forecast(N_TEST)),</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                           mae(test, hw_fit.forecast(N_TEST)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -570,16 +558,6 @@ One constraint to respect
 </div>
 </div>
 <hr>
-</section>
-<section id="step-4-compare-honestly" class="level2" data-number="1.6">
-<h2 data-number="1.6" class="anchored" data-anchor-id="step-4-compare-honestly"><span class="header-section-number">1.6</span> Step 4 — Compare honestly</h2>
-<div id="f8692235" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> (pd.DataFrame(results, index<span class="op">=</span>[<span class="st">"RMSE"</span>, <span class="st">"MAE"</span>]).T</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>         .sort_values(<span class="st">"RMSE"</span>).<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>))</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tbl.to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Discuss with the person next to you, before reading on:</strong> did any model beat the benchmark? By how much? And was it the model you expected in Step 2?</p>
-<hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -591,6 +569,49 @@ Walkthrough
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>(Screen: run the three-model cell. It takes a few seconds — Holt-Winters is estimating 52 seasonal indices.)</em> Three models, three lines, all straight from Lecture 1. SES — level only. No trend, no seasonality. The simplest thing that could work.</p>
+<p>Holt — level plus trend. Undamped for now; we come back to that in Step 5, and the fact that I’m flagging it should tell you something. Holt-Winters — level, trend, and seasonality, additive, period 52.</p>
+<p>One constraint worth respecting. Holt-Winters estimates a seasonal index for every one of the 52 weeks, and it needs two full cycles — 104 observations — just to initialize. You have 225 training weeks, so you’re fine. You will not always be fine. When you get to a series with three years of weekly data and you’re wondering why Holt-Winters won’t fit, this is why.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Before you scroll to Step 4: predict the ordering. Which of these three wins, which comes last? Write it down next to your number from Step 2.</p>
+<p>Most people rank them by sophistication — Holt-Winters first, because it models the most. See whether you did.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4-compare-honestly" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="step-4-compare-honestly"><span class="header-section-number">1.6</span> Step 4 — Compare honestly</h2>
+<div id="9e97e2b6" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> (pd.DataFrame(results, index<span class="op">=</span>[<span class="st">"RMSE"</span>, <span class="st">"MAE"</span>]).T</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>         .sort_values(<span class="st">"RMSE"</span>).<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tbl.to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Discuss with the person next to you, before reading on:</strong> did any model beat the benchmark? By how much? And was it the model you expected in Step 2?</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <pre><code>                RMSE   MAE
 SES              427   352
@@ -629,7 +650,7 @@ Try it
 <section id="step-5-break-it-then-fix-it" class="level2" data-number="1.7">
 <h2 data-number="1.7" class="anchored" data-anchor-id="step-5-break-it-then-fix-it"><span class="header-section-number">1.7</span> Step 5 — Break it, then fix it</h2>
 <p>Look at where Holt’s forecast goes.</p>
-<div id="0aa2693d" class="cell" data-execution_count="6">
+<div id="affd5e8c" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.5</span>))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, test.values, label<span class="op">=</span><span class="st">"actual"</span>, lw<span class="op">=</span><span class="fl">1.6</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, ses_fit.forecast(N_TEST), label<span class="op">=</span><span class="st">"SES"</span>, ls<span class="op">=</span><span class="st">"--"</span>)</span>
@@ -638,93 +659,21 @@ Try it
 </div>
 <p>Lecture 1 warned that undamped linear extrapolation gets unrealistic past about six periods. You are forecasting <strong>52</strong>.</p>
 <p><strong>Your turn:</strong> refit Holt with a damped trend and add it to the table. One keyword argument.</p>
-<div id="1e3f1c1a" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>Here<span class="st">'s what went wrong. Look at where Holt'</span>s forecast goes.</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>That<span class="st">'s a straight line, and it does not stop. Holt estimated a positive trend from the training</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="er">data — correctly, the series *was* growing — and then extrapolated it linearly for fifty-two</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>consecutive weeks. By the end of the horizon it<span class="st">'s forecasting a level the store has never</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="er">reached.</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>Lecture <span class="dv">1</span> warned that undamped linear extrapolation stops being credible after about six</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>periods. You are forecasting fifty<span class="op">-</span>two. The model isn<span class="st">'t wrong about the trend; it'</span>s wrong about</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>the trend continuing forever.</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>Meanwhile SES, the dashed flat line, just says <span class="st">"about here"</span> — <span class="kw">and</span> about<span class="op">-</span>here turns out to be a</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>much better guess than a confident straight line pointed at the ceiling.</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>tip}</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">## Try it</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>Your turn, <span class="kw">and</span> it<span class="st">'s genuinely one keyword argument. Uncomment the block and fill in the blank:</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="er">```python</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>holt_damped <span class="op">=</span> Holt(train, damped_trend<span class="op">=</span><span class="va">True</span>).fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="62f08385" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the one keyword argument ----</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># holt_damped = Holt(train, ___).fit()             # &lt;- damped_trend=True</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># results["Holt (damped)"] = (rmse(test, holt_damped.forecast(N_TEST)),</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                             mae(test, holt_damped.forecast(N_TEST)))</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># print(pd.DataFrame(results, index=["RMSE", "MAE"]).T</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#         .sort_values("RMSE").round(0).astype(int).to_string())</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"estimated phi: {holt_damped.params['damping_trend']:.3f}")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>That’s the fix. Add it to the table, print the result, and print the estimated phi. Pause here and do it — it’s thirty seconds of typing and you’ll remember it because you typed it.</p>
-<pre><code>Holt (damped)    426   351
-SES              427   352</code></pre>
-<p>Phi comes out at <strong>0.800</strong>. Two things here, and the second one is the honest one.</p>
-<p>First: damping rescued the model completely. Eleven sixty-six down to four twenty-six. Same model, same data, same trend estimate — one parameter that says “the trend decays as you forecast further out” moved it from worst on the table to best. Phi of 0.8 means each step ahead gets eighty percent of the previous step’s trend, so the forecast bends toward flat instead of running off. That is what phi below 1 <em>means</em>, and it’s the answer to the question in the lab.</p>
-<p>Second — and don’t let this slide past — <strong>damped Holt beat SES by one unit of RMSE.</strong> Four twenty-six against four twenty-seven. That is not a win. On a different held-out year it could easily flip. If you report “the damped model is best” you’re reporting noise as a finding.</p>
-<p>What actually happened is that damped Holt and SES are the same answer arrived at two ways. Damping the trend hard enough is close to not having a trend. The honest summary is: <em>on this series, models that keep the forecast near the current level beat models that extrapolate, and the two ways of doing that tie.</em></p>
-<p>:::</p>
-</section>
-<section id="your-turn-uncomment-and-fill-in-the-one-keyword-argument--" class="level2" data-number="1.8">
-<h2 data-number="1.8" class="anchored" data-anchor-id="your-turn-uncomment-and-fill-in-the-one-keyword-argument--"><span class="header-section-number">1.8</span> —- your turn: uncomment and fill in the one keyword argument —-</h2>
-</section>
-<section id="holt_damped-holttrain-___.fit---damped_trendtrue" class="level2" data-number="1.9">
-<h2 data-number="1.9" class="anchored" data-anchor-id="holt_damped-holttrain-___.fit---damped_trendtrue"><span class="header-section-number">1.9</span> holt_damped = Holt(train, ___).fit() # &lt;- damped_trend=True</h2>
-</section>
-<section id="section" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> </h1>
-<section id="resultsholt-damped-rmsetest-holt_damped.forecastn_test" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="resultsholt-damped-rmsetest-holt_damped.forecastn_test"><span class="header-section-number">2.1</span> results[“Holt (damped)”] = (rmse(test, holt_damped.forecast(N_TEST)),</h2>
-</section>
-<section id="maetest-holt_damped.forecastn_test" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="maetest-holt_damped.forecastn_test"><span class="header-section-number">2.2</span> mae(test, holt_damped.forecast(N_TEST)))</h2>
-</section>
-</section>
-<section id="section-1" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> </h1>
-<section id="printpd.dataframeresults-indexrmse-mae.t" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="printpd.dataframeresults-indexrmse-mae.t"><span class="header-section-number">3.1</span> print(pd.DataFrame(results, index=[“RMSE”, “MAE”]).T</h2>
-</section>
-<section id="sort_valuesrmse.round0.astypeint.to_string" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="sort_valuesrmse.round0.astypeint.to_string"><span class="header-section-number">3.2</span> .sort_values(“RMSE”).round(0).astype(int).to_string())</h2>
-</section>
-<section id="printfestimated-phi-holt_damped.paramsdamping_trend.3f" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="printfestimated-phi-holt_damped.paramsdamping_trend.3f"><span class="header-section-number">3.3</span> print(f”estimated phi: {holt_damped.params[‘damping_trend’]:.3f}“)</h2>
-<pre><code>
-Report the value of $\phi$. What does it mean that it came out below 1?
-
----
-
-## Step 6 — Same store. Different aisle. Opposite answer.
-
-Change one word — `HOUSEHOLD` becomes `FOODS`. Same store, same code, same horizon.
-
-::: {#559a7e04 .cell execution_count=8}
-``` {.python .cell-code}
-y2 = get_series("TX_1", "FOODS")
-train2, test2 = y2.iloc[:-N_TEST], y2.iloc[-N_TEST:]
-
-sn2 = y2.shift(52).iloc[-N_TEST:].values
-ses2 = SimpleExpSmoothing(train2).fit()
-
-print(f"TX_1 FOODS   seasonal naive RMSE {rmse(test2, sn2):,.0f}")
-print(f"TX_1 FOODS   SES            RMSE {rmse(test2, ses2.forecast(N_TEST)):,.0f}")</code></pre>
-<p>:::</p>
-<p><strong>Notice:</strong> the ranking flips. On the household aisle an exponential smoother won comfortably. On the food aisle of the <em>same store</em>, the benchmark wins and SES is about 13% worse.</p>
-<p>The reason is visible in one number. For TX_1 HOUSEHOLD the test year sits about <strong>15% above</strong> the year before it, so seasonal naive carries a stale level forward and loses badly. For TX_1 FOODS the level barely moves — about <strong>1.5% down</strong> — and last year is an excellent guess.</p>
-<p>So it is not the store, and it is not the method. It is whether the level moved.</p>
+<p>Report the value of <span class="math inline">\(\phi\)</span>. What does it mean that it came out below 1?</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -733,7 +682,66 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Here’s what went wrong. Look at where Holt’s forecast goes.</p>
+<p>That’s a straight line, and it does not stop. Holt estimated a positive trend from the training data — correctly, the series <em>was</em> growing — and then extrapolated it linearly for fifty-two consecutive weeks. By the end of the horizon it’s forecasting a level the store has never reached.</p>
+<p>Lecture 1 warned that undamped linear extrapolation stops being credible after about six periods. You are forecasting fifty-two. The model isn’t wrong about the trend; it’s wrong about the trend continuing forever.</p>
+<p>Meanwhile SES, the dashed flat line, just says “about here” — and about-here turns out to be a much better guess than a confident straight line pointed at the ceiling.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Your turn, and it’s genuinely one keyword argument. Uncomment the block and fill in the blank:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>holt_damped <span class="op">=</span> Holt(train, damped_trend<span class="op">=</span><span class="va">True</span>).fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>That’s the fix. Add it to the table, print the result, and print the estimated phi. Pause here and do it — it’s thirty seconds of typing and you’ll remember it because you typed it.</p>
+<pre><code>Holt (damped)    426   351
+SES              427   352</code></pre>
+<p>Phi comes out at <strong>0.800</strong>. Two things here, and the second one is the honest one.</p>
+<p>First: damping rescued the model completely. Eleven sixty-six down to four twenty-six. Same model, same data, same trend estimate — one parameter that says “the trend decays as you forecast further out” moved it from worst on the table to best. Phi of 0.8 means each step ahead gets eighty percent of the previous step’s trend, so the forecast bends toward flat instead of running off. That is what phi below 1 <em>means</em>, and it’s the answer to the question in the lab.</p>
+<p>Second — and don’t let this slide past — <strong>damped Holt beat SES by one unit of RMSE.</strong> Four twenty-six against four twenty-seven. That is not a win. On a different held-out year it could easily flip. If you report “the damped model is best” you’re reporting noise as a finding.</p>
+<p>What actually happened is that damped Holt and SES are the same answer arrived at two ways. Damping the trend hard enough is close to not having a trend. The honest summary is: <em>on this series, models that keep the forecast near the current level beat models that extrapolate, and the two ways of doing that tie.</em></p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-6-same-store.-different-aisle.-opposite-answer." class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="step-6-same-store.-different-aisle.-opposite-answer."><span class="header-section-number">1.8</span> Step 6 — Same store. Different aisle. Opposite answer.</h2>
+<p>Change one word — <code>HOUSEHOLD</code> becomes <code>FOODS</code>. Same store, same code, same horizon.</p>
+<div id="2a0af379" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>y2 <span class="op">=</span> get_series(<span class="st">"TX_1"</span>, <span class="st">"FOODS"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>train2, test2 <span class="op">=</span> y2.iloc[:<span class="op">-</span>N_TEST], y2.iloc[<span class="op">-</span>N_TEST:]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>sn2 <span class="op">=</span> y2.shift(<span class="dv">52</span>).iloc[<span class="op">-</span>N_TEST:].values</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>ses2 <span class="op">=</span> SimpleExpSmoothing(train2).fit()</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"TX_1 FOODS   seasonal naive RMSE </span><span class="sc">{</span>rmse(test2, sn2)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"TX_1 FOODS   SES            RMSE </span><span class="sc">{</span>rmse(test2, ses2.forecast(N_TEST))<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Notice:</strong> the ranking flips. On the household aisle an exponential smoother won comfortably. On the food aisle of the <em>same store</em>, the benchmark wins and SES is about 13% worse.</p>
+<p>The reason is visible in one number. For TX_1 HOUSEHOLD the test year sits about <strong>15% above</strong> the year before it, so seasonal naive carries a stale level forward and loses badly. For TX_1 FOODS the level barely moves — about <strong>1.5% down</strong> — and last year is an excellent guess.</p>
+<p>So it is not the store, and it is not the method. It is whether the level moved.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Change one word. <code>HOUSEHOLD</code> becomes <code>FOODS</code>. Same store, same code, same horizon, same fifty-two weeks held out.</p>
 <pre><code>TX_1 FOODS   seasonal naive RMSE 1308
@@ -748,8 +756,8 @@ TX_1 FOODS   SES            RMSE 1474</code></pre>
 </div>
 </div>
 </section>
-<section id="before-you-leave" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">3.4</span> Before you leave</h2>
+<section id="before-you-leave" class="level2" data-number="1.9">
+<h2 data-number="1.9" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">1.9</span> Before you leave</h2>
 <blockquote class="blockquote">
 <p><strong>Discuss:</strong> You now have two series where the best method is different. You are responsible for all 30 series in this dataset and you have to pick <strong>one</strong> approach to run in production every month.</p>
 <p>What do you actually do — and what would you need to measure to decide? “Fit everything and pick the winner per series” is an answer, but say what it costs you.</p>
@@ -757,7 +765,7 @@ TX_1 FOODS   SES            RMSE 1474</code></pre>
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -766,7 +774,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -789,8 +797,8 @@ Try it
 </div>
 </div>
 </section>
-<section id="what-your-run-should-produce" class="level2" data-number="3.5">
-<h2 data-number="3.5" class="anchored" data-anchor-id="what-your-run-should-produce"><span class="header-section-number">3.5</span> What your run should produce</h2>
+<section id="what-your-run-should-produce" class="level2" data-number="1.10">
+<h2 data-number="1.10" class="anchored" data-anchor-id="what-your-run-should-produce"><span class="header-section-number">1.10</span> What your run should produce</h2>
 <p>Your numbers will differ where a model is stochastic; these are the values this lab produces on the pinned environment.</p>
 <p>Everything the lab prints, for checking against your screen. These are deterministic; if yours differ, the data changed.</p>
 <table class="caption-top table">
@@ -854,7 +862,6 @@ Try it
 <p><strong>Note for the instructor.</strong> Holt-Winters emits a <code>ConvergenceWarning</code> on this series — the optimizer does not fully converge while estimating 52 seasonal indices. The lab suppresses warnings globally in Setup, so students will not see it. It does not change the conclusion (Holt-Winters loses to SES either way), but it is a second, quieter piece of evidence for the same point: that model is being asked to estimate more than this sample supports.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

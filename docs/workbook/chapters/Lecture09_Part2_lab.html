@@ -415,7 +415,7 @@ This lab is slow
 </section>
 <section id="setup" class="level2" data-number="10.2">
 <h2 data-number="10.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">10.2</span> Setup</h2>
-<div id="58b2ad30" class="cell" data-execution_count="1">
+<div id="ae9e92bb" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -478,7 +478,7 @@ Walkthrough
 <h2 data-number="10.3" class="anchored" data-anchor-id="step-1-positional-encoding-before-the-model"><span class="header-section-number">10.3</span> Step 1 — Positional encoding, before the model</h2>
 <p>Attention computes a <strong>weighted average</strong> over positions. Averaging does not care about order: shuffle the input and every attention output is unchanged.</p>
 <p>So position has to be added to the input itself. The standard device is a set of sinusoids of different frequencies.</p>
-<div id="bd984634" class="cell" data-execution_count="2">
+<div id="17a54b26" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sinusoidal(seq_len, d_model):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pe <span class="op">=</span> torch.zeros(seq_len, d_model)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> torch.arange(seq_len).unsqueeze(<span class="dv">1</span>).<span class="bu">float</span>()</span>
@@ -534,7 +534,7 @@ Try it
 </section>
 <section id="step-2-build-the-encoder" class="level2" data-number="10.4">
 <h2 data-number="10.4" class="anchored" data-anchor-id="step-2-build-the-encoder"><span class="header-section-number">10.4</span> Step 2 — Build the encoder</h2>
-<div id="cfe21bb4" class="cell" data-execution_count="3">
+<div id="4db67bb7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TransformerForecaster(nn.Module):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_channels<span class="op">=</span><span class="dv">4</span>, d_model<span class="op">=</span><span class="dv">64</span>, nhead<span class="op">=</span><span class="dv">4</span>, layers<span class="op">=</span><span class="dv">2</span>, use_pe<span class="op">=</span><span class="va">True</span>):</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
@@ -599,7 +599,7 @@ Walkthrough
 <section id="step-3-delete-the-line" class="level2" data-number="10.5">
 <h2 data-number="10.5" class="anchored" data-anchor-id="step-3-delete-the-line"><span class="header-section-number">10.5</span> Step 3 — Delete the line</h2>
 <p>Same model, same data, same seeds — <code>use_pe=False</code> removes the single addition in <code>forward</code>.</p>
-<div id="8c041417" class="cell" data-execution_count="4">
+<div id="598a9c48" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> use_pe <span class="kw">in</span> (<span class="va">True</span>, <span class="va">False</span>):</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    runs <span class="op">=</span> [train(use_pe, s)[<span class="dv">0</span>] <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>)]</span>
@@ -624,59 +624,57 @@ Nothing raised an exception
 </div>
 </div>
 <p><strong>Your turn:</strong> express the penalty as a percentage of the with-encoding RMSE.</p>
-<div id="1088f39b" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>Same model, same data, same two seeds. `use_pe<span class="op">=</span>False` removes that one addition <span class="kw">in</span> `forward` <span class="kw">and</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>changes nothing <span class="cf">else</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="bb8e5125" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.DataFrame(rows)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># penalty = ___ - ___</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"cost of the missing line: {penalty:,.0f} RMSE "</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#       f"({100*penalty/df['mean'].iloc[0]:.0f}% worse)")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>positional encoding mean sd runs yes 990 23 [1013, 967] no 1282 8 [1290, 1274]</p>
-<pre><code>
-**292 RMSE.** About 29% worse, from deleting one line.
-
-And now the sentence I want you to take out of this course, never mind this lab: **nothing raised
-an exception.**
-
-The model without positional encoding trained for thirty epochs. The loss went down. It converged.
-It returned forecasts in the right units, in the right shape, with a plausible RMSE that is better
-than the seasonal-naive benchmark of 2,152. If you had no comparison to make, you would ship it.
-
-What it was actually doing is working from an **unordered bag of 52 weeks.** It could not
-distinguish last week from a year ago. It knew what the year contained and nothing about when.
-
-Look at the `sd` column before anyone asks. The two conditions have spreads of 23 and 8 against a
-gap of 292 — twelve to thirty-six times the noise. By the standard Lab 7 set, this is about as
-unambiguous as a result gets.
-
-The practical warning: `nn.TransformerEncoderLayer` hands you attention, residual connections,
-layer normalization and the feed-forward sublayer. It does **not** hand you position, there is no
-default, and nothing checks that you added it. In a language model you would notice, because the
-output would be word salad. In a forecaster the output is a number, and numbers always look fine.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Fill in the blank and express the penalty as a percentage. You should get 292 RMSE, 29% worse.
-
-:::
-
-## ---- your turn: uncomment and fill in ----
-
-## df = pd.DataFrame(rows)
-
-## penalty = ___ - ___
-
-## print(f"cost of the missing line: {penalty:,.0f} RMSE "
-
-## f"({100*penalty/df['mean'].iloc[0]:.0f}% worse)")
-</code></pre>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Same model, same data, same two seeds. <code>use_pe=False</code> removes that one addition in <code>forward</code> and changes nothing else.</p>
+<pre><code>positional encoding  mean  sd         runs
+                yes   990  23  [1013, 967]
+                 no  1282   8 [1290, 1274]</code></pre>
+<p><strong>292 RMSE.</strong> About 29% worse, from deleting one line.</p>
+<p>And now the sentence I want you to take out of this course, never mind this lab: <strong>nothing raised an exception.</strong></p>
+<p>The model without positional encoding trained for thirty epochs. The loss went down. It converged. It returned forecasts in the right units, in the right shape, with a plausible RMSE that is better than the seasonal-naive benchmark of 2,152. If you had no comparison to make, you would ship it.</p>
+<p>What it was actually doing is working from an <strong>unordered bag of 52 weeks.</strong> It could not distinguish last week from a year ago. It knew what the year contained and nothing about when.</p>
+<p>Look at the <code>sd</code> column before anyone asks. The two conditions have spreads of 23 and 8 against a gap of 292 — twelve to thirty-six times the noise. By the standard Lab 7 set, this is about as unambiguous as a result gets.</p>
+<p>The practical warning: <code>nn.TransformerEncoderLayer</code> hands you attention, residual connections, layer normalization and the feed-forward sublayer. It does <strong>not</strong> hand you position, there is no default, and nothing checks that you added it. In a language model you would notice, because the output would be word salad. In a forecaster the output is a number, and numbers always look fine.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Fill in the blank and express the penalty as a percentage. You should get 292 RMSE, 29% worse.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-4-where-attention-lands" class="level2" data-number="10.6">
 <h2 data-number="10.6" class="anchored" data-anchor-id="step-4-where-attention-lands"><span class="header-section-number">10.6</span> Step 4 — Where attention lands</h2>
-<div id="a2e28804" class="cell" data-execution_count="6">
+<div id="a674bfae" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>board <span class="op">=</span> {</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LASSO, 46 features (HW4)"</span>: <span class="dv">744</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"XGBoost (HW4)"</span>: <span class="dv">781</span>,</span>
@@ -692,7 +690,7 @@ Fill in the blank and express the penalty as a percentage. You should get 292 RM
 <p><strong>Every advantage attention has is an advantage at scale.</strong> Parallel computation across positions matters when a sequence is thousands of steps and a corpus is billions of tokens. Direct long-range paths matter when the signal genuinely sits far back. Neither describes 5,900 windows of weekly retail demand.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -701,7 +699,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <pre><code>LASSO, 46 features (HW4)     744
 XGBoost (HW4)                781
@@ -728,7 +726,7 @@ Seasonal naive              2152</code></pre>
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -737,7 +735,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

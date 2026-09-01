@@ -128,9 +128,13 @@ def parse_mirror(path: pathlib.Path):
     """[(level, title, body)] for every '# ' and '## ' heading, in order."""
     body = path.read_text(encoding="utf-8")
     body = re.sub(r'^---\n.*?\n---\n', '', body, count=1, flags=re.S)   # frontmatter
-    parts, cur = [], None
+    parts, cur, in_fence = [], None, False
     for line in body.split("\n"):
-        m = re.match(r'^(#{1,2})\s+(.+?)\s*$', line)
+        # Same hazard as the workbook: a "#" at column 0 inside a fenced code block
+        # is a Python comment, not a heading.
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+        m = None if in_fence else re.match(r'^(#{1,2})\s+(.+?)\s*$', line)
         if m and not line.startswith("###"):
             if cur: parts.append(cur)
             cur = [len(m.group(1)), m.group(2).strip(), []]

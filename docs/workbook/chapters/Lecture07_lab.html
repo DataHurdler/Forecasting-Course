@@ -375,7 +375,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">7.2</span> Setup</h2>
-<div id="ae8fa99c" class="cell" data-execution_count="1">
+<div id="26e55d8a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -412,7 +412,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="7.3" class="anchored" data-anchor-id="step-1-from-a-panel-to-windows"><span class="header-section-number">7.3</span> Step 1 — From a panel to windows</h2>
 <p>A network cannot read a dataframe. It needs a stack of fixed-size examples.</p>
 <p>For each series, slide a 26-week window along the history: the window is the input, the units in the following week is the target.</p>
-<div id="09765b1f" class="cell" data-execution_count="2">
+<div id="70ab8adc" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X, Y, D <span class="op">=</span> [], [], []</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _, g <span class="kw">in</span> weekly.groupby([<span class="st">"store_id"</span>, <span class="st">"cat_id"</span>]):</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> g[CHANNELS].values.astype(<span class="st">"float32"</span>)</span>
@@ -430,65 +430,53 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><strong>Notice the window count is far larger than the row count.</strong> Every week is the end of one window and the interior of twenty-five others, so 8,310 rows become ~7,500 overlapping examples. That overlap is why the effective sample size is much smaller than it looks.</p>
 <p>Now standardize — <strong>using training statistics only</strong>.</p>
-<div id="a1462250" class="cell" data-execution_count="3">
+<div id="6122d978" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mu <span class="op">=</span> X[train_mask].mean(axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), keepdims<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sd <span class="op">=</span> X[train_mask].std(axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-8</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>y_mu, y_sd <span class="op">=</span> Y[train_mask].mean(), Y[train_mask].std()</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>Xn, Yn <span class="op">=</span> (X <span class="op">-</span> mu) <span class="op">/</span> sd, (Y <span class="op">-</span> y_mu) <span class="op">/</span> y_sd</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># flatten each window for a feedforward network: (26, 4) -&gt; 104 features</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>X_tr <span class="op">=</span> torch.tensor(Xn[train_mask].reshape(train_mask.<span class="bu">sum</span>(), <span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>y_tr <span class="op">=</span> torch.tensor(Yn[train_mask])</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>X_te <span class="op">=</span> torch.tensor(Xn[test_mask].reshape(test_mask.<span class="bu">sum</span>(), <span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"flattened to </span><span class="sc">{</span>X_tr<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> features per example"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>30 series, 8,310 rows</p>
-<pre><code></code></pre>
-<p>X shape (7530, 26, 4) (windows, weeks, channels) train 5,940 test 1,590</p>
-<pre><code>
-Here is the reframing that every method from here to the end of the course depends on.
-
-A network cannot read a dataframe. It needs a stack of identically-shaped examples. So for each
-series we slide a 26-week window along the history: those 26 weeks are the input, the units in
-week 27 are the target, and the *target's* date decides whether the example is training or test.
-
-Four channels — units, SNAP days, event days, average price. Twenty-six weeks. So each example is
-a 26-by-4 block.
-
-Now notice the count, because it is a trap dressed as good news. **8,310 rows became 7,530
-examples.** It looks like you have seven and a half thousand independent observations. You do not.
-Every week appears in twenty-six different windows — once as a target, twenty-five times as
-interior context. The examples overlap almost completely with their neighbours.
-
-So the effective sample size is far smaller than 7,530, and that matters for how much you should
-trust anything this network tells you. Half of Homework 5's difficulty is remembering this.
-</code></pre>
-<p>flattened to 104 features per example</p>
-<pre><code>
-Two details, both of which are graded in Homework 5.
-
-**The statistics come from training data only.** `mu` and `sd` are computed under `train_mask` and
-then applied to everything. Standardizing with statistics computed over the full dataset leaks
-test-period information into training, and it will not raise an error — it will just quietly make
-your results better than they are.
-
-**And then we flatten.** Twenty-six weeks by four channels becomes 104 numbers in a row. A
-feedforward network has no notion of sequence; it sees 104 unordered features. Hold that thought
-— it is the answer to one of the closing questions, and it is what Lecture 8 exists to fix. **This block is Homework 5 Part 1 Question 1.** Keep it.
-
-:::
-
-## flatten each window for a feedforward network: (26, 4) -&gt; 104 features
-
-X_tr = torch.tensor(Xn[train_mask].reshape(train_mask.sum(), -1))
-y_tr = torch.tensor(Yn[train_mask])
-X_te = torch.tensor(Xn[test_mask].reshape(test_mask.sum(), -1))
-
-print(f"flattened to {X_tr.shape[1]} features per example")</code></pre>
 <p><strong>This block is what Homework 5 Part 1 Q1 asks for.</strong> Keep it.</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>30 series, 8,310 rows</code></pre>
+<pre><code>X shape (7530, 26, 4)  (windows, weeks, channels)
+train 5,940   test 1,590</code></pre>
+<p>Here is the reframing that every method from here to the end of the course depends on.</p>
+<p>A network cannot read a dataframe. It needs a stack of identically-shaped examples. So for each series we slide a 26-week window along the history: those 26 weeks are the input, the units in week 27 are the target, and the <em>target’s</em> date decides whether the example is training or test.</p>
+<p>Four channels — units, SNAP days, event days, average price. Twenty-six weeks. So each example is a 26-by-4 block.</p>
+<p>Now notice the count, because it is a trap dressed as good news. <strong>8,310 rows became 7,530 examples.</strong> It looks like you have seven and a half thousand independent observations. You do not. Every week appears in twenty-six different windows — once as a target, twenty-five times as interior context. The examples overlap almost completely with their neighbours.</p>
+<p>So the effective sample size is far smaller than 7,530, and that matters for how much you should trust anything this network tells you. Half of Homework 5’s difficulty is remembering this.</p>
+<pre><code>flattened to 104 features per example</code></pre>
+<p>Two details, both of which are graded in Homework 5.</p>
+<p><strong>The statistics come from training data only.</strong> <code>mu</code> and <code>sd</code> are computed under <code>train_mask</code> and then applied to everything. Standardizing with statistics computed over the full dataset leaks test-period information into training, and it will not raise an error — it will just quietly make your results better than they are.</p>
+<p><strong>And then we flatten.</strong> Twenty-six weeks by four channels becomes 104 numbers in a row. A feedforward network has no notion of sequence; it sees 104 unordered features. Hold that thought — it is the answer to one of the closing questions, and it is what Lecture 8 exists to fix. <strong>This block is Homework 5 Part 1 Question 1.</strong> Keep it.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-2-train-a-network" class="level2" data-number="7.4">
 <h2 data-number="7.4" class="anchored" data-anchor-id="step-2-train-a-network"><span class="header-section-number">7.4</span> Step 2 — Train a network</h2>
-<div id="258757ca" class="cell" data-execution_count="4">
+<div id="0895215f" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_model(n_features, seed):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    torch.manual_seed(seed)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
@@ -519,7 +507,7 @@ print(f"flattened to {X_tr.shape[1]} features per example")</code></pre>
 <p><strong>Compare that RMSE against your records.</strong> XGBoost managed 781 on this panel in Homework 4, and a 46-coefficient LASSO managed 744. Your network has around 22,000 parameters.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -528,7 +516,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <pre><code>parameters: 21,761
 test RMSE:  1,109</code></pre>
@@ -544,14 +532,14 @@ test RMSE:  1,109</code></pre>
 <section id="step-3-run-it-again" class="level2" data-number="7.5">
 <h2 data-number="7.5" class="anchored" data-anchor-id="step-3-run-it-again"><span class="header-section-number">7.5</span> Step 3 — Run it again</h2>
 <p>Same code, same data, same settings. Only the random seed changes.</p>
-<div id="716acc78" class="cell" data-execution_count="5">
+<div id="9affb876" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> seed <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"seed </span><span class="sc">{</span>seed<span class="sc">}</span><span class="ss">:  test RMSE </span><span class="sc">{</span>train(make_model(X_tr.shape[<span class="dv">1</span>], seed))<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Say out loud what just happened</strong>, because it is the point of the lab. Nothing about the problem changed. The differences you see come entirely from random weight initialization and dropout.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -560,7 +548,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Same code. Same data. Same settings. Same machine. The only thing that changes is the random seed — which controls the initial weights and which units dropout switches off.</p>
 <pre><code>seed 1:  test RMSE 1,109
@@ -589,14 +577,14 @@ Try it
 <section id="step-4-so-how-would-you-compare-two-settings" class="level2" data-number="7.6">
 <h2 data-number="7.6" class="anchored" data-anchor-id="step-4-so-how-would-you-compare-two-settings"><span class="header-section-number">7.6</span> Step 4 — So how would you compare two settings?</h2>
 <p>Here is the trap. Suppose you want to know whether weight decay helps. You try three values, train once each, and pick the winner.</p>
-<div id="51637ab6" class="cell" data-execution_count="6">
+<div id="60585366" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> {wd: train(make_model(X_tr.shape[<span class="dv">1</span>], seed<span class="op">=</span><span class="dv">1</span>), weight_decay<span class="op">=</span>wd)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>          <span class="cf">for</span> wd <span class="kw">in</span> (<span class="fl">0.0</span>, <span class="fl">1e-4</span>, <span class="fl">1e-2</span>)}</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> wd, r <span class="kw">in</span> single.items():</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"weight_decay=</span><span class="sc">{</span>wd<span class="sc">:&lt;7}</span><span class="ss"> test RMSE </span><span class="sc">{</span>r<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now do it honestly — <strong>five seeds per setting</strong>, and look at the spread as well as the mean.</p>
-<div id="9624b2ce" class="cell" data-execution_count="7">
+<div id="31052e78" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> wd <span class="kw">in</span> (<span class="fl">0.0</span>, <span class="fl">1e-4</span>, <span class="fl">1e-2</span>):</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    runs <span class="op">=</span> [train(make_model(X_tr.shape[<span class="dv">1</span>], s), weight_decay<span class="op">=</span>wd) <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)]</span>
@@ -620,63 +608,61 @@ Compare the two tables before you go on
 </div>
 </div>
 <p><strong>Your turn:</strong> using your own two tables, state the smallest RMSE difference you would be willing to call real.</p>
-<div id="4d41ff4d" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>Here <span class="kw">is</span> the trap, <span class="kw">and</span> it <span class="kw">is</span> the single most common mistake <span class="kw">in</span> applied deep learning. You want to know whether weight decay helps. Three values, one training run each, pick the winner.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="c0b3c829" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># spread = ___                      # &lt;- a number from your five-seed table</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"differences smaller than about {spread:,.0f} RMSE are not evidence")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>weight_decay=0.0 test RMSE 1,109 weight_decay=0.0001 test RMSE 1,007 weight_decay=0.01 test RMSE 1,142</p>
-<pre><code>
-Clear result. `1e-4` wins by **102 RMSE** over no weight decay at all. Nine percent. You would
-write that down, you would put it in a slide, and honestly most people would put it in a paper. Now do it honestly. Five seeds per setting, and report the spread as well as the mean.
-</code></pre>
-<p>weight_decay mean sd min max 0 1084 86 946 1176 0.0001 1088 134 991 1343 0.01 1241 278 1050 1792</p>
-<pre><code>
-The two means differ by **four**.
-
-Not "the effect was smaller than we thought." Not "the advantage was modest." The 102-point
-advantage that the single-seed experiment found **did not exist.** Seed 1 happened to be a good
-draw for `1e-4` and an average draw for zero, and that is the entire finding.
-
-Look closer and it is worse than that. On `min` and on `max`, no weight decay is *better* than
-`1e-4` — 946 against 991, 1,176 against 1,343. The setting with the worse spread has the
-marginally better mean, by four. There is no effect here in any direction. Now the column the single run could never have produced: **`sd`**.
-
-`1e-2` is worse on average — 1,241 — but the important number is 278, more than three times the
-spread of no weight decay at all. It returned 1,050 once and 1,792 another time. That is a
-different *kind* of bad from a setting that reliably lands at 1,240. One is a model that is
-mediocre; the other is a model you cannot make promises about. You cannot see that in one run. Ever.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Fill in the blank and answer the question in your own words: what is the smallest RMSE difference
-you would be willing to call real on this problem?
-
-There is no single right answer, but there is a defensible way to reason. The run-to-run standard
-deviation at your best setting is about **86**. Two single runs differing by less than that are
-telling you nothing at all. If you want to claim a difference of that size is real, you need
-several seeds per setting and you need to compare the distributions, not the winners.
-
-Which means: **a difference under roughly 100 RMSE, from single runs, is not evidence.** And you
-will notice that this disqualifies almost every architecture comparison you have ever read.
-
-:::
-
-## ---- your turn: uncomment and fill in ----
-
-## spread = ___                      # &lt;- a number from your five-seed table
-
-## print(f"differences smaller than about {spread:,.0f} RMSE are not evidence")
-</code></pre>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Here is the trap, and it is the single most common mistake in applied deep learning. You want to know whether weight decay helps. Three values, one training run each, pick the winner.</p>
+<pre><code>weight_decay=0.0     test RMSE 1,109
+weight_decay=0.0001  test RMSE 1,007
+weight_decay=0.01    test RMSE 1,142</code></pre>
+<p>Clear result. <code>1e-4</code> wins by <strong>102 RMSE</strong> over no weight decay at all. Nine percent. You would write that down, you would put it in a slide, and honestly most people would put it in a paper. Now do it honestly. Five seeds per setting, and report the spread as well as the mean.</p>
+<pre><code>weight_decay  mean  sd  min  max
+           0  1084  86  946 1176
+      0.0001  1088 134  991 1343
+        0.01  1241 278 1050 1792</code></pre>
+<p>The two means differ by <strong>four</strong>.</p>
+<p>Not “the effect was smaller than we thought.” Not “the advantage was modest.” The 102-point advantage that the single-seed experiment found <strong>did not exist.</strong> Seed 1 happened to be a good draw for <code>1e-4</code> and an average draw for zero, and that is the entire finding.</p>
+<p>Look closer and it is worse than that. On <code>min</code> and on <code>max</code>, no weight decay is <em>better</em> than <code>1e-4</code> — 946 against 991, 1,176 against 1,343. The setting with the worse spread has the marginally better mean, by four. There is no effect here in any direction. Now the column the single run could never have produced: <strong><code>sd</code></strong>.</p>
+<p><code>1e-2</code> is worse on average — 1,241 — but the important number is 278, more than three times the spread of no weight decay at all. It returned 1,050 once and 1,792 another time. That is a different <em>kind</em> of bad from a setting that reliably lands at 1,240. One is a model that is mediocre; the other is a model you cannot make promises about. You cannot see that in one run. Ever.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Fill in the blank and answer the question in your own words: what is the smallest RMSE difference you would be willing to call real on this problem?</p>
+<p>There is no single right answer, but there is a defensible way to reason. The run-to-run standard deviation at your best setting is about <strong>86</strong>. Two single runs differing by less than that are telling you nothing at all. If you want to claim a difference of that size is real, you need several seeds per setting and you need to compare the distributions, not the winners.</p>
+<p>Which means: <strong>a difference under roughly 100 RMSE, from single runs, is not evidence.</strong> And you will notice that this disqualifies almost every architecture comparison you have ever read.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-5-break-it-on-purpose" class="level2" data-number="7.7">
 <h2 data-number="7.7" class="anchored" data-anchor-id="step-5-break-it-on-purpose"><span class="header-section-number">7.7</span> Step 5 — Break it on purpose</h2>
 <p>One line, no error message.</p>
-<div id="387056d8" class="cell" data-execution_count="9">
+<div id="87f2e071" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_broken(model, epochs<span class="op">=</span><span class="dv">60</span>, lr<span class="op">=</span><span class="fl">5e-4</span>):</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    opt <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span>lr)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    lossfn <span class="op">=</span> nn.MSELoss()</span>
@@ -699,7 +685,7 @@ will notice that this disqualifies almost every architecture comparison you have
 <p>No exception. No warning. Just a model that trains badly — and note <em>how</em> badly. The broken version lands at <strong>7,325</strong>, which is more than three times worse than the seasonal-naive benchmark of 2,152. A one-line omission turned a working model into something far worse than predicting last year’s value.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -708,7 +694,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>One last thing, and it is the same theme in a different costume. Look at <code>train_broken</code>. One line is commented out — <code>opt.zero_grad()</code>. Everything else is identical.</p>
 <pre><code>with    zero_grad():  1,109
@@ -731,7 +717,7 @@ without zero_grad():  7,325</code></pre>
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -740,7 +726,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

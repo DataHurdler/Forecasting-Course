@@ -419,7 +419,7 @@ Two cells here are slow
 <section id="setup" class="level2" data-number="8.2">
 <h2 data-number="8.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">8.2</span> Setup</h2>
 <p>Same windowing as Lab 7, with one change that matters.</p>
-<div id="0ee2414d" class="cell" data-execution_count="1">
+<div id="74cddd90" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -507,7 +507,7 @@ Walkthrough
 <li>A neuron in <strong>layer 1</strong> sees <strong>5</strong> consecutive weeks.</li>
 <li>A neuron in <strong>layer 2</strong> sees 3 layer-1 neurons — which between them span <span class="math inline">\(3 + (5 - 1) = \mathbf{7}\)</span> weeks.</li>
 </ul>
-<div id="6d4f9490" class="cell" data-execution_count="2">
+<div id="71a579e3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> receptive_field(kernels):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    rf <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">reversed</span>(kernels):</span>
@@ -548,7 +548,7 @@ kernels (5, 3, 3, 3)-&gt; receptive field 11 weeks</code></pre>
 </section>
 <section id="step-2-build-the-cnn" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="step-2-build-the-cnn"><span class="header-section-number">8.4</span> Step 2 — Build the CNN</h2>
-<div id="a3fa1864" class="cell" data-execution_count="3">
+<div id="aabce9d3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> conv_out_len(W):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W <span class="op">-</span> <span class="dv">4</span> <span class="op">-</span> <span class="dv">2</span>          <span class="co"># kernel 5, then kernel 3, no padding</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -607,7 +607,7 @@ test RMSE:  980</code></pre>
 <h2 data-number="8.5" class="anchored" data-anchor-id="step-3-does-pooling-belong-here"><span class="header-section-number">8.5</span> Step 3 — Does pooling belong here?</h2>
 <p>Lecture 8 argued that pooling buys <strong>translation invariance</strong> — an image classifier should not care where in the frame the cat is — and that a forecaster usually <em>should</em> care where the spike was.</p>
 <p>Test it. Three heads, three seeds each, because of last week.</p>
-<div id="2e8b9989" class="cell" data-execution_count="4">
+<div id="6766bd81" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>head_runs <span class="op">=</span> {}</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> head <span class="kw">in</span> (<span class="st">"flatten"</span>, <span class="st">"maxpool"</span>, <span class="st">"avgpool"</span>):</span>
@@ -667,7 +667,7 @@ Try it
 <section id="step-4-a-longer-window-the-same-receptive-field" class="level2" data-number="8.6">
 <h2 data-number="8.6" class="anchored" data-anchor-id="step-4-a-longer-window-the-same-receptive-field"><span class="header-section-number">8.6</span> Step 4 — A longer window, the same receptive field</h2>
 <p>Now the experiment Step 1 set up. Keep the architecture fixed and vary only the window.</p>
-<div id="0dcb6c33" class="cell" data-execution_count="5">
+<div id="fbf858de" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W <span class="kw">in</span> (<span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># W=26 was already fitted in Step 3 -- reuse those three rather than paying twice</span></span>
@@ -695,85 +695,64 @@ The result runs the wrong way, and that is the lesson
 </div>
 </div>
 <p><strong>Your turn:</strong> using <code>receptive_field()</code>, find how many kernel-3 layers you would need to stack after the first kernel-5 layer to actually span 52 weeks.</p>
-<div id="1b506b22" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>Now the experiment Step <span class="dv">1</span> <span class="bu">set</span> up, <span class="kw">and</span> it <span class="kw">is</span> the reason this lab exists.</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>Keep the architecture completely fixed — same two layers, same kernels, same seven<span class="op">-</span>week receptive</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>field — <span class="kw">and</span> vary only how much history you hand it. Thirteen weeks, twenty<span class="op">-</span>six, fifty<span class="op">-</span>two. Three</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>seeds each, <span class="kw">and</span> we reuse Step <span class="dv">3</span><span class="st">'s three `flatten` runs for the 26-week row rather than paying for</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="er">them twice.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d8b72446" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># k = [5]</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># while receptive_field(k) &lt; 52:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     k.append(___)               # &lt;- what kernel size?</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"{len(k)} layers needed: kernels {k} -&gt; {receptive_field(k)} weeks")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>window receptive_field parameters mean_RMSE sd runs 13 7 7329 980 42 [1039, 960, 943] 26 7 8161 1032 80 [980, 1145, 972] 52 7 9825 1103 26 [1111, 1068, 1131]</p>
-<pre><code>
-Quadrupling the window made the forecast **worse**.
-
-Now let me show you how to read this table honestly, because there are two different claims in it
-and only one of them is safe.
-
-**The middle comparison is not evidence.** Thirteen weeks against twenty-six is 980 against 1,032
-— a gap of 52, when the 26-week row's own standard deviation is 80. Last week you decided that
-differences smaller than about 100 RMSE, from a handful of runs, are not findings. That rule
-applies to results you like as much as results you don't. Those two windows are
-indistinguishable.
-
-**The ends are evidence.** Thirteen weeks against fifty-two is 980 against 1,103 — **123 RMSE**,
-and the spreads do not touch: the *worst* 13-week run, 1,039, still beats the *best* 52-week run,
-1,068. Three seeds each, no overlap. That one you can report.
-
-So the finding is: giving this architecture four times the history made it measurably worse, and
-giving it twice the history did nothing at all.
-
-Why? Look at the two columns either side of the RMSE. The receptive field is **7** on every row —
-it does not move, because nothing about the architecture changed. The parameter count goes 7,329,
-8,161, 9,825 — because the flatten layer's input grows with the window.
-
-So a longer window adds capacity and adds no reach. Every extra week you supply becomes more
-weights to fit and not one additional week that any neuron can actually look at. That is a recipe
-for overfitting, and the 52-week column is what it looks like.
-
-**More data into the model is not more information out of it, unless the architecture can reach
-it.**
-
-::: {.callout-tip}
-## Try it
-:::
-
-Fill in the blank in the next cell and find out how many kernel-3 layers you would have to stack
-after that first kernel-5 layer to span a full 52 weeks.
-
-The answer is **24** — twenty-five convolutional layers in total, for a receptive field of 53
-weeks. Twenty-three is not enough; it reaches 51.
-
-Sit with that for a second. To let this architecture see one year, you would need a
-twenty-five-layer network — on 5,940 training examples that overlap almost completely. Nobody is
-going to do that, and if they did it would overfit spectacularly.
-
-That is the honest limit of a plain 1D CNN for this problem, and it is why the next lecture is
-about a different mechanism rather than a deeper stack of the same one. Real practitioners reach
-for dilated convolutions here — filters with gaps in them, so the receptive field grows
-multiplicatively instead of by two per layer. That is a genuine third option and worth knowing the
-name of.
-
-:::
-
-## ---- your turn: uncomment and fill in ----
-
-## k = [5]
-
-## while receptive_field(k) &lt; 52:
-
-## k.append(___)               # &lt;- what kernel size?
-
-## print(f"{len(k)} layers needed: kernels {k} -&gt; {receptive_field(k)} weeks")
-</code></pre>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Now the experiment Step 1 set up, and it is the reason this lab exists.</p>
+<p>Keep the architecture completely fixed — same two layers, same kernels, same seven-week receptive field — and vary only how much history you hand it. Thirteen weeks, twenty-six, fifty-two. Three seeds each, and we reuse Step 3’s three <code>flatten</code> runs for the 26-week row rather than paying for them twice.</p>
+<pre><code> window  receptive_field  parameters  mean_RMSE  sd               runs
+     13                7        7329        980  42   [1039, 960, 943]
+     26                7        8161       1032  80    [980, 1145, 972]
+     52                7        9825       1103  26  [1111, 1068, 1131]</code></pre>
+<p>Quadrupling the window made the forecast <strong>worse</strong>.</p>
+<p>Now let me show you how to read this table honestly, because there are two different claims in it and only one of them is safe.</p>
+<p><strong>The middle comparison is not evidence.</strong> Thirteen weeks against twenty-six is 980 against 1,032 — a gap of 52, when the 26-week row’s own standard deviation is 80. Last week you decided that differences smaller than about 100 RMSE, from a handful of runs, are not findings. That rule applies to results you like as much as results you don’t. Those two windows are indistinguishable.</p>
+<p><strong>The ends are evidence.</strong> Thirteen weeks against fifty-two is 980 against 1,103 — <strong>123 RMSE</strong>, and the spreads do not touch: the <em>worst</em> 13-week run, 1,039, still beats the <em>best</em> 52-week run, 1,068. Three seeds each, no overlap. That one you can report.</p>
+<p>So the finding is: giving this architecture four times the history made it measurably worse, and giving it twice the history did nothing at all.</p>
+<p>Why? Look at the two columns either side of the RMSE. The receptive field is <strong>7</strong> on every row — it does not move, because nothing about the architecture changed. The parameter count goes 7,329, 8,161, 9,825 — because the flatten layer’s input grows with the window.</p>
+<p>So a longer window adds capacity and adds no reach. Every extra week you supply becomes more weights to fit and not one additional week that any neuron can actually look at. That is a recipe for overfitting, and the 52-week column is what it looks like.</p>
+<p><strong>More data into the model is not more information out of it, unless the architecture can reach it.</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Fill in the blank in the next cell and find out how many kernel-3 layers you would have to stack after that first kernel-5 layer to span a full 52 weeks.</p>
+<p>The answer is <strong>24</strong> — twenty-five convolutional layers in total, for a receptive field of 53 weeks. Twenty-three is not enough; it reaches 51.</p>
+<p>Sit with that for a second. To let this architecture see one year, you would need a twenty-five-layer network — on 5,940 training examples that overlap almost completely. Nobody is going to do that, and if they did it would overfit spectacularly.</p>
+<p>That is the honest limit of a plain 1D CNN for this problem, and it is why the next lecture is about a different mechanism rather than a deeper stack of the same one. Real practitioners reach for dilated convolutions here — filters with gaps in them, so the receptive field grows multiplicatively instead of by two per layer. That is a genuine third option and worth knowing the name of.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-5-where-does-it-land" class="level2" data-number="8.7">
 <h2 data-number="8.7" class="anchored" data-anchor-id="step-5-where-does-it-land"><span class="header-section-number">8.7</span> Step 5 — Where does it land?</h2>
-<div id="a4eac4a5" class="cell" data-execution_count="7">
+<div id="7b8b897e" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>board <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LASSO, 46 features (HW4)"</span>: <span class="dv">744</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"XGBoost (HW4)"</span>: <span class="dv">781</span>,</span>
@@ -786,7 +765,7 @@ name of.
 <p>The CNN is competitive with the feedforward network and well behind both tabular models — on a problem where the useful signal sits at lags the filter cannot reach.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -795,7 +774,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <pre><code>LASSO, 46 features (HW4)          744
 XGBoost (HW4)                     781
@@ -821,7 +800,7 @@ Seasonal naive                   2152</code></pre>
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -830,7 +809,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

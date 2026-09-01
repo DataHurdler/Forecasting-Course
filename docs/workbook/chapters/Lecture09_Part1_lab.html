@@ -404,7 +404,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="9.2">
 <h2 data-number="9.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">9.2</span> Setup</h2>
-<div id="e7a8f96a" class="cell" data-execution_count="1">
+<div id="9ef3e92e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -485,7 +485,7 @@ Walkthrough
 <section id="step-1-a-plain-rnn" class="level2" data-number="9.3">
 <h2 data-number="9.3" class="anchored" data-anchor-id="step-1-a-plain-rnn"><span class="header-section-number">9.3</span> Step 1 — A plain RNN</h2>
 <p>One recurrent layer, then a linear layer on the <strong>final</strong> hidden state — the summary after reading the whole window.</p>
-<div id="51864f42" class="cell" data-execution_count="2">
+<div id="1eae3c40" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Recurrent(nn.Module):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, kind, n_channels<span class="op">=</span><span class="dv">4</span>, hidden<span class="op">=</span><span class="dv">64</span>):</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
@@ -544,7 +544,7 @@ Walkthrough
 <section id="step-2-an-lstm" class="level2" data-number="9.4">
 <h2 data-number="9.4" class="anchored" data-anchor-id="step-2-an-lstm"><span class="header-section-number">9.4</span> Step 2 — An LSTM</h2>
 <p>Identical code, one word changed.</p>
-<div id="8147d369" class="cell" data-execution_count="3">
+<div id="a5a01b3c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>score_lstm, n_par_lstm <span class="op">=</span> train(<span class="st">"lstm"</span>, <span class="dv">26</span>, seed<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"LSTM        — </span><span class="sc">{</span>n_par_lstm<span class="sc">:,}</span><span class="ss"> parameters, test RMSE </span><span class="sc">{</span>score_lstm<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">parameter ratio: </span><span class="sc">{</span>n_par_lstm <span class="op">/</span> n_par<span class="sc">:.1f}</span><span class="ss">x the RNN"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -575,7 +575,7 @@ parameter ratio: 4.0x the RNN</code></pre>
 <section id="step-3-which-wins-and-does-it-hold" class="level2" data-number="9.5">
 <h2 data-number="9.5" class="anchored" data-anchor-id="step-3-which-wins-and-does-it-hold"><span class="header-section-number">9.5</span> Step 3 — Which wins, and does it hold?</h2>
 <p>One comparison at one window is not evidence. Vary the window and use two seeds.</p>
-<div id="1733569f" class="cell" data-execution_count="4">
+<div id="c66f8692" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W <span class="kw">in</span> (<span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> [train(<span class="st">"rnn"</span>,  W, s)[<span class="dv">0</span>] <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>)]</span>
@@ -602,53 +602,57 @@ Read the columns in this order
 </div>
 </div>
 <p><strong>Your turn:</strong> compute the gap at each window and say whether it is closing or widening.</p>
-<div id="4b47d569" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>One comparison at one window <span class="kw">is</span> <span class="kw">not</span> evidence. Three windows, two seeds each.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="05e9ae99" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.DataFrame(rows)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># df["gap"] = ___ - ___          # &lt;- which two columns?</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print(df[["window", "gap"]].to_string(index=False))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>window RNN RNN_sd LSTM LSTM_sd winner 13 878 33 990 21 RNN 26 842 19 987 17 RNN 52 805 5 998 3 RNN</p>
-<pre><code>
-The RNN wins at all three. And unlike Lab 8's window experiment, the seed question is settled
-cleanly here: the spreads are 3 to 33 against gaps of 112 to 193. Three to sixty times the noise.
-This is not a seed artifact. Now read the callout carefully, because it does something the earlier version of this lab did not.
-
-**First**, it bounds the claim: *at this training budget, on this panel.* Three windows rules out
-a fluke of one window. It does not rule out much else — all three rows are the same thirty series,
-the same split, the same recency structure. **One finding measured three ways, not three
-independent tests.**
-
-**Second**, the parameter count: the model that lost has four times as many as the model that won.
-
-**Third — and this is the new part — be suspicious.** Both models trained for exactly 30 epochs,
-because that is what `train()` defaults to. Nothing in this table establishes that 30 epochs is
-enough for *both* of them, and one of them has four times the parameters to fit.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Before you go on: compute the gap at each window and say whether it is closing or widening. Then
-predict what Step 4 will find.
-
-:::
-
-## ---- your turn: uncomment and fill in ----
-
-## df = pd.DataFrame(rows)
-
-## df["gap"] = ___ - ___          # &lt;- which two columns?
-
-## print(df[["window", "gap"]].to_string(index=False))
-</code></pre>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>One comparison at one window is not evidence. Three windows, two seeds each.</p>
+<pre><code> window  RNN  RNN_sd  LSTM  LSTM_sd winner
+     13  878      33   990       21    RNN
+     26  842      19   987       17    RNN
+     52  805       5   998        3    RNN</code></pre>
+<p>The RNN wins at all three. And unlike Lab 8’s window experiment, the seed question is settled cleanly here: the spreads are 3 to 33 against gaps of 112 to 193. Three to sixty times the noise. This is not a seed artifact. Now read the callout carefully, because it does something the earlier version of this lab did not.</p>
+<p><strong>First</strong>, it bounds the claim: <em>at this training budget, on this panel.</em> Three windows rules out a fluke of one window. It does not rule out much else — all three rows are the same thirty series, the same split, the same recency structure. <strong>One finding measured three ways, not three independent tests.</strong></p>
+<p><strong>Second</strong>, the parameter count: the model that lost has four times as many as the model that won.</p>
+<p><strong>Third — and this is the new part — be suspicious.</strong> Both models trained for exactly 30 epochs, because that is what <code>train()</code> defaults to. Nothing in this table establishes that 30 epochs is enough for <em>both</em> of them, and one of them has four times the parameters to fit.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Before you go on: compute the gap at each window and say whether it is closing or widening. Then predict what Step 4 will find.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-4-was-that-a-fair-fight" class="level2" data-number="9.6">
 <h2 data-number="9.6" class="anchored" data-anchor-id="step-4-was-that-a-fair-fight"><span class="header-section-number">9.6</span> Step 4 — Was that a fair fight?</h2>
 <p>Step 3 compared two models at <strong>one</strong> training budget. Lab 7 taught you not to trust a comparison run at one seed; this is the same objection one level up. An LSTM has four times the parameters, and bigger models generally take longer to converge.</p>
 <p>So train both to 100 epochs, and record the test RMSE along the way instead of only at the end.</p>
-<div id="f8de1378" class="cell" data-execution_count="6">
+<div id="0b57e6a9" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>CKPT <span class="op">=</span> [<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">45</span>, <span class="dv">60</span>, <span class="dv">80</span>, <span class="dv">100</span>]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> curve(kind, W, seed):</span>
@@ -683,7 +687,7 @@ predict what Step 4 will find.
 <span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>table[<span class="st">"gap"</span>] <span class="op">=</span> table.LSTM <span class="op">-</span> table.RNN</span>
 <span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(table.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="459d90be" class="cell" data-execution_count="7">
+<div id="aac29921" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">6.5</span>, <span class="fl">3.4</span>))</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ax.plot(CKPT, paths[<span class="st">"rnn"</span>],  marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"vanilla RNN"</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ax.plot(CKPT, paths[<span class="st">"lstm"</span>], marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"LSTM"</span>)</span>
@@ -714,67 +718,63 @@ The gap is largest at exactly the budget we used
 </div>
 </div>
 <p><strong>Your turn:</strong> the run-to-run spread in Step 3 was roughly 20 RMSE. From which checkpoint on is the gap smaller than that?</p>
-<div id="045b3cb9" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>This <span class="kw">is</span> the step the lab <span class="kw">is</span> really about, <span class="kw">and</span> I want to be honest that it was added after the</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>fact. The first version of this lab stopped at Step <span class="fl">3.</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>Lab <span class="dv">7</span> taught you <span class="kw">not</span> to trust a comparison run at one seed. This <span class="kw">is</span> the same objection one level</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>up: <span class="op">**</span><span class="kw">not</span> one seed, one budget.<span class="op">**</span> So train both models to <span class="dv">100</span> epochs <span class="kw">and</span> record the test RMSE at</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>seven checkpoints along the way, instead of only at the end.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="13c4ed12" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># noise = ___                       # &lt;- the seed spread from Step 3</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(table[table.gap.abs() &lt; noise].epochs.tolist())</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>epochs RNN LSTM gap 10 1099 1002 -97 20 922 1033 111 30 842 987 145 45 834 953 119 60 828 926 98 80 833 885 52 100 830 821 -9</p>
-<pre><code>
-Read the gap column down. At ten epochs it is **negative** — the LSTM is ahead. At thirty it is
-**plus one forty-five**. Then 119, 98, 52, and at a hundred epochs it is **minus nine**.
-
-**The gap is largest at exactly the budget we used in Step 3.** Not near the largest — the largest
-anywhere in the range.
-
-And look at the shapes, because they are different. The RNN goes 834, 828, 833, 830 from epoch 45
-onward. Flat. Finished. The LSTM goes 953, 926, 885, 821 — still falling at epoch 100, and its
-curve has not turned over. **We ran out of patience, not the model.**
-
-So the honest verdict is not "the LSTM loses." It is three separate statements, and you need all
-three.
-
-At a fixed 30-epoch budget, the RNN wins by a wide margin — that is true and it is what Step 3
-measured. Given enough epochs, the two **tie**. And the RNN reaches its best score roughly three
-times faster on a quarter of the parameters.
-
-That third one is a real advantage and worth having. Convergence speed matters when you are
-tuning, when you are retraining nightly, when compute is billed. But it is an **optimization**
-advantage, not a verdict on gating — and those are different claims that the Step 3 table cannot
-tell apart.
-
-::: {.callout-tip}
-## Try it
-:::
-
-The run-to-run spread in Step 3 was about 20. From which checkpoint on is the gap smaller than
-that? Fill the blank in and find out.
-
-One more thing before we move on, and it is the transferable part. Nobody thinks of the epoch
-count as part of an experiment. It is boilerplate — you set it once, you copy it between
-projects, you stop seeing it. That is precisely what made it dangerous here: a number that felt
-like configuration turned out to be the thing determining the answer. Seeds in Lab 7. Windows in Lab 8. Budget here. Same mistake, three costumes.
-
-:::
-
-## ---- your turn: uncomment and fill in ----
-
-## noise = ___                       # &lt;- the seed spread from Step 3
-
-## print(table[table.gap.abs() &lt; noise].epochs.tolist())
-</code></pre>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>This is the step the lab is really about, and I want to be honest that it was added after the fact. The first version of this lab stopped at Step 3.</p>
+<p>Lab 7 taught you not to trust a comparison run at one seed. This is the same objection one level up: <strong>not one seed, one budget.</strong> So train both models to 100 epochs and record the test RMSE at seven checkpoints along the way, instead of only at the end.</p>
+<pre><code> epochs  RNN  LSTM  gap
+     10 1099  1002  -97
+     20  922  1033  111
+     30  842   987  145
+     45  834   953  119
+     60  828   926   98
+     80  833   885   52
+    100  830   821   -9</code></pre>
+<p>Read the gap column down. At ten epochs it is <strong>negative</strong> — the LSTM is ahead. At thirty it is <strong>plus one forty-five</strong>. Then 119, 98, 52, and at a hundred epochs it is <strong>minus nine</strong>.</p>
+<p><strong>The gap is largest at exactly the budget we used in Step 3.</strong> Not near the largest — the largest anywhere in the range.</p>
+<p>And look at the shapes, because they are different. The RNN goes 834, 828, 833, 830 from epoch 45 onward. Flat. Finished. The LSTM goes 953, 926, 885, 821 — still falling at epoch 100, and its curve has not turned over. <strong>We ran out of patience, not the model.</strong></p>
+<p>So the honest verdict is not “the LSTM loses.” It is three separate statements, and you need all three.</p>
+<p>At a fixed 30-epoch budget, the RNN wins by a wide margin — that is true and it is what Step 3 measured. Given enough epochs, the two <strong>tie</strong>. And the RNN reaches its best score roughly three times faster on a quarter of the parameters.</p>
+<p>That third one is a real advantage and worth having. Convergence speed matters when you are tuning, when you are retraining nightly, when compute is billed. But it is an <strong>optimization</strong> advantage, not a verdict on gating — and those are different claims that the Step 3 table cannot tell apart.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>The run-to-run spread in Step 3 was about 20. From which checkpoint on is the gap smaller than that? Fill the blank in and find out.</p>
+<p>One more thing before we move on, and it is the transferable part. Nobody thinks of the epoch count as part of an experiment. It is boilerplate — you set it once, you copy it between projects, you stop seeing it. That is precisely what made it dangerous here: a number that felt like configuration turned out to be the thing determining the answer. Seeds in Lab 7. Windows in Lab 8. Budget here. Same mistake, three costumes.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-5-why-the-gates-buy-nothing-here" class="level2" data-number="9.7">
 <h2 data-number="9.7" class="anchored" data-anchor-id="step-5-why-the-gates-buy-nothing-here"><span class="header-section-number">9.7</span> Step 5 — Why the gates buy nothing here</h2>
 <p>The LSTM’s gates exist to solve one problem: in a plain RNN, gradients shrink as they propagate backward, so signal from far in the past never reaches the weights. Put a number on it.</p>
-<div id="8e38d277" class="cell" data-execution_count="9">
+<div id="227aabdc" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> factor <span class="kw">in</span> (<span class="fl">0.7</span>, <span class="fl">0.9</span>):</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"gradient shrink factor </span><span class="sc">{</span>factor<span class="sc">}</span><span class="ss"> per step:"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> steps <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
@@ -784,7 +784,7 @@ like configuration turned out to be the thing determining the answer. Seeds in L
 <p>At 0.7 per step the signal is essentially gone by 26 steps. <strong>That is the problem gating fixes.</strong></p>
 <p>Two things about that table before we go on. At a shrink factor of 0.7 the signal is gone by 26 steps. At <strong>0.9</strong> it is still 0.065 at 26 steps and 0.004 at 52 — small, but not zero. Vanishing gradients are a matter of degree and of <em>sequence length</em>, and 26 weeks is short.</p>
 <p>Now stop asserting and go measure whether this dataset has the problem gating solves. Three questions, three numbers.</p>
-<div id="c6d2e292" class="cell" data-execution_count="10">
+<div id="48716350" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> weekly.assign(series<span class="op">=</span>weekly.store_id <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> weekly.cat_id)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>w[<span class="st">"level"</span>] <span class="op">=</span> w.groupby(<span class="st">"series"</span>).units.transform(<span class="st">"mean"</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>w[<span class="st">"dev"</span>]   <span class="op">=</span> w.units <span class="op">-</span> w.level</span>
@@ -825,7 +825,7 @@ Three reasons the gates have nothing to do
 <p><strong>The transferable part</strong> is the three questions, not the answer. Before reaching for a gated or attention-based model on your own series, ask: how much of my variance is cross-sectional rather than sequential? Is my series smooth enough that recent values already summarise old ones? Does anything in my inputs <em>lead</em> the target? If the answers look like this panel’s, the extra machinery has nothing to do.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -834,7 +834,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Step 4 told us the RNN’s <em>margin</em> was mostly a budget artifact. It did not tell us why the LSTM never pulls <strong>ahead</strong> — and for that you have to look at the data.</p>
 <p>Start with the problem gating exists to solve. In a plain RNN, gradients shrink as they propagate backward, so signal from far in the past never reaches the weights.</p>
@@ -874,7 +874,7 @@ gradient shrink factor 0.9 per step:      26 steps back -&gt; 0.064611
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -883,7 +883,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

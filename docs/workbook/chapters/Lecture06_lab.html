@@ -404,7 +404,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="6.2">
 <h2 data-number="6.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">6.2</span> Setup</h2>
-<div id="e8d7994c" class="cell" data-execution_count="1">
+<div id="0c6b0e61" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -485,7 +485,7 @@ Walkthrough
 <section id="step-1-break-it" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="step-1-break-it"><span class="header-section-number">6.3</span> Step 1 — Break it</h2>
 <p>With 1,210 training rows and 62 features, OLS is fine. Now shrink the training window and watch.</p>
-<div id="d2720013" class="cell" data-execution_count="2">
+<div id="252eca2d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> (<span class="dv">1210</span>, <span class="dv">400</span>, <span class="dv">200</span>, <span class="dv">120</span>, <span class="dv">80</span>):</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    sub <span class="op">=</span> train.iloc[<span class="op">-</span>n:]</span>
@@ -541,7 +541,7 @@ Walkthrough
 <section id="step-2-two-penalties-two-behaviors" class="level2" data-number="6.4">
 <h2 data-number="6.4" class="anchored" data-anchor-id="step-2-two-penalties-two-behaviors"><span class="header-section-number">6.4</span> Step 2 — Two penalties, two behaviors</h2>
 <p>Back to the full training set. Fit Ridge and LASSO at a comparable penalty and count what survives.</p>
-<div id="b3ecd88f" class="cell" data-execution_count="3">
+<div id="14f9ba9b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sc <span class="op">=</span> StandardScaler().fit(X_train)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>Xs, Xts <span class="op">=</span> sc.transform(X_train), sc.transform(X_test)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -584,7 +584,7 @@ Walkthrough
 <section id="step-3-the-path-and-the-order-features-die-in" class="level2" data-number="6.5">
 <h2 data-number="6.5" class="anchored" data-anchor-id="step-3-the-path-and-the-order-features-die-in"><span class="header-section-number">6.5</span> Step 3 — The path, and the order features die in</h2>
 <p>Lecture 6 argued that the <strong>order</strong> predictors leave is a more stable finding than any single coefficient table. Produce that ordering.</p>
-<div id="7a21e430" class="cell" data-execution_count="4">
+<div id="847e4f52" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">60</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>paths <span class="op">=</span> []</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> alphas:</span>
@@ -598,7 +598,7 @@ Walkthrough
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"log10(alpha)"</span>)<span class="op">;</span> axes[<span class="dv">1</span>].set_ylabel(<span class="st">"non-zero coefficients"</span>)<span class="op">;</span> axes[<span class="dv">1</span>].set_title(<span class="st">"model size"</span>)</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="06e75cfb" class="cell" data-execution_count="5">
+<div id="cf86e887" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>survivors, order <span class="op">=</span> <span class="bu">set</span>(FEATURES), []</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, coefs <span class="kw">in</span> <span class="bu">zip</span>(alphas, paths):</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    nz <span class="op">=</span> <span class="bu">set</span>(np.array(FEATURES)[coefs <span class="op">!=</span> <span class="dv">0</span>])</span>
@@ -689,7 +689,7 @@ Try it
 </section>
 <section id="step-4-choosing-alpha-and-the-one-standard-error-rule" class="level2" data-number="6.6">
 <h2 data-number="6.6" class="anchored" data-anchor-id="step-4-choosing-alpha-and-the-one-standard-error-rule"><span class="header-section-number">6.6</span> Step 4 — Choosing alpha, and the one-standard-error rule</h2>
-<div id="7d28f3fd" class="cell" data-execution_count="6">
+<div id="317033fa" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tscv <span class="op">=</span> TimeSeriesSplit(n_splits<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">1</span>, <span class="fl">2.5</span>, <span class="dv">30</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -710,75 +710,62 @@ Try it
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"test </span><span class="sc">{</span>rmse(y_test, m.predict(X_test))<span class="sc">:5,.0f}</span><span class="ss">   non-zero </span><span class="sc">{</span><span class="bu">int</span>(np.<span class="bu">sum</span>(m[<span class="op">-</span><span class="dv">1</span>].coef_ <span class="op">!=</span> <span class="dv">0</span>))<span class="sc">:3d}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Your turn:</strong> plot the CV curve with its one-standard-error band, and mark both chosen alphas.</p>
-<div id="abd83d61" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>So far I have been picking penalties by hand. Now do it properly: five<span class="op">-</span>fold `TimeSeriesSplit`,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>thirty candidate alphas, <span class="kw">and</span> — this matters — the scaler goes <span class="op">**</span>inside<span class="op">**</span> the pipeline, so it <span class="kw">is</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>refitted on each fold<span class="st">'s training rows and never sees the validation fold.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="73d5aa7b" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the blank ----</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, ax = plt.subplots(figsize=(7, 3.4))</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.plot(np.log10(grid), means)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.fill_between(np.log10(grid), means - ses, means + ses, alpha=0.2)</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.axvline(np.log10(grid[i_min]), ls="--", label="CV minimum")</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.axvline(np.log10(___), ls=":", label="one-SE")        # &lt;- which index?</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_xlabel("log10(alpha)"); ax.set_ylabel("CV RMSE"); ax.legend()</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.tight_layout()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>CV minimum alpha 19.64 CV 323 test 286 non-zero 21 one-SE rule alpha 59.68 CV 346 test 309 non-zero 11</p>
-<pre><code>
-Two ways to read the same CV curve.
-
-The **CV minimum** takes the alpha with the best cross-validated score. Standard, and it lands on
-21 features.
-
-The **one-standard-error rule** takes the *largest* alpha — the simplest model — whose CV score is
-still within one standard error of the best. The argument is that the CV curve is itself an
-estimate with noise on it, so a model that is statistically indistinguishable from the best but
-much simpler is the better bet.
-
-Here that means going from **21 features to 11**, and paying **23 units of test RMSE** for it —
-286 up to 309, about eight percent.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Two things to do. First, uncomment the plot and fill in the blank — the one-SE index — so you can
-see the band and both verticals. Then answer the question the lab asks: is that trade worth it
-here?
-
-I'll give you the shape of the answer rather than the answer, because the honest reply is that
-**the lab has not told you enough to decide.**
-
-If this model is going into a dashboard that a person reads and questions, eleven coefficients
-against twenty-one is a real gain, and eight percent is cheap. If it is one component inside an
-automated replenishment system that nobody reads, you just paid eight percent for a property
-nobody consumes.
-
-It is worth knowing what the eleven survivors are: `lag1`, `lag7`, `lag14`, `lag21`, `lag27`,
-`lag28`, `lag35`, `lag56`, `lag364`, the 364-day rolling mean, and `snap`. Nine lags, a level, and
-the SNAP flag. That is a model you could describe out loud in one sentence — and notice `snap`
-survived to the very end, which is the same feature permutation importance rescued in Lab 5.
-
-:::
-
-## ---- your turn: uncomment and fill in the blank ----
-
-## fig, ax = plt.subplots(figsize=(7, 3.4))
-
-## ax.plot(np.log10(grid), means)
-
-## ax.fill_between(np.log10(grid), means - ses, means + ses, alpha=0.2)
-
-## ax.axvline(np.log10(grid[i_min]), ls="--", label="CV minimum")
-
-## ax.axvline(np.log10(___), ls=":", label="one-SE")        # &lt;- which index?
-
-## ax.set_xlabel("log10(alpha)"); ax.set_ylabel("CV RMSE"); ax.legend()
-
-## plt.tight_layout()
-</code></pre>
 <p>The one-SE rule roughly halves the number of surviving features. <strong>Decide whether that trade is worth it here</strong> — and say what you would need to know about how the model will be used before you could answer properly.</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>So far I have been picking penalties by hand. Now do it properly: five-fold <code>TimeSeriesSplit</code>, thirty candidate alphas, and — this matters — the scaler goes <strong>inside</strong> the pipeline, so it is refitted on each fold’s training rows and never sees the validation fold.</p>
+<pre><code>  CV minimum   alpha   19.64   CV   323   test   286   non-zero  21
+  one-SE rule  alpha   59.68   CV   346   test   309   non-zero  11</code></pre>
+<p>Two ways to read the same CV curve.</p>
+<p>The <strong>CV minimum</strong> takes the alpha with the best cross-validated score. Standard, and it lands on 21 features.</p>
+<p>The <strong>one-standard-error rule</strong> takes the <em>largest</em> alpha — the simplest model — whose CV score is still within one standard error of the best. The argument is that the CV curve is itself an estimate with noise on it, so a model that is statistically indistinguishable from the best but much simpler is the better bet.</p>
+<p>Here that means going from <strong>21 features to 11</strong>, and paying <strong>23 units of test RMSE</strong> for it — 286 up to 309, about eight percent.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Two things to do. First, uncomment the plot and fill in the blank — the one-SE index — so you can see the band and both verticals. Then answer the question the lab asks: is that trade worth it here?</p>
+<p>I’ll give you the shape of the answer rather than the answer, because the honest reply is that <strong>the lab has not told you enough to decide.</strong></p>
+<p>If this model is going into a dashboard that a person reads and questions, eleven coefficients against twenty-one is a real gain, and eight percent is cheap. If it is one component inside an automated replenishment system that nobody reads, you just paid eight percent for a property nobody consumes.</p>
+<p>It is worth knowing what the eleven survivors are: <code>lag1</code>, <code>lag7</code>, <code>lag14</code>, <code>lag21</code>, <code>lag27</code>, <code>lag28</code>, <code>lag35</code>, <code>lag56</code>, <code>lag364</code>, the 364-day rolling mean, and <code>snap</code>. Nine lags, a level, and the SNAP flag. That is a model you could describe out loud in one sentence — and notice <code>snap</code> survived to the very end, which is the same feature permutation importance rescued in Lab 5.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-5-why-your-cv-number-looks-worse-than-the-truth" class="level2" data-number="6.7">
 <h2 data-number="6.7" class="anchored" data-anchor-id="step-5-why-your-cv-number-looks-worse-than-the-truth"><span class="header-section-number">6.7</span> Step 5 — Why your CV number looks worse than the truth</h2>
 <p>The CV RMSE above is noticeably higher than the test RMSE. That is not a mistake, and the reason is sitting in Step 1.</p>
-<div id="7d86378f" class="cell" data-execution_count="8">
+<div id="9af2c3af" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (tr_idx, va_idx) <span class="kw">in</span> <span class="bu">enumerate</span>(tscv.split(X_train), <span class="dv">1</span>):</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> make_pipeline(StandardScaler(), Lasso(alpha<span class="op">=</span><span class="dv">20</span>, max_iter<span class="op">=</span><span class="dv">50000</span>)).fit(X_train[tr_idx], y_train[tr_idx])</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  fold </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: train n=</span><span class="sc">{</span><span class="bu">len</span>(tr_idx)<span class="sc">:4d}</span><span class="ss"> (n/k=</span><span class="sc">{</span><span class="bu">len</span>(tr_idx)<span class="op">/</span><span class="bu">len</span>(FEATURES)<span class="sc">:4.1f}</span><span class="ss">)   "</span></span>
@@ -788,7 +775,7 @@ survived to the very end, which is the same feature permutation importance rescu
 <p>That is a reason to read the CV number as a conservative estimate, not a reason to abandon it — and emphatically not a reason to switch to random folds, which fix the pessimism by letting the model see the future.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -797,7 +784,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>One loose end from Step 4 that you should not let pass. The CV score at the minimum was <strong>323</strong>. The test RMSE of that same model was <strong>286</strong>. Cross-validation was pessimistic by about 13%.</p>
 <p>If those had gone the other way you would be worried. This direction has a specific cause, and it is sitting in Step 1.</p>
@@ -817,7 +804,7 @@ Walkthrough
 <section id="before-you-leave" class="level2" data-number="6.8">
 <h2 data-number="6.8" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">6.8</span> Before you leave</h2>
 <p>Add today’s best linear model to the scoreboard you have been building since Lab 4.</p>
-<div id="9db1c9d0" class="cell" data-execution_count="9">
+<div id="8408a621" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>best <span class="op">=</span> make_pipeline(StandardScaler(), Lasso(alpha<span class="op">=</span>grid[i_min], max_iter<span class="op">=</span><span class="dv">50000</span>)).fit(X_train, y_train)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>board <span class="op">=</span> {</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Benchmark (same day last year)"</span>: rmse(y_test, test.units_lag365.values),</span>
@@ -836,7 +823,7 @@ Walkthrough
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -845,7 +832,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <pre><code>Benchmark (same day last year)    625
 Single tree (Lab 4)               324

@@ -43,9 +43,15 @@ def strip_instructor(md: str) -> str:
 
 def lab_steps(md: str):
     """[(title, body)] for '# Step n — Title', plus the lead-in under 'What we are doing'."""
-    parts, cur = [], None
+    parts, cur, in_fence = [], None, False
     for line in md.split("\n"):
-        m = re.match(r'^#\s+(.+?)\s*$', line)
+        # A "#" at column 0 inside a code fence is a PYTHON COMMENT, not a heading.
+        # Lab 1 has "# SES — level only." and two siblings; treating those as
+        # headings split the code block in half and left the walkthrough markup
+        # stranded inside an unterminated ```{python} fence.
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+        m = None if in_fence else re.match(r'^#\s+(.+?)\s*$', line)
         if m:
             if cur: parts.append(cur)
             cur = [m.group(1).strip(), []]
@@ -100,7 +106,13 @@ def build_lab(lab: pathlib.Path) -> pathlib.Path:
             prose = said[near[0]] if near else None
         if prose:
             used += 1
-            lines += ["::: {.callout-note collapse=\"true\"}\n## Walkthrough", "", prose, "", ":::", ""]
+            # Five colons, not three. The narration can itself contain ::: callouts
+            # (a "[STOP — learner works]" becomes a callout-tip), and Pandoc closes a
+            # fenced div at the first fence of EQUAL length — so a ::: wrapper was
+            # being closed by the first inner callout, spilling the rest of the
+            # walkthrough into the page and leaving literal ":::" in the output.
+            lines += ['::::: {.callout-note collapse="true"}\n## Walkthrough', "",
+                      prose, "", ":::::", ""]
     exp = expected_output(nar)
     if exp:
         lines += ["## What your run should produce", "",

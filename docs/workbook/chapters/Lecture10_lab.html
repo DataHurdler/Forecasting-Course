@@ -403,7 +403,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="11.2">
 <h2 data-number="11.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">11.2</span> Setup</h2>
-<div id="d8770111" class="cell" data-execution_count="1">
+<div id="5dd6bb40" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -472,7 +472,7 @@ Walkthrough
 <h2 data-number="11.3" class="anchored" data-anchor-id="step-1-check-the-prior-before-you-use-it"><span class="header-section-number">11.3</span> Step 1 — Check the prior before you use it</h2>
 <p>We will model the count of high-SNAP weeks as Beta-Binomial. Start with <code>Beta(2, 2)</code> — weakly informative, centred at 0.5.</p>
 <p><strong>Before fitting anything</strong>, ask what that prior alone implies about the data.</p>
-<div id="4fa07bd9" class="cell" data-execution_count="2">
+<div id="3f81de09" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> pm.Beta(<span class="st">"theta"</span>, alpha<span class="op">=</span><span class="dv">2</span>, beta<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    obs   <span class="op">=</span> pm.Binomial(<span class="st">"obs"</span>, n<span class="op">=</span>N_WEEKS, p<span class="op">=</span>theta, observed<span class="op">=</span>N_HIGH)</span>
@@ -514,7 +514,7 @@ Walkthrough
 </section>
 <section id="step-2-fit-it" class="level2" data-number="11.4">
 <h2 data-number="11.4" class="anchored" data-anchor-id="step-2-fit-it"><span class="header-section-number">11.4</span> Step 2 — Fit it</h2>
-<div id="6f86e65c" class="cell" data-execution_count="3">
+<div id="ac29b458" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, chains<span class="op">=</span><span class="dv">4</span>, progressbar<span class="op">=</span><span class="va">False</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -549,7 +549,7 @@ theta  0.2628  0.026     0.22     0.31     3686     5175  1.00</code></pre>
 <section id="step-3-did-the-sampler-work" class="level2" data-number="11.5">
 <h2 data-number="11.5" class="anchored" data-anchor-id="step-3-did-the-sampler-work"><span class="header-section-number">11.5</span> Step 3 — Did the sampler work?</h2>
 <p>MCMC always returns samples. Whether they came from the posterior is a separate question, and one you are expected to answer every time.</p>
-<div id="4a79b144" class="cell" data-execution_count="4">
+<div id="7cf53439" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(idata.sample_stats.diverging.<span class="bu">sum</span>())</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"R-hat        </span><span class="sc">{</span>summary<span class="sc">.</span>r_hat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.3f}</span><span class="ss">    (want &lt; 1.01)"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"ESS (bulk)   </span><span class="sc">{</span>summary<span class="sc">.</span>ess_bulk<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">      (want &gt; 400)"</span>)</span>
@@ -588,7 +588,7 @@ divergences  0        (want 0)</code></pre>
 <section id="step-4-ask-the-posterior-a-question" class="level2" data-number="11.6">
 <h2 data-number="11.6" class="anchored" data-anchor-id="step-4-ask-the-posterior-a-question"><span class="header-section-number">11.6</span> Step 4 — Ask the posterior a question</h2>
 <p>The posterior is a set of samples, so any question about <span class="math inline">\(\theta\)</span> is answered by counting.</p>
-<div id="3ead9f25" class="cell" data-execution_count="5">
+<div id="a1c9d06d" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> idata.posterior[<span class="st">"theta"</span>].values.ravel()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"P(theta &gt; 0.30)          = </span><span class="sc">{</span>(theta <span class="op">&gt;</span> <span class="fl">0.30</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
@@ -637,7 +637,7 @@ Try it
 <section id="step-5-how-much-did-the-prior-matter" class="level2" data-number="11.7">
 <h2 data-number="11.7" class="anchored" data-anchor-id="step-5-how-much-did-the-prior-matter"><span class="header-section-number">11.7</span> Step 5 — How much did the prior matter?</h2>
 <p>The honest objection to Bayesian work is that the prior is arbitrary. Test how much it moves the answer.</p>
-<div id="314bf6a3" class="cell" data-execution_count="6">
+<div id="43915358" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, b, label <span class="kw">in</span> [(<span class="dv">2</span>, <span class="dv">2</span>, <span class="st">"Beta(2,2) — weak, centred 0.5"</span>),</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">5</span>, <span class="dv">15</span>, <span class="st">"Beta(5,15) — informed, centred 0.25"</span>),</span>
@@ -667,81 +667,16 @@ With enough data the prior stops mattering
 </div>
 </div>
 <p><strong>Your turn:</strong> re-run the badly-wrong prior against only the <strong>first 10 weeks</strong> of data and report how far the posterior moves.</p>
-<div id="828631e4" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>Now the honest objection, the one you should expect <span class="im">from</span> <span class="bu">any</span> audience: <span class="op">**</span>the prior <span class="kw">is</span> arbitrary,</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>so the answer <span class="kw">is</span> arbitrary.<span class="op">**</span> Test it rather than argue about it.</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>Three priors. Weak <span class="kw">and</span> centred at <span class="fl">0.5</span>. Informed <span class="kw">and</span> centred at <span class="fl">0.25</span> — roughly right. And one</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>centred at <span class="op">**</span><span class="fl">0.91</span><span class="op">**</span>, which <span class="kw">is</span> <span class="kw">not</span> a mild disagreement, it <span class="kw">is</span> a belief that nine weeks <span class="kw">in</span> ten are</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>high<span class="op">-</span>SNAP weeks. Deliberately, badly wrong.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="03c24d86" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># n_small, k_small = 10, int((ca1.snap_days &gt;= 5).head(10).sum())</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># with pm.Model():</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     th = pm.Beta("theta", alpha=___, beta=___)      # &lt;- the badly-wrong prior</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     pm.Binomial("obs", n=n_small, p=th, observed=k_small)</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     i3 = pm.sample(1000, tune=1000, chains=2, progressbar=False, random_seed=42)</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># print(az.summary(i3, ci_kind="hdi", ci_prob=0.94).round(3).to_string())</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<pre><code>                             prior  prior_mean  posterior_mean
-     Beta(2,2) — weak, centred 0.5       0.500           0.265</code></pre>
-<p>Beta(5,15) — informed, centred 0.25 0.250 0.259 Beta(20,2) — badly wrong, centred 0.91 0.909 0.309</p>
-<pre><code>
-The prior means span 0.25 to 0.91 — a range of **0.66**. The posterior means span 0.259 to 0.309 —
-a range of **0.05**. The data compressed the disagreement by a factor of thirteen.
-
-Now let me be more careful than the word "close" allows, because this is the step where it is
-tempting to oversell.
-
-The badly-wrong prior did **not** land in the same place as the others. It landed at 0.309, and
-the weak prior's 94% interval runs up to 0.313. So the wrong prior's answer sits *just inside* the
-upper edge of what the honest analysis considered plausible — inside the range, but at the very
-boundary of it. And its own interval, [0.258, 0.358], barely contains the observed proportion of
-0.260 at its lower edge.
-
-So the correct claim is not "the prior did not matter." It is: **with 277 observations, even an
-absurd prior gets dragged to the edge of the right answer rather than away from it.** That is a
-strong result and it does not need embellishment.
-
-And it comes with a condition, which is the sentence to land hardest on. It holds **when you have
-enough data.** With eight observations instead of 277, that third prior would still be sitting in
-your answer, plainly visible.
-
-::: {.callout-tip}
-## Try it
-:::
-
-That is your turn. Re-run the badly-wrong prior against only the **first ten weeks** and report
-how far the posterior moves. Fill in the two blanks — they are the alpha and beta of the
-`Beta(20,2)`.
-
-And that situation — a handful of observations per unit, and a prior that therefore still matters
-— is not a contrived exercise. It is Lecture 11 Part 2, where ten series have very different
-amounts of data and the thin ones borrow strength from the thick ones. Everything you just did by
-hand, the hierarchy will do automatically.
-
-:::
-
-## ---- your turn: uncomment and fill in ----
-
-## n_small, k_small = 10, int((ca1.snap_days &gt;= 5).head(10).sum())
-
-## with pm.Model():
-
-## th = pm.Beta("theta", alpha=___, beta=___)      # &lt;- the badly-wrong prior
-
-## pm.Binomial("obs", n=n_small, p=th, observed=k_small)
-
-## i3 = pm.sample(1000, tune=1000, chains=2, progressbar=False, random_seed=42)
-
-## print(az.summary(i3, ci_kind="hdi", ci_prob=0.94).round(3).to_string())
-</code></pre>
 <hr>
-</section>
-<section id="before-you-leave" class="level2" data-number="11.8">
-<h2 data-number="11.8" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">11.8</span> Before you leave</h2>
-<blockquote class="blockquote">
-<p><strong>Discuss (the prior):</strong> Your Step 5 table says a deliberately wrong prior barely changed the answer. Under what circumstances would you <em>not</em> be reassured by that, and what would you check?</p>
-<p><strong>Discuss (the check):</strong> You verified <span class="math inline">\(\hat{R}\)</span>, ESS and divergences before reading any result. Name the equivalent check you have been doing all semester for a non-Bayesian model, and say which is easier to skip.</p>
-<p><strong>Discuss (for Homework 6):</strong> Part 1 asks you to run a prior predictive check and propose a better prior than <code>Beta(2, 2)</code> for a rate you know is roughly a quarter. What <code>alpha</code> and <code>beta</code> would you choose, and how would you defend the strength of it rather than just the centre?</p>
-</blockquote>
-<hr>
-<p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -753,6 +688,57 @@ Walkthrough
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Now the honest objection, the one you should expect from any audience: <strong>the prior is arbitrary, so the answer is arbitrary.</strong> Test it rather than argue about it.</p>
+<p>Three priors. Weak and centred at 0.5. Informed and centred at 0.25 — roughly right. And one centred at <strong>0.91</strong>, which is not a mild disagreement, it is a belief that nine weeks in ten are high-SNAP weeks. Deliberately, badly wrong.</p>
+<pre><code>                                 prior  prior_mean  posterior_mean
+         Beta(2,2) — weak, centred 0.5       0.500           0.265
+   Beta(5,15) — informed, centred 0.25       0.250           0.259
+Beta(20,2) — badly wrong, centred 0.91       0.909           0.309</code></pre>
+<p>The prior means span 0.25 to 0.91 — a range of <strong>0.66</strong>. The posterior means span 0.259 to 0.309 — a range of <strong>0.05</strong>. The data compressed the disagreement by a factor of thirteen.</p>
+<p>Now let me be more careful than the word “close” allows, because this is the step where it is tempting to oversell.</p>
+<p>The badly-wrong prior did <strong>not</strong> land in the same place as the others. It landed at 0.309, and the weak prior’s 94% interval runs up to 0.313. So the wrong prior’s answer sits <em>just inside</em> the upper edge of what the honest analysis considered plausible — inside the range, but at the very boundary of it. And its own interval, [0.258, 0.358], barely contains the observed proportion of 0.260 at its lower edge.</p>
+<p>So the correct claim is not “the prior did not matter.” It is: <strong>with 277 observations, even an absurd prior gets dragged to the edge of the right answer rather than away from it.</strong> That is a strong result and it does not need embellishment.</p>
+<p>And it comes with a condition, which is the sentence to land hardest on. It holds <strong>when you have enough data.</strong> With eight observations instead of 277, that third prior would still be sitting in your answer, plainly visible.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>That is your turn. Re-run the badly-wrong prior against only the <strong>first ten weeks</strong> and report how far the posterior moves. Fill in the two blanks — they are the alpha and beta of the <code>Beta(20,2)</code>.</p>
+<p>And that situation — a handful of observations per unit, and a prior that therefore still matters — is not a contrived exercise. It is Lecture 11 Part 2, where ten series have very different amounts of data and the thin ones borrow strength from the thick ones. Everything you just did by hand, the hierarchy will do automatically.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="before-you-leave" class="level2" data-number="11.8">
+<h2 data-number="11.8" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">11.8</span> Before you leave</h2>
+<blockquote class="blockquote">
+<p><strong>Discuss (the prior):</strong> Your Step 5 table says a deliberately wrong prior barely changed the answer. Under what circumstances would you <em>not</em> be reassured by that, and what would you check?</p>
+<p><strong>Discuss (the check):</strong> You verified <span class="math inline">\(\hat{R}\)</span>, ESS and divergences before reading any result. Name the equivalent check you have been doing all semester for a non-Bayesian model, and say which is easier to skip.</p>
+<p><strong>Discuss (for Homework 6):</strong> Part 1 asks you to run a prior predictive check and propose a better prior than <code>Beta(2, 2)</code> for a rate you know is roughly a quarter. What <code>alpha</code> and <code>beta</code> would you choose, and how would you defend the strength of it rather than just the centre?</p>
+</blockquote>
+<hr>
+<p><em>Solutions posted to Canvas after class.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

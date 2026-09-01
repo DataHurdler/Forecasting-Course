@@ -403,7 +403,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="12.2">
 <h2 data-number="12.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">12.2</span> Setup</h2>
-<div id="5e01052b" class="cell" data-execution_count="1">
+<div id="5c3b81ac" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -467,7 +467,7 @@ Walkthrough
 <section id="step-1-fit-it-the-obvious-way" class="level2" data-number="12.3">
 <h2 data-number="12.3" class="anchored" data-anchor-id="step-1-fit-it-the-obvious-way"><span class="header-section-number">12.3</span> Step 1 — Fit it the obvious way</h2>
 <p>The model is a drifting level plus seasonality. PyMC has a distribution for a random walk, so the natural thing is to use it.</p>
-<div id="97f772f3" class="cell" data-execution_count="2">
+<div id="937e3a68" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> centred:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">"sigma_level"</span>, <span class="fl">10.0</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    level <span class="op">=</span> pm.GaussianRandomWalk(<span class="st">"level"</span>, sigma<span class="op">=</span>sigma_level, shape<span class="op">=</span>n)</span>
@@ -513,7 +513,7 @@ divergences  0</code></pre>
 <section id="step-2-reparameterize" class="level2" data-number="12.4">
 <h2 data-number="12.4" class="anchored" data-anchor-id="step-2-reparameterize"><span class="header-section-number">12.4</span> Step 2 — Reparameterize</h2>
 <p>The problem is the <em>shape</em> of the posterior, not the model. Write the walk as a cumulative sum of standard Normal draws scaled by <code>sigma_level</code>, and the sampler gets a geometry it can navigate.</p>
-<div id="2eb97778" class="cell" data-execution_count="3">
+<div id="d5fc09ed" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">"sigma_level"</span>, <span class="fl">10.0</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> pm.Normal(<span class="st">"z"</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>n)                              <span class="co"># standard normal</span></span>
@@ -531,7 +531,7 @@ divergences  0</code></pre>
 </div>
 <p><strong>Same model, same data, same priors.</strong> <code>cumsum(z * sigma)</code> and <code>GaussianRandomWalk(sigma=sigma)</code> describe the identical distribution — only the coordinates the sampler explores have changed.</p>
 <p>Look at the components it recovered:</p>
-<div id="58f6df36" class="cell" data-execution_count="4">
+<div id="d7502db7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lev <span class="op">=</span> idata.posterior[<span class="st">"level"</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, n).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sea <span class="op">=</span> (idata.posterior[<span class="st">"beta"</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span><span class="op">*</span>K) <span class="op">@</span> X_tr.T).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -574,7 +574,7 @@ divergences  0</code></pre>
 <p>To forecast you need the level at each future week. There are two candidates, and one of them is theoretically right.</p>
 <p><strong>Held constant:</strong> carry the last estimated level forward unchanged. Simple, and it asserts the level stops drifting the moment your data ends — which is not what the model says.</p>
 <p><strong>Propagated:</strong> let the level keep random-walking forward, exactly as it did in-sample. This is what the fitted model actually implies.</p>
-<div id="d0e9cf80" class="cell" data-execution_count="5">
+<div id="95006b7f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>post <span class="op">=</span> idata.posterior</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>lev_last <span class="op">=</span> post[<span class="st">"level"</span>].values[:, :, <span class="op">-</span><span class="dv">1</span>].ravel()</span>
@@ -584,97 +584,31 @@ divergences  0</code></pre>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> <span class="bu">len</span>(lev_last)</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> test.units.values</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>To forecast you need the level at each future week, <span class="kw">and</span> there are two candidates.</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="op">**</span>Held constant.<span class="op">**</span> Carry the last estimated level forward unchanged. Simple — <span class="kw">and</span> it asserts that</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>the level stops drifting the moment your data ends, which <span class="kw">is</span> <span class="kw">not</span> what the model says.</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="op">**</span>Propagated.<span class="op">**</span> Let the level keep random<span class="op">-</span>walking forward exactly <span class="im">as</span> it did <span class="kw">in</span><span class="op">-</span>sample. This <span class="kw">is</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>what the fitted model actually implies. It <span class="kw">is</span> the defensible choice.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># The POINT forecast is identical for both methods, and not approximately so:</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># propagating the level adds zero-mean steps, so E[level] is unchanged. Only the</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># spread differs. Compute the point forecast once, from the deterministic part.</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>point <span class="op">=</span> (lev_last[:, <span class="va">None</span>] <span class="op">+</span> b <span class="op">@</span> X_te.T).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>rmse_point <span class="op">=</span> <span class="bu">float</span>(np.sqrt(np.mean((actual <span class="op">-</span> point) <span class="op">**</span> <span class="dv">2</span>)))</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> score(draws, label):</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(draws, [<span class="dv">3</span>, <span class="dv">97</span>], axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"method"</span>: label,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"RMSE"</span>: <span class="bu">round</span>(rmse_point),</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"coverage_%"</span>: <span class="bu">round</span>(<span class="dv">100</span><span class="op">*</span><span class="bu">float</span>(np.mean((actual <span class="op">&gt;=</span> lo) <span class="op">&amp;</span> (actual <span class="op">&lt;=</span> hi)))),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"mean_width"</span>: <span class="bu">round</span>(<span class="bu">float</span>(np.mean(hi <span class="op">-</span> lo)))}</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) level held constant at its last value  -- the tempting shortcut</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>mu_a <span class="op">=</span> lev_last[:, <span class="va">None</span>] <span class="op">+</span> b <span class="op">@</span> X_te.T</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>draws_a <span class="op">=</span> mu_a <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>mu_a.shape) <span class="op">*</span> sg[:, <span class="va">None</span>]</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) level keeps random-walking into the future -- what the model actually says</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>steps <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>(D, N_TEST)) <span class="op">*</span> sl[:, <span class="va">None</span>]</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>mu_b <span class="op">=</span> lev_last[:, <span class="va">None</span>] <span class="op">+</span> np.cumsum(steps, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">+</span> b <span class="op">@</span> X_te.T</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>draws_b <span class="op">=</span> mu_b <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>mu_b.shape) <span class="op">*</span> sg[:, <span class="va">None</span>]</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame([score(draws_a, <span class="st">"level held constant"</span>),</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>                    score(draws_b, <span class="st">"level propagated"</span>)]).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<pre><code>         method  RMSE  coverage_%  mean_width</code></pre>
-<p>level held constant 1589 96 6340 level propagated 1589 100 11667</p>
-<pre><code>
-The point forecasts are **identical** — 1,589 on both rows, and not by coincidence. Propagating
-the level adds steps whose mean is zero, so the expected level is unchanged and RMSE simply cannot
-tell these two apart. Everything separating them is in the **interval**, which differs by a factor
-of nearly two, and not in the direction you would predict.
-
-The theoretically correct method **over-covers**: 100% of weeks fell inside a 94% interval. The
-shortcut lands at 96%, close to nominal. **The defensible choice calibrated worse.**
-
-::: {.callout-tip}
-## Try it
-:::
-
-Pause and work out why before I tell you. Then do the first "your turn" — print the two scale
-parameters and the drift accumulated over 52 weeks.
-
-Over 52 weeks a random walk accumulates about $\sqrt{52}$ — call it seven — times `sigma_level` of
-drift. So if `sigma_level` is even somewhat too large, the interval inflates fast, and it inflates
-with the *square root of the horizon*.
-
-**And there is good reason to think it is too large**, which brings back the Fourier choice from
-the setup. The random walk is the most flexible component in this model. Anything the six
-coefficients cannot represent — a promotion, a holiday that moves, a single bad week — has nowhere
-else to go, so it gets absorbed into the level. That inflates `sigma_level` beyond genuine drift,
-and the forecast then propagates that inflated drift for a year.
-
-So — and this is the sentence that matters — the frozen version is **not right**. It is wrong in a
-way that happens to **cancel** an overestimated drift, on this series, at this horizon. Rely on
-that and it will fail somewhere else, silently, and you will not know which of the two errors
-moved.
-</code></pre>
-<p>coverage / mean width, by horizon (nominal 94%) method wk 1-13 wk 14-39 wk 40-52 level held constant 100% / 6,255 92% / 6,537 100% / 6,027 level propagated 100% / 8,081 100% / 11,974 100% / 14,637</p>
-<pre><code>
-Read the **widths** across each row, not the coverage.
-
-The frozen version: 6,255 at weeks 1–13, and 6,027 at weeks 40–52. It is *narrower* a year out
-than a month out. It has no mechanism to widen, because nothing in it knows that time has passed. The propagated version: 8,081, then 11,974, then 14,637. It nearly doubles.
-
-**One of these models knows that forecasting further ahead is harder, and the other does not.**
-That is a structural difference, not a scoring difference, and it is why the aggregate table on
-its own would have misled you. On this series, at this horizon, the ignorance happened to cost
-nothing. On a series with a genuinely drifting level it would cost a great deal.
-
-And notice the only sub-nominal cell in the table: the frozen version drops to **92%** in weeks
-14–39. Its respectable 96% average is hiding a stretch where it is overconfident. Aggregates hide
-things; that is the third time this course has said so.
-
-:::
-
-## The POINT forecast is identical for both methods, and not approximately so:
-
-## propagating the level adds zero-mean steps, so E[level] is unchanged. Only the
-
-## spread differs. Compute the point forecast once, from the deterministic part.
-
-point = (lev_last[:, None] + b @ X_te.T).mean(0) * y_sd + y_mu
-rmse_point = float(np.sqrt(np.mean((actual - point) ** 2)))
-
-def score(draws, label):
-    lo, hi = np.percentile(draws, [3, 97], axis=0) * y_sd + y_mu
-    return {"method": label,
-            "RMSE": round(rmse_point),
-            "coverage_%": round(100*float(np.mean((actual &gt;= lo) &amp; (actual &lt;= hi)))),
-            "mean_width": round(float(np.mean(hi - lo)))}
-
-## (a) level held constant at its last value  -- the tempting shortcut
-
-mu_a = lev_last[:, None] + b @ X_te.T
-draws_a = mu_a + rng.normal(0, 1, size=mu_a.shape) * sg[:, None]
-
-## (b) level keeps random-walking into the future -- what the model actually says
-
-steps = rng.normal(0, 1, size=(D, N_TEST)) * sl[:, None]
-mu_b = lev_last[:, None] + np.cumsum(steps, axis=1) + b @ X_te.T
-draws_b = mu_b + rng.normal(0, 1, size=mu_b.shape) * sg[:, None]
-
-print(pd.DataFrame([score(draws_a, "level held constant"),
-                    score(draws_b, "level propagated")]).to_string(index=False))</code></pre>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -693,108 +627,32 @@ The theoretically correct choice calibrated worse. Work out why.
 </div>
 </div>
 <p><strong>Your turn:</strong> check the size of the estimated drift against the noise it is competing with.</p>
-<div id="075df2ea" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">## ---- your turn: uncomment and fill in ----</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">## print(az.summary(idata, var_names=[___, ___],        # &lt;- the two scale parameters</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">## ci_kind="hdi", ci_prob=0.94).round(4).to_string())</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">## print("\ndrift accumulated over 52 weeks, in standardized units:")</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">## print(f"  {np.sqrt(52) * float(post['sigma_level'].values.mean()):.2f}")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="bd746a35" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(az.summary(idata, var_names=[___, ___],        # &lt;- the two scale parameters</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                  ci_kind="hdi", ci_prob=0.94).round(4).to_string())</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print("\ndrift accumulated over 52 weeks, in standardized units:")</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"  {np.sqrt(52) * float(post['sigma_level'].values.mean()):.2f}")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 <p><strong>Now split coverage by horizon</strong>, which is where the difference actually shows.</p>
-<div id="85670c09" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> by_horizon(draws, label):</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(draws, [<span class="dv">3</span>, <span class="dv">97</span>], axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    inside <span class="op">=</span> (actual <span class="op">&gt;=</span> lo) <span class="op">&amp;</span> (actual <span class="op">&lt;=</span> hi)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    segs <span class="op">=</span> {<span class="st">"wk 1-13"</span>: <span class="bu">slice</span>(<span class="dv">0</span>,<span class="dv">13</span>), <span class="st">"wk 14-39"</span>: <span class="bu">slice</span>(<span class="dv">13</span>,<span class="dv">39</span>), <span class="st">"wk 40-52"</span>: <span class="bu">slice</span>(<span class="dv">39</span>,<span class="dv">52</span>)}</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> {<span class="st">"method"</span>: label}</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, sl_ <span class="kw">in</span> segs.items():</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        row[name] <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>inside[sl_]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">% / </span><span class="sc">{</span><span class="bu">int</span>((hi<span class="op">-</span>lo)[sl_].mean())<span class="sc">:,}</span><span class="ss">"</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> row</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"coverage / mean width, by horizon (nominal 94%)"</span>)</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame([by_horizon(draws_a, <span class="st">"level held constant"</span>),</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                    by_horizon(draws_b, <span class="st">"level propagated"</span>)]).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b60412d2" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> by_horizon(draws, label):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(draws, [<span class="dv">3</span>, <span class="dv">97</span>], axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    inside <span class="op">=</span> (actual <span class="op">&gt;=</span> lo) <span class="op">&amp;</span> (actual <span class="op">&lt;=</span> hi)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    segs <span class="op">=</span> {<span class="st">"wk 1-13"</span>: <span class="bu">slice</span>(<span class="dv">0</span>,<span class="dv">13</span>), <span class="st">"wk 14-39"</span>: <span class="bu">slice</span>(<span class="dv">13</span>,<span class="dv">39</span>), <span class="st">"wk 40-52"</span>: <span class="bu">slice</span>(<span class="dv">39</span>,<span class="dv">52</span>)}</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> {<span class="st">"method"</span>: label}</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, sl_ <span class="kw">in</span> segs.items():</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        row[name] <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>inside[sl_]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">% / </span><span class="sc">{</span><span class="bu">int</span>((hi<span class="op">-</span>lo)[sl_].mean())<span class="sc">:,}</span><span class="ss">"</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> row</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"coverage / mean width, by horizon (nominal 94%)"</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame([by_horizon(draws_a, <span class="st">"level held constant"</span>),</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                    by_horizon(draws_b, <span class="st">"level propagated"</span>)]).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Read the widths across each row.</strong> The frozen version’s interval is essentially the same width at week 50 as at week 1 — it has no mechanism to widen. The propagated version’s roughly doubles.</p>
 <p>That is the real distinction, and it is structural rather than a matter of which scored better here: <strong>one of these models knows that forecasting further ahead is harder, and the other does not.</strong> On this series, at this horizon, that ignorance happened not to cost anything. On a series with a genuinely drifting level it would.</p>
 <hr>
-</section>
-<section id="step-4-calibrated-is-not-the-same-as-useful" class="level2" data-number="12.6">
-<h2 data-number="12.6" class="anchored" data-anchor-id="step-4-calibrated-is-not-the-same-as-useful"><span class="header-section-number">12.6</span> Step 4 — Calibrated is not the same as useful</h2>
-<p>Take the propagated version — the one the model implies — and ask two separate questions of it.</p>
-<div id="d12ce8b5" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> score(draws_b, <span class="st">"level propagated"</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coverage      </span><span class="sc">{</span>res[<span class="st">'coverage_%'</span>]<span class="sc">}</span><span class="ss">%   against a nominal 94%"</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"mean width    </span><span class="sc">{</span>res[<span class="st">'mean_width'</span>]<span class="sc">:,}</span><span class="ss"> units"</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"              = </span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>res[<span class="st">'mean_width'</span>]<span class="op">/</span>ca1<span class="sc">.</span>units<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">% of average weekly units"</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"RMSE          </span><span class="sc">{</span>res[<span class="st">'RMSE'</span>]<span class="sc">:,}</span><span class="ss">"</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"seasonal naive</span><span class="sc">{</span>np<span class="sc">.</span>sqrt(np.mean((actual <span class="op">-</span> train.units.values[<span class="op">-</span><span class="dv">52</span>:])<span class="op">**</span><span class="dv">2</span>))<span class="sc">:&gt;7,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Question one: is it calibrated?</strong> Compare coverage against 94%.</p>
-<p><strong>Question two: is it useful?</strong> Compare the width against the size of the thing you are forecasting, and ask whether you would place an inventory order against it.</p>
-<p><strong>Your turn:</strong> state, in one sentence each, your answer to both — and whether passing the first excuses failing the second.</p>
-<div id="941504e4" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>Take the propagated version — the one the model implies — <span class="kw">and</span> ask it two <span class="op">**</span>separate<span class="op">**</span> questions.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>coverage 100% against a nominal 94% mean width 11,667 units = 59% of average weekly units RMSE 1,589 seasonal naive 1,660</p>
-<pre><code>
-**Question one: is it calibrated?** Yes, and then some. 100% against a nominal 94% — not
-overconfident. Conservative. **Question two: is it useful?**
-
-The interval is **11,667 units wide on a series averaging about 19,700** — call it plus or minus
-thirty percent. Now say that out loud as a business sentence: *"I am 94% confident that next
-week's demand is somewhere between roughly thirty percent below and thirty percent above
-average."*
-
-Nobody places an inventory order against that. It is honest and it is useless, and those are not
-the same axis.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Write your one-sentence answer to each question, and then the third question the lab actually
-asks: does passing the first excuse failing the second?
-
-And the point forecast: 1,589 against seasonal naive's 1,660. **About 4% better**, for a model
-that took twenty seconds to sample, a reparameterization to converge, and a page of code.
-
-If accuracy were the argument for this model, that number would be an embarrassment. Accuracy is
-not the argument. What you bought is a level and a seasonal component you can plot and defend, a
-full distribution for every future week, and — the thing the whole lab has been about — an
-interval that **admits when it does not know**. Whether that trade is worth 5% is a business
-question, and it depends entirely on whether anyone downstream will use the uncertainty you went
-to the trouble of producing.
-
-:::
-
-## ---- your turn: uncomment and answer in the strings ----
-
-## calibrated = "..."
-
-## useful     = "..."
-
-## print(calibrated); print(useful)
-</code></pre>
-<hr>
-</section>
-<section id="before-you-leave" class="level2" data-number="12.7">
-<h2 data-number="12.7" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">12.7</span> Before you leave</h2>
-<blockquote class="blockquote">
-<p><strong>Discuss (the two problems):</strong> The convergence failure was caught by a diagnostic. The over-wide interval was not — it needed a held-out set and a coverage calculation. What is the structural difference between the two, and what habit catches the second kind?</p>
-<p><strong>Discuss (the payoff):</strong> The point forecast beat seasonal naive by only a few percent. Given that, what did fitting this model actually buy — and name a business question it can answer that XGBoost from Homework 4 cannot.</p>
-<p><strong>Discuss (the fix):</strong> The interval is honest and too wide to act on. Propose one change to the <em>model</em> — not the forecasting code — that would narrow it, and say what you would be assuming in exchange.</p>
-</blockquote>
-<hr>
-<p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -806,6 +664,126 @@ Walkthrough
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>To forecast you need the level at each future week, and there are two candidates.</p>
+<p><strong>Held constant.</strong> Carry the last estimated level forward unchanged. Simple — and it asserts that the level stops drifting the moment your data ends, which is not what the model says.</p>
+<p><strong>Propagated.</strong> Let the level keep random-walking forward exactly as it did in-sample. This is what the fitted model actually implies. It is the defensible choice.</p>
+<pre><code>             method  RMSE  coverage_%  mean_width
+level held constant  1589          96        6340
+   level propagated  1589         100       11667</code></pre>
+<p>The point forecasts are <strong>identical</strong> — 1,589 on both rows, and not by coincidence. Propagating the level adds steps whose mean is zero, so the expected level is unchanged and RMSE simply cannot tell these two apart. Everything separating them is in the <strong>interval</strong>, which differs by a factor of nearly two, and not in the direction you would predict.</p>
+<p>The theoretically correct method <strong>over-covers</strong>: 100% of weeks fell inside a 94% interval. The shortcut lands at 96%, close to nominal. <strong>The defensible choice calibrated worse.</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Pause and work out why before I tell you. Then do the first “your turn” — print the two scale parameters and the drift accumulated over 52 weeks.</p>
+<p>Over 52 weeks a random walk accumulates about <span class="math inline">\(\sqrt{52}\)</span> — call it seven — times <code>sigma_level</code> of drift. So if <code>sigma_level</code> is even somewhat too large, the interval inflates fast, and it inflates with the <em>square root of the horizon</em>.</p>
+<p><strong>And there is good reason to think it is too large</strong>, which brings back the Fourier choice from the setup. The random walk is the most flexible component in this model. Anything the six coefficients cannot represent — a promotion, a holiday that moves, a single bad week — has nowhere else to go, so it gets absorbed into the level. That inflates <code>sigma_level</code> beyond genuine drift, and the forecast then propagates that inflated drift for a year.</p>
+<p>So — and this is the sentence that matters — the frozen version is <strong>not right</strong>. It is wrong in a way that happens to <strong>cancel</strong> an overestimated drift, on this series, at this horizon. Rely on that and it will fail somewhere else, silently, and you will not know which of the two errors moved.</p>
+<pre><code>coverage / mean width, by horizon (nominal 94%)
+             method      wk 1-13      wk 14-39      wk 40-52
+level held constant 100% / 6,255   92% / 6,537  100% / 6,027
+   level propagated 100% / 8,081 100% / 11,974 100% / 14,637</code></pre>
+<p>Read the <strong>widths</strong> across each row, not the coverage.</p>
+<p>The frozen version: 6,255 at weeks 1–13, and 6,027 at weeks 40–52. It is <em>narrower</em> a year out than a month out. It has no mechanism to widen, because nothing in it knows that time has passed. The propagated version: 8,081, then 11,974, then 14,637. It nearly doubles.</p>
+<p><strong>One of these models knows that forecasting further ahead is harder, and the other does not.</strong> That is a structural difference, not a scoring difference, and it is why the aggregate table on its own would have misled you. On this series, at this horizon, the ignorance happened to cost nothing. On a series with a genuinely drifting level it would cost a great deal.</p>
+<p>And notice the only sub-nominal cell in the table: the frozen version drops to <strong>92%</strong> in weeks 14–39. Its respectable 96% average is hiding a stretch where it is overconfident. Aggregates hide things; that is the third time this course has said so.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4-calibrated-is-not-the-same-as-useful" class="level2" data-number="12.6">
+<h2 data-number="12.6" class="anchored" data-anchor-id="step-4-calibrated-is-not-the-same-as-useful"><span class="header-section-number">12.6</span> Step 4 — Calibrated is not the same as useful</h2>
+<p>Take the propagated version — the one the model implies — and ask two separate questions of it.</p>
+<div id="20ee316c" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> score(draws_b, <span class="st">"level propagated"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coverage      </span><span class="sc">{</span>res[<span class="st">'coverage_%'</span>]<span class="sc">}</span><span class="ss">%   against a nominal 94%"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"mean width    </span><span class="sc">{</span>res[<span class="st">'mean_width'</span>]<span class="sc">:,}</span><span class="ss"> units"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"              = </span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>res[<span class="st">'mean_width'</span>]<span class="op">/</span>ca1<span class="sc">.</span>units<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">% of average weekly units"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"RMSE          </span><span class="sc">{</span>res[<span class="st">'RMSE'</span>]<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"seasonal naive</span><span class="sc">{</span>np<span class="sc">.</span>sqrt(np.mean((actual <span class="op">-</span> train.units.values[<span class="op">-</span><span class="dv">52</span>:])<span class="op">**</span><span class="dv">2</span>))<span class="sc">:&gt;7,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Question one: is it calibrated?</strong> Compare coverage against 94%.</p>
+<p><strong>Question two: is it useful?</strong> Compare the width against the size of the thing you are forecasting, and ask whether you would place an inventory order against it.</p>
+<p><strong>Your turn:</strong> state, in one sentence each, your answer to both — and whether passing the first excuses failing the second.</p>
+<div id="ee4b3951" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and answer in the strings ----</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># calibrated = "..."</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># useful     = "..."</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print(calibrated); print(useful)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Take the propagated version — the one the model implies — and ask it two <strong>separate</strong> questions.</p>
+<pre><code>coverage      100%   against a nominal 94%
+mean width    11,667 units
+              = 59% of average weekly units
+RMSE          1,589
+seasonal naive  1,660</code></pre>
+<p><strong>Question one: is it calibrated?</strong> Yes, and then some. 100% against a nominal 94% — not overconfident. Conservative. <strong>Question two: is it useful?</strong></p>
+<p>The interval is <strong>11,667 units wide on a series averaging about 19,700</strong> — call it plus or minus thirty percent. Now say that out loud as a business sentence: <em>“I am 94% confident that next week’s demand is somewhere between roughly thirty percent below and thirty percent above average.”</em></p>
+<p>Nobody places an inventory order against that. It is honest and it is useless, and those are not the same axis.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Write your one-sentence answer to each question, and then the third question the lab actually asks: does passing the first excuse failing the second?</p>
+<p>And the point forecast: 1,589 against seasonal naive’s 1,660. <strong>About 4% better</strong>, for a model that took twenty seconds to sample, a reparameterization to converge, and a page of code.</p>
+<p>If accuracy were the argument for this model, that number would be an embarrassment. Accuracy is not the argument. What you bought is a level and a seasonal component you can plot and defend, a full distribution for every future week, and — the thing the whole lab has been about — an interval that <strong>admits when it does not know</strong>. Whether that trade is worth 5% is a business question, and it depends entirely on whether anyone downstream will use the uncertainty you went to the trouble of producing.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="before-you-leave" class="level2" data-number="12.7">
+<h2 data-number="12.7" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">12.7</span> Before you leave</h2>
+<blockquote class="blockquote">
+<p><strong>Discuss (the two problems):</strong> The convergence failure was caught by a diagnostic. The over-wide interval was not — it needed a held-out set and a coverage calculation. What is the structural difference between the two, and what habit catches the second kind?</p>
+<p><strong>Discuss (the payoff):</strong> The point forecast beat seasonal naive by only a few percent. Given that, what did fitting this model actually buy — and name a business question it can answer that XGBoost from Homework 4 cannot.</p>
+<p><strong>Discuss (the fix):</strong> The interval is honest and too wide to act on. Propose one change to the <em>model</em> — not the forecasting code — that would narrow it, and say what you would be assuming in exchange.</p>
+</blockquote>
+<hr>
+<p><em>Solutions posted to Canvas after class.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

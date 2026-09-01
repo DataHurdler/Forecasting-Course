@@ -374,7 +374,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">4.2</span> Setup</h2>
-<div id="8bb15ae9" class="cell" data-execution_count="1">
+<div id="06dc6570" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -444,20 +444,20 @@ benchmark (same day last year): RMSE 625</code></pre>
 <section id="step-1-fit-a-tree-and-read-it-out-loud" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="step-1-fit-a-tree-and-read-it-out-loud"><span class="header-section-number">4.3</span> Step 1 — Fit a tree and read it out loud</h2>
 <p>Start deliberately shallow, because a depth-3 tree is small enough to read.</p>
-<div id="1f9d0709" class="cell" data-execution_count="2">
+<div id="eb7fa065" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tree3 <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">3</span>, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(export_text(tree3, feature_names<span class="op">=</span>FEATURES, decimals<span class="op">=</span><span class="dv">0</span>))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">test RMSE: </span><span class="sc">{</span>rmse(y_test, tree3.predict(X_test))<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="3743fda2" class="cell" data-execution_count="3">
+<div id="2dfaf97a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plot_tree(tree3, feature_names<span class="op">=</span>FEATURES, filled<span class="op">=</span><span class="va">True</span>, rounded<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">7</span>, ax<span class="op">=</span>ax)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Read the root split aloud to the person next to you</strong>, in business language — not <code>dow &lt;= 4.50</code> but what that <em>means</em> about this store.</p>
 <p>Then look at the importances:</p>
-<div id="453b367d" class="cell" data-execution_count="4">
+<div id="30d0d141" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>imp <span class="op">=</span> pd.Series(tree3.feature_importances_, index<span class="op">=</span>FEATURES).sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imp[imp <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">round</span>(<span class="dv">3</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -544,7 +544,7 @@ Try it
 <section id="step-2-watch-the-biasvariance-tradeoff-happen" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="step-2-watch-the-biasvariance-tradeoff-happen"><span class="header-section-number">4.4</span> Step 2 — Watch the bias–variance tradeoff happen</h2>
 <p>Lecture 4 drew this as a curve. Now produce it.</p>
-<div id="4276443a" class="cell" data-execution_count="5">
+<div id="f1a01fd5" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> depth <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="va">None</span>]:</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span>depth, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
@@ -556,7 +556,7 @@ Try it
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>sweep <span class="op">=</span> pd.DataFrame(rows)</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sweep.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="31e05ea1" class="cell" data-execution_count="6">
+<div id="16b27f89" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.train_RMSE, marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"train"</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.test_RMSE,  marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"test"</span>)</span>
@@ -601,7 +601,7 @@ Walkthrough
 <section id="step-3-why-one-tree-is-not-enough" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="step-3-why-one-tree-is-not-enough"><span class="header-section-number">4.5</span> Step 3 — Why one tree is not enough</h2>
 <p>Lecture 4 claimed a tree is unstable: change the data slightly and the structure changes. Test it properly, using bootstrap resamples — draw a sample of the same size <em>with replacement</em>, refit, and repeat.</p>
-<div id="5f2e773f" class="cell" data-execution_count="7">
+<div id="cb05005b" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>roots, preds <span class="op">=</span> {}, []</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -622,7 +622,7 @@ Walkthrough
 </div>
 <p>The root may well be stable — one feature can be dominant enough that every resample finds it first. <strong>That is not the same as the tree being stable.</strong> Look at the spread of predictions: on a typical day the twenty trees disagree by a meaningful margin, and on the worst day they disagree enormously. All that disagreement lives <em>below</em> the root.</p>
 <p>Now the payoff, and it is one line:</p>
-<div id="f94ad9e3" class="cell" data-execution_count="8">
+<div id="fa6a2acd" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> np.mean([rmse(y_test, p) <span class="cf">for</span> p <span class="kw">in</span> P])</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>averaged <span class="op">=</span> rmse(y_test, P.mean(<span class="dv">0</span>))</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -668,7 +668,7 @@ improvement: 18%</code></pre>
 <section id="step-4-where-trees-reliably-fail" class="level2" data-number="4.6">
 <h2 data-number="4.6" class="anchored" data-anchor-id="step-4-where-trees-reliably-fail"><span class="header-section-number">4.6</span> Step 4 — Where trees reliably fail</h2>
 <p>A tree predicts the <strong>mean of the training rows in a leaf</strong>. So every prediction it can ever make is an average of values it has already seen.</p>
-<div id="a1860862" class="cell" data-execution_count="9">
+<div id="7cce396d" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>full <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> full.predict(X_test)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -676,7 +676,7 @@ improvement: 18%</code></pre>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"prediction range      : [</span><span class="sc">{</span>p<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:,.0f}</span><span class="ss">, </span><span class="sc">{</span>p<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">]"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The predictions cannot leave the training range — not “usually do not,” <em>cannot</em>. Now watch what that does at the extremes.</p>
-<div id="c394f9a2" class="cell" data-execution_count="10">
+<div id="84ba4d18" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>hi <span class="op">=</span> y_test <span class="op">&gt;</span> np.percentile(y_test, <span class="dv">90</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>lo <span class="op">=</span> y_test <span class="op">&lt;</span> np.percentile(y_test, <span class="dv">10</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -686,62 +686,54 @@ improvement: 18%</code></pre>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   predicted </span><span class="sc">{</span>p[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">   over by  </span><span class="sc">{</span>p[lo]<span class="sc">.</span>mean()<span class="op">-</span>y_test[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Your turn:</strong> the two errors above point in opposite directions. Plot predicted against actual for the test set, add the 45-degree line, and see the shape this produces.</p>
-<div id="a62a5d03" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>Every lecture <span class="kw">in</span> this course should end by telling you where the method breaks. Here <span class="kw">is</span> where a</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>tree breaks, <span class="kw">and</span> it follows <span class="im">from</span> one sentence: <span class="op">**</span>a tree predicts the mean of the training rows <span class="kw">in</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>a leaf.<span class="op">**</span> Every prediction it will ever make <span class="kw">is</span> an average of values it has already seen.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="0e83c284" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the two blanks ----</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, ax = plt.subplots(figsize=(4.5, 4.5))</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.scatter(___, ___, s=6, alpha=0.4)          # &lt;- actual on x, predicted on y</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># lims = [y_test.min(), y_test.max()]</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.plot(lims, lims, "k--", lw=1)</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_xlabel("actual units"); ax.set_ylabel("predicted units")</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.tight_layout()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>training target range : [0, 5,016] prediction range : [0, 4,527]</p>
-<pre><code>
-The prediction range sits inside the training range, and it *has* to — not "usually does," cannot.
-A tree can never forecast a value above the largest one in its training data, because there is no
-arithmetic in it that could produce one. No trend term, no extrapolation, nothing. If this store
-grows 20% next year, the tree will predict last year's ceiling forever.
-</code></pre>
-<p>busiest 10% of test days (n=37): actual 4,115 predicted 3,929 under by 186 quietest 10% of test days (n=37): actual 2,030 predicted 2,237 over by 207</p>
-<pre><code>
-Both ends are wrong, and — this is the point — **they are wrong in opposite directions**.
-The busy days are under-forecast by 186 units. The quiet days are over-forecast by 207. The model
-is pulling everything toward the middle.
-
-Be precise about what this is and is not. The hard ceiling did not bite this year: the busiest
-test day was 4,717 units and the training set had a 5,016-unit day, so nothing was clipped.
-What you are seeing is the softer, more common version — leaf averaging shrinks the extremes
-inward. It is not a large effect in absolute terms next to a full tree's RMSE of 406. It is a
-*systematic* one, which is worse, because it will not average out over the year and it is exactly
-the days you care most about.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Uncomment the scatter block and fill in the two blanks — actual on x, predicted on y, with the
-45-degree line. Pause the video, run it, and come back when you can describe the shape.
-
-You should be looking at a cloud that is flatter than the 45-degree line. Below the line on the
-right, above it on the left, hinged in the middle. Once you have seen that shape you will
-recognize it everywhere, in every method that predicts by averaging.
-
-:::
-
-## ---- your turn: uncomment and fill in the two blanks ----
-
-## fig, ax = plt.subplots(figsize=(4.5, 4.5))
-
-## ax.scatter(___, ___, s=6, alpha=0.4)          # &lt;- actual on x, predicted on y
-
-## lims = [y_test.min(), y_test.max()]
-
-## ax.plot(lims, lims, "k--", lw=1)
-
-## ax.set_xlabel("actual units"); ax.set_ylabel("predicted units")
-
-## plt.tight_layout()
-</code></pre>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Every lecture in this course should end by telling you where the method breaks. Here is where a tree breaks, and it follows from one sentence: <strong>a tree predicts the mean of the training rows in a leaf.</strong> Every prediction it will ever make is an average of values it has already seen.</p>
+<pre><code>training target range : [0, 5,016]
+prediction range      : [0, 4,527]</code></pre>
+<p>The prediction range sits inside the training range, and it <em>has</em> to — not “usually does,” cannot. A tree can never forecast a value above the largest one in its training data, because there is no arithmetic in it that could produce one. No trend term, no extrapolation, nothing. If this store grows 20% next year, the tree will predict last year’s ceiling forever.</p>
+<pre><code>busiest 10% of test days  (n=37): actual 4,115   predicted 3,929   under by 186
+quietest 10% of test days (n=37): actual 2,030   predicted 2,237   over by  207</code></pre>
+<p>Both ends are wrong, and — this is the point — <strong>they are wrong in opposite directions</strong>. The busy days are under-forecast by 186 units. The quiet days are over-forecast by 207. The model is pulling everything toward the middle.</p>
+<p>Be precise about what this is and is not. The hard ceiling did not bite this year: the busiest test day was 4,717 units and the training set had a 5,016-unit day, so nothing was clipped. What you are seeing is the softer, more common version — leaf averaging shrinks the extremes inward. It is not a large effect in absolute terms next to a full tree’s RMSE of 406. It is a <em>systematic</em> one, which is worse, because it will not average out over the year and it is exactly the days you care most about.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Uncomment the scatter block and fill in the two blanks — actual on x, predicted on y, with the 45-degree line. Pause the video, run it, and come back when you can describe the shape.</p>
+<p>You should be looking at a cloud that is flatter than the 45-degree line. Below the line on the right, above it on the left, hinged in the middle. Once you have seen that shape you will recognize it everywhere, in every method that predicts by averaging.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="before-you-leave" class="level2" data-number="4.7">
 <h2 data-number="4.7" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">4.7</span> Before you leave</h2>
@@ -754,7 +746,7 @@ recognize it everywhere, in every method that predicts by averaging.
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -763,7 +755,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">

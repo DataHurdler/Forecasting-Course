@@ -376,7 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">5.2</span> Setup</h2>
-<div id="ca6ec5d3" class="cell" data-execution_count="1">
+<div id="9fff4752" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -447,7 +447,7 @@ Single tree (Lab 4)                     324
 </section>
 <section id="step-1-the-real-thing" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="step-1-the-real-thing"><span class="header-section-number">5.3</span> Step 1 — The real thing</h2>
-<div id="5c0fe263" class="cell" data-execution_count="2">
+<div id="2bdb73d7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>rf.fit(X_train, y_train)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -480,7 +480,7 @@ Walkthrough
 <section id="step-2-how-many-trees-is-enough" class="level2" data-number="5.4">
 <h2 data-number="5.4" class="anchored" data-anchor-id="step-2-how-many-trees-is-enough"><span class="header-section-number">5.4</span> Step 2 — How many trees is enough?</h2>
 <p>The usual worry about a big model is overfitting. Adding trees to a forest is the rare knob where that worry does not apply — but it does stop paying.</p>
-<div id="3f9f6584" class="cell" data-execution_count="3">
+<div id="045bbe70" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> [<span class="dv">5</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">300</span>, <span class="dv">600</span>]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>curve <span class="op">=</span> []</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> counts:</span>
@@ -540,7 +540,7 @@ Try it
 <h2 data-number="5.5" class="anchored" data-anchor-id="step-3-the-random-in-random-forest"><span class="header-section-number">5.5</span> Step 3 — The “random” in Random Forest</h2>
 <p>Bagging alone gives every tree a different sample of <em>rows</em>. A Random Forest also gives each split a different random subset of <em>columns</em> — <code>max_features</code>. Lecture 5 argued this decorrelates the trees, so their errors cancel more completely when averaged.</p>
 <p>Test it.</p>
-<div id="c2f15acb" class="cell" data-execution_count="4">
+<div id="4d58b564" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> mf <span class="kw">in</span> [<span class="va">None</span>, <span class="fl">0.6</span>, <span class="st">"sqrt"</span>, <span class="fl">0.2</span>]:</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, max_features<span class="op">=</span>mf,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                              random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>).fit(X_train, y_train)</span>
@@ -594,7 +594,7 @@ Walkthrough
 <section id="step-4-validation-for-free" class="level2" data-number="5.6">
 <h2 data-number="5.6" class="anchored" data-anchor-id="step-4-validation-for-free"><span class="header-section-number">5.6</span> Step 4 — Validation for free</h2>
 <p>Each bootstrap sample leaves out about a third of the rows. Those out-of-bag rows never trained that tree, so they can score it — a validation estimate with no holdout set.</p>
-<div id="df91519c" class="cell" data-execution_count="5">
+<div id="ffe54bad" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rf_oob <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, oob_score<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                               random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>).fit(X_train, y_train)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -644,7 +644,7 @@ Try it
 </section>
 <section id="step-5-two-importances-two-different-answers" class="level2" data-number="5.7">
 <h2 data-number="5.7" class="anchored" data-anchor-id="step-5-two-importances-two-different-answers"><span class="header-section-number">5.7</span> Step 5 — Two importances, two different answers</h2>
-<div id="f0eec9b2" class="cell" data-execution_count="6">
+<div id="bdbb6baf" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mdi <span class="op">=</span> pd.Series(rf.feature_importances_, index<span class="op">=</span>FEATURES)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>perm <span class="op">=</span> permutation_importance(rf, X_test, y_test, n_repeats<span class="op">=</span><span class="dv">10</span>,</span>
@@ -665,96 +665,16 @@ Try it
 <li><code>avg_price</code> against <code>is_event</code>: MDI ranks the price column <em>above</em> the event flag, while permutation scores price at exactly zero and the event flag at 22 units of RMSE</li>
 </ul>
 <p><strong>Your turn:</strong> plot the two rankings side by side as horizontal bar charts so the disagreements are visible at a glance.</p>
-<div id="ff461f88" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="078edcf2" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the two blanks ----</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, axes = plt.subplots(1, 2, figsize=(11, 3.5))</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># mdi.sort_values().plot.barh(ax=axes[0], title="MDI (impurity)")</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ___.sort_values().plot.barh(ax=axes[1], title="Permutation (ΔRMSE)")   # &lt;- which Series?</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.tight_layout()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<pre><code>            MDI  permutation_ΔRMSE  MDI_rank  perm_rank</code></pre>
-<p>dow 0.583 284.2 1 1 units_lag28 0.119 36.8 2 4 units_lag1 0.086 116.9 3 2 units_lag7 0.053 35.6 4 5 units_lag365 0.036 10.2 5 8 doy 0.036 18.1 5 7 units_lag14 0.031 7.7 7 9 snap 0.027 40.4 8 3 avg_price 0.017 0.0 9 10 is_event 0.012 22.3 10 6</p>
-<pre><code>
-First, the units, because they change what the numbers mean. MDI is a share of impurity reduction
-— it sums to one and it is computed on the **training** data by the fitting process. Permutation
-importance is measured in **RMSE**: shuffle that column in the **test** set and see how much worse
-the forecast gets. So `dow` at 284 means "destroy day-of-week and you lose 284 units of accuracy."
-You can say that sentence to a manager. You cannot say "0.583" to anyone.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Pause and find the three disagreements before I name them.
-
-**One.** `units_lag28` is second on MDI and fourth on permutation, at 36.8 — while `units_lag1`,
-which MDI ranks *below* it, is worth 116.9. Three times as much. MDI counts how often a feature
-was *used* for splitting; permutation measures what happens when you take it away. A feature used
-constantly for small refinements can lose to one used rarely for large ones.
-
-**Two, and this is the one that matters commercially.** `snap` is **eighth** on MDI and **third**
-on permutation, worth 40 units of RMSE. SNAP benefits land on fixed days of the month and this is
-a food aisle: SNAP days average 3,201 units against 2,839 otherwise, about 13% higher, on 400 of
-1,211 training days. MDI nearly buried a real, actionable effect.
-
-**Three.** Look at `avg_price` against `is_event`. MDI ranks price *above* the event flag —
-0.017 to 0.012. Permutation says price is worth **exactly zero** and the event flag is worth 22.
-
-That inversion has a known mechanism, and Lecture 4's footnote named it: **MDI is biased toward
-high-cardinality features.** `avg_price` takes 173 distinct values in the training set, so it
-offers 172 candidate split points, and with that many chances some will reduce impurity by luck
-alone. `is_event` is binary — one possible split, no opportunity to get lucky. MDI rewards
-opportunity; permutation rewards contribution.
-
-The practical rule: **MDI is free and permutation is honest.** MDI comes out of the fit at no cost
-and is fine for a quick screen. Anything you are going to act on — or say out loud to a category
-manager — gets checked with permutation, on held-out data.
-
-::: {.callout-tip}
-## Try it
-— fill in the one blank and plot the two rankings side by side. The
-blank is the permutation series. Come back when you can see the `snap` bar jump.
-:::
-
-:::
-
-## ---- your turn: uncomment and fill in the two blanks ----
-
-## fig, axes = plt.subplots(1, 2, figsize=(11, 3.5))
-
-## mdi.sort_values().plot.barh(ax=axes[0], title="MDI (impurity)")
-
-## ___.sort_values().plot.barh(ax=axes[1], title="Permutation (ΔRMSE)")   # &lt;- which Series?
-
-## plt.tight_layout()
-</code></pre>
-<hr>
-</section>
-<section id="step-6-stop-averaging.-start-correcting." class="level2" data-number="5.8">
-<h2 data-number="5.8" class="anchored" data-anchor-id="step-6-stop-averaging.-start-correcting."><span class="header-section-number">5.8</span> Step 6 — Stop averaging. Start correcting.</h2>
-<p>A forest builds many trees <strong>in parallel</strong> and averages them. Boosting builds them <strong>in sequence</strong>, each one fitted to what the previous ones got wrong.</p>
-<p>The first four rows hold the learning rate fixed and add rounds — the same experiment you ran on the forest in Step 2. The last two change the rate instead.</p>
-<div id="163f4680" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr, n <span class="kw">in</span> [(<span class="fl">0.1</span>, <span class="dv">100</span>), (<span class="fl">0.1</span>, <span class="dv">300</span>), (<span class="fl">0.1</span>, <span class="dv">1000</span>), (<span class="fl">0.1</span>, <span class="dv">3000</span>),</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>              (<span class="fl">0.3</span>, <span class="dv">100</span>), (<span class="fl">0.05</span>, <span class="dv">1000</span>)]:</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span>n, learning_rate<span class="op">=</span>lr, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                         subsample<span class="op">=</span><span class="fl">0.8</span>, colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                         random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  lr=</span><span class="sc">{</span>lr<span class="sc">:&lt;5}</span><span class="ss"> n=</span><span class="sc">{</span>n<span class="sc">:&lt;5}</span><span class="ss"> train </span><span class="sc">{</span>rmse(y_train, m.predict(X_train))<span class="sc">:5,.0f}</span><span class="ss">"</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"   test </span><span class="sc">{</span>rmse(y_test, m.predict(X_test))<span class="sc">:5,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="3fe0f39f" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>best <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span><span class="dv">100</span>, learning_rate<span class="op">=</span><span class="fl">0.1</span>, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                        subsample<span class="op">=</span><span class="fl">0.8</span>, colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                        random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>scoreboard[<span class="st">"XGBoost (lr=0.1, 100 trees)"</span>] <span class="op">=</span> rmse(y_test, best.predict(X_test))</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.Series(scoreboard).<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>).sort_values(ascending<span class="op">=</span><span class="va">False</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Read the first four rows as a curve, then compare it with Step 2.</strong> Training error falls to zero. Test error bottoms out around 300 rounds and then <strong>climbs back up</strong> — 3,000 rounds is worse than 100. In Step 2 you added trees to a forest all the way to 600 and it never once hurt.</p>
-<p>That is the practical difference between the two ensembles. A forest’s trees are fitted independently and averaged, so extra ones can only sharpen the average. Boosting’s trees are fitted to the previous ensemble’s <em>residuals</em>, so extra ones keep going — eventually correcting noise. <code>n_estimators</code> is a free choice in a forest and a tuning parameter in boosting.</p>
-<p>The last two rows say the obvious complement: a big rate with few rounds and a small rate with many land in much the same place, because roughly it is the product that sets the budget. What you cannot do is set a rate and then let the rounds run.</p>
-<p>Note which configuration we put on the scoreboard below — <code>lr=0.1, n=100</code>, the conventional default, <strong>not</strong> the row with the best test RMSE. Picking the winner out of a column computed on the test set is the mistake Lecture 1 warned about, and it does not stop being a mistake because the grid is small.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -763,7 +683,93 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>                MDI  permutation_ΔRMSE  MDI_rank  perm_rank
+dow           0.583              284.2         1          1
+units_lag28   0.119               36.8         2          4
+units_lag1    0.086              116.9         3          2
+units_lag7    0.053               35.6         4          5
+units_lag365  0.036               10.2         5          8
+doy           0.036               18.1         5          7
+units_lag14   0.031                7.7         7          9
+snap          0.027               40.4         8          3
+avg_price     0.017                0.0         9         10
+is_event      0.012               22.3        10          6</code></pre>
+<p>First, the units, because they change what the numbers mean. MDI is a share of impurity reduction — it sums to one and it is computed on the <strong>training</strong> data by the fitting process. Permutation importance is measured in <strong>RMSE</strong>: shuffle that column in the <strong>test</strong> set and see how much worse the forecast gets. So <code>dow</code> at 284 means “destroy day-of-week and you lose 284 units of accuracy.” You can say that sentence to a manager. You cannot say “0.583” to anyone.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Pause and find the three disagreements before I name them.</p>
+<p><strong>One.</strong> <code>units_lag28</code> is second on MDI and fourth on permutation, at 36.8 — while <code>units_lag1</code>, which MDI ranks <em>below</em> it, is worth 116.9. Three times as much. MDI counts how often a feature was <em>used</em> for splitting; permutation measures what happens when you take it away. A feature used constantly for small refinements can lose to one used rarely for large ones.</p>
+<p><strong>Two, and this is the one that matters commercially.</strong> <code>snap</code> is <strong>eighth</strong> on MDI and <strong>third</strong> on permutation, worth 40 units of RMSE. SNAP benefits land on fixed days of the month and this is a food aisle: SNAP days average 3,201 units against 2,839 otherwise, about 13% higher, on 400 of 1,211 training days. MDI nearly buried a real, actionable effect.</p>
+<p><strong>Three.</strong> Look at <code>avg_price</code> against <code>is_event</code>. MDI ranks price <em>above</em> the event flag — 0.017 to 0.012. Permutation says price is worth <strong>exactly zero</strong> and the event flag is worth 22.</p>
+<p>That inversion has a known mechanism, and Lecture 4’s footnote named it: <strong>MDI is biased toward high-cardinality features.</strong> <code>avg_price</code> takes 173 distinct values in the training set, so it offers 172 candidate split points, and with that many chances some will reduce impurity by luck alone. <code>is_event</code> is binary — one possible split, no opportunity to get lucky. MDI rewards opportunity; permutation rewards contribution.</p>
+<p>The practical rule: <strong>MDI is free and permutation is honest.</strong> MDI comes out of the fit at no cost and is fine for a quick screen. Anything you are going to act on — or say out loud to a category manager — gets checked with permutation, on held-out data.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>— fill in the one blank and plot the two rankings side by side. The blank is the permutation series. Come back when you can see the <code>snap</code> bar jump.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="step-6-stop-averaging.-start-correcting." class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="step-6-stop-averaging.-start-correcting."><span class="header-section-number">5.8</span> Step 6 — Stop averaging. Start correcting.</h2>
+<p>A forest builds many trees <strong>in parallel</strong> and averages them. Boosting builds them <strong>in sequence</strong>, each one fitted to what the previous ones got wrong.</p>
+<p>The first four rows hold the learning rate fixed and add rounds — the same experiment you ran on the forest in Step 2. The last two change the rate instead.</p>
+<div id="cf0b53ce" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr, n <span class="kw">in</span> [(<span class="fl">0.1</span>, <span class="dv">100</span>), (<span class="fl">0.1</span>, <span class="dv">300</span>), (<span class="fl">0.1</span>, <span class="dv">1000</span>), (<span class="fl">0.1</span>, <span class="dv">3000</span>),</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>              (<span class="fl">0.3</span>, <span class="dv">100</span>), (<span class="fl">0.05</span>, <span class="dv">1000</span>)]:</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span>n, learning_rate<span class="op">=</span>lr, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                         subsample<span class="op">=</span><span class="fl">0.8</span>, colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                         random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  lr=</span><span class="sc">{</span>lr<span class="sc">:&lt;5}</span><span class="ss"> n=</span><span class="sc">{</span>n<span class="sc">:&lt;5}</span><span class="ss"> train </span><span class="sc">{</span>rmse(y_train, m.predict(X_train))<span class="sc">:5,.0f}</span><span class="ss">"</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"   test </span><span class="sc">{</span>rmse(y_test, m.predict(X_test))<span class="sc">:5,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="dbf090e2" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>best <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span><span class="dv">100</span>, learning_rate<span class="op">=</span><span class="fl">0.1</span>, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                        subsample<span class="op">=</span><span class="fl">0.8</span>, colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                        random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>scoreboard[<span class="st">"XGBoost (lr=0.1, 100 trees)"</span>] <span class="op">=</span> rmse(y_test, best.predict(X_test))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.Series(scoreboard).<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>).sort_values(ascending<span class="op">=</span><span class="va">False</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Read the first four rows as a curve, then compare it with Step 2.</strong> Training error falls to zero. Test error bottoms out around 300 rounds and then <strong>climbs back up</strong> — 3,000 rounds is worse than 100. In Step 2 you added trees to a forest all the way to 600 and it never once hurt.</p>
+<p>That is the practical difference between the two ensembles. A forest’s trees are fitted independently and averaged, so extra ones can only sharpen the average. Boosting’s trees are fitted to the previous ensemble’s <em>residuals</em>, so extra ones keep going — eventually correcting noise. <code>n_estimators</code> is a free choice in a forest and a tuning parameter in boosting.</p>
+<p>The last two rows say the obvious complement: a big rate with few rounds and a small rate with many land in much the same place, because roughly it is the product that sets the budget. What you cannot do is set a rate and then let the rounds run.</p>
+<p>Note which configuration we put on the scoreboard below — <code>lr=0.1, n=100</code>, the conventional default, <strong>not</strong> the row with the best test RMSE. Picking the winner out of a column computed on the test set is the mistake Lecture 1 warned about, and it does not stop being a mistake because the grid is small.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Everything so far today has been the same idea: build many trees independently, average them. Boosting is a different idea. Trees are built <strong>in sequence</strong>, and each new one is fitted to what the ensemble so far got <strong>wrong</strong>. Nothing is averaged. Every tree is a correction.</p>
 <pre><code>  lr=0.1   n=100   train   171   test   244
@@ -800,7 +806,7 @@ XGBoost (lr=0.1, 100 trees)          244</code></pre>
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -809,7 +815,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Read the scoreboard as one object. 625 to 244 — a 61% reduction against the benchmark, on one series, with the same ten features throughout. Almost all of it arrived in two jumps: a single tree over the benchmark, and averaging over the single tree. The last two steps, the forest and boosting, bought 22 units between them.</p>
 <div class="callout callout-style-default callout-tip callout-titled">

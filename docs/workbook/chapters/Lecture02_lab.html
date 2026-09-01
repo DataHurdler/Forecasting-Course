@@ -404,7 +404,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">2.2</span> Setup</h2>
-<div id="e6129efb" class="cell" data-execution_count="1">
+<div id="afeb2f7b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -465,13 +465,13 @@ Walkthrough
 </section>
 <section id="step-1-look-then-test" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="step-1-look-then-test"><span class="header-section-number">2.3</span> Step 1 — Look, then test</h2>
-<div id="118cf533" class="cell" data-execution_count="2">
+<div id="5080e209" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.2</span>))</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax.plot(y.index, y.values, lw<span class="op">=</span><span class="fl">1.3</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"CA_1 HOUSEHOLD — weekly units"</span>)<span class="op">;</span> plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Notice:</strong> the level wanders. Your eye says non-stationary. Now make the test agree.</p>
-<div id="b226b209" class="cell" data-execution_count="3">
+<div id="85941b08" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> report_adf(series, label):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    stat, p, lags, nobs, crit, _ <span class="op">=</span> adfuller(series.dropna(), autolag<span class="op">=</span><span class="st">"AIC"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>label<span class="sc">:&lt;28}</span><span class="ss"> ADF </span><span class="sc">{</span>stat<span class="sc">:&gt;7.2f}</span><span class="ss">   p </span><span class="sc">{</span>p<span class="sc">:&gt;6.3f}</span><span class="ss">   lags </span><span class="sc">{</span>lags<span class="sc">:&gt;2}</span><span class="ss">   "</span></span>
@@ -480,7 +480,7 @@ Walkthrough
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>report_adf(y, <span class="st">"levels"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now difference it and re-test.</p>
-<div id="ddc7de27" class="cell" data-execution_count="4">
+<div id="501f0476" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dy <span class="op">=</span> y.diff().dropna()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>report_adf(dy, <span class="st">"first difference"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -512,7 +512,7 @@ first difference             ADF   -5.00   p  0.000   lags 11   stationary</code
 <section id="step-2-now-you-are-allowed-to-read-the-acf" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="step-2-now-you-are-allowed-to-read-the-acf"><span class="header-section-number">2.4</span> Step 2 — Now you are allowed to read the ACF</h2>
 <p>Lecture 2’s rule: the ACF of a non-stationary series decays slowly no matter what the underlying process is. Run both and see it.</p>
-<div id="50e646a8" class="cell" data-execution_count="5">
+<div id="56a5c322" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">5</span>))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plot_acf(y, lags<span class="op">=</span><span class="dv">30</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>,<span class="dv">0</span>])<span class="op">;</span>  axes[<span class="dv">0</span>,<span class="dv">0</span>].set_title(<span class="st">"ACF — levels (uninformative)"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plot_pacf(y, lags<span class="op">=</span><span class="dv">30</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>,<span class="dv">1</span>])<span class="op">;</span> axes[<span class="dv">0</span>,<span class="dv">1</span>].set_title(<span class="st">"PACF — levels"</span>)</span>
@@ -560,7 +560,7 @@ Try it
 </section>
 <section id="step-3-fit-it" class="level2" data-number="2.5">
 <h2 data-number="2.5" class="anchored" data-anchor-id="step-3-fit-it"><span class="header-section-number">2.5</span> Step 3 — Fit it</h2>
-<div id="df4401fe" class="cell" data-execution_count="6">
+<div id="69112965" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>order <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)                           <span class="co"># &lt;- REPLACE with your proposal from Step 2</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ARIMA(train, order<span class="op">=</span>order).fit()</span>
@@ -593,7 +593,7 @@ Walkthrough
 <section id="step-4-break-it-the-horizon-trap" class="level2" data-number="2.6">
 <h2 data-number="2.6" class="anchored" data-anchor-id="step-4-break-it-the-horizon-trap"><span class="header-section-number">2.6</span> Step 4 — Break it: the horizon trap</h2>
 <p>Now the same model, evaluated a different way.</p>
-<div id="c18d811e" class="cell" data-execution_count="7">
+<div id="51e1097d" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>errs <span class="op">=</span> []</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>vals <span class="op">=</span> y.values</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">104</span>, <span class="bu">len</span>(vals) <span class="op">-</span> <span class="dv">1</span>):</span>
@@ -634,7 +634,7 @@ single-split 52-step RMSE: 569</code></pre>
 <h2 data-number="2.7" class="anchored" data-anchor-id="step-5-granger-causality-and-the-trap-in-it"><span class="header-section-number">2.7</span> Step 5 — Granger causality, and the trap in it</h2>
 <p>Does the food aisle help predict the household aisle?</p>
 <p><code>grangercausalitytests</code> prints four test variants for every lag up to <code>maxlag</code> — a wall of output you did not ask for. The helper below silences it and pulls out the single F-test.</p>
-<div id="fb0b7db5" class="cell" data-execution_count="8">
+<div id="a4c96536" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>food <span class="op">=</span> get_series(<span class="st">"CA_1"</span>, <span class="st">"FOODS"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>pair <span class="op">=</span> pd.concat([y.rename(<span class="st">"household"</span>), food.rename(<span class="st">"food"</span>)], axis<span class="op">=</span><span class="dv">1</span>).diff().dropna()</span>
@@ -651,136 +651,134 @@ single-split 52-step RMSE: 569</code></pre>
 </div>
 <p>Note the argument order: the <strong>second</strong> argument is the candidate cause. Getting this backwards is the single most common mistake with this function.</p>
 <p><strong>Your turn:</strong> run the other direction and report both F-statistics.</p>
-<div id="b16a0024" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>Does the food aisle <span class="bu">help</span> predict the household aisle?</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>First, the practical note. `grangercausalitytests` prints four test variants <span class="cf">for</span> every lag up to</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>`maxlag` — <span class="cf">for</span> lag <span class="dv">4</span>, that<span class="st">'s a screen and a half of output nobody asked for. The helper</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="er">swallows it with `redirect_stdout` and pulls out the single F-test we want. That's what those</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>imports were <span class="cf">for</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="64b46e55" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment, then swap the two arguments ----</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># granger(___, ___)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<pre><code>  food -&gt; household  F =  3.83   p = 0.0048   significant</code></pre>
-<pre><code>
-Now the argument order, and please write this down: **the second argument is the candidate
-cause.** `granger("household", "food")` asks whether food helps predict household. Getting this
-backwards is the single most common mistake with this function, and it is silent — you get a
-perfectly reasonable-looking result to the wrong question.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Your turn. Run the other direction and report both F-statistics. It's one line — uncomment and
-swap the arguments.
-</code></pre>
-<p>household -&gt; food F = 2.80 p = 0.0263 significant</p>
-<pre><code>
-Both directions are significant. Food predicts household, and household predicts food.
-
-Sit with how strange that is. Household goods do not cause groceries. Groceries do not cause
-household goods. Nobody buys paper towels *because* they bought bananas. And yet the test says
-each helps predict the other, at conventional significance, in both directions. We'll come back to what's generating that. Hold the question.
-
-:::
-
-## ---- your turn: uncomment, then swap the two arguments ----
-
-## granger(___, ___)
-</code></pre>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Does the food aisle help predict the household aisle?</p>
+<p>First, the practical note. <code>grangercausalitytests</code> prints four test variants for every lag up to <code>maxlag</code> — for lag 4, that’s a screen and a half of output nobody asked for. The helper swallows it with <code>redirect_stdout</code> and pulls out the single F-test we want. That’s what those imports were for.</p>
+<pre><code>      food -&gt; household  F =  3.83   p = 0.0048   significant</code></pre>
+<p>Now the argument order, and please write this down: <strong>the second argument is the candidate cause.</strong> <code>granger("household", "food")</code> asks whether food helps predict household. Getting this backwards is the single most common mistake with this function, and it is silent — you get a perfectly reasonable-looking result to the wrong question.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Your turn. Run the other direction and report both F-statistics. It’s one line — uncomment and swap the arguments.</p>
+<pre><code> household -&gt; food        F =  2.80   p = 0.0263   significant</code></pre>
+<p>Both directions are significant. Food predicts household, and household predicts food.</p>
+<p>Sit with how strange that is. Household goods do not cause groceries. Groceries do not cause household goods. Nobody buys paper towels <em>because</em> they bought bananas. And yet the test says each helps predict the other, at conventional significance, in both directions. We’ll come back to what’s generating that. Hold the question.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="step-6-the-same-test-on-macro-data-and-why-the-sample-matters" class="level2" data-number="2.8">
 <h2 data-number="2.8" class="anchored" data-anchor-id="step-6-the-same-test-on-macro-data-and-why-the-sample-matters"><span class="header-section-number">2.8</span> Step 6 — The same test on macro data, and why the sample matters</h2>
 <p>Step 5 used two aisles of one store. Now the question from the lecture slide: <strong>does unemployment Granger-cause retail sales?</strong></p>
 <p>Run <code>python scripts/prep_fred.py</code> once before class — it caches three FRED series to <code>data/processed/fred_monthly.csv</code>, so this step needs no network and no API key.</p>
-<div id="7ca2a88d" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fred <span class="op">=</span> pd.read_csv(data_path(<span class="st">"fred_monthly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"date"</span>]).set_index(<span class="st">"date"</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>Now the question <span class="im">from</span> the lecture slide, on real macro data. Does unemployment Granger<span class="op">-</span>cause</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>retail sales?</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>Both series arrive already stationary — retail growth <span class="kw">is</span> log<span class="op">-</span>differenced monthly percent change,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>unemployment <span class="kw">is</span> the monthly change <span class="kw">in</span> the rate. So we can test directly.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="3f6fd5a5" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fred <span class="op">=</span> pd.read_csv(data_path(<span class="st">"fred_monthly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"date"</span>]).set_index(<span class="st">"date"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Both series are already stationary transforms:</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   retail_growth = monthly % change in retail sales (log-differenced)</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   unrate_diff   = monthly change in the unemployment rate</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>macro <span class="op">=</span> fred[[<span class="st">"retail_growth"</span>, <span class="st">"unrate_diff"</span>]].dropna()</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> granger_macro(effect, cause, data, lag<span class="op">=</span><span class="dv">4</span>):</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> redirect_stdout(io.StringIO()):</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> grangercausalitytests(data[[effect, cause]], maxlag<span class="op">=</span>lag)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    F, p <span class="op">=</span> res[lag][<span class="dv">0</span>][<span class="st">"ssr_ftest"</span>][<span class="dv">0</span>], res[lag][<span class="dv">0</span>][<span class="st">"ssr_ftest"</span>][<span class="dv">1</span>]</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>cause<span class="sc">:&gt;12}</span><span class="ss"> -&gt; </span><span class="sc">{</span>effect<span class="sc">:&lt;14}</span><span class="ss"> F = </span><span class="sc">{</span>F<span class="sc">:6.2f}</span><span class="ss">   p = </span><span class="sc">{</span>p<span class="sc">:.4f}</span><span class="ss">"</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"   </span><span class="sc">{</span><span class="st">'significant'</span> <span class="cf">if</span> p <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">'NOT significant'</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Full sample: </span><span class="sc">{</span>macro<span class="sc">.</span>index<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:</span><span class="op">%</span>Y<span class="op">-%</span>m<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>macro<span class="sc">.</span>index<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:</span><span class="op">%</span>Y<span class="op">-%</span>m<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="bu">len</span>(macro)<span class="sc">}</span><span class="ss"> months)"</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>granger_macro(<span class="st">"retail_growth"</span>, <span class="st">"unrate_diff"</span>, macro)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>granger_macro(<span class="st">"unrate_diff"</span>, <span class="st">"retail_growth"</span>, macro)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Full sample: 1992-02 to 2026-06 (412 months) unrate_diff -&gt; retail_growth F = 18.22 p = 0.0000 significant retail_growth -&gt; unrate_diff F = 12.80 p = 0.0000 significant</p>
-<pre><code>
-Both directions significant, and unemployment is the stronger of the two — F of eighteen against
-thirteen. That matches the story everybody expects. People lose jobs, people stop spending. You
-could write that paragraph without running anything, which is exactly why you should be
-suspicious of how satisfying it is. **Now drop the COVID window.**
-</code></pre>
-<p>Excluding Feb 2020 - Jun 2021 (395 months) unrate_diff -&gt; retail_growth F = 2.91 p = 0.0214 significant retail_growth -&gt; unrate_diff F = 6.74 p = 0.0000 significant</p>
-<pre><code>
-Seventeen months removed out of four hundred and twelve — four percent of the sample. The
-unemployment-to-retail F-statistic falls from **18.22 to 2.91.** It's still significant, barely,
-but it has lost about six-sevenths of its strength. The reverse direction went from 12.80 to 6.74. Weaker, but still overwhelming.
-
-::: {.callout-tip}
-## Try it
-:::
-
-Your turn. Restrict to everything *before* February 2020 — no COVID period at all, no recovery
-either — and run both directions.
-</code></pre>
-<p>Pre-COVID, before Feb 2020 (336 months) unrate_diff -&gt; retail_growth F = 1.85 p = 0.1196 NOT significant retail_growth -&gt; unrate_diff F = 9.67 p = 0.0000 significant</p>
-<pre><code>
-Eighteen point two two. Two point nine one. One point eight five.
-
-On twenty-eight years of pre-pandemic data, unemployment does **not** Granger-cause retail sales.
-The intuitive direction — the one everybody expects, the one that has a mechanism, the one you'd
-put in a slide without checking — is gone.
-
-And the direction nobody leads with, retail predicting unemployment, survives every single cut:
-12.80, then 6.74, then 9.67. Never above a p-value of point zero zero zero one.
-
-:::
-
-## Both series are already stationary transforms:
-
-## retail_growth = monthly % change in retail sales (log-differenced)
-
-## unrate_diff   = monthly change in the unemployment rate
-
-macro = fred[["retail_growth", "unrate_diff"]].dropna()
-
-def granger_macro(effect, cause, data, lag=4):
-    with redirect_stdout(io.StringIO()):
-        res = grangercausalitytests(data[[effect, cause]], maxlag=lag)
-    F, p = res[lag][0]["ssr_ftest"][0], res[lag][0]["ssr_ftest"][1]
-    print(f"  {cause:&gt;12} -&gt; {effect:&lt;14} F = {F:6.2f}   p = {p:.4f}"
-          f"   {'significant' if p &lt; 0.05 else 'NOT significant'}")
-
-print(f"Full sample: {macro.index.min():%Y-%m} to {macro.index.max():%Y-%m} ({len(macro)} months)")
-granger_macro("retail_growth", "unrate_diff", macro)
-granger_macro("unrate_diff", "retail_growth", macro)</code></pre>
 <p>Both directions are significant, and unemployment looks like the stronger driver. That matches the story everyone expects: people lose jobs, people stop spending.</p>
 <p><strong>Now drop the COVID window and run it again.</strong></p>
-<div id="e960efd4" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ex_covid <span class="op">=</span> macro[(macro.index <span class="op">&lt;</span> <span class="st">"2020-02-01"</span>) <span class="op">|</span> (macro.index <span class="op">&gt;</span> <span class="st">"2021-06-01"</span>)]</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Excluding Feb 2020 - Jun 2021 (</span><span class="sc">{</span><span class="bu">len</span>(ex_covid)<span class="sc">}</span><span class="ss"> months)"</span>)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>granger_macro(<span class="st">"retail_growth"</span>, <span class="st">"unrate_diff"</span>, ex_covid)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>granger_macro(<span class="st">"unrate_diff"</span>, <span class="st">"retail_growth"</span>, ex_covid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="0df77608" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>ex_covid <span class="op">=</span> macro[(macro.index <span class="op">&lt;</span> <span class="st">"2020-02-01"</span>) <span class="op">|</span> (macro.index <span class="op">&gt;</span> <span class="st">"2021-06-01"</span>)]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Excluding Feb 2020 - Jun 2021 (</span><span class="sc">{</span><span class="bu">len</span>(ex_covid)<span class="sc">}</span><span class="ss"> months)"</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>granger_macro(<span class="st">"retail_growth"</span>, <span class="st">"unrate_diff"</span>, ex_covid)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>granger_macro(<span class="st">"unrate_diff"</span>, <span class="st">"retail_growth"</span>, ex_covid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Your turn:</strong> restrict the sample to everything <em>before</em> February 2020 and run both directions once more.</p>
-<div id="83871f4e" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">## ---- your turn: uncomment and fill in the filter ----</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">## pre_covid = macro[___]                     # &lt;- rows with index &lt; "2020-02-01"</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">## granger_macro("retail_growth", "unrate_diff", pre_covid)</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">## granger_macro("unrate_diff", "retail_growth", pre_covid)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="92196784" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the filter ----</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pre_covid = macro[___]                     # &lt;- rows with index &lt; "2020-02-01"</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># granger_macro("retail_growth", "unrate_diff", pre_covid)</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># granger_macro("unrate_diff", "retail_growth", pre_covid)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Now the question from the lecture slide, on real macro data. Does unemployment Granger-cause retail sales?</p>
+<p>Both series arrive already stationary — retail growth is log-differenced monthly percent change, unemployment is the monthly change in the rate. So we can test directly.</p>
+<pre><code>Full sample: 1992-02 to 2026-06 (412 months)
+   unrate_diff -&gt; retail_growth   F =  18.22   p = 0.0000   significant
+ retail_growth -&gt; unrate_diff     F =  12.80   p = 0.0000   significant</code></pre>
+<p>Both directions significant, and unemployment is the stronger of the two — F of eighteen against thirteen. That matches the story everybody expects. People lose jobs, people stop spending. You could write that paragraph without running anything, which is exactly why you should be suspicious of how satisfying it is. <strong>Now drop the COVID window.</strong></p>
+<pre><code>Excluding Feb 2020 - Jun 2021 (395 months)
+   unrate_diff -&gt; retail_growth   F =   2.91   p = 0.0214   significant
+ retail_growth -&gt; unrate_diff     F =   6.74   p = 0.0000   significant</code></pre>
+<p>Seventeen months removed out of four hundred and twelve — four percent of the sample. The unemployment-to-retail F-statistic falls from <strong>18.22 to 2.91.</strong> It’s still significant, barely, but it has lost about six-sevenths of its strength. The reverse direction went from 12.80 to 6.74. Weaker, but still overwhelming.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Your turn. Restrict to everything <em>before</em> February 2020 — no COVID period at all, no recovery either — and run both directions.</p>
+<pre><code>Pre-COVID, before Feb 2020 (336 months)
+   unrate_diff -&gt; retail_growth   F =   1.85   p = 0.1196   NOT significant
+ retail_growth -&gt; unrate_diff     F =   9.67   p = 0.0000   significant</code></pre>
+<p>Eighteen point two two. Two point nine one. One point eight five.</p>
+<p>On twenty-eight years of pre-pandemic data, unemployment does <strong>not</strong> Granger-cause retail sales. The intuitive direction — the one everybody expects, the one that has a mechanism, the one you’d put in a slide without checking — is gone.</p>
+<p>And the direction nobody leads with, retail predicting unemployment, survives every single cut: 12.80, then 6.74, then 9.67. Never above a p-value of point zero zero zero one.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="before-you-leave" class="level2" data-number="2.9">
 <h2 data-number="2.9" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">2.9</span> Before you leave</h2>
@@ -798,7 +796,7 @@ granger_macro("unrate_diff", "retail_growth", macro)</code></pre>
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -807,7 +805,7 @@ Walkthrough
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Two questions, and I want both in the Week 2 thread before Lecture 3.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
