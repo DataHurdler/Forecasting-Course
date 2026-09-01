@@ -9,7 +9,21 @@ book:
   search: true
   chapters:
     - index.qmd
+    - chapters/Lecture01_ETS_Eval.qmd
+    - chapters/Lecture02_ARIMA_VAR.qmd
+    - chapters/Lecture03_GAMs.qmd
+    - chapters/Lecture04_DecisionTrees.qmd
+    - chapters/Lecture05_TreeEnsembles.qmd
+    - chapters/Lecture06_Regularization.qmd
+    - chapters/Lecture07_NeuralNets.qmd
+    - chapters/Lecture08_CNNs.qmd
     - chapters/Lecture09_Part1_RNN_LSTM.qmd
+    - chapters/Lecture09_Part2_Transformers.qmd
+    - chapters/Lecture10_BayesianFoundations.qmd
+    - chapters/Lecture11_Part1_BayesianTS.qmd
+    - chapters/Lecture11_Part2_Hierarchical.qmd
+    - chapters/Lecture12_BayesianRegression.qmd
+    - chapters/Lecture13_Synthesis.qmd
 
 format:
   html:
