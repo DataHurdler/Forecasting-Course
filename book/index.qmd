@@ -1,0 +1,36 @@
+# Preface {.unnumbered}
+
+This is the book form of **ECON 8310: Business Forecasting** at the University of Nebraska at
+Omaha. It is not a summary of the course and not a replacement for it — it is the same material in
+a format you can read, search and quote from.
+
+Every chapter is one lecture, and carries that lecture's title exactly. Within a chapter, each
+section is a slide from the deck: the table, figure or definition the class saw, followed by what
+was said about it.
+
+## How this book is made
+
+Nothing here is written twice. Each chapter is **generated** from the course's own files — the
+Quarto mirror of the Beamer deck, and the recording script written for that lecture — by
+`scripts/build_book.py`. The consequence matters more than the mechanism: a number, a table or a
+figure in this book cannot disagree with the deck it came from, because it is never copied. It is
+read from the deck on every build.
+
+That property is not decoration. Over one week in August 2026 the course found three reported
+figures that no committed code reproduced, a diagnostics table whose headline claim the
+reproducible numbers contradicted, and a tuning result that was noise. Each had been correct when
+written and had quietly stopped being so. A book assembled by hand would have inherited all of
+them.
+
+## What the course is about
+
+One dataset, measured honestly, method after method.
+
+Every model in this book is fitted to the same panel of thirty Walmart store-category series and
+scored on the same held-out block, so the numbers can be put beside one another. The result is not
+the one anyone predicts in week one: a 46-coefficient linear model finishes at the top, ahead of
+four neural architectures, and the two with the most attention behind them finish fifth and sixth.
+
+The chapters explain why, from the data rather than from the reputation of the methods. That is
+the actual subject: not which model wins, but how to find out, and how to tell when a confident
+number has not earned its confidence.

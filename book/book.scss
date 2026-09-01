@@ -1,0 +1,31 @@
+/*-- scss:defaults --*/
+$primary: #D71920;   // UNO crimson
+
+/*-- scss:rules --*/
+// The four box environments the decks use. Colours match Preambles/header.tex
+// and the RevealJS theme so a reader moving between formats sees one course.
+.keybox, .definitionbox, .warningbox, .examplebox {
+  padding: 0.85rem 1.1rem;
+  margin: 1.25rem 0;
+  border-radius: 3px;
+  border-left: 4px solid #ccc;
+  background: #fafafa;
+}
+.keybox        { border-left-color: #D71920; background: #fdf4f4; }
+.definitionbox { border-left-color: #1f4e79; background: #f4f7fb; }
+.warningbox    { border-left-color: #B45309; background: #fdf8f0; }
+.examplebox    { border-left-color: #2e7d32; background: #f4faf5; }
+
+.definitionbox-title, .examplebox-title {
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+.definitionbox-title { color: #1f4e79; }
+.examplebox-title    { color: #2e7d32; }
+
+.key-result   { color: #D71920; font-weight: 700; }
+.interpretation { font-style: italic; padding-left: 1rem; }
+.neutral      { color: #666; }
+.positive     { color: #2e7d32; font-weight: 600; }
+.negative     { color: #b00020; font-weight: 600; }
+.hi           { color: #D71920; font-weight: 600; }

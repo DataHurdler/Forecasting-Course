@@ -1,0 +1,24 @@
+project:
+  type: book
+  output-dir: ../docs/book
+
+book:
+  title: "Business Forecasting"
+  subtitle: "ECON 8310 · University of Nebraska at Omaha"
+  author: "Zijun Luo"
+  date: last-modified
+  search: true
+  chapters:
+    - index.qmd
+    - chapters/Lecture09_Part1_RNN_LSTM.qmd
+
+format:
+  html:
+    theme: [cosmo, book.scss]
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    code-copy: true
+
+execute:
+  freeze: auto

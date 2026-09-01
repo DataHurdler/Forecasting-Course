@@ -107,3 +107,11 @@ Narration/*_solutions_script.md
 # rendered previews next to sources (deployed copies live in docs/)
 Homework/*.html
 Labs/*.html
+
+# Book chapters are GENERATED from the decks and narration by
+# scripts/build_book.py. They are disposable output — edit the deck or the
+# narration, never the chapter. Committing them would create the fourth copy of
+# every number that the generator exists to prevent.
+book/chapters/
+book/.quarto/
+book/_book/
