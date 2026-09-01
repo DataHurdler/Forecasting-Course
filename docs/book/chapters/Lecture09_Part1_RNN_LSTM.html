@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>9&nbsp; RNNs and LSTMs – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture09_Part2_Transformers.html" rel="next">
+<link href="../chapters/Lecture08_CNNs.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture09_Part1_RNN_LSTM.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">9.1</span> Lecture Outline</a></li>
+  <li><a href="#where-the-last-two-lectures-ran-out" id="toc-where-the-last-two-lectures-ran-out" class="nav-link" data-scroll-target="#where-the-last-two-lectures-ran-out"><span class="header-section-number">9.2</span> Where the Last Two Lectures Ran Out</a>
+  <ul class="collapse">
+  <li><a href="#two-architectures-that-cannot-see-time" id="toc-two-architectures-that-cannot-see-time" class="nav-link" data-scroll-target="#two-architectures-that-cannot-see-time"><span class="header-section-number">9.2.1</span> Two Architectures That Cannot See Time</a></li>
+  <li><a href="#the-recurrent-idea-carry-state-forward" id="toc-the-recurrent-idea-carry-state-forward" class="nav-link" data-scroll-target="#the-recurrent-idea-carry-state-forward"><span class="header-section-number">9.2.2</span> The Recurrent Idea: Carry State Forward</a></li>
+  </ul></li>
+  <li><a href="#the-vanilla-rnn" id="toc-the-vanilla-rnn" class="nav-link" data-scroll-target="#the-vanilla-rnn"><span class="header-section-number">9.3</span> The Vanilla RNN</a>
+  <ul class="collapse">
+  <li><a href="#vanilla-rnn-one-equation-repeated" id="toc-vanilla-rnn-one-equation-repeated" class="nav-link" data-scroll-target="#vanilla-rnn-one-equation-repeated"><span class="header-section-number">9.3.1</span> Vanilla RNN: One Equation, Repeated</a></li>
+  <li><a href="#training-it-backpropagation-through-time" id="toc-training-it-backpropagation-through-time" class="nav-link" data-scroll-target="#training-it-backpropagation-through-time"><span class="header-section-number">9.3.2</span> Training It: Backpropagation Through Time</a></li>
+  <li><a href="#why-a-vanilla-rnn-forgets" id="toc-why-a-vanilla-rnn-forgets" class="nav-link" data-scroll-target="#why-a-vanilla-rnn-forgets"><span class="header-section-number">9.3.3</span> Why a Vanilla RNN Forgets</a></li>
+  </ul></li>
+  <li><a href="#lstm-long-short-term-memory" id="toc-lstm-long-short-term-memory" class="nav-link" data-scroll-target="#lstm-long-short-term-memory"><span class="header-section-number">9.4</span> LSTM: Long Short-Term Memory</a>
+  <ul class="collapse">
+  <li><a href="#lstm-a-cell-state-and-three-gates" id="toc-lstm-a-cell-state-and-three-gates" class="nav-link" data-scroll-target="#lstm-a-cell-state-and-three-gates"><span class="header-section-number">9.4.1</span> LSTM: A Cell State and Three Gates</a></li>
+  <li><a href="#what-the-gates-are-doing-in-plain-terms" id="toc-what-the-gates-are-doing-in-plain-terms" class="nav-link" data-scroll-target="#what-the-gates-are-doing-in-plain-terms"><span class="header-section-number">9.4.2</span> What the Gates Are Doing, in Plain Terms</a></li>
+  <li><a href="#why-the-cell-state-fixes-the-gradient" id="toc-why-the-cell-state-fixes-the-gradient" class="nav-link" data-scroll-target="#why-the-cell-state-fixes-the-gradient"><span class="header-section-number">9.4.3</span> Why the Cell State Fixes the Gradient</a></li>
+  </ul></li>
+  <li><a href="#in-pytorch-and-does-it-work" id="toc-in-pytorch-and-does-it-work" class="nav-link" data-scroll-target="#in-pytorch-and-does-it-work"><span class="header-section-number">9.5</span> In PyTorch, and Does It Work</a>
+  <ul class="collapse">
+  <li><a href="#lstm-for-forecasting-in-pytorch" id="toc-lstm-for-forecasting-in-pytorch" class="nav-link" data-scroll-target="#lstm-for-forecasting-in-pytorch"><span class="header-section-number">9.5.1</span> LSTM for Forecasting in PyTorch</a></li>
+  <li><a href="#does-it-work-the-scoreboard-so-far" id="toc-does-it-work-the-scoreboard-so-far" class="nav-link" data-scroll-target="#does-it-work-the-scoreboard-so-far"><span class="header-section-number">9.5.2</span> Does It Work? The Scoreboard So Far</a></li>
+  <li><a href="#why-the-gated-model-lost-at-30-epochs" id="toc-why-the-gated-model-lost-at-30-epochs" class="nav-link" data-scroll-target="#why-the-gated-model-lost-at-30-epochs"><span class="header-section-number">9.5.3</span> Why the Gated Model Lost at 30 Epochs</a></li>
+  <li><a href="#check-1-was-it-a-fair-fight" id="toc-check-1-was-it-a-fair-fight" class="nav-link" data-scroll-target="#check-1-was-it-a-fair-fight"><span class="header-section-number">9.5.4</span> Check 1: Was It a Fair Fight?</a></li>
+  <li><a href="#check-2-what-in-the-data-explains-it" id="toc-check-2-what-in-the-data-explains-it" class="nav-link" data-scroll-target="#check-2-what-in-the-data-explains-it"><span class="header-section-number">9.5.5</span> Check 2: What in the Data Explains It</a></li>
+  </ul></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">9.6</span> Key Takeaways</a>
+  <ul class="collapse">
+  <li><a href="#rnn-and-lstm-in-context" id="toc-rnn-and-lstm-in-context" class="nav-link" data-scroll-target="#rnn-and-lstm-in-context"><span class="header-section-number">9.6.1</span> RNN and LSTM in Context</a></li>
+  <li><a href="#lecture-9-part-1-key-takeaways" id="toc-lecture-9-part-1-key-takeaways" class="nav-link" data-scroll-target="#lecture-9-part-1-key-takeaways"><span class="header-section-number">9.6.2</span> Lecture 9 Part 1: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">9.6.3</span> References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 9, Part 1 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">9.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Where the Last Two Lectures Ran Out</li>
+<li>The Vanilla RNN</li>
+<li>LSTM: Long Short-Term Memory</li>
+<li>In PyTorch, and Does It Work</li>
+<li>Key Takeaways</li>
+</ol>
+<p>Five parts. First, precisely where Lectures 7 and 8 ran out of road — because the limitation is specific and it’s worth naming. Then the vanilla RNN, which is one equation applied repeatedly. Then why that equation fails on long dependencies, which turns out to be a mathematical fact rather than a tuning problem. Then the LSTM, built to fix exactly that. And finally PyTorch, and an honest scoreboard.</p>
+</section>
+<section id="where-the-last-two-lectures-ran-out" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="where-the-last-two-lectures-ran-out"><span class="header-section-number">9.2</span> Where the Last Two Lectures Ran Out</h2>
+<p>Two architectures, two different ways of failing to see time.</p>
+<section id="two-architectures-that-cannot-see-time" class="level3" data-number="9.2.1">
+<h3 data-number="9.2.1" class="anchored" data-anchor-id="two-architectures-that-cannot-see-time"><span class="header-section-number">9.2.1</span> Two Architectures That Cannot See Time</h3>
+<p>Lecture 7 gave you a feedforward network. It treats each row independently — everything it knows about <em>when</em> something happened, you encoded by hand as a lag column. Shuffle the features and the model is unchanged.</p>
+<p>Lecture 8 gave you a 1D CNN, which does see local shape. But its <strong>receptive field</strong> is fixed by architecture: stacked width-5 and width-3 filters reach about seven weeks back, and no reasonable stack of small filters reaches an annual lag. Worse, pooling deliberately discarded <em>where</em> in the window each pattern occurred — and we measured that costing about 500 RMSE.</p>
+<div class="keybox">
+<p>Both architectures share one assumption: the input is a <strong>fixed-size block</strong> to be processed all at once. Neither has any notion of reading a sequence <em>in order</em> and carrying something forward.</p>
+</div>
+<p>That is the gap today closes.</p>
+<p>Let’s be precise about what’s missing, because “doesn’t understand time” is too vague to act on.</p>
+<p>Lecture 7’s feedforward network treats each row independently. Everything it knows about <em>when</em> something happened, you encoded by hand as a lag column. Shuffle the feature columns and the model is unchanged. Time is not in the architecture; it’s in your feature engineering.</p>
+<p>Lecture 8’s CNN does better — it genuinely sees local shape. But its <strong>receptive field</strong> is fixed by the architecture. Stacked width-five and width-three filters reach about seven weeks back, and no reasonable stack of small filters reaches an annual lag.</p>
+<p>And worse, pooling deliberately discarded <em>where</em> in the window each pattern occurred. We measured that costing about five hundred RMSE. Here’s the assumption both of them share, and it’s the one we’re breaking today.</p>
+<p>Both treat the input as a <strong>fixed-size block</strong>, to be processed all at once. Neither has any notion of reading a sequence <em>in order</em> and carrying something forward from one step to the next. That’s the gap. Everything today closes it.</p>
+<p>It’s worth noticing that we have been <em>compensating</em> for this gap all semester, quite successfully. Lag columns are a workaround. Rolling means are a workaround. The Fourier terms in Homework 4 are a workaround. Every one of them is you, the analyst, telling a memoryless model something about time that it cannot work out for itself.</p>
+<p>And they work well — LASSO on forty-six of those workarounds is still leading our scoreboard. So this isn’t a story where the old approach was broken. It’s a story about whether the model can <em>discover</em> the temporal structure instead of being handed it. That’s the question today tests.</p>
+</section>
+<section id="the-recurrent-idea-carry-state-forward" class="level3" data-number="9.2.2">
+<h3 data-number="9.2.2" class="anchored" data-anchor-id="the-recurrent-idea-carry-state-forward"><span class="header-section-number">9.2.2</span> The Recurrent Idea: Carry State Forward</h3>
+<p>A recurrent network reads the sequence one step at a time and maintains a <strong>hidden state</strong> <span class="math inline">\(\mathbf{h}_t\)</span> — a running summary of everything seen so far.</p>
+<p>At each step it does two things: update the summary using the new input <em>and</em> the previous summary, then optionally emit an output. The same weights are used at every step, which is weight sharing again — along time rather than along space.</p>
+<p><strong>The consequence worth sitting with.</strong> There is no fixed window. In principle <span class="math inline">\(\mathbf{h}_t\)</span> encodes the entire history <span class="math inline">\(x_1, \ldots, x_t\)</span>, so the architecture imposes no limit on how far back the model can look.</p>
+<p><strong>In principle.</strong> Most of this lecture is about the gap between that promise and what a recurrent network actually delivers — and about the architecture built to close it.</p>
+<p>The recurrent idea is simple enough to state in one sentence, and I’d like you to have it before any equations.</p>
+<p>A recurrent network reads the sequence one step at a time, and maintains a <strong>hidden state</strong> — call it h-t — which is a running summary of everything it has seen so far.</p>
+<p>At each step it does two things. It updates that summary, using the new observation <em>and</em> the previous summary. And optionally it emits an output.</p>
+<p>Critically, the <strong>same weights</strong> are used at every step. That’s weight sharing again — but along <em>time</em> rather than along space, which is where the CNN shared them. Now the consequence, and it’s a big claim.</p>
+<p>There is no fixed window. In principle, h-t encodes the <em>entire</em> history — every observation from step one to step t. The architecture imposes no limit whatsoever on how far back the model can look. Compare that with the CNN’s seven weeks, which was baked in by the filter sizes. <strong>In principle.</strong></p>
+<p>Most of this lecture is about the gap between that promise and what a recurrent network actually delivers. And then about the architecture that was invented specifically to close it.</p>
+</section>
+</section>
+<section id="the-vanilla-rnn" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="the-vanilla-rnn"><span class="header-section-number">9.3</span> The Vanilla RNN</h2>
+<p>One equation, applied over and over — and the reason that is both the whole idea and the whole problem.</p>
+<p>One equation, applied over and over — and the reason that is both the whole idea and the whole problem.</p>
+<section id="vanilla-rnn-one-equation-repeated" class="level3" data-number="9.3.1">
+<h3 data-number="9.3.1" class="anchored" data-anchor-id="vanilla-rnn-one-equation-repeated"><span class="header-section-number">9.3.1</span> Vanilla RNN: One Equation, Repeated</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>The recurrence</p>
+</div>
+<p><span class="math display">\[\mathbf{h}_t = \tanh\!\left(\mathbf{W}_h \mathbf{h}_{t-1} + \mathbf{W}_x \mathbf{x}_t + \mathbf{b}\right),
+\qquad \hat{y}_t = \mathbf{W}_y \mathbf{h}_t + \mathbf{b}_y\]</span></p>
+<p><span class="math inline">\(\mathbf{W}_h\)</span>, <span class="math inline">\(\mathbf{W}_x\)</span>, <span class="math inline">\(\mathbf{W}_y\)</span> are the <em>same</em> matrices at every step.</p>
+</div>
+<p>Read the first equation in words: the new summary is a squashed mix of the old summary and the new observation. That is the entire model.</p>
+<p>Because the weights are shared across steps, a 26-week window costs no more parameters than a 5-week one — and the same network handles sequences of different lengths without modification. Our RNN below holds about <strong>4,500 parameters</strong>, against 22,657 for the small feedforward network in Lecture 7.</p>
+<p>For forecasting we usually want one number, not a sequence, so we take the <strong>final</strong> hidden state <span class="math inline">\(\mathbf{h}_T\)</span> — the summary after reading the whole window — and put one linear layer on top of it.</p>
+<p>Here’s the recurrence. The new hidden state h-t is tanh of: W-h times the old hidden state, plus W-x times the new input, plus a bias. And the output is a linear layer on top of the hidden state.</p>
+<p>Read the first equation in words: <strong>the new summary is a squashed mix of the old summary and the new observation.</strong> That is the entire model. Everything else today is consequences of that line.</p>
+<p>The three weight matrices are the <em>same</em> at every time step. Not one per step — one, reused. Two things follow from that sharing, and both are genuinely nice.</p>
+<p>First, a twenty-six-week window costs no more parameters than a five-week one. Compare the CNN, where a longer window meant more filters or more layers. Here, window length is free.</p>
+<p>Second, the same trained network handles sequences of <em>different</em> lengths without modification. You can train on twenty-six weeks and run it on forty. Nothing in the architecture cares.</p>
+<p>Our RNN below holds about <strong>four and a half thousand parameters</strong>. Lecture 7’s small feedforward network held twenty-two thousand six hundred fifty-seven. This is a much smaller model.</p>
+<p>One practical note. For forecasting we usually want a single number, not a sequence of outputs. So we take the <strong>final</strong> hidden state — the summary after reading the whole window — and put one linear layer on top of it. That’s the pattern you’ll write in Homework 5.</p>
+<p>A word on the hidden size, since it’s the main thing you’ll tune. It’s how wide that running summary is — how much the model is allowed to carry forward. Sixty-four is a sensible default for our data. Too small and the summary can’t hold enough to be useful; too large and you’re back in the overfitting regime from Lecture 7, with far more parameters than observations.</p>
+<p>And notice the tanh in the recurrence isn’t decorative. It squashes the state to between minus one and one at every step, which keeps the running summary from growing without bound as the sequence gets longer. Remove it and the state can drift off to enormous values. It’s also, as we’re about to see, part of why the gradient dies.</p>
+</section>
+<section id="training-it-backpropagation-through-time" class="level3" data-number="9.3.2">
+<h3 data-number="9.3.2" class="anchored" data-anchor-id="training-it-backpropagation-through-time"><span class="header-section-number">9.3.2</span> Training It: Backpropagation Through Time</h3>
+<p>Training an RNN is ordinary backpropagation applied to an unusual graph. <strong>Unroll</strong> the recurrence across the window and it becomes a 26-layer feedforward network — one layer per time step — in which every layer shares the same weights.</p>
+<p>Gradients then flow backward from the loss at step <span class="math inline">\(T\)</span> all the way to step 1. Because <span class="math inline">\(\mathbf{W}_h\)</span> appears at every step, its gradient is a <em>sum</em> of contributions from all 26 positions.</p>
+<div class="warningbox">
+<p><strong>This is where it breaks.</strong> Propagating a gradient back through <span class="math inline">\(k\)</span> steps multiplies by roughly <span class="math inline">\(\mathbf{W}_h\)</span> <span class="math inline">\(k\)</span> times. If the relevant factor is below 1, the gradient shrinks <em>exponentially</em>; above 1, it explodes. Either way, long-range signal does not survive the trip.</p>
+</div>
+<p>Exploding gradients have an easy fix — <code>clip_grad_norm_</code> caps the size of the update, and we use it. Vanishing gradients do not, which is what the next section is for.</p>
+<p>Training an RNN is ordinary backpropagation applied to an unusual graph, and the trick is to see the graph correctly.</p>
+<p><strong>Unroll</strong> the recurrence across the window. Twenty-six time steps becomes a twenty-six-layer feedforward network — one layer per step — in which every layer shares the same weights.</p>
+<p>Once you see it that way, there’s nothing new. Gradients flow backward from the loss at the final step all the way to step one. Because W-h appears at <em>every</em> step, its gradient is a <strong>sum</strong> of contributions from all twenty-six positions. And this is where it breaks.</p>
+<p>Propagating a gradient back through k steps multiplies it by roughly W-h, k times over. If the relevant factor is below one, the gradient shrinks <strong>exponentially</strong> as it travels. If it’s above one, it explodes. Either way, long-range signal does not survive the trip.</p>
+<p>The exploding case has an easy fix — <code>clip_grad_norm_</code> caps the size of the update, and we use it in every recurrent model in this course. One line, and the problem is gone.</p>
+<p>The vanishing case does not have an easy fix. That’s what the next slide quantifies, and what the whole second half of the lecture is about.</p>
+</section>
+<section id="why-a-vanilla-rnn-forgets" class="level3" data-number="9.3.3">
+<h3 data-number="9.3.3" class="anchored" data-anchor-id="why-a-vanilla-rnn-forgets"><span class="header-section-number">9.3.3</span> Why a Vanilla RNN Forgets</h3>
+<p>Put numbers on it. Suppose each backward step multiplies the gradient by a factor of <span class="math inline">\(0.7\)</span> — an unremarkable value for a <span class="math inline">\(\tanh\)</span> network <span class="citation" data-cites="Bengio1994">[@Bengio1994]</span>.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Steps back</th>
+<th style="text-align: right;">Gradient factor</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;"><span class="math inline">\(0.70\)</span></td>
+<td>full signal</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;"><span class="math inline">\(0.17\)</span></td>
+<td>weakened but usable</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">10</td>
+<td style="text-align: right;"><span class="math inline">\(0.028\)</span></td>
+<td>barely present</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">26</td>
+<td style="text-align: right;"><span class="math inline">\(0.000\,002\)</span></td>
+<td>gone</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">52</td>
+<td style="text-align: right;"><span class="math inline">\(\approx 10^{-9}\)</span></td>
+<td>the annual lag, invisible</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The promise from two slides ago fails in practice.</strong> A vanilla RNN <em>can</em> in principle encode arbitrarily long history, but the gradient that would teach it to do so has vanished long before it reaches back that far. In practice these networks learn dependencies of roughly ten steps.</p>
+<p><strong>Bengio and colleagues</strong> proved this is not an optimization bug to be tuned away — it is inherent to the architecture. Which is why the fix had to be a different architecture.</p>
+<p>Let’s put numbers on it, because “the gradient shrinks” is not vivid enough to change anyone’s behaviour.</p>
+<p>Suppose each backward step multiplies the gradient by a factor of zero-point-seven. That’s an unremarkable value for a tanh network — nothing pathological. One step back: zero-point-seven. Full signal. Five steps: zero-point-one-seven. Weakened, but usable. Ten steps: zero-point-zero-two-eight. Barely present. Twenty-six steps — our window length — <strong>two millionths.</strong> Gone.</p>
+<p>Fifty-two steps, which is the annual lag: about ten to the minus nine. Invisible. There is no optimizer, no learning rate, no amount of training that recovers a signal that small.</p>
+<p>So the promise from slide five fails in practice. A vanilla RNN <em>can</em>, in principle, encode arbitrarily long history. But the gradient that would <em>teach</em> it to do so has vanished long before it reaches back that far. In practice these networks learn dependencies of roughly ten steps. Not fifty-two.</p>
+<p>And I want to stress one thing about the Bengio result. This is not an optimization bug that better tuning fixes. It was <strong>proved</strong> to be inherent to the architecture. Which is why the fix had to be a different architecture, and why the next section exists.</p>
+</section>
+</section>
+<section id="lstm-long-short-term-memory" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="lstm-long-short-term-memory"><span class="header-section-number">9.4</span> LSTM: Long Short-Term Memory</h2>
+<p>Add a memory that information passes through rather than being recomputed at every step.</p>
+<p>Add a memory that information passes through, rather than being recomputed at every step.</p>
+<section id="lstm-a-cell-state-and-three-gates" class="level3" data-number="9.4.1">
+<h3 data-number="9.4.1" class="anchored" data-anchor-id="lstm-a-cell-state-and-three-gates"><span class="header-section-number">9.4.1</span> LSTM: A Cell State and Three Gates</h3>
+<p>An LSTM carries <strong>two</strong> things forward: a <strong>cell state</strong> <span class="math inline">\(\mathbf{c}_t\)</span>, which is the long-term memory, and a <strong>hidden state</strong> <span class="math inline">\(\mathbf{h}_t\)</span>, which is what the rest of the network sees. Three gates control the traffic between them <span class="citation" data-cites="Hochreiter1997">[@Hochreiter1997]</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Forget gate</strong></td>
+<td><span class="math inline">\(\mathbf{f}_t = \sigma(\mathbf{W}_f[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_f)\)</span> — what fraction of the old memory to keep</td>
+</tr>
+<tr class="even">
+<td><strong>Input gate</strong></td>
+<td><span class="math inline">\(\mathbf{i}_t = \sigma(\mathbf{W}_i[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_i)\)</span> — how much of the new candidate to write</td>
+</tr>
+<tr class="odd">
+<td><strong>Output gate</strong></td>
+<td><span class="math inline">\(\mathbf{o}_t = \sigma(\mathbf{W}_o[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_o)\)</span> — how much of memory to expose</td>
+</tr>
+</tbody>
+</table>
+<p>The memory update itself is the line that matters:</p>
+<p><span class="math display">\[\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} \;+\; \mathbf{i}_t \odot \tilde{\mathbf{c}}_t,
+\qquad \mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t)\]</span></p>
+<p>Each gate is a sigmoid, so it outputs between 0 and 1 — a soft switch the network learns.</p>
+<p>An LSTM carries <strong>two</strong> things forward instead of one.</p>
+<p>A <strong>cell state</strong>, c-t — that’s the long-term memory. And a <strong>hidden state</strong>, h-t — that’s what the rest of the network actually sees. Three gates control the traffic between them.</p>
+<p>The <strong>forget gate</strong> decides what fraction of the old memory to keep. The <strong>input gate</strong> decides how much of the new candidate value to write in. The <strong>output gate</strong> decides how much of the memory to expose to the outside world.</p>
+<p>Each gate is a sigmoid, so it outputs a number between zero and one. Think of it as a soft switch — not open or closed, but a dial, and the network learns where to set it. Now this line is the one that matters. Everything else is bookkeeping.</p>
+<p>The new cell state equals the forget gate times the old cell state, <strong>plus</strong> the input gate times the new candidate.</p>
+<p>Note the operations. There’s an element-wise multiply by a number between zero and one — that’s the forgetting. And then there’s an <strong>addition</strong>.</p>
+<p>Keep your eye on that plus sign. Two slides from now it will turn out to be the whole reason the architecture works.</p>
+<p>One more thing before we move on: notice what the gates are functions <em>of</em>. Each one takes the previous hidden state and the current input, runs them through a weight matrix, and squashes with a sigmoid.</p>
+<p>So the gates are <strong>learned and input-dependent</strong>. The network is not applying a fixed forgetting rate. It decides, at every single time step, based on what it’s currently looking at, how much to forget and how much to write.</p>
+<p>That’s a genuinely different kind of model from anything we’ve built. A LASSO coefficient is the same number for every observation. An LSTM gate is recomputed at every step of every sequence. That flexibility is the appeal — and, as the scoreboard will show, it’s also capacity you have to pay for whether or not you need it.</p>
+</section>
+<section id="what-the-gates-are-doing-in-plain-terms" class="level3" data-number="9.4.2">
+<h3 data-number="9.4.2" class="anchored" data-anchor-id="what-the-gates-are-doing-in-plain-terms"><span class="header-section-number">9.4.2</span> What the Gates Are Doing, in Plain Terms</h3>
+<p>The equations are compact but the behaviour is intuitive. Take a store forecasting demand week by week.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Forget</strong></td>
+<td>“The promotion that ran three months ago no longer explains anything — drop it.” The gate closes toward 0 and that part of memory decays away.</td>
+</tr>
+<tr class="even">
+<td><strong>Input</strong></td>
+<td>“This week is Thanksgiving and the spike is enormous — record it.” The gate opens toward 1 and the event is written into the cell.</td>
+</tr>
+<tr class="odd">
+<td><strong>Output</strong></td>
+<td>“I am holding a memory of last December, but this week is April — do not act on it yet.” Information stays in <span class="math inline">\(\mathbf{c}_t\)</span> without contaminating the current prediction.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The output gate is the one people skip, and it is the subtle one.</strong> It separates <em>what the model remembers</em> from <em>what the model uses right now</em>. A vanilla RNN cannot make that distinction — its single hidden state has to serve both jobs at once, so anything it stores is immediately in play.</p>
+<p>The equations are compact, but the behaviour is genuinely intuitive. Let me put it in the language of a store forecasting demand week by week.</p>
+<p>The <strong>forget</strong> gate says: “the promotion that ran three months ago no longer explains anything — drop it.” The gate closes toward zero, and that part of memory decays away.</p>
+<p>The <strong>input</strong> gate says: “this week is Thanksgiving and the spike is enormous — record it.” The gate opens toward one, and the event is written into the cell.</p>
+<p>The <strong>output</strong> gate says: “I’m holding a memory of last December, but this week is April — don’t act on it yet.” The information stays in the cell state without contaminating this week’s prediction. The output gate is the one people skip when they explain this, and it’s the subtle one.</p>
+<p>It separates <strong>what the model remembers</strong> from <strong>what the model uses right now</strong>. Those are different things, and a vanilla RNN cannot make the distinction — it has one hidden state, which has to serve both jobs at once. Anything an RNN stores is immediately in play, affecting the very next prediction.</p>
+<p>The LSTM can hold something in reserve. That’s a genuine capability, and it’s why these models work well on language, where a fact mentioned in sentence one might not matter again until sentence forty.</p>
+</section>
+<section id="why-the-cell-state-fixes-the-gradient" class="level3" data-number="9.4.3">
+<h3 data-number="9.4.3" class="anchored" data-anchor-id="why-the-cell-state-fixes-the-gradient"><span class="header-section-number">9.4.3</span> Why the Cell State Fixes the Gradient</h3>
+<p>Look again at the memory update, and specifically at the operation in the middle:</p>
+<p><span class="math display">\[\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t\]</span></p>
+<p>The old memory enters <strong>additively</strong>, and it is not passed through a weight matrix or a <span class="math inline">\(\tanh\)</span> on the way. When the forget gate is near 1, <span class="math inline">\(\mathbf{c}_t \approx \mathbf{c}_{t-1}\)</span> plus whatever is new — and the gradient flows backward through that addition essentially undiminished.</p>
+<p>Compare with the vanilla RNN, where every backward step multiplies by <span class="math inline">\(\mathbf{W}_h\)</span> and the <span class="math inline">\(\tanh\)</span> derivative. Repeated multiplication shrinks; repeated addition does not.</p>
+<div class="keybox">
+<p><strong>You have seen this fix before.</strong> It is the ResNet skip connection from Lecture 8 — <span class="math inline">\(\mathbf{y} = \mathcal{F}(\mathbf{x}) + \mathbf{x}\)</span> — solving the same problem in the same way. Give the gradient an additive path home and depth stops destroying it.</p>
+</div>
+<p>LSTM (1997) predates ResNet (2015) by eighteen years — the idea was rediscovered for depth after being invented for time.</p>
+<p>Back to that plus sign.</p>
+<p>Look at how the old memory enters. It’s <strong>additive</strong>. And notice what is <em>not</em> happening to it: it is not passed through a weight matrix, and it is not passed through a tanh, on its way from c-t minus one to c-t.</p>
+<p>When the forget gate sits near one, c-t is approximately c-t minus one, plus whatever’s new. And a gradient flowing backward through that addition passes essentially <strong>undiminished</strong>.</p>
+<p>Compare the vanilla RNN, where every single backward step multiplies by W-h and by the derivative of tanh. Repeated multiplication shrinks. Repeated addition does not. And you have seen this fix before — last week.</p>
+<p>It is the ResNet skip connection. y equals F of x, <strong>plus x</strong>. Same problem: gradients dying as they travel back through depth. Same solution: give the gradient an additive path home.</p>
+<p>Here’s the detail I enjoy. The LSTM is from 1997. ResNet is from 2015. The idea was invented for <strong>time</strong>, forgotten by the computer vision community, and then rediscovered eighteen years later for <strong>depth</strong>.</p>
+<p>Same mathematics, two fields, two decades apart. Which is a decent argument for understanding mechanisms rather than memorizing architectures — the mechanism transferred, the architecture didn’t.</p>
+</section>
+</section>
+<section id="in-pytorch-and-does-it-work" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="in-pytorch-and-does-it-work"><span class="header-section-number">9.5</span> In PyTorch, and Does It Work</h2>
+<p>Four lines of model code, and an honest measurement against everything else this course has fitted.</p>
+<p>Four lines of model code, and an honest measurement against everything else this course has fitted.</p>
+<section id="lstm-for-forecasting-in-pytorch" class="level3" data-number="9.5.1">
+<h3 data-number="9.5.1" class="anchored" data-anchor-id="lstm-for-forecasting-in-pytorch"><span class="header-section-number">9.5.1</span> LSTM for Forecasting in PyTorch</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Window in, one forecast out</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LSTMForecaster(nn.Module):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_features, hidden<span class="op">=</span><span class="dv">64</span>, layers<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.lstm <span class="op">=</span> nn.LSTM(n_features, hidden, num_layers<span class="op">=</span>layers,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                            batch_first<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc <span class="op">=</span> nn.Linear(hidden, <span class="dv">1</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):        <span class="co"># x: (batch, seq_len, n_features)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        out, (h, c) <span class="op">=</span> <span class="va">self</span>.lstm(x)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.fc(out[:, <span class="op">-</span><span class="dv">1</span>, :]).squeeze(<span class="op">-</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>batch_first=True</code> gives shape <code>(batch, seq_len, features)</code> — the <em>opposite</em> of <code>Conv1d</code>. <code>out[:, -1, :]</code> is the state after the last step. Lecture 7’s rules still hold, plus <code>clip_grad_norm_(..., 1.0)</code>.</p>
+<p>The good news: after all that machinery, the code is short. <code>nn.LSTM</code> gives you the entire thing — all three gates, the cell state, the whole update.</p>
+<p>You define the LSTM layer, you define a linear layer on top, and in <code>forward</code> you run the sequence through and take the last time step. Two things that will cost you time if you don’t know them.</p>
+<p><code>batch_first=True</code> gives you shape <code>(batch, seq_len, features)</code>. That is the <strong>opposite</strong> of what <code>Conv1d</code> wanted last week, which was <code>(batch, channels, time)</code>. If you’re moving code between the two — which Homework 5 asks you to do — this is where you’ll get a shape error.</p>
+<p>And <code>out[:, -1, :]</code> is the hidden state after the last step. That’s the summary of the whole window, which is what we put the linear layer on.</p>
+<p>Everything from Lecture 7 still applies: Adam, weight decay, <code>zero_grad()</code>, <code>shuffle=False</code>, split by time. Plus one addition — <code>clip_grad_norm_</code> with a max norm of one, to handle the exploding gradient case from slide 8.</p>
+<p>I want to flag how little of the theory shows up in the code, because it cuts both ways.</p>
+<p>Everything from the last three slides — the cell state, the three gates, the additive update, the whole reason this architecture exists — is inside <code>nn.LSTM</code>. One line. You could use this model having understood none of it.</p>
+<p>That’s the appeal of the tooling, and it’s also the risk. If you don’t know that gating solves long-range forgetting, you have no way to predict in advance that it will do nothing on a twenty-six-week window. You’d just fit it, see a worse number, and have no account of why. The measurement on the next slide is only <em>interpretable</em> because we spent twenty minutes on the mechanism.</p>
+</section>
+<section id="does-it-work-the-scoreboard-so-far" class="level3" data-number="9.5.2">
+<h3 data-number="9.5.2" class="anchored" data-anchor-id="does-it-work-the-scoreboard-so-far"><span class="header-section-number">9.5.2</span> Does It Work? The Scoreboard So Far</h3>
+<p>Same weekly panel, same 26-week windows, same test block as Homework 4.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Model</th>
+<th style="text-align: right;">Test RMSE</th>
+<th style="text-align: right;">Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LASSO, 46 engineered features</td>
+<td style="text-align: right;"><strong>744</strong></td>
+<td style="text-align: right;">46</td>
+</tr>
+<tr class="even">
+<td>XGBoost, 46 engineered features</td>
+<td style="text-align: right;">781</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr class="odd">
+<td><strong>Vanilla RNN</strong>, 4 raw channels</td>
+<td style="text-align: right;"><strong>842</strong></td>
+<td style="text-align: right;">4,545</td>
+</tr>
+<tr class="even">
+<td>Random forest</td>
+<td style="text-align: right;">899</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr class="odd">
+<td><strong>LSTM</strong>, 4 raw channels</td>
+<td style="text-align: right;">987</td>
+<td style="text-align: right;">17,985</td>
+</tr>
+<tr class="even">
+<td>1D CNN, best variant</td>
+<td style="text-align: right;">1,032</td>
+<td style="text-align: right;">8,161</td>
+</tr>
+<tr class="odd">
+<td>Seasonal naive</td>
+<td style="text-align: right;">2,152</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><span class="key-result"><strong>Recurrence beats convolution decisively</strong></span> — and it did so on <em>four raw channels</em> with no lag engineering at all, against 46 hand-built features for LASSO. That is the case for reading a sequence in order, in one line.</p>
+<p><strong>And the LSTM lost to the vanilla RNN</strong> — at a fixed 30-epoch budget. That is not a typo, and the next three slides are about what it does and does not mean.</p>
+<p>Same weekly panel, same twenty-six-week windows, same test block as Homework 4. Everything here is directly comparable.</p>
+<p>LASSO with forty-six engineered features: seven forty-four. XGBoost: seven eighty-one. Then the <strong>vanilla RNN</strong> at eight forty-two, on four thousand five hundred parameters. Random forest: eight ninety-nine. The <strong>LSTM</strong> at nine eighty-seven, on eighteen thousand parameters. The best CNN variant at one thousand thirty-two. Seasonal naive at the bottom, twenty-one fifty-two. Two readings, and the first is genuinely good news for recurrence.</p>
+<p><strong>Recurrence beats convolution decisively</strong> — eight forty-two against one thousand thirty-two. And it did that on <strong>four raw channels</strong>, with no lag engineering at all, against forty-six hand-built features for LASSO. That is a real argument for reading a sequence in order, and it’s the strongest result deep learning gets on our data. And the second reading. <strong>The LSTM lost to the vanilla RNN</strong> — at a fixed thirty-epoch budget.</p>
+<p>That is not a typo. Hold onto the qualifier, though, because the next three slides are about what that line does and does not mean.</p>
+</section>
+<section id="why-the-gated-model-lost-at-30-epochs" class="level3" data-number="9.5.3">
+<h3 data-number="9.5.3" class="anchored" data-anchor-id="why-the-gated-model-lost-at-30-epochs"><span class="header-section-number">9.5.3</span> Why the Gated Model Lost at 30 Epochs</h3>
+<p>The result holds at all three window lengths. That rules out a fluke of one <em>window</em> — though all three rows share one panel and one split, so it is one finding measured three ways, not three independent tests:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Window</th>
+<th style="text-align: right;">Vanilla RNN</th>
+<th style="text-align: right;">LSTM</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>13 weeks</td>
+<td style="text-align: right;"><strong>878</strong></td>
+<td style="text-align: right;">990</td>
+<td>RNN wins</td>
+</tr>
+<tr class="even">
+<td>26 weeks</td>
+<td style="text-align: right;"><strong>842</strong></td>
+<td style="text-align: right;">987</td>
+<td>RNN wins</td>
+</tr>
+<tr class="odd">
+<td>52 weeks</td>
+<td style="text-align: right;"><strong>805</strong></td>
+<td style="text-align: right;">998</td>
+<td>RNN wins</td>
+</tr>
+</tbody>
+</table>
+<p><strong>An LSTM solves a problem this data does not have.</strong> Gating preserves information across <em>long</em> dependency chains, and weekly demand is dominated by the recent past.</p>
+<p>The gates are not free: <strong>17,985 parameters against 4,545</strong>. But before concluding that they bought nothing, a table like this one owes two checks — <strong>was the comparison fair</strong>, and <strong>what in the data explains it</strong>. The next two slides run both.</p>
+<div class="warningbox">
+<p>A margin measured at one training budget is a claim about that budget. We chose 30 epochs because it is the default, not because it was shown to be enough for both models.</p>
+</div>
+<p>Thirteen weeks: RNN eight seventy-eight, LSTM nine ninety. Twenty-six weeks: eight forty-two against nine eighty-seven. Fifty-two weeks: eight-oh-five against nine ninety-eight. The RNN wins at all three window lengths.</p>
+<p>Now, be careful about how much that buys us. Three windows rules out a fluke of one <em>window</em>. It does not rule out much else — all three rows are the same thirty series, the same split, the same recency structure. It is one finding measured three ways, not three independent tests. Say that out loud to the room; it is the kind of distinction that separates a result from a slogan.</p>
+<p>The natural reading is: an LSTM solves a problem <strong>this data does not have</strong>. Gating preserves information across <em>long</em> dependency chains — that is what it was invented for — and weekly demand is dominated by the recent past. And the gates are not free: eighteen thousand parameters against four and a half thousand.</p>
+<p>But before we sign off on that, notice what we have <em>not</em> checked. Both models trained for thirty epochs, because thirty is what the training function defaults to. Nobody showed that thirty epochs is enough for <strong>both</strong> of them — and one of them has four times the parameters. A margin measured at one training budget is a claim about that budget.</p>
+<p>So the next two slides do the two things this table owes us: <strong>was the comparison fair</strong>, and <strong>what in the data explains it</strong>.</p>
+</section>
+<section id="check-1-was-it-a-fair-fight" class="level3" data-number="9.5.4">
+<h3 data-number="9.5.4" class="anchored" data-anchor-id="check-1-was-it-a-fair-fight"><span class="header-section-number">9.5.4</span> Check 1: Was It a Fair Fight?</h3>
+<p>An LSTM carries four times the parameters. Bigger models converge slower. So vary the <strong>training budget</strong> and watch the margin, at the 26-week window:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Epochs</th>
+<th style="text-align: right;">10</th>
+<th style="text-align: right;">30</th>
+<th style="text-align: right;">60</th>
+<th style="text-align: right;">100</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Vanilla RNN</td>
+<td style="text-align: right;">1,099</td>
+<td style="text-align: right;"><strong>842</strong></td>
+<td style="text-align: right;">828</td>
+<td style="text-align: right;">830</td>
+</tr>
+<tr class="even">
+<td>LSTM</td>
+<td style="text-align: right;">1,002</td>
+<td style="text-align: right;">987</td>
+<td style="text-align: right;">926</td>
+<td style="text-align: right;"><strong>821</strong></td>
+</tr>
+<tr class="odd">
+<td>Gap (LSTM − RNN)</td>
+<td style="text-align: right;">−97</td>
+<td style="text-align: right;">+145</td>
+<td style="text-align: right;">+98</td>
+<td style="text-align: right;">−9</td>
+</tr>
+</tbody>
+</table>
+<p>The gap is <strong>largest at exactly the budget we used</strong>, and it closes at every checkpoint after it. The RNN is flat from about epoch 45; the LSTM is <em>still improving</em> at 100 — we ran out of patience, not the model.</p>
+<div class="keybox">
+<p>At a fixed 30-epoch budget the RNN wins by a wide margin. At convergence the two <strong>tie</strong>. The RNN’s genuine advantage is that it gets there roughly <strong>three times faster on a quarter of the parameters</strong> — an optimization advantage, not a verdict on gating.</p>
+</div>
+<p>Same two models, twenty-six-week window. This time we vary the training budget and watch the margin.</p>
+<p>At ten epochs, the LSTM is <strong>ahead</strong> by ninety-seven. At thirty — our setting — the RNN is ahead by a hundred and forty-five. At sixty, ninety-eight. At a hundred, the gap is <strong>minus nine</strong>.</p>
+<p>Read the shape of it. The gap is <strong>largest at exactly the budget we chose</strong>. Not near the largest: the largest anywhere in the range we looked at.</p>
+<p>And look at the curves separately, because they are different shapes. The RNN is finished by about epoch forty-five — eight twenty-eight, eight thirty-three, eight thirty. Flat. The LSTM is still coming down at a hundred: nine eighty-seven, nine twenty-six, eight twenty-one. It has not turned over. <strong>We ran out of patience, not the model.</strong> So the honest verdict is not “the LSTM loses.” It is three things.</p>
+<p>At a fixed thirty-epoch budget, the RNN wins by a wide margin. Given enough epochs, the two <strong>tie</strong>. And the RNN gets to its best answer roughly <strong>three times faster on a quarter of the parameters</strong> — which is a real advantage, and worth having, and is an <em>optimization</em> advantage rather than a verdict about gating.</p>
+<p>I want to be direct about what happened here. The first version of this slide deck did not have this check, and the previous slide’s table was presented as an architecture result. It is not one. It took varying a parameter nobody thinks of as part of the experiment to find that out — which is the same lesson as the seeds in Lecture 7, one level up.</p>
+</section>
+<section id="check-2-what-in-the-data-explains-it" class="level3" data-number="9.5.5">
+<h3 data-number="9.5.5" class="anchored" data-anchor-id="check-2-what-in-the-data-explains-it"><span class="header-section-number">9.5.5</span> Check 2: What in the Data Explains It</h3>
+<p>Gating pays when a value must survive many steps that would otherwise overwrite it. Three measurements say this panel has no such structure.</p>
+<p><strong>1. Most variance is not sequential.</strong> <strong>91%</strong> of the variation in weekly units is <em>between</em> series — which store, which category — and 9% is within a series over time. The main task is reading the level, and the last few weeks give you that.</p>
+<p><strong>2. The series are smooth.</strong> Within-series autocorrelation is <strong>0.83</strong> at lag 1 and still <strong>0.43</strong> at lag 52. That is why long memory is unnecessary rather than why it is needed: the recent past is a <em>sufficient statistic</em> for the distant past. Nothing must be carried across a gap, because the gap was filled in continuously.</p>
+<p><strong>3. Nothing in the inputs arrives early.</strong> <code>snap_days</code> correlates +0.14 with units in the same week and ≈ 0 at every lead; <code>event_days</code> is flat everywhere. No <em>announcement</em> structure — and that is precisely what a forget gate is for.</p>
+<div class="keybox">
+<p>Ask these three of your own series before reaching for a gated model: how much of my variance is cross-sectional? Is my series smooth enough that recent values already summarize old ones? Does anything in my inputs <strong>lead</strong> the target?</p>
+</div>
+<p>Second check. Gating pays off when a value has to survive many steps that would otherwise overwrite it. Does this panel have anything like that? Three measurements say no.</p>
+<p><strong>One. Most of the variance is not sequential at all.</strong> Ninety-one percent of the variation in weekly units is <em>between</em> series — which store, which category — and nine percent is within a series over time. The main thing a model has to get right is the level of the series in front of it, and the last few weeks tell you that. No memory mechanism required.</p>
+<p><strong>Two. The series are smooth</strong> — and this one is counter-intuitive, so take it slowly. Within-series autocorrelation is point eight three at lag one, and still point four three at lag fifty-two. That <em>looks</em> like long memory, and it is actually the reason long memory is unnecessary. Because neighbouring weeks are nearly the same number, the recent past is a <strong>sufficient statistic</strong> for the distant past. Nothing has to be carried across the gap, because the gap was filled in continuously along the way.</p>
+<p>Gating earns its keep when something must survive steps that would overwrite it. Here nothing overwrites anything.</p>
+<p><strong>Three. Nothing in the inputs arrives early.</strong> SNAP days correlate about point one four with units in the same week, and essentially zero at every lead. Event days are flat everywhere, including at zero. There is no <strong>announcement</strong> structure in this data — nothing shows up at time <em>t</em> that has to be stored until <em>t</em> plus <em>k</em>. That is the textbook use for a forget gate and an input gate, and this panel does not contain one instance of it.</p>
+<p>And this is the part to carry out of the lecture — not the answer, the three questions. Before you reach for a gated model, or an attention model, on your own series: how much of my variance is cross-sectional rather than sequential? Is my series smooth enough that recent values already summarize the old ones? Does anything in my inputs <em>lead</em> the target? If the answers look like this panel’s, the extra machinery has nothing to do.</p>
+</section>
+</section>
+<section id="key-takeaways" class="level2" data-number="9.6">
+<h2 data-number="9.6" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">9.6</span> Key Takeaways</h2>
+<p>What recurrence buys, what it costs, and what is still missing.</p>
+<section id="rnn-and-lstm-in-context" class="level3" data-number="9.6.1">
+<h3 data-number="9.6.1" class="anchored" data-anchor-id="rnn-and-lstm-in-context"><span class="header-section-number">9.6.1</span> RNN and LSTM in Context</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Architecture</th>
+<th>Sees order?</th>
+<th>Effective memory</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FFN on lags</td>
+<td>no</td>
+<td>whatever you engineered</td>
+<td>cheap</td>
+</tr>
+<tr class="even">
+<td>1D CNN</td>
+<td>local only</td>
+<td>receptive field ($$7 steps)</td>
+<td>cheap</td>
+</tr>
+<tr class="odd">
+<td>Vanilla RNN</td>
+<td>yes</td>
+<td>$<span class="math inline">\(10–30 steps in practice | cheap |
+| LSTM | yes | hundreds of steps | 4\)</span>$ an RNN</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>An LSTM holds roughly <strong>four times</strong> the parameters of a vanilla RNN at the same hidden size — each of the three gates plus the candidate needs its own weight matrix. That is the price of the memory, and on a short window you pay it for nothing.</p>
+<p><strong>What is still missing.</strong> An LSTM reads strictly left to right, one step at a time, so it cannot be parallelized across the sequence, and everything it knows about step 3 must survive being squeezed through every state between 3 and <span class="math inline">\(T\)</span>. Part 2 removes both constraints.</p>
+<p>Four architectures, three questions. Does it see order? How much can it actually remember? What does it cost?</p>
+<p>The FFN on lags: no order, and it remembers whatever you engineered. The CNN: local order only, about seven steps. The vanilla RNN: yes to order, roughly ten to thirty steps in practice — note that’s <em>practice</em>, not the theoretical unlimited. The LSTM: yes, and hundreds of steps, at four times the cost.</p>
+<p>An LSTM holds roughly four times the parameters of a vanilla RNN at the same hidden size, because each of the three gates plus the candidate needs its own weight matrix. That’s the price of the memory. On a short window you pay it for nothing.</p>
+<p>If you go looking, you’ll also meet the <strong>GRU</strong> — the gated recurrent unit. It merges the forget and input gates into one and drops the separate cell state, so it sits between the two models on this table: more gating than a vanilla RNN, fewer parameters than an LSTM.</p>
+<p>On data like ours, where the gates aren’t earning their keep anyway, a GRU often performs about like an LSTM at lower cost. It’s a reasonable thing to try in your final project if you go down this road — and a reasonable thing to skip, given what the scoreboard says about this whole family on this dataset. And here’s what’s still missing, because it motivates next week.</p>
+<p>An LSTM reads strictly left to right, one step at a time. Two consequences. It <strong>cannot be parallelized</strong> across the sequence — step t needs step t minus one finished, so a thousand-step sequence takes a thousand sequential operations no matter how much hardware you own.</p>
+<p>And everything it knows about step three has to survive being squeezed through <strong>every</strong> hidden state between three and the end. The gates make that survival more likely, but the information is still passing through a bottleneck at every step.</p>
+<p>Part 2 removes both constraints, with a mechanism that lets every position look directly at every other position in a single operation.</p>
+</section>
+<section id="lecture-9-part-1-key-takeaways" class="level3" data-number="9.6.2">
+<h3 data-number="9.6.2" class="anchored" data-anchor-id="lecture-9-part-1-key-takeaways"><span class="header-section-number">9.6.2</span> Lecture 9 Part 1: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p>A <strong>recurrent network</strong> reads a sequence in order and carries a hidden state. Weights are shared across time, so window length costs no parameters.</p></li>
+<li><p>Training is <strong>backpropagation through time</strong>: unroll the recurrence and it is a deep network whose layers share weights. Repeated multiplication shrinks the gradient exponentially — at 52 steps, around <span class="math inline">\(10^{-9}\)</span>.</p></li>
+<li><p>An <strong>LSTM</strong> adds a cell state updated <strong>additively</strong>. Addition preserves gradients where multiplication destroys them — the ResNet fix, eighteen years earlier.</p></li>
+<li><p>Three gates: <strong>forget</strong> what is stale, <strong>input</strong> what is new, <strong>output</strong> what is relevant now.</p></li>
+<li><p>On our panel both recurrent models <strong>beat every CNN variant</strong> on four raw channels — and both still lose to a 46-coefficient LASSO.</p></li>
+<li><p>The <strong>LSTM lost to the vanilla RNN at a 30-epoch budget</strong>, at all three window lengths — but the two <strong>tie</strong> once both are trained to convergence, and 91% of this panel’s variance is cross-sectional anyway. Gating solves long-range forgetting; this data does not suffer from it. <strong>Fit the architecture to the problem — and check that a margin survives the budget you measured it at.</strong></p></li>
+</ol>
+</div>
+<p><span class="neutral">Next week: attention and Transformers — reading the whole sequence at once.</span></p>
+<p>One. A recurrent network reads a sequence in order and carries a hidden state. Weights are shared across time, so window length costs no parameters.</p>
+<p>Two. Training is backpropagation through time — unroll the recurrence and it’s a deep network whose layers share weights. Repeated multiplication shrinks the gradient exponentially. At fifty-two steps, around ten to the minus nine.</p>
+<p>Three. An LSTM adds a cell state updated <strong>additively</strong>. Addition preserves gradients where multiplication destroys them — the ResNet fix, eighteen years earlier. Four. Three gates: forget what’s stale, input what’s new, output what’s relevant now.</p>
+<p>Five. On our panel, both recurrent models beat every CNN variant, on four raw channels. And both still lose to a forty-six-coefficient LASSO.</p>
+<p>And six. The LSTM lost to the vanilla RNN at a thirty-epoch budget, at all three window lengths — and tied once both reached convergence. Gating solves long-range forgetting; a twenty-six-week window doesn’t suffer from it. So the gates bought four times the parameters and nothing else. <strong>Fit the architecture to the problem.</strong> Next week: attention and Transformers. Reading the whole sequence at once.</p>
+</section>
+<section id="references" class="level3" data-number="9.6.3">
+<h3 data-number="9.6.3" class="anchored" data-anchor-id="references"><span class="header-section-number">9.6.3</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture08_CNNs.html" class="pagination-link" aria-label="CNN Architectures">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture09_Part2_Transformers.html" class="pagination-link" aria-label="Transformers">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

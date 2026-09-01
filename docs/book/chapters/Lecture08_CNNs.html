@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>8&nbsp; CNN Architectures – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture09_Part1_RNN_LSTM.html" rel="next">
+<link href="../chapters/Lecture07_NeuralNets.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture08_CNNs.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">8.1</span> Lecture Outline</a></li>
+  <li><a href="#convolution-the-core-idea" id="toc-convolution-the-core-idea" class="nav-link" data-scroll-target="#convolution-the-core-idea"><span class="header-section-number">8.2</span> Convolution: The Core Idea</a>
+  <ul class="collapse">
+  <li><a href="#why-convolution" id="toc-why-convolution" class="nav-link" data-scroll-target="#why-convolution"><span class="header-section-number">8.2.1</span> Why Convolution?</a></li>
+  <li><a href="#how-a-convolutional-layer-works" id="toc-how-a-convolutional-layer-works" class="nav-link" data-scroll-target="#how-a-convolutional-layer-works"><span class="header-section-number">8.2.2</span> How a Convolutional Layer Works</a></li>
+  </ul></li>
+  <li><a href="#pooling-and-dropout" id="toc-pooling-and-dropout" class="nav-link" data-scroll-target="#pooling-and-dropout"><span class="header-section-number">8.3</span> Pooling and Dropout</a>
+  <ul class="collapse">
+  <li><a href="#pooling-downsampling-feature-maps" id="toc-pooling-downsampling-feature-maps" class="nav-link" data-scroll-target="#pooling-downsampling-feature-maps"><span class="header-section-number">8.3.1</span> Pooling: Downsampling Feature Maps</a></li>
+  </ul></li>
+  <li><a href="#cnn-architecture-evolution" id="toc-cnn-architecture-evolution" class="nav-link" data-scroll-target="#cnn-architecture-evolution"><span class="header-section-number">8.4</span> CNN Architecture Evolution</a>
+  <ul class="collapse">
+  <li><a href="#lenet-to-vgg-depth-and-small-filters" id="toc-lenet-to-vgg-depth-and-small-filters" class="nav-link" data-scroll-target="#lenet-to-vgg-depth-and-small-filters"><span class="header-section-number">8.4.1</span> LeNet to VGG: Depth and Small Filters</a></li>
+  <li><a href="#inception-and-resnet-depth-that-trains" id="toc-inception-and-resnet-depth-that-trains" class="nav-link" data-scroll-target="#inception-and-resnet-depth-that-trains"><span class="header-section-number">8.4.2</span> Inception and ResNet: Depth That Trains</a></li>
+  <li><a href="#what-carries-over-to-time-series" id="toc-what-carries-over-to-time-series" class="nav-link" data-scroll-target="#what-carries-over-to-time-series"><span class="header-section-number">8.4.3</span> What Carries Over to Time Series</a></li>
+  </ul></li>
+  <li><a href="#d-cnns-for-time-series" id="toc-d-cnns-for-time-series" class="nav-link" data-scroll-target="#d-cnns-for-time-series"><span class="header-section-number">8.5</span> 1D CNNs for Time Series</a>
+  <ul class="collapse">
+  <li><a href="#why-use-a-1d-cnn-for-forecasting" id="toc-why-use-a-1d-cnn-for-forecasting" class="nav-link" data-scroll-target="#why-use-a-1d-cnn-for-forecasting"><span class="header-section-number">8.5.1</span> Why Use a 1D CNN for Forecasting?</a></li>
+  <li><a href="#d-cnn-forecasting-pipeline-in-pytorch" id="toc-d-cnn-forecasting-pipeline-in-pytorch" class="nav-link" data-scroll-target="#d-cnn-forecasting-pipeline-in-pytorch"><span class="header-section-number">8.5.2</span> 1D CNN Forecasting Pipeline in PyTorch</a></li>
+  <li><a href="#does-it-actually-work" id="toc-does-it-actually-work" class="nav-link" data-scroll-target="#does-it-actually-work"><span class="header-section-number">8.5.3</span> Does It Actually Work?</a></li>
+  </ul></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">8.6</span> Key Takeaways</a>
+  <ul class="collapse">
+  <li><a href="#cnn-architecture-summary" id="toc-cnn-architecture-summary" class="nav-link" data-scroll-target="#cnn-architecture-summary"><span class="header-section-number">8.6.1</span> CNN Architecture Summary</a></li>
+  <li><a href="#lecture-8-key-takeaways" id="toc-lecture-8-key-takeaways" class="nav-link" data-scroll-target="#lecture-8-key-takeaways"><span class="header-section-number">8.6.2</span> Lecture 8: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">8.6.3</span> References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 8 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">8.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Convolution: The Core Idea</li>
+<li>Pooling and Dropout</li>
+<li>CNN Architecture Evolution</li>
+<li>1D CNNs for Time Series</li>
+<li>Key Takeaways</li>
+</ol>
+<p>Four parts. Convolution itself — what a filter is and what it costs. Pooling, which is where I want you to be suspicious. Then twenty years of image architectures, compressed into the three ideas that outlived them. And then one-dimensional CNNs on our own time series, with an honest measurement at the end.</p>
+<p>A word on why we’re spending time on image architectures in a forecasting course, since that’s a fair question to have.</p>
+<p>Two reasons. The first is that three of their ideas transfer directly, and you’ll recognize one of them again next week inside a completely different model. The second is that the history is a worked example of the thing this course keeps insisting on: every one of these architectures won by encoding a <em>better assumption</em> about its data, not by being bigger. That’s the transferable lesson, and it happens to be easier to see in pictures than in demand curves.</p>
+</section>
+<section id="convolution-the-core-idea" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="convolution-the-core-idea"><span class="header-section-number">8.2</span> Convolution: The Core Idea</h2>
+<p>Look at a small window, and look for the same thing everywhere. Two ideas, and they are the whole architecture.</p>
+<p>Two ideas: look locally, and reuse what you learn everywhere.</p>
+<section id="why-convolution" class="level3" data-number="8.2.1">
+<h3 data-number="8.2.1" class="anchored" data-anchor-id="why-convolution"><span class="header-section-number">8.2.1</span> Why Convolution?</h3>
+<p>Start with why a fully connected layer fails on structured input. A <span class="math inline">\(224 \times 224\)</span> image has 50,176 pixels, so a single hidden layer of 1,000 neurons needs <strong>50 million weights</strong> — for one layer. Lecture 7’s network had 22,657 parameters in total.</p>
+<p>Worse than the cost is the waste. That layer ignores <strong>spatial structure</strong>: it has no notion that neighbouring pixels are related and distant ones usually are not. And it does not <strong>generalize position</strong> — a pattern learned in the top-left corner is stored separately from the same pattern in the bottom-right.</p>
+<div class="keybox">
+<p>A convolutional layer fixes both with two ideas. <strong>Local connectivity:</strong> each neuron sees only a small <strong>receptive field</strong>. <strong>Weight sharing:</strong> the same filter is applied at every position. Far fewer parameters, and a pattern learned anywhere is recognized everywhere.</p>
+</div>
+<p>The analogy that makes it stick: a reader does not memorize the letter “A” separately for every position on the page. They learn it once and apply it everywhere. A filter does exactly that.</p>
+<p>Start with why a fully connected layer fails on structured input, because the failure is dramatic.</p>
+<p>A two-twenty-four by two-twenty-four image has just over fifty thousand pixels. If you feed that into a single hidden layer of a thousand neurons, that layer needs <strong>fifty million weights</strong>. For one layer. Put that next to last week’s network, which had twenty-two thousand six hundred fifty-seven parameters in total. But the cost is not the worst part. The waste is.</p>
+<p>That fully connected layer has no notion that neighbouring pixels are related and distant ones usually are not — it treats pixel one and pixel fifty thousand as equally likely to interact. And it does not generalize position: a pattern it learns in the top-left corner is stored completely separately from the same pattern in the bottom-right. It has to learn everything twice.</p>
+<p>A convolutional layer fixes both problems with two ideas. <strong>Local connectivity</strong> — each neuron sees only a small window, called its <strong>receptive field</strong>. And <strong>weight sharing</strong> — the same filter is applied at every position in the input. Far fewer parameters, and a pattern learned anywhere is recognized everywhere.</p>
+<p>The analogy that makes it stick: you don’t memorize the letter “A” separately for every position on the page. You learn it once, and you apply that one recognizer everywhere you look. A filter does exactly that.</p>
+<p>And notice this is the same <em>kind</em> of move we’ve made before, in a different costume. Weight sharing is a constraint. We are telling the model, before it sees any data, that a pattern occurring at position ten and the same pattern at position two hundred should be treated identically. That is a strong assumption, and it is what buys the parameter reduction.</p>
+<p>Constraints that encode true structure make models better. Constraints that encode false structure make them worse, and no amount of training fixes it. Hold that thought — by the end of this lecture we will have an example of each, on the same dataset.</p>
+</section>
+<section id="how-a-convolutional-layer-works" class="level3" data-number="8.2.2">
+<h3 data-number="8.2.2" class="anchored" data-anchor-id="how-a-convolutional-layer-works"><span class="header-section-number">8.2.2</span> How a Convolutional Layer Works</h3>
+<p>For a sequence, a 1D convolution slides a filter of length <span class="math inline">\(K\)</span> along the series and takes a dot product at each position:</p>
+<p><span class="math display">\[(f * g)[t] = \sum_{k=0}^{K-1} f[k] \cdot g[t - k]\]</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Kernel size</strong></td>
+<td>Filter length <span class="math inline">\(K\)</span>. Larger means a wider receptive field — more context per output, and more parameters.</td>
+</tr>
+<tr class="even">
+<td><strong>Stride</strong></td>
+<td>How far the filter moves between positions. Stride 2 halves the output length.</td>
+</tr>
+<tr class="odd">
+<td><strong>Padding</strong></td>
+<td>Zeros at the edges. <code>padding='same'</code> keeps output length equal to input length.</td>
+</tr>
+<tr class="even">
+<td><strong>Filters</strong></td>
+<td>How many different patterns to learn. This becomes the number of output channels.</td>
+</tr>
+</tbody>
+</table>
+<p>Each filter learns one <strong>local pattern</strong> — an edge, a spike, a seasonal dip. Its output is a <strong>feature map</strong> whose high values mark where that pattern was found.</p>
+<p>For a sequence — which is what we care about — a one-dimensional convolution slides a filter of length K along the series, and at each position it takes a dot product.</p>
+<p>That’s the formula on the slide, and honestly the formula is less useful than the picture: a small window sliding along, computing one number at each stop.</p>
+<p><strong>Kernel size</strong> is the filter length. Bigger means a wider receptive field — more context per output — and more parameters. <strong>Stride</strong> is how far the filter jumps between positions. Stride two halves your output length.</p>
+<p><strong>Padding</strong> puts zeros at the edges. Setting padding to <code>'same'</code> keeps the output the same length as the input, which saves you a lot of arithmetic.</p>
+<p><strong>Filters</strong> is how many <em>different</em> patterns you want to learn. That number becomes the channel count of the output.</p>
+<p>Here’s what to hold onto. Each filter learns <strong>one local pattern</strong> — an edge, a spike, a seasonal dip. What comes out is called a <strong>feature map</strong>, and its high values mark the places where that pattern was found.</p>
+<p>Two things follow from that, and they’re worth stating explicitly because they shape how you read the results later.</p>
+<p>First, the filter’s weights are <strong>learned</strong>, not designed. You don’t tell it to look for a promotional spike. You give it a slot for thirty-two patterns and gradient descent decides what those patterns are. That is the “learned features” promise — the thing that’s supposed to replace your hand-built lag columns.</p>
+<p>Second — and this is the constraint — a filter can only see K steps at a time. Stack two layers and the second one sees a window of windows, so the reach grows, but it grows <em>slowly</em>. This is called the <strong>receptive field</strong>, and I’m naming it now because it is going to be the single most important number in this lecture.</p>
+</section>
+</section>
+<section id="pooling-and-dropout" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="pooling-and-dropout"><span class="header-section-number">8.3</span> Pooling and Dropout</h2>
+<p>Pooling shrinks the feature map and buys robustness — at a price that matters more for forecasting than for images.</p>
+<section id="pooling-downsampling-feature-maps" class="level3" data-number="8.3.1">
+<h3 data-number="8.3.1" class="anchored" data-anchor-id="pooling-downsampling-feature-maps"><span class="header-section-number">8.3.1</span> Pooling: Downsampling Feature Maps</h3>
+<p><strong>Pooling</strong> reduces a feature map by summarizing each small region with a single number. Max pooling takes the largest value in the window; average pooling takes the mean. A <span class="math inline">\(2\times2\)</span> max pool with stride 2 quarters the number of values.</p>
+<p>Two things are bought. <strong>Fewer parameters downstream</strong>, because later layers see a smaller input. And <strong>translation invariance</strong>: shift the input slightly and the pooled output barely changes, so the network recognizes a cat whether it sits left or right of centre.</p>
+<div class="warningbox">
+<p><strong>Translation invariance is a feature for images and a problem for forecasting.</strong> If a demand spike moved three weeks later, that is not a nuisance to be smoothed away — it is the thing you are trying to predict. Pooling deliberately discards <em>where</em> in the window a pattern occurred, and for a time series the position is often the signal.</p>
+</div>
+<p>Hold that objection. We measure exactly what it costs later in this lecture.</p>
+<p><strong>Pooling</strong> reduces a feature map by summarizing each little region with one number. Max pooling takes the largest value in the window. Average pooling takes the mean. A two-by-two max pool with stride two cuts the number of values to a quarter.</p>
+<p>You buy two things. <strong>Fewer parameters downstream</strong>, because the later layers see a smaller input. And <strong>translation invariance</strong> — shift the input slightly and the pooled output barely changes, so the network recognizes a cat whether it’s left or right of centre. And here is where I want you to get suspicious. Translation invariance is a <strong>feature</strong> for images and a <strong>problem</strong> for forecasting.</p>
+<p>Think about what it’s actually doing. If a demand spike moved three weeks later, pooling treats that as noise to be smoothed away. But that shift is not a nuisance — for a forecaster, <em>when the spike happened</em> is very often the entire thing you’re trying to predict.</p>
+<p>Pooling deliberately discards <strong>where</strong> in the window a pattern occurred. For an image classifier that’s exactly right. For a time series, position is frequently the signal.</p>
+<p>Hold that objection. Don’t resolve it yet. We’re going to measure precisely what it costs, later in this lecture.</p>
+</section>
+</section>
+<section id="cnn-architecture-evolution" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="cnn-architecture-evolution"><span class="header-section-number">8.4</span> CNN Architecture Evolution</h2>
+<p>Twenty years of image models, and the three ideas that outlived them.</p>
+<section id="lenet-to-vgg-depth-and-small-filters" class="level3" data-number="8.4.1">
+<h3 data-number="8.4.1" class="anchored" data-anchor-id="lenet-to-vgg-depth-and-small-filters"><span class="header-section-number">8.4.1</span> LeNet to VGG: Depth and Small Filters</h3>
+<p><strong>LeNet-5</strong> <span class="citation" data-cites="LeCun1998">[@LeCun1998]</span> established the template in 1998: alternating convolution and pooling layers, then fully connected layers at the end. It had roughly 60,000 parameters and read handwritten digits on cheques.</p>
+<p><strong>VGG</strong> <span class="citation" data-cites="Simonyan2015">[@Simonyan2015]</span> scaled that idea up in 2014 and made one sharp simplification: use <em>only</em> <span class="math inline">\(3\times3\)</span> filters, but stack many of them. Two stacked <span class="math inline">\(3\times3\)</span> layers see the same receptive field as one <span class="math inline">\(5\times5\)</span>, with fewer parameters and an extra nonlinearity in between.</p>
+<div class="keybox">
+<p><strong>The lesson that carried:</strong> depth built from small filters beats width built from large ones. It is cheaper in parameters and more expressive, and it is why almost every modern architecture is deep and narrow rather than shallow and wide.</p>
+</div>
+<p>VGG’s cost was its size — around 138 million parameters, most of them in the final fully connected layers. That is the problem the next two architectures attacked.</p>
+<p><strong>LeNet-5</strong>, in 1998, established the template that everything since has followed: alternating convolution and pooling layers, then fully connected layers at the end. Roughly sixty thousand parameters, and it read handwritten digits on bank cheques — a real deployed system, in the nineties.</p>
+<p><strong>VGG</strong>, in 2014, scaled that up and made one sharp simplification. Use <strong>only</strong> three-by-three filters — but stack a lot of them.</p>
+<p>Why does that work? Two stacked three-by-threes see the same receptive field as one five-by-five. But they use fewer parameters, and you get an extra nonlinearity in between them, which makes the combination strictly more expressive.</p>
+<p>That is the lesson that carried forward: <strong>depth built from small filters beats width built from large ones.</strong> Cheaper and more expressive. It’s why nearly every modern architecture is deep and narrow rather than shallow and wide.</p>
+<p>VGG’s cost was its size — around a hundred thirty-eight million parameters, and most of those were sitting in the final fully connected layers, not in the convolutions at all. That is exactly the problem the next two architectures went after.</p>
+<p>That detail is worth pausing on, because it is a good lesson about where cost actually lives. The convolutions — the part everyone talks about — were relatively cheap, precisely because of weight sharing. The expensive part was the ordinary dense layers bolted on the end, which have no sharing at all.</p>
+<p>When you profile a model and find the bottleneck, it is very often in the least interesting component. That’s true of forecasting pipelines too: the modelling is rarely what costs you, the data preparation is.</p>
+</section>
+<section id="inception-and-resnet-depth-that-trains" class="level3" data-number="8.4.2">
+<h3 data-number="8.4.2" class="anchored" data-anchor-id="inception-and-resnet-depth-that-trains"><span class="header-section-number">8.4.2</span> Inception and ResNet: Depth That Trains</h3>
+<p><strong>Inception</strong> <span class="citation" data-cites="Szegedy2015">[@Szegedy2015]</span> asked why a layer should commit to one filter size. Its module runs <span class="math inline">\(1\times1\)</span>, <span class="math inline">\(3\times3\)</span> and <span class="math inline">\(5\times5\)</span> convolutions <em>in parallel</em> and concatenates the results, letting the network choose the scale. <span class="math inline">\(1\times1\)</span> convolutions reduce channel count first, keeping the cost down.</p>
+<p><strong>ResNet</strong> <span class="citation" data-cites="He2016">[@He2016]</span> solved a different problem. Past a certain depth, deeper networks got <em>worse</em> — not from overfitting, but because gradients degraded on their way back through many layers. The fix is a <strong>residual</strong> or skip connection:</p>
+<p><span class="math display">\[\mathbf{y} = \mathcal{F}(\mathbf{x}) + \mathbf{x}\]</span></p>
+<p>Each block learns the <em>difference</em> from its input rather than a whole new representation, and the <span class="math inline">\(+\,\mathbf{x}\)</span> gives the gradient a direct path backward. That single change made networks of 100+ layers trainable, and skip connections now appear in nearly every deep architecture — including the Transformers in Lecture 9.</p>
+<p>Two different attacks on that problem.</p>
+<p><strong>Inception</strong> asked a good question: why should a layer commit to one filter size at all? Its module runs one-by-one, three-by-three and five-by-five convolutions <strong>in parallel</strong> and concatenates the results, letting the network decide which scale matters. The one-by-one convolutions do something clever — they cut the channel count first, so the expensive convolutions operate on a smaller input. <strong>ResNet</strong> solved a different problem, and it’s the one that transfers to us.</p>
+<p>Past a certain depth, deeper networks were getting <strong>worse</strong>. Not from overfitting — the training error was worse too. The gradients were degrading on their way back through many layers. The fix is one line: y equals F of x, <strong>plus x</strong>. A <strong>residual</strong>, or skip, connection.</p>
+<p>Two ways to read that. Each block now learns the <em>difference</em> from its input rather than a whole new representation — usually an easier job. And the plus-x gives the gradient a direct path backward, unimpeded by the layers in between.</p>
+<p>That single change made networks of a hundred layers and more trainable. Skip connections now appear in essentially every deep architecture — including the Transformers we’ll see in Lecture 9, and, as it turns out, inside the LSTM, which predates ResNet by eighteen years.</p>
+<p>I want to draw out why the addition matters, because we will use this exact argument again next week and it’s easier to absorb twice.</p>
+<p>When a gradient travels backward through a chain of layers, each layer <em>multiplies</em> it by something. Multiply enough numbers below one together and you get essentially zero — the signal dies before it reaches the early layers, so they never learn.</p>
+<p>Addition doesn’t do that. The plus-x term hands the gradient a route home that skips the multiplication entirely. Repeated multiplication shrinks; repeated addition doesn’t.</p>
+<p>Remember that sentence. In Lecture 9 you’ll see the LSTM’s cell state doing precisely the same thing, for precisely the same reason, invented eighteen years earlier for time rather than for depth.</p>
+</section>
+<section id="what-carries-over-to-time-series" class="level3" data-number="8.4.3">
+<h3 data-number="8.4.3" class="anchored" data-anchor-id="what-carries-over-to-time-series"><span class="header-section-number">8.4.3</span> What Carries Over to Time Series</h3>
+<p>These architectures were built for images, on problems that look nothing like weekly demand forecasting. Three of their ideas transfer anyway.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Small stacked filters</strong></td>
+<td>A width-3 filter twice sees six weeks of context with far fewer weights than one width-6 filter.</td>
+</tr>
+<tr class="even">
+<td><strong>Skip connections</strong></td>
+<td>Same fix for the same problem — gradients that fade through depth.</td>
+</tr>
+<tr class="odd">
+<td><strong>Learned features</strong></td>
+<td>You stop hand-engineering lag windows and let filters find the local shapes that matter.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>One idea does not transfer, and it is the one we flagged:</strong> pooling for translation invariance. An image classifier should not care where the cat is. A forecaster usually should care where the spike was.</p>
+<p>These architectures were built for images, on problems that look nothing like weekly demand forecasting. Three of their ideas transfer anyway.</p>
+<p><strong>Small stacked filters.</strong> A width-three filter applied twice sees six weeks of context, with far fewer weights than one width-six filter would need. <strong>Skip connections.</strong> Same fix, same problem — gradients that fade as they travel back through depth. <strong>Learned features.</strong> You stop hand-engineering lag windows and let the filters find whichever local shapes actually matter.</p>
+<p>One idea does <strong>not</strong> transfer, and it’s the one we flagged twenty minutes ago: pooling for translation invariance.</p>
+<p>An image classifier should not care where the cat is. A forecaster usually should care very much where the spike was. So we’re carrying two assumptions into the next section, and they are not equally good.</p>
+<p><strong>Locality</strong> — that nearby time steps are more related than distant ones — is largely <em>true</em> of demand data. Last week matters more than the week before. Good assumption.</p>
+<p><strong>Translation invariance</strong> — that where a pattern occurred doesn’t matter — is largely <em>false</em> for forecasting. Good assumption for images, bad one here.</p>
+<p>A CNN gives you both, bundled together, because they came from the same field. Part of using one well is knowing which half you actually wanted.</p>
+</section>
+</section>
+<section id="d-cnns-for-time-series" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="d-cnns-for-time-series"><span class="header-section-number">8.5</span> 1D CNNs for Time Series</h2>
+<p>The same machinery, along a time axis — and what it costs.</p>
+<section id="why-use-a-1d-cnn-for-forecasting" class="level3" data-number="8.5.1">
+<h3 data-number="8.5.1" class="anchored" data-anchor-id="why-use-a-1d-cnn-for-forecasting"><span class="header-section-number">8.5.1</span> Why Use a 1D CNN for Forecasting?</h3>
+<p>A 1D CNN takes a <strong>window</strong> of the recent past — say 26 weeks — across several channels, and predicts the next value. Each channel is one series: units, SNAP days, events, price.</p>
+<p>The appeal is that you stop choosing lags. Rather than deciding that lag 1, lag 4 and lag 52 matter, you hand the model the whole window and let the filters learn which local shapes predict what comes next.</p>
+<div class="keybox">
+<p><strong>Two genuine advantages.</strong> It is far cheaper than a fully connected network on the same window — weight sharing again. And it handles <em>many parallel series</em> naturally, since the same filters apply to every store-category at once.</p>
+</div>
+<p><strong>The catch is the receptive field.</strong> Stacked width-5 and width-3 filters see about seven weeks of context. Annual seasonality is 52 weeks away, and no reasonable stack of small filters reaches that far. Either you add dilation, or you feed the annual lag in as its own channel.</p>
+<p>Here’s the setup. A one-dimensional CNN takes a <strong>window</strong> of the recent past — say twenty-six weeks — across several channels, and predicts the next value. Each channel is one series: units, SNAP days, event flags, price.</p>
+<p>The appeal is that you stop choosing lags. Instead of deciding that lag one, lag four and lag fifty-two are the ones that matter, you hand the model the whole window and let the filters work out which local shapes predict what comes next.</p>
+<p>Two advantages that are genuinely real. It’s far cheaper than a fully connected network on the same window — that’s weight sharing again. And it handles <strong>many parallel series</strong> naturally, because the same filters apply to every store-category at once. But the catch is the receptive field, and it’s serious.</p>
+<p>Stack a width-five filter and a width-three filter and you see about <strong>seven weeks</strong> of context. That’s it. Annual seasonality sits fifty-two weeks away, and no reasonable stack of small filters is going to reach that far.</p>
+<p>So you have two options. Add dilation — filters with gaps in them, which reach further for the same parameter count. Or feed the annual lag in as its own channel, which is a confession that you’re doing feature engineering after all.</p>
+<p>And notice what that second option costs you rhetorically. The entire pitch for a CNN was “stop choosing lags, let the filters find the structure.” The moment you hand it <code>lag_52</code> as a channel because the receptive field can’t reach, you have given that pitch back. You’re now doing feature engineering <em>and</em> paying for a neural network.</p>
+<p>That is not a reason never to use one. It is a reason to be clear-eyed about what the architecture is actually buying you on a given problem. Remember that number — seven weeks. It explains the results two slides from now.</p>
+</section>
+<section id="d-cnn-forecasting-pipeline-in-pytorch" class="level3" data-number="8.5.2">
+<h3 data-number="8.5.2" class="anchored" data-anchor-id="d-cnn-forecasting-pipeline-in-pytorch"><span class="header-section-number">8.5.2</span> 1D CNN Forecasting Pipeline in PyTorch</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Window in, one forecast out</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> nn.Sequential(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    nn.Conv1d(n_channels, <span class="dv">32</span>, kernel_size<span class="op">=</span><span class="dv">5</span>), nn.ReLU(),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    nn.Conv1d(<span class="dv">32</span>, <span class="dv">64</span>, kernel_size<span class="op">=</span><span class="dv">3</span>),         nn.ReLU(),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    nn.AdaptiveAvgPool1d(<span class="dv">1</span>),   <span class="co"># collapses the time axis</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    nn.Flatten(),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">64</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Input shape is <code>(batch, channels, time)</code> — note that channels come <em>before</em> time, which is the transpose of how the data naturally sits in a dataframe.</p>
+<p>Everything from Lecture 7 still applies: Adam with weight decay, <code>zero_grad()</code> every batch, <code>shuffle=False</code>, and a split by time rather than at random.</p>
+<p><span class="neutral smaller"><code>AdaptiveAvgPool1d(1)</code> averages across the whole time axis. Watch what that does on the next slide.</span></p>
+<p>Six lines. Two convolutions with ReLUs, a pooling step, a flatten, and a linear layer down to one number.</p>
+<p>One thing that trips everyone up: the input shape is <code>(batch, channels, time)</code>. Channels come <strong>before</strong> time. That is the transpose of how the data naturally sits in a dataframe, and it’s also the opposite of what <code>nn.LSTM</code> wants next week. You will get this wrong at least once; the error message is unhelpful.</p>
+<p>Everything from Lecture 7 still applies. Adam with weight decay. <code>zero_grad()</code> every batch. <code>shuffle=False</code>. Split by time, not at random.</p>
+<p>And note what <code>AdaptiveAvgPool1d(1)</code> does: it averages across the <em>entire</em> time axis, collapsing it to a single number per channel. Watch what that costs on the next slide.</p>
+</section>
+<section id="does-it-actually-work" class="level3" data-number="8.5.3">
+<h3 data-number="8.5.3" class="anchored" data-anchor-id="does-it-actually-work"><span class="header-section-number">8.5.3</span> Does It Actually Work?</h3>
+<p>Fitted on our weekly panel — 26-week windows, four channels, 30 store-category series, the same test block as Homework 4.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Model</th>
+<th style="text-align: right;">Test RMSE</th>
+<th style="text-align: right;">Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LASSO (Homework 4)</td>
+<td style="text-align: right;"><strong>744</strong></td>
+<td style="text-align: right;">46</td>
+</tr>
+<tr class="even">
+<td>XGBoost (Homework 4)</td>
+<td style="text-align: right;">781</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr class="odd">
+<td>Random forest (Homework 3)</td>
+<td style="text-align: right;">899</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr class="even">
+<td>1D CNN, flatten head</td>
+<td style="text-align: right;">1,032</td>
+<td style="text-align: right;">8,161</td>
+</tr>
+<tr class="odd">
+<td>1D CNN, global max pool</td>
+<td style="text-align: right;">1,418</td>
+<td style="text-align: right;">6,945</td>
+</tr>
+<tr class="even">
+<td>1D CNN, global average pool</td>
+<td style="text-align: right;">1,534</td>
+<td style="text-align: right;">6,945</td>
+</tr>
+<tr class="odd">
+<td>Seasonal naive</td>
+<td style="text-align: right;">2,152</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><span class="key-result"><strong>Every CNN variant loses to a 46-coefficient linear model</strong></span> — a seven-week receptive field cannot see the annual lag LASSO was handed directly.</p>
+<p>And swapping average pooling for <code>Flatten</code>, which keeps <em>where</em> each pattern occurred, is worth about <strong>500 RMSE</strong> — three seeds each, against a spread of about 80.</p>
+<p>Same weekly panel. Twenty-six-week windows, four channels, thirty store-category series, the same test block as Homework 4 — so these numbers are directly comparable to work you’ve already done. LASSO, with forty-six engineered features: seven forty-four. XGBoost: seven eighty-one. Random forest: eight ninety-nine.</p>
+<p>Then the CNNs. Flatten head: one thousand thirty-two. Global max pool: fourteen eighteen. Global average pool: fifteen thirty-four. Seasonal naive, at the bottom: twenty-one fifty-two. Two things to take from this.</p>
+<p>First — <strong>every CNN variant loses to a forty-six-coefficient linear model.</strong> Not narrowly. And now you know why: a seven-week receptive field cannot see the annual lag that LASSO was simply handed as a column. The architecture’s assumption about locality is wrong for this data. Second, and this is the one I promised you.</p>
+<p>Swapping average pooling for <code>Flatten</code> — which keeps <em>where</em> each pattern occurred, instead of averaging it away — is worth about <strong>five hundred RMSE</strong>. Three seeds each, against a run-to-run spread of roughly eighty. That gap is real. That’s the objection from slide 7, measured. Pooling threw away position, and position was carrying signal.</p>
+<p>And I want to be careful about how far to push that conclusion, because there’s a tempting overreach here.</p>
+<p>This does <strong>not</strong> mean pooling is bad. It means pooling encodes an assumption — that position is irrelevant — and on this dataset that assumption is false. Run the same experiment on image classification and the sign would flip, decisively.</p>
+<p>That’s the shape of nearly every result in this course. There is no ranking of methods that holds across problems. There’s a match, or a mismatch, between what the method assumes and what the data is. Your job is to know what your method assumes — which is much harder than knowing how to call it, and much more valuable.</p>
+</section>
+</section>
+<section id="key-takeaways" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">8.6</span> Key Takeaways</h2>
+<section id="cnn-architecture-summary" class="level3" data-number="8.6.1">
+<h3 data-number="8.6.1" class="anchored" data-anchor-id="cnn-architecture-summary"><span class="header-section-number">8.6.1</span> CNN Architecture Summary</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Architecture</th>
+<th>Year</th>
+<th>The idea that survived</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LeNet-5</td>
+<td>1998</td>
+<td>Conv–pool–conv–pool–dense: the template</td>
+</tr>
+<tr class="even">
+<td>VGG</td>
+<td>2014</td>
+<td>Only <span class="math inline">\(3\times3\)</span> filters, stacked deep</td>
+</tr>
+<tr class="odd">
+<td>Inception</td>
+<td>2014</td>
+<td>Parallel filter sizes; <span class="math inline">\(1\times1\)</span> to cut channels</td>
+</tr>
+<tr class="even">
+<td>ResNet</td>
+<td>2015</td>
+<td>Skip connections make real depth trainable</td>
+</tr>
+<tr class="odd">
+<td>1D CNN</td>
+<td>—</td>
+<td>The same machinery along a time axis</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reach for a 1D CNN</strong> when local shape matters more than exact position, when you have many parallel series, or as a cheap feature extractor feeding something else.</p>
+<p><strong>Do not reach for one</strong> when the dominant signal is at a long lag, when you have well engineered tabular features already, or when a stakeholder needs to read the model. On the evidence above, that covers most of what we forecast in this course.</p>
+<p>The lineage in one table. LeNet gave us the template. VGG: small filters, stacked deep. Inception: parallel filter sizes, and one-by-ones to control cost. ResNet: skip connections, which made real depth trainable. And the 1D CNN, which is that same machinery run along a time axis.</p>
+<p><strong>Reach for a 1D CNN</strong> when local shape matters more than exact position, when you have many parallel series, or as a cheap feature extractor that feeds something else.</p>
+<p>That third use is underrated, incidentally. You don’t have to use a CNN as the whole model. A common production pattern is to let convolutions compress a long raw window into a handful of learned summary features, then feed <em>those</em> into gradient boosting alongside your engineered columns. You get the pattern discovery without betting the forecast on it.</p>
+<p><strong>Do not reach for one</strong> when the dominant signal is at a long lag, when you already have well engineered tabular features, or when a stakeholder needs to read the model and understand it.</p>
+<p>And be honest about what that second list covers. On the evidence we just saw, it describes most of what we forecast in this course. Which raises the obvious question: why teach it, then?</p>
+<p>Because the receptive field problem is not a fact about CNNs, it’s a fact about <em>this data</em> — a strong annual cycle and a short window. Change either one and the answer changes. And because convolution is a component, not just a model: it shows up inside architectures you’ll meet later, in production forecasting systems, and in every paper on the subject. Knowing what it assumes is what lets you predict, before fitting anything, whether it will work on a problem you haven’t seen yet.</p>
+<p>That prediction — made in advance, from structure rather than from trying it — is the skill this course is actually training.</p>
+</section>
+<section id="lecture-8-key-takeaways" class="level3" data-number="8.6.2">
+<h3 data-number="8.6.2" class="anchored" data-anchor-id="lecture-8-key-takeaways"><span class="header-section-number">8.6.2</span> Lecture 8: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p><strong>Convolution</strong> is local connectivity plus weight sharing. A pattern is learned once and detected everywhere, at a fraction of the parameters.</p></li>
+<li><p><strong>Pooling</strong> buys translation invariance — which an image classifier wants and a forecaster usually does not. Measured cost here: about 500 RMSE.</p></li>
+<li><p>The architecture history reduces to three transferable ideas: <strong>small filters stacked deep</strong>, <strong>skip connections</strong> for trainable depth, and <strong>learned</strong> rather than hand-engineered features.</p></li>
+<li><p>A <strong>1D CNN</strong> takes a window across channels and predicts the next step. Its weakness is the <strong>receptive field</strong>: seven weeks of context cannot see an annual lag.</p></li>
+<li><p>On our panel every CNN variant <strong>lost to a 46-coefficient LASSO</strong>. Architecture has to fit the problem; it is not a ladder you climb.</p></li>
+</ol>
+</div>
+<p><span class="neutral">Next: RNNs and LSTMs — architectures built to carry state through time, which is what the receptive field could not do.</span></p>
+<p>One. Convolution is local connectivity plus weight sharing. A pattern is learned once and detected everywhere, at a fraction of the parameters.</p>
+<p>Two. Pooling buys translation invariance — which an image classifier wants and a forecaster usually does not. Measured cost on our data: about five hundred RMSE.</p>
+<p>Three. The architecture history reduces to three transferable ideas: small filters stacked deep, skip connections for trainable depth, and learned rather than hand-engineered features.</p>
+<p>Four. A 1D CNN takes a window across channels and predicts the next step. Its weakness is the receptive field — seven weeks of context cannot see an annual lag.</p>
+<p>And five. On our panel, every CNN variant lost to a forty-six-coefficient LASSO. Architecture has to fit the problem. It is not a ladder you climb.</p>
+<p>Next time: RNNs and LSTMs. Architectures built to carry state through time — which is precisely what the receptive field could not do.</p>
+</section>
+<section id="references" class="level3" data-number="8.6.3">
+<h3 data-number="8.6.3" class="anchored" data-anchor-id="references"><span class="header-section-number">8.6.3</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture07_NeuralNets.html" class="pagination-link" aria-label="Introduction to Neural Networks">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="pagination-link" aria-label="RNNs and LSTMs">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

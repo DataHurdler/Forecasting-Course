@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>15&nbsp; Synthesis — What the Semester Measured – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture12_BayesianRegression.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture13_Synthesis.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">15.1</span> Lecture Outline</a></li>
+  <li><a href="#what-we-built" id="toc-what-we-built" class="nav-link" data-scroll-target="#what-we-built"><span class="header-section-number">15.2</span> What We Built</a>
+  <ul class="collapse">
+  <li><a href="#the-arc-of-the-course" id="toc-the-arc-of-the-course" class="nav-link" data-scroll-target="#the-arc-of-the-course"><span class="header-section-number">15.2.1</span> The Arc of the Course</a></li>
+  <li><a href="#the-scoreboard" id="toc-the-scoreboard" class="nav-link" data-scroll-target="#the-scoreboard"><span class="header-section-number">15.2.2</span> The Scoreboard</a></li>
+  </ul></li>
+  <li><a href="#what-the-results-taught" id="toc-what-the-results-taught" class="nav-link" data-scroll-target="#what-the-results-taught"><span class="header-section-number">15.3</span> What the Results Taught</a>
+  <ul class="collapse">
+  <li><a href="#lesson-1-the-benchmark-is-a-real-competitor" id="toc-lesson-1-the-benchmark-is-a-real-competitor" class="nav-link" data-scroll-target="#lesson-1-the-benchmark-is-a-real-competitor"><span class="header-section-number">15.3.1</span> Lesson 1: The Benchmark Is a Real Competitor</a></li>
+  <li><a href="#lesson-2-more-sophisticated-did-not-mean-better" id="toc-lesson-2-more-sophisticated-did-not-mean-better" class="nav-link" data-scroll-target="#lesson-2-more-sophisticated-did-not-mean-better"><span class="header-section-number">15.3.2</span> Lesson 2: More Sophisticated Did Not Mean Better</a></li>
+  <li><a href="#lesson-3-one-idea-appeared-six-times" id="toc-lesson-3-one-idea-appeared-six-times" class="nav-link" data-scroll-target="#lesson-3-one-idea-appeared-six-times"><span class="header-section-number">15.3.3</span> Lesson 3: One Idea Appeared Six Times</a></li>
+  </ul></li>
+  <li><a href="#choosing-a-method" id="toc-choosing-a-method" class="nav-link" data-scroll-target="#choosing-a-method"><span class="header-section-number">15.4</span> Choosing a Method</a>
+  <ul class="collapse">
+  <li><a href="#which-method-when" id="toc-which-method-when" class="nav-link" data-scroll-target="#which-method-when"><span class="header-section-number">15.4.1</span> Which Method, When</a></li>
+  </ul></li>
+  <li><a href="#doing-it-honestly" id="toc-doing-it-honestly" class="nav-link" data-scroll-target="#doing-it-honestly"><span class="header-section-number">15.5</span> Doing It Honestly</a>
+  <ul class="collapse">
+  <li><a href="#errors-that-fail-silently-i-the-pipeline" id="toc-errors-that-fail-silently-i-the-pipeline" class="nav-link" data-scroll-target="#errors-that-fail-silently-i-the-pipeline"><span class="header-section-number">15.5.1</span> Errors That Fail Silently I: the Pipeline</a></li>
+  <li><a href="#errors-that-fail-silently-ii-the-code-was-fine" id="toc-errors-that-fail-silently-ii-the-code-was-fine" class="nav-link" data-scroll-target="#errors-that-fail-silently-ii-the-code-was-fine"><span class="header-section-number">15.5.2</span> Errors That Fail Silently II: the Code Was Fine</a></li>
+  <li><a href="#the-day-every-model-in-this-course-fails" id="toc-the-day-every-model-in-this-course-fails" class="nav-link" data-scroll-target="#the-day-every-model-in-this-course-fails"><span class="header-section-number">15.5.3</span> The Day Every Model in This Course Fails</a></li>
+  <li><a href="#what-a-defensible-forecast-report-contains" id="toc-what-a-defensible-forecast-report-contains" class="nav-link" data-scroll-target="#what-a-defensible-forecast-report-contains"><span class="header-section-number">15.5.4</span> What a Defensible Forecast Report Contains</a></li>
+  <li><a href="#where-you-do-this-yourself" id="toc-where-you-do-this-yourself" class="nav-link" data-scroll-target="#where-you-do-this-yourself"><span class="header-section-number">15.5.5</span> Where You Do This Yourself</a></li>
+  </ul></li>
+  <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next"><span class="header-section-number">15.6</span> Where to Go Next</a>
+  <ul class="collapse">
+  <li><a href="#what-this-course-did-not-cover" id="toc-what-this-course-did-not-cover" class="nav-link" data-scroll-target="#what-this-course-did-not-cover"><span class="header-section-number">15.6.1</span> What This Course Did Not Cover</a></li>
+  <li><a href="#closing" id="toc-closing" class="nav-link" data-scroll-target="#closing"><span class="header-section-number">15.6.2</span> Closing</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">15.6.3</span> References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 13 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="15.1">
+<h2 data-number="15.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">15.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>What We Built</li>
+<li>What the Results Taught</li>
+<li>Choosing a Method</li>
+<li>Doing It Honestly</li>
+<li>Where to Go Next</li>
+</ol>
+<p>Five parts. What we built, and how the four parts of the course relate. What the results actually taught — three lessons, each paid for with a measurement. How to choose a method. How to do it honestly, which is the longest section. And where to go next.</p>
+</section>
+<section id="what-we-built" class="level2" data-number="15.2">
+<h2 data-number="15.2" class="anchored" data-anchor-id="what-we-built"><span class="header-section-number">15.2</span> What We Built</h2>
+<p>Four parts, twelve lectures, one dataset — and a scoreboard nobody would have predicted in Week 1.</p>
+<section id="the-arc-of-the-course" class="level3" data-number="15.2.1">
+<h3 data-number="15.2.1" class="anchored" data-anchor-id="the-arc-of-the-course"><span class="header-section-number">15.2.1</span> The Arc of the Course</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th>Lectures</th>
+<th>The central idea</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Time series</td>
+<td>1–3</td>
+<td>Specify a structure — level, trend, season — and estimate it.</td>
+</tr>
+<tr class="even">
+<td>Trees</td>
+<td>4–6</td>
+<td>Stop specifying. Hand an algorithm features and let it find the structure.</td>
+</tr>
+<tr class="odd">
+<td>Deep learning</td>
+<td>7–9</td>
+<td>Let the <em>architecture</em> encode what kind of structure to expect.</td>
+</tr>
+<tr class="even">
+<td>Bayesian</td>
+<td>10–12</td>
+<td>Change the deliverable: return a distribution, not a number.</td>
+</tr>
+</tbody>
+</table>
+<p>Read down that last column and the course is not really four toolkits. It is four answers to a single question: <strong>where does the knowledge in a forecast come from?</strong></p>
+<p>From you, in the model structure. From the data, via a search procedure. From the architecture’s assumptions. Or from a prior, stated openly and updated. <strong>That framing is what survives when the libraries change.</strong></p>
+<p>Four parts. Classical time series, Lectures 1 to 3: <strong>specify a structure</strong> — level, trend, season — and estimate it. Trees, 4 to 6: <strong>stop specifying</strong>, hand an algorithm features and let it find the structure. Deep learning, 7 to 9: let the <strong>architecture</strong> encode what kind of structure to expect. Bayesian, 10 to 12: change the <strong>deliverable</strong> — return a distribution, not a number. Now read down that last column again, because there’s something there.</p>
+<p>This course is not really four toolkits. It’s four answers to a single question: <strong>where does the knowledge in a forecast come from?</strong></p>
+<p>From you, encoded in the model structure. From the data, via a search procedure. From the architecture’s built-in assumptions. Or from a prior, stated openly and then updated.</p>
+<p>That framing is what survives when the libraries change. Every method you meet for the rest of your career sits somewhere on that spectrum, and knowing where tells you what it will be good at and what it will fail at.</p>
+</section>
+<section id="the-scoreboard" class="level3" data-number="15.2.2">
+<h3 data-number="15.2.2" class="anchored" data-anchor-id="the-scoreboard"><span class="header-section-number">15.2.2</span> The Scoreboard</h3>
+<p>Every model in this course, on the M5 weekly panel — same 30 series, same held-out block.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Model</th>
+<th style="text-align: right;">Test RMSE</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LASSO, 46 engineered features</td>
+<td style="text-align: right;"><strong>744</strong></td>
+<td>Homework 4</td>
+</tr>
+<tr class="even">
+<td>XGBoost, tuned</td>
+<td style="text-align: right;">781</td>
+<td>Homework 4</td>
+</tr>
+<tr class="odd">
+<td>Vanilla RNN, 4 raw channels</td>
+<td style="text-align: right;">842</td>
+<td>Lecture 9 Part 1</td>
+</tr>
+<tr class="even">
+<td>Random forest</td>
+<td style="text-align: right;">899</td>
+<td>Homework 3</td>
+</tr>
+<tr class="odd">
+<td>LSTM</td>
+<td style="text-align: right;">987</td>
+<td>Lecture 9 Part 1</td>
+</tr>
+<tr class="even">
+<td>Transformer encoder</td>
+<td style="text-align: right;">990</td>
+<td>Lecture 9 Part 2</td>
+</tr>
+<tr class="odd">
+<td>1D CNN, flatten head</td>
+<td style="text-align: right;">1,032</td>
+<td>Lecture 8</td>
+</tr>
+<tr class="even">
+<td>Seasonal naive</td>
+<td style="text-align: right;">2,152</td>
+<td>every week</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The ordering is not the one anyone predicts in Week 1.</strong> A 46-coefficient linear model is at the top. The two architectures with the most attention behind them — the LSTM and the Transformer — finished fifth and sixth of eight, behind a plain RNN with a fraction of their parameters — at the training budget each was measured at, which Lecture 9 Part 1 shows is part of the claim.</p>
+<p>Every model in this course, on the same M5 weekly panel. Same thirty series, same held-out block.</p>
+<p>LASSO with forty-six engineered features: <strong>seven forty-four</strong>. XGBoost, tuned: seven eighty-one. Vanilla RNN on four raw channels: eight forty-two. Random forest: eight ninety-nine. LSTM: nine eighty-seven. Transformer encoder: nine ninety. 1D CNN: one thousand thirty-two. And seasonal naive, at the bottom: twenty-one fifty-two. That ordering is not the one anyone predicts in Week 1. A <strong>forty-six-coefficient linear model</strong> is at the top. Above gradient boosting, above every neural architecture we built.</p>
+<p>And the two architectures with the most attention and money behind them — the LSTM and the Transformer — finished <strong>fifth and sixth of eight</strong>, behind a plain RNN with a fraction of their parameters.</p>
+<p>I want to be careful about what that does and doesn’t mean, because the wrong lesson is easy to take. It does not mean Transformers are overrated in general — they reorganized an entire field. It means they are <strong>mismatched to this problem</strong>, and the rest of this lecture is about learning to see that mismatch in advance rather than after nine hours of fitting.</p>
+</section>
+</section>
+<section id="what-the-results-taught" class="level2" data-number="15.3">
+<h2 data-number="15.3" class="anchored" data-anchor-id="what-the-results-taught"><span class="header-section-number">15.3</span> What the Results Taught</h2>
+<p>Three lessons, each paid for with a measurement.</p>
+<section id="lesson-1-the-benchmark-is-a-real-competitor" class="level3" data-number="15.3.1">
+<h3 data-number="15.3.1" class="anchored" data-anchor-id="lesson-1-the-benchmark-is-a-real-competitor"><span class="header-section-number">15.3.1</span> Lesson 1: The Benchmark Is a Real Competitor</h3>
+<p>In Homework 1 the seasonal-naive benchmark <strong>beat every exponential smoothing and ARIMA model</strong> you fitted — and the reason is countable. Holt-Winters must estimate <strong>52 seasonal indices from 4.3 annual cycles</strong> of training data: about four observations per parameter. Seasonal naive estimates <strong>nothing</strong>, and the level it carries moves +3.7%, +1.3%, −4.4%, +2.9% year over year — stable inside ±5%.</p>
+<p>Across the whole course the benchmark was beaten, but rarely by the margin the effort implied. The Bayesian structural model beat it by <strong>4%</strong>. The GAMs in Homework 2 beat it by <strong>12%</strong>. The best model on the weekly panel beat it by 65% — after 46 engineered features and a cross-validated penalty.</p>
+<div class="keybox">
+<p><strong>Compute the benchmark first, every time.</strong> It costs one line, it is often close, and it is the only number that tells you whether the rest of the work was worth doing.</p>
+</div>
+<p>This is also the cheapest professional habit you can carry out of this course. A forecast presented without a benchmark is a number no one can evaluate — including you.</p>
+<p>Start with the one that should be most uncomfortable.</p>
+<p>In Homework 1, the seasonal-naive benchmark — same week last year, one line of code — <strong>beat every exponential smoothing and ARIMA model you fitted.</strong></p>
+<p>That was not a trick question or a rigged setup. It is simply what the data supports at that horizon. And across the whole course, the benchmark was beaten, but rarely by the margin the effort implied.</p>
+<p>The Bayesian structural model beat it by <strong>four percent</strong>. The GAMs in Homework 2 beat it by <strong>twelve percent</strong>. The best model on the weekly panel beat it by sixty-five percent — after forty-six engineered features and a cross-validated penalty. So: <strong>compute the benchmark first, every time.</strong></p>
+<p>It costs one line. It is often close. And it is the only number that tells you whether the rest of your work was worth doing.</p>
+<p>This is also the cheapest professional habit you can carry out of this course, and the one most likely to distinguish you early in a job. A forecast presented without a benchmark is a number nobody can evaluate — including you, including the person who built it. If you take one thing from twelve weeks, take that.</p>
+</section>
+<section id="lesson-2-more-sophisticated-did-not-mean-better" class="level3" data-number="15.3.2">
+<h3 data-number="15.3.2" class="anchored" data-anchor-id="lesson-2-more-sophisticated-did-not-mean-better"><span class="header-section-number">15.3.2</span> Lesson 2: More Sophisticated Did Not Mean Better</h3>
+<p>Four times this course, the more advanced method failed to win — and each time for a reason we could name.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>LSTM lost to a plain RNN</strong></td>
+<td>At three window lengths, <em>at a fixed 30-epoch budget</em> — they tie by 100. Gating fixes long-range forgetting; 91% of this panel’s variance is between-series, so there is little to forget.</td>
+</tr>
+<tr class="even">
+<td><strong>Transformer lost to an RNN</strong></td>
+<td>67,329 parameters against roughly <strong>230 effectively independent</strong> 26-week blocks — ours overlap 96%. Attention’s long-range paths had nothing here to reach.</td>
+</tr>
+<tr class="odd">
+<td><strong>CNNs lost to LASSO</strong></td>
+<td>A seven-week receptive field cannot see an annual lag.</td>
+</tr>
+<tr class="even">
+<td><strong>Tuning bought nothing measurable</strong></td>
+<td>Nine fits and a 3-unit change, against a <strong>seed spread of 20–90</strong> at one fixed config. CV improved; test did not.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>None of these means the losing method is bad</strong> — each solves a problem this data does not have. LSTMs earn their gates on long dependency chains; Transformers earn their parameters on large corpora.</p>
+<p><strong>Match the method to the structure of the problem</strong>, not to the recency of the paper.</p>
+<p>Four times this semester the more advanced method lost. And each time, we could <strong>name the reason</strong> — which is the part that matters.</p>
+<p>The <strong>LSTM lost to a plain RNN</strong>, at three window lengths. Gating fixes long-range forgetting; a twenty-six-week window does not suffer from long-range forgetting. Four times the parameters, no gain.</p>
+<p>The <strong>Transformer lost to an RNN</strong>, with fifteen times the parameters. Its advantages are advantages <em>at scale</em>, and five thousand nine hundred forty windows is not scale. <strong>CNNs lost to LASSO</strong>, because a seven-week receptive field cannot see an annual lag. And <strong>tuning bought nothing measurable</strong> — nine fits, and a three-unit change.</p>
+<p>Both numbers came from a stochastic fit: the assignment specifies <code>subsample=0.8, colsample_bytree=0.8</code>. Fixing <code>random_state=42</code> makes each number reproducible, but it does <strong>not</strong> make their difference meaningful — two different hyperparameter settings at the same seed draw entirely different subsamples. Vary only the seed at one fixed config on this panel and the spread is <strong>twenty to ninety RMSE</strong>. A three-unit gap is inside that many times over.</p>
+<p>So the lesson is not that tuning hurt. It is that nine fits bought nothing you could measure — XGBoost’s defaults are well chosen for tabular data, and a grid search that improves cross-validation need not improve test.</p>
+<p>None of these means the losing method is bad. Every one of them solves a problem this data does not have. LSTMs earn their gates on long dependency chains. Transformers earn their parameters on large corpora. Those are real capabilities that simply were not needed here. <strong>Match the method to the structure of the problem, not to the recency of the paper.</strong></p>
+<p>And notice the standard I’m holding these to. It’s not “the fancy model lost, therefore fancy models are bad.” It’s “the fancy model lost, and we can say precisely which of its assumptions didn’t apply.” That second statement is worth something. The first is just cynicism.</p>
+</section>
+<section id="lesson-3-one-idea-appeared-six-times" class="level3" data-number="15.3.3">
+<h3 data-number="15.3.3" class="anchored" data-anchor-id="lesson-3-one-idea-appeared-six-times"><span class="header-section-number">15.3.3</span> Lesson 3: One Idea Appeared Six Times</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Lecture</th>
+<th>Name it went by</th>
+<th>What it penalized</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>GAM smoothing penalty</td>
+<td>Wiggliness of a spline</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Cost-complexity pruning</td>
+<td>Number of leaves</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td><code>reg_lambda</code>, <code>gamma</code></td>
+<td>Leaf weights, leaf count</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Ridge, LASSO, Elastic Net</td>
+<td>Coefficient size</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Weight decay, dropout</td>
+<td>Network weights</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>Hierarchical prior</td>
+<td>Distance from the group mean</td>
+</tr>
+</tbody>
+</table>
+<p>Six model families that look nothing alike, one bargain underneath: <strong>fit against complexity, with a single parameter setting the exchange rate.</strong></p>
+<p>Five of those six tune that parameter by cross-validation. The sixth — the hierarchical prior — <strong>estimates it</strong>, which is the cleanest version of the idea in the course.</p>
+<p><strong>This is what to remember when the tools change.</strong> The libraries in this course will be replaced. The trade between fit and complexity will not.</p>
+<p>Here’s the one I most want you to leave with.</p>
+<p>Lecture 3: the GAM smoothing penalty, penalizing the wiggliness of a spline. Lecture 4: cost-complexity pruning, penalizing the number of leaves. Lecture 5: <code>reg_lambda</code> and <code>gamma</code>, penalizing leaf weights and leaf count. Lecture 6: Ridge, LASSO, Elastic Net, penalizing coefficient size. Lecture 7: weight decay and dropout, penalizing network weights. Lecture 11: the hierarchical prior, penalizing distance from the group mean.</p>
+<p>Six model families that look nothing like each other. Splines, trees, boosted trees, linear models, neural networks, and a Bayesian hierarchy. One bargain underneath all of them: <strong>fit against complexity, with a single parameter setting the exchange rate.</strong></p>
+<p>And five of those six tune that parameter by cross-validation — you try values and pick one. The sixth, the hierarchical prior, <strong>estimates</strong> it, with a posterior and its own uncertainty. That makes it the cleanest version of the idea in the course.</p>
+<p>This is what to remember when the tools change. And they will change — most of the specific libraries in this course will look dated within a decade.</p>
+<p>The <strong>trade between fit and complexity</strong> will not. When you meet a method none of us have heard of yet, one of the first useful questions is: where is its complexity penalty, and what sets it?</p>
+</section>
+</section>
+<section id="choosing-a-method" class="level2" data-number="15.4">
+<h2 data-number="15.4" class="anchored" data-anchor-id="choosing-a-method"><span class="header-section-number">15.4</span> Choosing a Method</h2>
+<section id="which-method-when" class="level3" data-number="15.4.1">
+<h3 data-number="15.4.1" class="anchored" data-anchor-id="which-method-when"><span class="header-section-number">15.4.1</span> Which Method, When</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>If your situation is…</th>
+<th>start here</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>One series, clear seasonality, short history</td>
+<td>ETS or ARIMA — and check the benchmark</td>
+</tr>
+<tr class="even">
+<td>Several seasonal cycles at once</td>
+<td>GAM or Prophet</td>
+</tr>
+<tr class="odd">
+<td>Many engineered features, tabular</td>
+<td><strong>Regularized regression first</strong>, then XGBoost</td>
+</tr>
+<tr class="even">
+<td>Many parallel series, shared drivers</td>
+<td>Gradient boosting with series identifiers</td>
+</tr>
+<tr class="odd">
+<td>Genuinely long dependencies, lots of data</td>
+<td>Recurrent or attention architectures</td>
+</tr>
+<tr class="even">
+<td>Few observations per group</td>
+<td>Hierarchical Bayesian — partial pooling</td>
+</tr>
+<tr class="odd">
+<td>The decision needs a probability</td>
+<td>Bayesian, for the predictive distribution</td>
+</tr>
+</tbody>
+</table>
+<p>“Regularized regression first” is not a concession — it won our largest comparison and its coefficients can be read aloud. And the last row is the only one where the <em>question</em> changes rather than the accuracy.</p>
+<p>One series, clear seasonality, short history? ETS or ARIMA — and check the benchmark. Several seasonal cycles at once? GAM or Prophet. Many engineered features, tabular data? <strong>Regularized regression first</strong>, then XGBoost. Many parallel series with shared drivers? Gradient boosting with series identifiers. Genuinely long dependencies and lots of data? Recurrent or attention architectures. Few observations per group? Hierarchical Bayesian — partial pooling. The decision needs a probability? Bayesian, for the predictive distribution.</p>
+<p>Two things about that list.</p>
+<p>“Regularized regression first” is not a concession or a beginner’s option. It <strong>won our largest comparison</strong>, and its coefficients can be read aloud in a meeting. Start there and make the complicated model prove it deserves to replace it.</p>
+<p>And the last row is the only one where the <strong>question changes</strong> rather than the accuracy. Everything above it is a horse race on RMSE. That row is about needing a different kind of answer — which is the thing Lectures 10 through 12 were really for.</p>
+</section>
+</section>
+<section id="doing-it-honestly" class="level2" data-number="15.5">
+<h2 data-number="15.5" class="anchored" data-anchor-id="doing-it-honestly"><span class="header-section-number">15.5</span> Doing It Honestly</h2>
+<p>The errors that do not announce themselves.</p>
+<section id="errors-that-fail-silently-i-the-pipeline" class="level3" data-number="15.5.1">
+<h3 data-number="15.5.1" class="anchored" data-anchor-id="errors-that-fail-silently-i-the-pipeline"><span class="header-section-number">15.5.1</span> Errors That Fail Silently I: the Pipeline</h3>
+<p>Every one of these produces a confident, plausible, wrong answer with no error message — and every one is a <strong>bug in the code</strong>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><code>KFold</code> on a time series</td>
+<td>Random folds put the future in training. CV error looks excellent; the forecast fails.</td>
+</tr>
+<tr class="even">
+<td>Scaling outside the fold</td>
+<td>Validation statistics leak into training. Smaller effect, same class of error.</td>
+</tr>
+<tr class="odd">
+<td>Rolling features unshifted</td>
+<td>A window including the current week leaks the target into its own predictor.</td>
+</tr>
+<tr class="even">
+<td>Reading MDI importance</td>
+<td>Pure noise ranked <strong>17th of 29</strong> in Homework 3 — above a real feature — purely for having many distinct values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The common thread:</strong> the failure is not a crash, it is a number that looks fine — which is why the discipline is procedural. Split by time, scale inside the fold, shift the window, plant a control.</p>
+<p>Every error on this slide produces a confident, plausible, <strong>wrong</strong> answer with no error message. And every one of them is a <strong>bug in the code</strong>.</p>
+<p><code>KFold</code> on a time series. Random folds put the future into training. Your CV error looks excellent, and your forecast fails. Scaling outside the fold. Validation statistics leak into training. Smaller effect, same class of error. Rolling features unshifted. A window that includes the current week leaks the target into its own predictor.</p>
+<p>Reading MDI importance. In Homework 3, <strong>pure noise ranked seventeenth of twenty-nine</strong> — above a real feature — purely because it had many distinct values. The common thread is that the failure is not a crash. It’s a number that looks fine.</p>
+<p>Which is exactly why the discipline has to be <strong>procedural</strong>. Split by time. Scale inside the fold. Shift the window. Plant a control.</p>
+<p>You do those things because they’re on a list, not because something broke — because nothing is ever going to break.</p>
+</section>
+<section id="errors-that-fail-silently-ii-the-code-was-fine" class="level3" data-number="15.5.2">
+<h3 data-number="15.5.2" class="anchored" data-anchor-id="errors-that-fail-silently-ii-the-code-was-fine"><span class="header-section-number">15.5.2</span> Errors That Fail Silently II: the Code Was Fine</h3>
+<p>Harder, and more common in professional work. Here <strong>nothing is wrong with the program</strong>: the model fits, the diagnostics pass, and the answer is still wrong.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>Pooling groups that are not <strong>exchangeable</strong></td>
+<td>Lecture 11 Part 2 pooled ten FOODS series with twenty that ignore SNAP. Textbook shrinkage, clean diagnostics, and it reported <span class="math inline">\(+0.011\)</span> where held-out weeks said <span class="math inline">\(+0.089\)</span>.</td>
+</tr>
+<tr class="even">
+<td>Standardizing a coefficient you then <strong>interpret</strong></td>
+<td>Lecture 12: divide log price by its standard deviation and <code>b_price</code> stops being an elasticity. Identical fit, identical diagnostics, and the 5% price scenario moves by <strong>22<span class="math inline">\(\times\)</span></strong>.</td>
+</tr>
+<tr class="odd">
+<td>Omitting a confounder</td>
+<td>The naive elasticity was six times too large <em>with an interval half the width</em>. Precision is not accuracy.</td>
+</tr>
+<tr class="even">
+<td>Ignoring <span class="math inline">\(\hat{R}\)</span> and divergences</td>
+<td>Our first two Bayesian fits returned reasonable-looking forecasts while failing convergence outright.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Only the last row has a diagnostic.</strong> The first three were caught by held-out data, by a DAG drawn before the model, and by asking what one unit of a variable means — none of which any library will run for you.</p>
+<p>Now the harder category, and the one that is far more common in professional work.</p>
+<p>Here <strong>nothing is wrong with your program.</strong> The model fits. The sampler converges. Every diagnostic passes. And the answer is still wrong.</p>
+<p><strong>Pooling groups that are not exchangeable.</strong> Lecture 11 Part 2’s lab pooled ten FOODS series with twenty that ignore SNAP. Textbook shrinkage, clean diagnostics — and it reported an effect of plus point-oh-one-one where the held-out weeks said plus point-oh-eight-nine.</p>
+<p><strong>Standardizing a coefficient you then interpret.</strong> Lecture 12: divide log price by its standard deviation, and <code>b_price</code> stops being an elasticity. Identical fit, identical diagnostics, and the five percent price scenario moves by a factor of <strong>twenty-two</strong>.</p>
+<p><strong>Omitting a confounder.</strong> The naive elasticity was six times too large — <em>with an interval half the width</em> of the correct one. Precision is not accuracy. <strong>Ignoring R-hat and divergences.</strong> Our first two Bayesian fits returned reasonable-looking forecasts while failing convergence outright. Look at that list and ask which of them a diagnostic would have caught. <strong>Only the last one.</strong></p>
+<p>The first three were caught by held-out data, by a DAG drawn before the model, and by asking what one unit of a variable actually means. None of those is something a library will run for you. There is no <code>check_exchangeability()</code>. There is no warning when your coefficient stops being an elasticity.</p>
+<p>That’s the difference between knowing how to call a method and knowing what it assumes. Twelve weeks of this course have been aimed at the second one.</p>
+</section>
+<section id="the-day-every-model-in-this-course-fails" class="level3" data-number="15.5.3">
+<h3 data-number="15.5.3" class="anchored" data-anchor-id="the-day-every-model-in-this-course-fails"><span class="header-section-number">15.5.3</span> The Day Every Model in This Course Fails</h3>
+<p>Every 25 December the stores close and recorded sales are <strong>exactly zero</strong> — five times in our sample, against a daily average near 2,800.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>25 Dec</th>
+<th style="text-align: right;">2012</th>
+<th style="text-align: right;">2013</th>
+<th style="text-align: right;">2014</th>
+<th style="text-align: right;">2015</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Actual</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td>Seasonal naive</td>
+<td style="text-align: right;">2,230</td>
+<td style="text-align: right;">2,045</td>
+<td style="text-align: right;">2,485</td>
+<td style="text-align: right;">2,365</td>
+</tr>
+</tbody>
+</table>
+<p>Four days — <strong>0.25%</strong> of the evaluation window — carry <strong>4.6%</strong> of its squared error, eighteen times their share. Drop them and the benchmark’s RMSE falls from 537 to 525 without a single modelling change.</p>
+<p><strong>The information was never missing.</strong> <code>is_event</code> fires on <strong>158</strong> days, of which <strong>5</strong> are closures: the feature cannot tell “the doors are locked” from an ordinary Super Bowl, so no model learned the difference.</p>
+<div class="keybox">
+<p>Knowable years ahead, and every method still failed — because the <em>encoding</em> discarded the distinction, not because the model was misspecified. The harder case is a shock nobody could have known at all: the Favorita earthquake of 16 April 2016 is one, and that dataset is available for final projects.</p>
+</div>
+<p>One more failure, and it is not on the previous slide’s list because it is not a mistake anybody made. It is a limit.</p>
+<p>Every twenty-fifth of December, the stores close. Recorded sales are <strong>exactly zero</strong> — five times in our sample, against a daily average near twenty-eight hundred.</p>
+<p>And the seasonal-naive benchmark, on those four evaluable days, predicts twenty-two thirty, twenty forty-five, twenty-four eighty-five, twenty-three sixty-five. Wrong by a hundred percent of the true value, every time, on a date known years in advance.</p>
+<p>Now the number that makes this more than an anecdote. Those four days are <strong>one quarter of one percent</strong> of the evaluation window, and they carry <strong>four point six percent</strong> of its squared error. Eighteen times their share. Drop four days out of fifteen hundred and the benchmark’s RMSE falls from 537 to 525 — without changing a single thing about the model. So why did nobody catch it? Not for want of information.</p>
+<p><code>is_event</code> fires on <strong>158</strong> days in this data. <strong>Five</strong> of them are closures. Every model in this course — the trees that split on it, the networks that took it as a channel, the Bayesian regressions that gave it a coefficient — saw a flag that lumps a locked front door together with a hundred and fifty-three Super Bowls and Easters. The feature could not express the difference, so no model could learn it.</p>
+<p>And that is the honest shape of this failure. It was knowable years ahead. Nothing was missing from the world; something was missing from the <strong>encoding</strong>. The model was not misspecified — it was asked a question in a vocabulary that had no word for “closed.”</p>
+<p>The harder case is a shock nobody could have known about at all. On the sixteenth of April 2016 a magnitude 7.8 earthquake struck Ecuador, and sales at a large grocery chain there spiked for weeks as people bought water and relief supplies. A forecast made on the fifteenth — by any method in this course — is catastrophically wrong for the following month. Not because the model was bad, but because the future stopped resembling the past, which is the one assumption every method here shares.</p>
+<p>That dataset is available if your project wants a real structural break rather than a simulated one. Knowing where the whole toolkit stops working is part of knowing how to use it.</p>
+</section>
+<section id="what-a-defensible-forecast-report-contains" class="level3" data-number="15.5.4">
+<h3 data-number="15.5.4" class="anchored" data-anchor-id="what-a-defensible-forecast-report-contains"><span class="header-section-number">15.5.4</span> What a Defensible Forecast Report Contains</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>A benchmark</strong></td>
+<td>Computed, not cited. Every model measured against it.</td>
+</tr>
+<tr class="even">
+<td><strong>A time-aware split</strong></td>
+<td>Walk-forward or a held-out final block, never random.</td>
+</tr>
+<tr class="odd">
+<td><strong>More than one evaluation</strong></td>
+<td>A single test split can flatter. Homework 4 ranked models the same way twice, which is why that ranking is believable.</td>
+</tr>
+<tr class="even">
+<td><strong>The result that went against you</strong></td>
+<td>Including tuning that did not help, and the model you expected to win.</td>
+</tr>
+<tr class="odd">
+<td><strong>An interpretation</strong></td>
+<td>In the units of the business, not of the loss function.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The fourth row is the one that distinguishes professional work.</strong> A report where every result confirms the author’s expectation is not a report anyone should act on.</p>
+<p>You have practised this all semester: the assignments were built so the obvious answer is frequently the wrong one, and the credit was for noticing.</p>
+<p>So what does good work actually look like when you hand it to someone? <strong>A benchmark</strong> — computed, not cited. Every model measured against it. <strong>A time-aware split</strong> — walk-forward or a held-out final block. Never random.</p>
+<p><strong>More than one evaluation.</strong> A single test split can flatter. Homework 4 ranked models the same way twice, and that’s why that ranking is believable.</p>
+<p><strong>The result that went against you</strong> — including tuning that didn’t help, and the model you expected to win. <strong>An interpretation</strong>, in the units of the business rather than of the loss function.</p>
+<p>That fourth row is the one that distinguishes professional work, and it’s the one that feels counterintuitive when you’re junior.</p>
+<p>A report where <strong>every</strong> result confirms the author’s expectation is not a report anyone should act on. Either the author got lucky, or they stopped looking, or they’re not telling you everything. Reporting what went against you is what makes the rest of it credible.</p>
+<p>And you have practised this all semester, whether or not it felt like it. The assignments were built so that the obvious answer is frequently the wrong one — and the credit was for <strong>noticing</strong>, not for getting the flattering number.</p>
+</section>
+<section id="where-you-do-this-yourself" class="level3" data-number="15.5.5">
+<h3 data-number="15.5.5" class="anchored" data-anchor-id="where-you-do-this-yourself"><span class="header-section-number">15.5.5</span> Where You Do This Yourself</h3>
+<p>The final project asks for exactly the report on the previous slide, on data of your choosing.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Three methods, from at least two parts of the course</strong></td>
+<td>Classical, trees, deep learning, Bayesian. Three variations on one family does not count — the comparison must be between approaches differing <em>in kind</em>.</td>
+</tr>
+<tr class="even">
+<td><strong>Plus a benchmark</strong></td>
+<td>Which does not count toward the three, and is not optional. Lesson 1 is why.</td>
+</tr>
+<tr class="odd">
+<td><strong>Walk-forward validation</strong></td>
+<td>For every comparison. Not a random split, not once.</td>
+</tr>
+<tr class="even">
+<td><strong>A recommendation a non-specialist can act on</strong></td>
+<td>In the units of the business, with the uncertainty attached.</td>
+</tr>
+<tr class="odd">
+<td><strong>A methods reflection</strong></td>
+<td>Which model won, and what about <em>your</em> data made it win. This is where the course is actually assessed.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The last row is not a formality.</strong> Every scoreboard in this course came with a reason, and a project that reports a ranking without one has done the computation but not the work.</p>
+<p>Which brings us to the final project, because it asks for exactly the report on the previous slide, on data of your choosing.</p>
+<p><strong>Three methods, from at least two parts of the course.</strong> Classical, trees, deep learning, Bayesian. Three variations on one family does not satisfy this — the comparison has to be between approaches that differ <em>in kind</em>.</p>
+<p><strong>Plus a benchmark</strong>, which does not count toward the three and is not optional. Lesson 1 is why. <strong>Walk-forward validation</strong> for every comparison. Not a random split, and not once. <strong>A recommendation a non-specialist can act on</strong>, in business units, with the uncertainty attached. <strong>A methods reflection</strong> — which model won, and what about <em>your</em> data made it win. That last row is not a formality, and it’s where the grade actually lives.</p>
+<p>Every scoreboard in this course came with a <strong>reason</strong>. The LSTM lost because gating solves a problem this data doesn’t have. The CNN lost because seven weeks can’t see an annual lag. The Transformer lost because its advantages are advantages at scale. A project that reports a ranking without a reason has done the computation but not the work.</p>
+</section>
+</section>
+<section id="where-to-go-next" class="level2" data-number="15.6">
+<h2 data-number="15.6" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">15.6</span> Where to Go Next</h2>
+<section id="what-this-course-did-not-cover" class="level3" data-number="15.6.1">
+<h3 data-number="15.6.1" class="anchored" data-anchor-id="what-this-course-did-not-cover"><span class="header-section-number">15.6.1</span> What This Course Did Not Cover</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Hierarchical reconciliation</strong></td>
+<td>Making store forecasts add up to regional totals. Different from Lecture 11’s hierarchy. FPP Ch. 11.</td>
+</tr>
+<tr class="even">
+<td><strong>Intermittent demand</strong></td>
+<td>Series that are mostly zeros — Croston’s method and its relatives. Common in spare parts and slow-moving SKUs.</td>
+</tr>
+<tr class="odd">
+<td><strong>Structural breaks</strong></td>
+<td>When the future stops resembling the past. Every method here fails together, and detecting it early is its own field.</td>
+</tr>
+<tr class="even">
+<td><strong>Causal inference</strong></td>
+<td>DAGs told us confounders exist. Estimating causal effects credibly is a separate course.</td>
+</tr>
+<tr class="odd">
+<td><strong>Foundation models</strong></td>
+<td>Pretrained forecasters applied zero-shot. Moving quickly — FPP-Py Ch. 15 is a starting point.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The third row is the one most likely to matter in your career.</strong> Every model in this course assumes the future resembles the past. When that stops being true, the model does not tell you — and the benchmark fails at the same moment.</p>
+<p>Some honest gaps, so you know what you don’t know.</p>
+<p><strong>Hierarchical reconciliation</strong> — making store forecasts add up to regional totals. Genuinely different from Lecture 11’s hierarchy, and FPP Chapter 11 covers it.</p>
+<p><strong>Intermittent demand</strong> — series that are mostly zeros. Croston’s method and its relatives. Very common in spare parts and slow-moving SKUs, and none of our methods handle it well. <strong>Structural breaks</strong> — when the future stops resembling the past. <strong>Causal inference</strong> — DAGs told us confounders exist. Estimating causal effects credibly is a separate course. <strong>Foundation models</strong> — pretrained forecasters applied zero-shot. Moving fast; FPP-Py Chapter 15 is a starting point.</p>
+<p>The third row is the one most likely to matter in your career, so let me be explicit about why.</p>
+<p><strong>Every model in this course assumes the future resembles the past.</strong> Every single one. And when that stops being true — a pandemic, a competitor entering, a supply shock, a pricing change — the model does not tell you.</p>
+<p>Worse: <strong>the benchmark fails at exactly the same moment</strong>, so your usual safety net goes with it. Your forecast is wrong, your comparison is wrong, and everything still looks internally consistent. Detecting that early is its own field, and it’s worth knowing that field exists.</p>
+</section>
+<section id="closing" class="level3" data-number="15.6.2">
+<h3 data-number="15.6.2" class="anchored" data-anchor-id="closing"><span class="header-section-number">15.6.2</span> Closing</h3>
+<div class="keybox">
+<ol type="1">
+<li><p><strong>Compute the benchmark first.</strong> It is often close, and it is the only number that says whether your work was worth doing.</p></li>
+<li><p><strong>Match the method to the problem</strong>, not to the paper’s publication date. The most advanced model on our data finished sixth.</p></li>
+<li><p><strong>One idea recurs</strong>: fit against complexity, with a parameter setting the rate. You have now seen it six times under six names.</p></li>
+<li><p><strong>Split by time, always.</strong> The leakage errors in this field do not crash — they return a better-looking number.</p></li>
+<li><p><strong>Diagnostics check the model you wrote, not whether it was the right one.</strong> Convergence, <span class="math inline">\(\hat{R}\)</span> and ESS all passed on the two worst answers this course produced. Held-out data caught them.</p></li>
+<li><p><strong>Report what went against you.</strong> It is the part that makes the rest credible.</p></li>
+<li><p><strong>Know what your forecast is for.</strong> A point estimate and a predictive distribution answer different questions, and only one of them supports a decision under uncertainty.</p></li>
+</ol>
+</div>
+<p><span class="neutral">The libraries will change. The habits are the transferable part.</span></p>
+<p>One. <strong>Compute the benchmark first.</strong> It’s often close, and it’s the only number that says whether your work was worth doing.</p>
+<p>Two. <strong>Match the method to the problem</strong>, not to the paper’s publication date. The most advanced model on our data finished sixth.</p>
+<p>Three. <strong>One idea recurs</strong>: fit against complexity, with a parameter setting the rate. Six times, under six names.</p>
+<p>Four. <strong>Split by time, always.</strong> The leakage errors in this field don’t crash — they return a better-looking number.</p>
+<p>Five. <strong>Diagnostics check the model you wrote, not whether it was the right one.</strong> Convergence, R-hat and ESS all passed on the two worst answers this course produced. Held-out data caught them. Six. <strong>Report what went against you.</strong> It’s the part that makes the rest credible.</p>
+<p>Seven. <strong>Know what your forecast is for.</strong> A point estimate and a predictive distribution answer different questions, and only one of them supports a decision under uncertainty. The libraries will change. The habits are the transferable part. Thank you — and good luck with the project.</p>
+</section>
+<section id="references" class="level3" data-number="15.6.3">
+<h3 data-number="15.6.3" class="anchored" data-anchor-id="references"><span class="header-section-number">15.6.3</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture12_BayesianRegression.html" class="pagination-link" aria-label="Bayesian Statistics III --- Bayesian Linear Regression">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

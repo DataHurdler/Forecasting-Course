@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>7&nbsp; Introduction to Neural Networks – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture08_CNNs.html" rel="next">
+<link href="../chapters/Lecture06_Regularization.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture07_NeuralNets.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">7.1</span> Lecture Outline</a></li>
+  <li><a href="#from-trees-to-neural-networks" id="toc-from-trees-to-neural-networks" class="nav-link" data-scroll-target="#from-trees-to-neural-networks"><span class="header-section-number">7.2</span> From Trees to Neural Networks</a>
+  <ul class="collapse">
+  <li><a href="#why-go-beyond-trees" id="toc-why-go-beyond-trees" class="nav-link" data-scroll-target="#why-go-beyond-trees"><span class="header-section-number">7.2.1</span> Why Go Beyond Trees?</a></li>
+  <li><a href="#from-linear-regression-to-a-single-neuron" id="toc-from-linear-regression-to-a-single-neuron" class="nav-link" data-scroll-target="#from-linear-regression-to-a-single-neuron"><span class="header-section-number">7.2.2</span> From Linear Regression to a Single Neuron</a></li>
+  <li><a href="#why-the-nonlinearity-is-the-whole-trick" id="toc-why-the-nonlinearity-is-the-whole-trick" class="nav-link" data-scroll-target="#why-the-nonlinearity-is-the-whole-trick"><span class="header-section-number">7.2.3</span> Why the Nonlinearity Is the Whole Trick</a></li>
+  </ul></li>
+  <li><a href="#feedforward-networks" id="toc-feedforward-networks" class="nav-link" data-scroll-target="#feedforward-networks"><span class="header-section-number">7.3</span> Feedforward Networks</a>
+  <ul class="collapse">
+  <li><a href="#feedforward-network-layers-and-forward-pass" id="toc-feedforward-network-layers-and-forward-pass" class="nav-link" data-scroll-target="#feedforward-network-layers-and-forward-pass"><span class="header-section-number">7.3.1</span> Feedforward Network: Layers and Forward Pass</a></li>
+  <li><a href="#how-big-is-this-model-actually" id="toc-how-big-is-this-model-actually" class="nav-link" data-scroll-target="#how-big-is-this-model-actually"><span class="header-section-number">7.3.2</span> How Big Is This Model, Actually?</a></li>
+  </ul></li>
+  <li><a href="#training-loss-and-backpropagation" id="toc-training-loss-and-backpropagation" class="nav-link" data-scroll-target="#training-loss-and-backpropagation"><span class="header-section-number">7.4</span> Training: Loss and Backpropagation</a>
+  <ul class="collapse">
+  <li><a href="#training-loss-gradients-and-the-update-step" id="toc-training-loss-gradients-and-the-update-step" class="nav-link" data-scroll-target="#training-loss-gradients-and-the-update-step"><span class="header-section-number">7.4.1</span> Training: Loss, Gradients, and the Update Step</a></li>
+  <li><a href="#preventing-overfitting-where-lecture-6-returns" id="toc-preventing-overfitting-where-lecture-6-returns" class="nav-link" data-scroll-target="#preventing-overfitting-where-lecture-6-returns"><span class="header-section-number">7.4.2</span> Preventing Overfitting — Where Lecture 6 Returns</a></li>
+  </ul></li>
+  <li><a href="#pytorch-implementation" id="toc-pytorch-implementation" class="nav-link" data-scroll-target="#pytorch-implementation"><span class="header-section-number">7.5</span> PyTorch Implementation</a>
+  <ul class="collapse">
+  <li><a href="#pytorch-dataset-and-dataloader" id="toc-pytorch-dataset-and-dataloader" class="nav-link" data-scroll-target="#pytorch-dataset-and-dataloader"><span class="header-section-number">7.5.1</span> PyTorch: Dataset and DataLoader</a></li>
+  <li><a href="#pytorch-defining-the-model" id="toc-pytorch-defining-the-model" class="nav-link" data-scroll-target="#pytorch-defining-the-model"><span class="header-section-number">7.5.2</span> PyTorch: Defining the Model</a></li>
+  <li><a href="#pytorch-the-training-loop" id="toc-pytorch-the-training-loop" class="nav-link" data-scroll-target="#pytorch-the-training-loop"><span class="header-section-number">7.5.3</span> PyTorch: The Training Loop</a></li>
+  </ul></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">7.6</span> Key Takeaways</a>
+  <ul class="collapse">
+  <li><a href="#neural-networks-vs.-tree-methods" id="toc-neural-networks-vs.-tree-methods" class="nav-link" data-scroll-target="#neural-networks-vs.-tree-methods"><span class="header-section-number">7.6.1</span> Neural Networks vs.&nbsp;Tree Methods</a></li>
+  <li><a href="#lecture-7-key-takeaways" id="toc-lecture-7-key-takeaways" class="nav-link" data-scroll-target="#lecture-7-key-takeaways"><span class="header-section-number">7.6.2</span> Lecture 7: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">7.6.3</span> References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 7 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">7.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>From Trees to Neural Networks</li>
+<li>Feedforward Networks</li>
+<li>Training: Loss and Backpropagation</li>
+<li>PyTorch Implementation</li>
+<li>Key Takeaways</li>
+</ol>
+<p>Five parts. First, why you’d go beyond trees at all — and when you shouldn’t. Then the feedforward network itself: layers, width, depth, and how quickly the parameter count runs away from you. Then training — loss, backpropagation, the update step. Then PyTorch, which is four pieces you’ll use in every deep learning assignment for the rest of the semester. And then where a network actually belongs in the toolkit you now have.</p>
+</section>
+<section id="from-trees-to-neural-networks" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="from-trees-to-neural-networks"><span class="header-section-number">7.2</span> From Trees to Neural Networks</h2>
+<p>Trees predict in steps. Networks predict in curves — and that difference buys less than you would expect on tabular data, and everything on sequences.</p>
+<p>Trees predict in steps. Networks predict in curves. And that difference buys you less than you would expect on tabular data, and everything on sequences.</p>
+<section id="why-go-beyond-trees" class="level3" data-number="7.2.1">
+<h3 data-number="7.2.1" class="anchored" data-anchor-id="why-go-beyond-trees"><span class="header-section-number">7.2.1</span> Why Go Beyond Trees?</h3>
+<p>A tree-based model treats every row as independent. Order is not part of the model — everything it knows about time, you put there by hand, as lag columns and rolling means. And its prediction is <strong>piecewise constant</strong>, which is why in Lab 4 the tree could not predict above the largest value it had seen.</p>
+<p>A neural network learns a <strong>smooth, continuous</strong> function instead. Its architecture is not fixed: the same machinery adapts to sequences, images and text, and it can learn its own intermediate representations rather than being handed engineered ones.</p>
+<div class="warningbox">
+<p><strong>This is not an upgrade.</strong> On the tabular problems of Homework 3 and 4, gradient boosting and a tuned LASSO were hard to beat, and a network will often lose to both. Reach for one when the data is a <em>sequence</em>, when the raw input is an image or audio, or when <span class="math inline">\(n\)</span> is very large. Otherwise you are paying in tuning time for accuracy you will not get.</p>
+</div>
+<p>So today is about the machinery. Lectures 8 and 9 are where it earns its place.</p>
+<p>Two honest reasons, and one honest warning.</p>
+<p>The first reason: a tree-based model treats every row as independent. Order is not part of the model. Everything a random forest knows about <em>time</em> — that last week matters, that fifty-two weeks ago matters — you put there by hand, as lag columns and rolling means. If you shuffled the feature columns, the model would be identical.</p>
+<p>The second reason: a tree’s prediction is <strong>piecewise constant</strong>. Remember Lab 4, where the tree could not predict above the largest value it had ever seen? That’s not a bug in our implementation. It is what a tree is. It averages training values in a leaf, so it cannot extrapolate. A neural network learns a smooth, continuous function, and it can. Now the warning, and I want to be blunt about it.</p>
+<p>This is <strong>not an upgrade</strong>. On the tabular problems in Homework 3 and Homework 4, gradient boosting and a tuned LASSO were hard to beat, and a network will often lose to both. You reach for a network when the data is genuinely a sequence, when the raw input is an image or audio, or when your sample size is very large. Otherwise you are paying in tuning time for accuracy you will not get.</p>
+<p>So today is about the machinery. Lectures 8 and 9 are where it earns its place.</p>
+</section>
+<section id="from-linear-regression-to-a-single-neuron" class="level3" data-number="7.2.2">
+<h3 data-number="7.2.2" class="anchored" data-anchor-id="from-linear-regression-to-a-single-neuron"><span class="header-section-number">7.2.2</span> From Linear Regression to a Single Neuron</h3>
+<p>Start from something you already know. Linear regression predicts <span class="math inline">\(\hat{y} = \mathbf{w}^\top \mathbf{x} + b\)</span>.</p>
+<p>A <strong>neuron</strong> is that same expression with one addition — a nonlinear <strong>activation</strong> <span class="math inline">\(\sigma(\cdot)\)</span> wrapped around it:</p>
+<p><span class="math display">\[a = \sigma(\mathbf{w}^\top \mathbf{x} + b)\]</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Activation</th>
+<th>Formula</th>
+<th>Where it is used</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ReLU</td>
+<td><span class="math inline">\(\max(0,z)\)</span></td>
+<td>Hidden layers — the default</td>
+</tr>
+<tr class="even">
+<td>Sigmoid</td>
+<td><span class="math inline">\(1/(1+e^{-z})\)</span></td>
+<td>Binary outputs, and LSTM gates (Lecture 9)</td>
+</tr>
+<tr class="odd">
+<td>Tanh</td>
+<td><span class="math inline">\(\tanh(z)\)</span></td>
+<td>Sequence states</td>
+</tr>
+<tr class="even">
+<td>Linear</td>
+<td><span class="math inline">\(z\)</span></td>
+<td>The output layer, for regression</td>
+</tr>
+</tbody>
+</table>
+<p>ReLU makes the intuition literal: the neuron asks <em>“is this pattern present?”</em> If the evidence is positive it passes a signal through; if not it outputs exactly zero and stays silent.</p>
+<p>Let’s build the thing from something you already know.</p>
+<p>Linear regression predicts y-hat equals w-transpose x plus b. A weighted sum of your predictors, plus an intercept. You’ve been fitting that since Lecture 2.</p>
+<p>A <strong>neuron</strong> is that exact expression with one addition: a nonlinear function wrapped around the outside. We call that function the <strong>activation</strong>, and we write it sigma. So: a equals sigma of w-transpose x plus b. That’s it. That is the entire unit.</p>
+<p>Four activations you’ll meet. <strong>ReLU</strong> — max of zero and z — is the default for hidden layers. <strong>Sigmoid</strong> squashes to between zero and one; you’ll see it again in Lecture 9 as an LSTM gate. <strong>Tanh</strong> squashes to between minus one and one, and shows up in sequence states. And <strong>linear</strong>, which is just z — that’s your output layer when you’re doing regression, because you don’t want to squash a forecast.</p>
+<p>ReLU is worth a sentence of intuition, because it makes the whole thing concrete. The neuron is asking a question: <em>is this pattern present?</em> If the evidence is positive, it passes a signal through, proportional to how positive. If the evidence is negative, it outputs exactly zero and stays silent. That’s a detector.</p>
+<p>And that “exactly zero” is doing more work than it looks. Because ReLU switches fully off, a trained network is <strong>sparse</strong> at any given input — most neurons contribute nothing, and the ones that fire are the ones whose pattern is present. That sparsity is part of why ReLU trains faster than sigmoid: a sigmoid never quite switches off, so every unit is always slightly involved in every prediction, and its gradient gets very small at both extremes.</p>
+<p>One thing to watch on the output layer. It is genuinely tempting to put an activation there because every other layer has one. Don’t. A ReLU on the output would make negative forecasts impossible, which sounds harmless until you remember we often model <em>log</em> units or <em>differences</em>, where negative is exactly what you want. Regression output layers stay linear.</p>
+</section>
+<section id="why-the-nonlinearity-is-the-whole-trick" class="level3" data-number="7.2.3">
+<h3 data-number="7.2.3" class="anchored" data-anchor-id="why-the-nonlinearity-is-the-whole-trick"><span class="header-section-number">7.2.3</span> Why the Nonlinearity Is the Whole Trick</h3>
+<p>It is worth being precise about what <span class="math inline">\(\sigma(\cdot)\)</span> buys, because it is easy to assume that depth alone is what makes a network powerful. It is not.</p>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Stacking linear layers gains you nothing</p>
+</div>
+<p>A linear function of a linear function is linear. Compose two layers with no activation between them and you get <span class="math inline">\(\mathbf{W}_2(\mathbf{W}_1\mathbf{x}) = (\mathbf{W}_2\mathbf{W}_1)\mathbf{x}\)</span> — a single matrix, and therefore a single linear model with extra steps.</p>
+</div>
+<p>Insert a nonlinearity between the layers and the picture changes completely. The <strong>universal approximation theorem</strong> says a network with one hidden layer can approximate <em>any</em> continuous function to arbitrary accuracy, given enough neurons.</p>
+<p><strong>Read that claim carefully.</strong> It says a network <em>can</em> represent the function — not that your optimizer will find it, that you have the data to identify it, or that it will generalize. Existence is not estimation, the same gap as between the optimal tree and the greedy one CART builds.</p>
+<p>I want to be precise about what that sigma actually buys, because it is easy to assume that <em>depth</em> is what makes a network powerful. It is not.</p>
+<p>Here is the thing to understand. A linear function of a linear function is linear. If you stack two layers with no activation between them, you get W-two times W-one times x — and W-two times W-one is just some other matrix. So you have a single matrix, applied once. You’ve built a linear model with extra steps and a slower fitting procedure. Depth alone gains you <strong>nothing</strong>.</p>
+<p>Put a nonlinearity between the layers and the picture changes completely. There’s a result called the <strong>universal approximation theorem</strong> which says a network with a single hidden layer can approximate any continuous function to arbitrary accuracy, given enough neurons. Now — read that claim carefully, because it is quoted far more often than it is understood.</p>
+<p>It says the network <strong>can represent</strong> the function. It does not say your optimizer will find it. It does not say you have enough data to identify it. And it certainly does not say the result will generalize to next quarter.</p>
+<p>Existence is not estimation. You’ve already met that gap: in Lecture 4 we said the optimal decision tree exists, and CART builds a greedy one instead, because finding the optimal one is computationally hopeless. Same shape of problem, different setting.</p>
+<p>There’s a practical reading of the theorem too, and it’s more useful than the theoretical one. The theorem is about a <em>single</em> hidden layer, made arbitrarily wide. In practice nobody builds that. Everybody builds narrow-and-deep instead, because depth composes features — layer two builds on what layer one found, rather than starting over — and that turns out to need far fewer total neurons for the same job.</p>
+<p>So when someone tells you “neural networks are universal approximators,” the correct response is that so are polynomials, and so are splines, and you would not use a degree-forty polynomial to forecast demand. Being able to represent everything is not by itself a recommendation. What matters is whether the shape the model prefers matches the shape your data actually has — which is exactly the theme of the next two lectures.</p>
+</section>
+</section>
+<section id="feedforward-networks" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="feedforward-networks"><span class="header-section-number">7.3</span> Feedforward Networks</h2>
+<p>Stack layers of neurons, and each layer learns a higher-level representation of the one below it.</p>
+<section id="feedforward-network-layers-and-forward-pass" class="level3" data-number="7.3.1">
+<h3 data-number="7.3.1" class="anchored" data-anchor-id="feedforward-network-layers-and-forward-pass"><span class="header-section-number">7.3.1</span> Feedforward Network: Layers and Forward Pass</h3>
+<p>A <strong>feedforward network</strong> — an FFN, or multilayer perceptron — is three things in sequence. An <strong>input layer</strong> of raw features <span class="math inline">\(\mathbf{x} \in \mathbb{R}^p\)</span>; some number of <strong>hidden layers</strong>, each applying <span class="math inline">\(\mathbf{a}^{(\ell)} = \sigma\!\left(\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)} + \mathbf{b}^{(\ell)}\right)\)</span>; and an <strong>output layer</strong> that is linear for regression.</p>
+<p>Two words you need: <strong>width</strong> is the number of neurons in a layer, <strong>depth</strong> is the number of hidden layers. Together they set the model’s capacity.</p>
+<div class="keybox">
+<p><strong>Sensible starting sizes for forecasting:</strong> 2–3 hidden layers, 64–256 neurons each, ReLU activations, dropout between 0.2 and 0.5. Start at the small end of every range.</p>
+</div>
+<p>Bigger is not better on its own. A wider or deeper network needs more data and more regularization to reach the same generalization, so add capacity only when validation error says the current model is genuinely too simple — not because it is available.</p>
+<p>A <strong>feedforward network</strong> — you’ll also see it called an FFN or a multilayer perceptron — is three things in sequence.</p>
+<p>An <strong>input layer</strong>, which is just your raw features. Some number of <strong>hidden layers</strong>, each one applying that neuron equation to the layer below it — matrix multiply, add a bias, apply the activation. And an <strong>output layer</strong>, which for regression is linear, no activation.</p>
+<p>Two words you need. <strong>Width</strong> is how many neurons are in a layer. <strong>Depth</strong> is how many hidden layers you have. Together they set the model’s capacity — the range of functions it can represent.</p>
+<p>Sensible starting sizes for forecasting: two to three hidden layers, sixty-four to two hundred fifty-six neurons each, ReLU activations, dropout somewhere between zero-point-two and zero-point-five. <strong>Start at the small end of every one of those ranges.</strong></p>
+<p>Because here’s the trap. Bigger is not better on its own. A wider or deeper network needs <em>more data</em> and <em>more regularization</em> to reach the same generalization. So you add capacity when validation error tells you the current model is genuinely too simple — not because the capacity is available and it’s one keystroke away.</p>
+<p>Here’s the diagnostic that tells you which way to move. Look at training error and validation error together. If <strong>both</strong> are bad, your model is too simple — add width or depth. If training error is excellent and validation error is poor, you have the opposite problem, and more capacity will make it worse; you need more regularization, or more data, or fewer features.</p>
+<p>That’s the bias-variance picture from Lecture 4, and it does not change just because the model has twenty thousand parameters instead of twenty leaves. Only the knobs change.</p>
+<p>The reason I push you toward the small end is practical. A small network that underfits tells you so clearly and trains in seconds. A large network that overfits produces a beautiful training curve and a forecast you shouldn’t ship, and it takes ten times as long to discover that.</p>
+</section>
+<section id="how-big-is-this-model-actually" class="level3" data-number="7.3.2">
+<h3 data-number="7.3.2" class="anchored" data-anchor-id="how-big-is-this-model-actually"><span class="header-section-number">7.3.2</span> How Big Is This Model, Actually?</h3>
+<p>Capacity is easy to add by accident, so it is worth counting once. A layer mapping <span class="math inline">\(m\)</span> inputs to <span class="math inline">\(n\)</span> outputs holds <span class="math inline">\(m \times n\)</span> weights plus <span class="math inline">\(n\)</span> biases.</p>
+<p>Take a network for our weekly panel: 46 engineered features in, two hidden layers of 128, one output.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Layer</th>
+<th style="text-align: right;">Shape</th>
+<th style="text-align: right;">Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Input <span class="math inline">\(\rightarrow\)</span> hidden 1</td>
+<td style="text-align: right;"><span class="math inline">\(46 \times 128\)</span></td>
+<td style="text-align: right;">6,016</td>
+</tr>
+<tr class="even">
+<td>Hidden 1 <span class="math inline">\(\rightarrow\)</span> hidden 2</td>
+<td style="text-align: right;"><span class="math inline">\(128 \times 128\)</span></td>
+<td style="text-align: right;">16,512</td>
+</tr>
+<tr class="odd">
+<td>Hidden 2 <span class="math inline">\(\rightarrow\)</span> output</td>
+<td style="text-align: right;"><span class="math inline">\(128 \times 1\)</span></td>
+<td style="text-align: right;">129</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>22,657</strong></td>
+</tr>
+</tbody>
+</table>
+<p><span class="key-result"><strong>Twenty-two thousand parameters on five thousand rows</strong> — four per observation.</span></p>
+<p>Lecture 6 called sixty predictors on a hundred and fifty observations a crisis. This is far past that ratio, and networks train here routinely. What makes it survivable is not the architecture but the regularization, next.</p>
+<p>Capacity is easy to add by accident, so let’s count it once, properly.</p>
+<p>A layer mapping m inputs to n outputs holds m times n weights, plus n biases. That’s it — that’s the whole formula.</p>
+<p>Take a network for our weekly panel. Forty-six engineered features going in — the same features you built for Homework 4. Two hidden layers of a hundred twenty-eight. One output.</p>
+<p>Input to hidden one: forty-six times one hundred twenty-eight, that’s six thousand and sixteen parameters. Hidden one to hidden two: one twenty-eight squared, sixteen thousand five hundred twelve. Hidden two to output: one hundred twenty-nine. Total: <strong>twenty-two thousand six hundred fifty-seven parameters.</strong></p>
+<p>Now sit with that number for a second. We have about five thousand rows of training data. That’s roughly <strong>four parameters for every observation</strong>.</p>
+<p>In Lecture 6 I described sixty predictors on a hundred and fifty observations as a crisis — the situation where ordinary least squares falls apart and you <em>must</em> regularize. This is far past that ratio. And networks train in this regime routinely, every day, in production. What makes it survivable is not the architecture. It’s the regularization. Which is next.</p>
+</section>
+</section>
+<section id="training-loss-and-backpropagation" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="training-loss-and-backpropagation"><span class="header-section-number">7.4</span> Training: Loss and Backpropagation</h2>
+<p>Compute the error, propagate it backward, adjust every weight by its share of the blame. Repeat.</p>
+<section id="training-loss-gradients-and-the-update-step" class="level3" data-number="7.4.1">
+<h3 data-number="7.4.1" class="anchored" data-anchor-id="training-loss-gradients-and-the-update-step"><span class="header-section-number">7.4.1</span> Training: Loss, Gradients, and the Update Step</h3>
+<p>Training is one loop, repeated. <strong>First</strong>, compute the loss — for regression, mean squared error, <span class="math inline">\(\mathcal{L} = \frac{1}{n}\sum_i (y_i - \hat{y}_i)^2\)</span>.</p>
+<p><strong>Second, backpropagation:</strong> work backward through the network, using the chain rule to assign each weight its share of the error. <strong>Third</strong>, nudge every weight against its gradient:</p>
+<p><span class="math display">\[\mathbf{W} \leftarrow \mathbf{W} - \eta \, \frac{\partial \mathcal{L}}{\partial \mathbf{W}}, \qquad \eta = \text{learning rate}\]</span></p>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Stochastic gradient descent</p>
+</div>
+<p>Rather than using the whole dataset for each update, use a random <strong>mini-batch</strong> of 32–256 rows. Noisier steps, far more of them, and much faster. One pass through every batch is an <strong>epoch</strong>.</p>
+</div>
+<p><strong>You never differentiate by hand.</strong> <code>loss.backward()</code> does the backward pass, and <code>torch.optim.Adam(lr=1e-3)</code> beats plain SGD — it adapts the step size per parameter.</p>
+<p>Training is one loop, repeated. Three steps.</p>
+<p><strong>First</strong>, compute the loss. For regression that’s mean squared error — the average squared gap between prediction and truth. Nothing new.</p>
+<p><strong>Second</strong>, backpropagation. You work <em>backward</em> through the network, using the chain rule from calculus to assign each weight its share of the error. That’s all backprop is: the chain rule, applied systematically, right to left.</p>
+<p><strong>Third</strong>, you nudge every weight against its gradient. W becomes W minus eta times the derivative of the loss with respect to W. Eta is the <strong>learning rate</strong> — how big a step you take.</p>
+<p>One refinement. Rather than using the whole dataset to compute each update, you use a random <strong>mini-batch</strong> — typically thirty-two to two hundred fifty-six rows. The steps are noisier, but you take far more of them and each one is much cheaper. That’s <strong>stochastic gradient descent</strong>. One full pass through every batch is called an <strong>epoch</strong>.</p>
+<p>And here’s the practical part: <strong>you never differentiate anything by hand.</strong> Calling <code>loss.backward()</code> does the entire backward pass for you. That’s what a deep learning framework <em>is</em>, fundamentally — it records every operation you performed on the way forward so it can walk that record backward and apply the chain rule automatically.</p>
+<p>Two words about the learning rate, because it is the hyperparameter that will waste the most of your time if you get it wrong.</p>
+<p>Too large, and the loss jumps around or diverges outright — you overshoot the minimum on every step. Too small, and training is correct but glacial, and you’ll conclude the model doesn’t work when actually you just didn’t wait. If your loss curve is spiky or turns into <code>nan</code>, lower the learning rate by a factor of ten before you change anything else.</p>
+<p>In practice you won’t use plain SGD anyway. <code>torch.optim.Adam</code> with a learning rate of one-e-minus-three adapts the step size separately for each parameter, and it is the sensible default for everything in this course. It is more forgiving of a badly chosen learning rate than plain SGD, which is most of why it became standard.</p>
+</section>
+<section id="preventing-overfitting-where-lecture-6-returns" class="level3" data-number="7.4.2">
+<h3 data-number="7.4.2" class="anchored" data-anchor-id="preventing-overfitting-where-lecture-6-returns"><span class="header-section-number">7.4.2</span> Preventing Overfitting — Where Lecture 6 Returns</h3>
+<p>Twenty-two thousand parameters on five thousand rows will memorize the training set unless something stops it. Three things do, and <strong>you have met two of them already</strong>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><code>weight_decay</code></td>
+<td><strong>This is Ridge.</strong> An <span class="math inline">\(\ell_2\)</span> penalty on the weights, under a different name. <code>Adam(..., weight_decay=1e-4)</code></td>
+</tr>
+<tr class="even">
+<td><code>nn.Dropout(p)</code></td>
+<td>Randomly zero a fraction <span class="math inline">\(p\)</span> of neuron outputs on each forward pass, so no neuron can depend on a specific other one being present. All neurons are active at test time.</td>
+</tr>
+<tr class="odd">
+<td>Early stopping</td>
+<td>Watch validation loss each epoch; stop when it has not improved for <span class="math inline">\(k\)</span> epochs, and keep the weights from the <em>best</em> epoch, not the last.</td>
+</tr>
+</tbody>
+</table>
+<p><span class="hi"><strong>That is the fifth appearance of one idea.</strong></span> The GAM smoothing penalty in Lecture 3, cost-complexity pruning in Lecture 4, <code>reg_lambda</code> on leaf weights in Lecture 5, Ridge and LASSO in Lecture 6 — and now weight decay. Fit against complexity, one parameter setting the exchange rate, chosen by validation.</p>
+<p>Twenty-two thousand parameters on five thousand rows will memorize the training set unless something stops it. Three things do — and <strong>you have already met two of them.</strong></p>
+<p><code>weight_decay</code>. This is <strong>Ridge regression</strong>. It is an L2 penalty on the network’s weights, under a different name, passed as an argument to the optimizer. Same mathematics, same effect, new label.</p>
+<p><code>nn.Dropout(p)</code>. On each forward pass, randomly zero out a fraction p of the neuron outputs. The consequence is that no neuron can rely on any specific other neuron being present, so the network can’t build fragile chains of dependency. At test time you turn it off and all neurons are active.</p>
+<p><strong>Early stopping.</strong> Watch validation loss every epoch. When it stops improving for some number of epochs, stop — and critically, keep the weights from the <em>best</em> epoch, not the last one. That is the <strong>fifth appearance of one idea</strong> in this course.</p>
+<p>The GAM smoothing penalty in Lecture 3, which penalized wiggliness. Cost-complexity pruning in Lecture 4, which penalized the number of leaves. <code>reg_lambda</code> in Lecture 5, penalizing leaf weights. Ridge and LASSO in Lecture 6, penalizing coefficient size. And now weight decay, penalizing network weights.</p>
+<p>Five model families that look nothing like each other. One bargain underneath: <strong>fit against complexity, with a single parameter setting the exchange rate, chosen by validation.</strong></p>
+<p>You’ll see it a sixth time in Lecture 11, and there it will be the cleanest version of all.</p>
+</section>
+</section>
+<section id="pytorch-implementation" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="pytorch-implementation"><span class="header-section-number">7.5</span> PyTorch Implementation</h2>
+<p>Four pieces: a Dataset, a DataLoader, a model, and a training loop.</p>
+<section id="pytorch-dataset-and-dataloader" class="level3" data-number="7.5.1">
+<h3 data-number="7.5.1" class="anchored" data-anchor-id="pytorch-dataset-and-dataloader"><span class="header-section-number">7.5.1</span> PyTorch: Dataset and DataLoader</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Wrapping your arrays</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> Dataset, DataLoader</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ForecastDataset(Dataset):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, X, y):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.X <span class="op">=</span> torch.tensor(X, dtype<span class="op">=</span>torch.float32)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.y <span class="op">=</span> torch.tensor(y, dtype<span class="op">=</span>torch.float32)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__len__</span>(<span class="va">self</span>): <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.X)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, i): <span class="cf">return</span> <span class="va">self</span>.X[i], <span class="va">self</span>.y[i]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>loader <span class="op">=</span> DataLoader(ForecastDataset(X_tr, y_tr),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                    batch_size<span class="op">=</span><span class="dv">64</span>, shuffle<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>Dataset</code> fetches <em>one</em> example; <code>DataLoader</code> handles batching.</p>
+<p><strong>Note <code>shuffle=False</code>.</strong> Nearly every tutorial sets it <code>True</code> — right for images, wrong here. It destroys the ordering your lag features depend on.</p>
+<p>Two objects. A <code>Dataset</code> knows how to fetch <strong>one</strong> example — you give it <code>__len__</code> so it knows how many there are, and <code>__getitem__</code> so it can hand back item i. A <code>DataLoader</code> wraps that and handles batching, so your training loop can just iterate. You’ll write this exact class, or something very close to it, in Homework 5. Look at <code>shuffle=False</code>.</p>
+<p>Nearly every PyTorch tutorial you find online sets that to <code>True</code>. For image classification that is correct — the order of your cat photos is meaningless, and shuffling helps.</p>
+<p>For us it is <strong>wrong</strong>, and it will quietly damage your model. Our rows are ordered in time, and the lag features depend on that ordering. Shuffling destroys it.</p>
+<p>This is the same discipline as <code>TimeSeriesSplit</code> instead of <code>KFold</code>, from Lecture 5. The default in the tooling assumes your rows are exchangeable. Ours are not.</p>
+<p>And notice the failure mode, because it’s the one this course keeps returning to. Setting <code>shuffle=True</code> does not raise an error. It does not warn you. Your model trains, your loss goes down, and you get a number — a number that is better than it should be, because you have quietly let the model see the future.</p>
+<p>That is the same class of error as <code>KFold</code> on a time series, as scaling outside the fold, as an unshifted rolling feature. None of them crash. All of them return a better-looking answer than you deserve. Which is exactly why the discipline has to be procedural: you check these things because they’re on a list, not because something broke.</p>
+</section>
+<section id="pytorch-defining-the-model" class="level3" data-number="7.5.2">
+<h3 data-number="7.5.2" class="anchored" data-anchor-id="pytorch-defining-the-model"><span class="header-section-number">7.5.2</span> PyTorch: Defining the Model</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>A two-layer network with dropout</p>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> nn.Sequential(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    nn.Linear(n_features, <span class="dv">128</span>), nn.ReLU(), nn.Dropout(<span class="fl">0.3</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">128</span>, <span class="dv">128</span>),        nn.ReLU(), nn.Dropout(<span class="fl">0.3</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">128</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Read it top to bottom and it is the diagram: a linear map, a nonlinearity, some dropout, again, then a linear output with no activation because this is regression.</p>
+<p><code>nn.Sequential</code> chains layers in order and is enough for anything in this lecture. When an architecture needs branching or a skip connection — Lecture 8 — you subclass <code>nn.Module</code> and write <code>forward()</code> yourself.</p>
+<p><span class="neutral smaller"><code>nn.Linear(in, out)</code> holds the weight matrix and bias for one layer. That is where the 22,657 parameters live.</span></p>
+<p>Here is the network from slide 9, in five lines.</p>
+<p>Read it top to bottom and it <em>is</em> the diagram. A linear map to a hundred twenty-eight units. A ReLU. Some dropout. Then again — linear, ReLU, dropout. Then a final linear layer down to one output, with no activation on it, because this is regression and we don’t want to squash the forecast.</p>
+<p><code>nn.Sequential</code> chains layers in order, and it is enough for anything in this lecture. When you need an architecture that branches, or that has a skip connection — which is Lecture 8 — you’ll subclass <code>nn.Module</code> and write the <code>forward()</code> method yourself.</p>
+<p>And <code>nn.Linear(in, out)</code> is where the weight matrix and bias vector actually live. That’s where those twenty-two thousand six hundred fifty-seven parameters are sitting.</p>
+</section>
+<section id="pytorch-the-training-loop" class="level3" data-number="7.5.3">
+<h3 data-number="7.5.3" class="anchored" data-anchor-id="pytorch-the-training-loop"><span class="header-section-number">7.5.3</span> PyTorch: The Training Loop</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>The four steps, per mini-batch</p>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>opt <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>, weight_decay<span class="op">=</span><span class="fl">1e-4</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>lossfn <span class="op">=</span> nn.MSELoss()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(n_epochs):</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> xb, yb <span class="kw">in</span> loader:</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        opt.zero_grad()                        <span class="co"># 1 clear old gradients</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> lossfn(model(xb).squeeze(), yb) <span class="co"># 2 forward</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        loss.backward()                        <span class="co"># 3 backward</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        opt.step()                             <span class="co"># 4 update weights</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Every PyTorch training loop is those four lines with more around them.</p>
+<p><strong>The one that bites:</strong> forget <code>zero_grad()</code> and PyTorch <em>accumulates</em> gradients rather than replacing them. No error, no warning — just a model that trains badly.</p>
+<p>And here is the loop. Four steps per mini-batch, and every PyTorch training loop you will ever read is these four lines with more scaffolding around them.</p>
+<p><code>zero_grad</code> — clear the old gradients. Forward pass and compute the loss. <code>backward</code> — compute the new gradients. <code>step</code> — update the weights.</p>
+<p>That’s it. Set up the optimizer with Adam, learning rate one-e-minus-three, weight decay one-e-minus-four — there’s your Ridge penalty. Loss function is MSE. Now the one that bites people.</p>
+<p>If you forget <code>zero_grad()</code>, PyTorch does not raise an error. It does not warn you. What it does is <strong>accumulate</strong> gradients across batches instead of replacing them — because gradient accumulation is a legitimate technique that some people want deliberately. So your model trains. It just trains badly, and you have no idea why.</p>
+<p>We will do this deliberately in the lab, so you can see what the loss curve looks like when it happens. It is worth seeing once in a controlled setting rather than at eleven at night before a deadline.</p>
+</section>
+</section>
+<section id="key-takeaways" class="level2" data-number="7.6">
+<h2 data-number="7.6" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">7.6</span> Key Takeaways</h2>
+<p>Where a network belongs in the toolkit you now have.</p>
+<section id="neural-networks-vs.-tree-methods" class="level3" data-number="7.6.1">
+<h3 data-number="7.6.1" class="anchored" data-anchor-id="neural-networks-vs.-tree-methods"><span class="header-section-number">7.6.1</span> Neural Networks vs.&nbsp;Tree Methods</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Sequences</th>
+<th>Extrapolates</th>
+<th>Tuning</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LASSO / Ridge</td>
+<td>no</td>
+<td>yes</td>
+<td>light</td>
+<td>Many correlated predictors</td>
+</tr>
+<tr class="even">
+<td>Random forest</td>
+<td>no</td>
+<td>no</td>
+<td>light</td>
+<td>Tabular, robust default</td>
+</tr>
+<tr class="odd">
+<td>XGBoost</td>
+<td>no</td>
+<td>no</td>
+<td>moderate</td>
+<td>Tabular, best-in-class</td>
+</tr>
+<tr class="even">
+<td>FFN</td>
+<td>no</td>
+<td>yes</td>
+<td>heavy</td>
+<td>Smooth functions, large <span class="math inline">\(n\)</span></td>
+</tr>
+<tr class="odd">
+<td>RNN / LSTM</td>
+<td><strong>yes</strong></td>
+<td>yes</td>
+<td>heavy</td>
+<td>Sequences (Lecture 9)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>An FFN on lag features is doing the same job as XGBoost on lag features</strong> — same inputs, same flat table, no notion of order. It is not obviously the better tool, and on the evidence of Homework 4 it usually is not <span class="citation" data-cites="James2021">[@James2021]</span>.</p>
+<p>What changes in the next two lectures is the <em>architecture</em>: convolutions that see local structure, and recurrence that carries state through time. That is when the sequence column above starts saying yes, and it is the reason to learn this machinery now.</p>
+<p>Five methods, four questions. Does it see sequences? Can it extrapolate beyond the training range? How much tuning does it need? And what is it actually for?</p>
+<p>LASSO and Ridge: no sequences, but they extrapolate, they need almost no tuning, and they’re your answer when you have many correlated predictors. Random forest: no sequences, no extrapolation, light tuning, and it’s the robust tabular default. XGBoost: same, more tuning, best-in-class accuracy on tabular data. The feedforward network: still no sequences, extrapolates, heavy tuning, and it’s for smooth functions when n is large. And RNNs and LSTMs — which is Lecture 9 — finally say <strong>yes</strong> in that first column.</p>
+<p>Here’s the sentence I want you to leave with.</p>
+<p>An FFN on lag features is doing <strong>the same job</strong> as XGBoost on lag features. Same inputs, same flat table, no notion of order in either one. It is not obviously the better tool, and on the evidence of Homework 4 it usually is not.</p>
+<p>What changes over the next two lectures is not the fitting procedure. It’s the <strong>architecture</strong> — convolutions that see local structure, and recurrence that carries state through time. That is when the sequence column starts saying yes, and it is precisely why we learned this machinery today. One more column worth dwelling on: <strong>extrapolation</strong>.</p>
+<p>Trees and forests say no, and that’s not a tuning problem — it’s structural. A tree predicts by averaging the training values that landed in a leaf, so it physically cannot output a number larger than the largest one it has seen. If your series is trending upward, a random forest will forecast a flat line at the top of its training range, forever.</p>
+<p>The linear models and the networks say yes. A LASSO fit with a trend term will happily project that trend forward. So will a network.</p>
+<p>Whether that is a <em>feature</em> depends entirely on whether the trend is real. Extrapolating a genuine trend is the right answer. Extrapolating a temporary run-up is how forecasts embarrass people. The model cannot tell the difference — that judgement is yours, and it’s the kind of thing a DAG in Lecture 12 helps you reason about.</p>
+</section>
+<section id="lecture-7-key-takeaways" class="level3" data-number="7.6.2">
+<h3 data-number="7.6.2" class="anchored" data-anchor-id="lecture-7-key-takeaways"><span class="header-section-number">7.6.2</span> Lecture 7: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p>A <strong>neuron</strong> is linear regression wrapped in a nonlinear activation. Without the nonlinearity, stacking layers collapses back to one linear model.</p></li>
+<li><p>An <strong>FFN</strong> stacks those layers. Width and depth set capacity, and capacity accumulates faster than you expect — 22,657 parameters on 5,000 rows.</p></li>
+<li><p><strong>Training</strong> is one loop: loss <span class="math inline">\(\to\)</span> <code>backward()</code> <span class="math inline">\(\to\)</span> <code>step()</code>, on mini-batches, using Adam. You never differentiate by hand.</p></li>
+<li><p><strong>Regularization is not new.</strong> Weight decay is Ridge; dropout and early stopping do the same job by other means. Fifth appearance of one idea.</p></li>
+<li><p>For time series: <strong>do not shuffle</strong> the DataLoader, split by time, and call <code>zero_grad()</code> every batch.</p></li>
+<li><p>An FFN on engineered features is a competitor to XGBoost, <strong>not an upgrade</strong>. Architecture is what earns its keep — next two lectures.</p></li>
+</ol>
+</div>
+<p><span class="neutral">Next: CNN architectures — convolution, pooling, and 1D convolutions for time series.</span></p>
+<p>One. A neuron is linear regression wrapped in a nonlinear activation — and without that nonlinearity, stacking layers collapses back to a single linear model.</p>
+<p>Two. An FFN stacks those layers. Width and depth set capacity, and capacity accumulates faster than you expect. Twenty-two thousand parameters on five thousand rows. Three. Training is one loop: loss, <code>backward()</code>, <code>step()</code>, on mini-batches, using Adam. You never differentiate by hand.</p>
+<p>Four. Regularization is not new. Weight decay <em>is</em> Ridge; dropout and early stopping do the same job by other means. That’s the fifth appearance of one idea.</p>
+<p>Five. For time series specifically: do not shuffle the DataLoader, split by time, and call <code>zero_grad()</code> every batch.</p>
+<p>And six — the one that matters most. An FFN on engineered features is a <strong>competitor</strong> to XGBoost, not an upgrade. Architecture is what earns its keep, and that starts next week. Next time: CNN architectures. Convolution, pooling, and what a one-dimensional convolution does to a time series.</p>
+</section>
+<section id="references" class="level3" data-number="7.6.3">
+<h3 data-number="7.6.3" class="anchored" data-anchor-id="references"><span class="header-section-number">7.6.3</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture06_Regularization.html" class="pagination-link" aria-label="Regularization &amp; Model Selection">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture08_CNNs.html" class="pagination-link" aria-label="CNN Architectures">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

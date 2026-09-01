@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>6&nbsp; Regularization &amp; Model Selection – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture07_NeuralNets.html" rel="next">
+<link href="../chapters/Lecture05_TreeEnsembles.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture06_Regularization.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">6.1</span> Lecture Outline</a></li>
+  <li><a href="#the-problem-too-many-predictors" id="toc-the-problem-too-many-predictors" class="nav-link" data-scroll-target="#the-problem-too-many-predictors"><span class="header-section-number">6.2</span> The Problem: Too Many Predictors</a>
+  <ul class="collapse">
+  <li><a href="#why-regularize" id="toc-why-regularize" class="nav-link" data-scroll-target="#why-regularize"><span class="header-section-number">6.2.1</span> Why Regularize?</a></li>
+  <li><a href="#subset-selection-the-classical-answer" id="toc-subset-selection-the-classical-answer" class="nav-link" data-scroll-target="#subset-selection-the-classical-answer"><span class="header-section-number">6.2.2</span> Subset Selection: The Classical Answer</a></li>
+  </ul></li>
+  <li><a href="#shrinkage-methods" id="toc-shrinkage-methods" class="nav-link" data-scroll-target="#shrinkage-methods"><span class="header-section-number">6.3</span> Shrinkage Methods</a>
+  <ul class="collapse">
+  <li><a href="#ridge-regression-ell_2" id="toc-ridge-regression-ell_2" class="nav-link" data-scroll-target="#ridge-regression-ell_2"><span class="header-section-number">6.3.1</span> Ridge Regression (<span class="math inline">\(\ell_2\)</span>)</a></li>
+  <li><a href="#lasso-ell_1" id="toc-lasso-ell_1" class="nav-link" data-scroll-target="#lasso-ell_1"><span class="header-section-number">6.3.2</span> LASSO (<span class="math inline">\(\ell_1\)</span>)</a></li>
+  <li><a href="#why-lasso-zeros-out-and-ridge-does-not" id="toc-why-lasso-zeros-out-and-ridge-does-not" class="nav-link" data-scroll-target="#why-lasso-zeros-out-and-ridge-does-not"><span class="header-section-number">6.3.3</span> Why LASSO Zeros Out and Ridge Does Not</a></li>
+  <li><a href="#elastic-net-both-penalties-at-once" id="toc-elastic-net-both-penalties-at-once" class="nav-link" data-scroll-target="#elastic-net-both-penalties-at-once"><span class="header-section-number">6.3.4</span> Elastic Net: Both Penalties at Once</a></li>
+  </ul></li>
+  <li><a href="#choosing-the-penalty" id="toc-choosing-the-penalty" class="nav-link" data-scroll-target="#choosing-the-penalty"><span class="header-section-number">6.4</span> Choosing the Penalty</a>
+  <ul class="collapse">
+  <li><a href="#the-regularization-path" id="toc-the-regularization-path" class="nav-link" data-scroll-target="#the-regularization-path"><span class="header-section-number">6.4.1</span> The Regularization Path</a></li>
+  <li><a href="#choosing-lambda-by-cross-validation" id="toc-choosing-lambda-by-cross-validation" class="nav-link" data-scroll-target="#choosing-lambda-by-cross-validation"><span class="header-section-number">6.4.2</span> Choosing <span class="math inline">\(\lambda\)</span> by Cross-Validation</a></li>
+  </ul></li>
+  <li><a href="#in-practice" id="toc-in-practice" class="nav-link" data-scroll-target="#in-practice"><span class="header-section-number">6.5</span> In Practice</a>
+  <ul class="collapse">
+  <li><a href="#regularization-in-python" id="toc-regularization-in-python" class="nav-link" data-scroll-target="#regularization-in-python"><span class="header-section-number">6.5.1</span> Regularization in Python</a></li>
+  </ul></li>
+  <li><a href="#key-takeaways-and-roadmap" id="toc-key-takeaways-and-roadmap" class="nav-link" data-scroll-target="#key-takeaways-and-roadmap"><span class="header-section-number">6.6</span> Key Takeaways and Roadmap</a>
+  <ul class="collapse">
+  <li><a href="#linear-methods-which-one-when" id="toc-linear-methods-which-one-when" class="nav-link" data-scroll-target="#linear-methods-which-one-when"><span class="header-section-number">6.6.1</span> Linear Methods: Which One When</a></li>
+  <li><a href="#lecture-6-key-takeaways" id="toc-lecture-6-key-takeaways" class="nav-link" data-scroll-target="#lecture-6-key-takeaways"><span class="header-section-number">6.6.2</span> Lecture 6: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">6.6.3</span> References</a></li>
+  </ul></li>
+  <li><a href="#timing-guide" id="toc-timing-guide" class="nav-link" data-scroll-target="#timing-guide"><span class="header-section-number">6.7</span> Timing guide</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 6 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">6.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>The Problem: Too Many Predictors</li>
+<li>Shrinkage Methods</li>
+<li>Choosing the Penalty</li>
+<li>In Practice</li>
+<li>Key Takeaways</li>
+</ol>
+<p>Four parts. The problem — why too many predictors breaks ordinary least squares. Shrinkage — Ridge, LASSO, and Elastic Net. Choosing the penalty, which is where most people go wrong. And then practice, plus a map of which method to reach for when.</p>
+</section>
+<section id="the-problem-too-many-predictors" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="the-problem-too-many-predictors"><span class="header-section-number">6.2</span> The Problem: Too Many Predictors</h2>
+<p>Feature engineering gives us more predictors than we can safely estimate. Something has to decide which ones survive.</p>
+<p>Feature engineering gives us more predictors than we can safely estimate. Something has to decide which ones survive.</p>
+<section id="why-regularize" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="why-regularize"><span class="header-section-number">6.2.1</span> Why Regularize?</h3>
+<p>OLS minimizes <span class="math inline">\(\sum_{i}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2\)</span>. A weekly model with lags, calendar dummies, promotions, and macro series can easily carry <span class="math inline">\(k = 60\)</span> predictors on <span class="math inline">\(n = 150\)</span> observations — OLS will fit that sample beautifully and forecast badly.</p>
+<p>Three things go wrong at once. The variance of <span class="math inline">\(\hat{\boldsymbol{\beta}}\)</span> grows with <span class="math inline">\(k\)</span>. Correlated predictors produce unstable, wildly large coefficients with opposing signs. And once <span class="math inline">\(k &gt; n\)</span> there is no unique solution at all.</p>
+<p><strong>Regularization</strong> adds a penalty on coefficient size:</p>
+<p><span class="math display">\[\underbrace{\sum_i (y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \cdot \text{Penalty}(\boldsymbol{\beta})}_{\text{complexity}}\]</span></p>
+<p>You accept a little bias to buy a large reduction in variance — and for a forecast, that trade is almost always worth making.</p>
+<p>Start with what OLS actually does. It minimizes the sum of squared residuals. Nothing else. It has no opinion about how many predictors you handed it or how large the coefficients get.</p>
+<p>Now put a realistic number on it. A weekly model with lags, calendar dummies, promotions, and a couple of macro series carries sixty predictors easily. And three years of weekly history is a hundred and fifty-six observations.</p>
+<p>Sixty predictors, a hundred and fifty observations. OLS will fit that sample beautifully. It will also forecast badly. Three things go wrong, and they’re worth separating because they have different fixes.</p>
+<p><strong>First, variance grows with k.</strong> Every predictor you add gives the model another dimension in which to chase noise. The coefficients get less precisely estimated, all of them, including the ones you cared about.</p>
+<p><strong>Second, correlated predictors produce unstable coefficients.</strong> This is the one you’ll actually see in your output. Put lag one and lag two in the same model — and they move together, almost by construction — and OLS can’t tell which deserves the credit. So you get a coefficient of plus eight hundred on one and minus seven hundred and forty on the other. They nearly cancel. The fit is fine. The individual numbers are nonsense, and if you report them to a stakeholder you are reporting noise with a decimal point on it.</p>
+<p><strong>Third, once k exceeds n there is no unique solution at all.</strong> Not a bad estimate — no estimate. Infinitely many coefficient vectors fit the training data perfectly. Regularization’s answer is to stop minimizing fit alone, and minimize fit <em>plus a penalty on coefficient size</em>.</p>
+<p>Look at the shape of that expression on the slide, because you have seen it before. Fit on the left. A complexity penalty on the right. Lambda setting the exchange rate between them.</p>
+<p>That is the GAM smoothing penalty from Lecture 3. That is cost-complexity pruning from Lecture 4. Same skeleton, different penalty — and by the end of today I’ll show you it’s been hiding in one more place you didn’t expect.</p>
+<p>And the bargain is always the same: you accept a little bias to buy a large reduction in variance. For a forecast — where all you care about is the error on data you haven’t seen — that trade is almost always worth making.</p>
+</section>
+<section id="subset-selection-the-classical-answer" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="subset-selection-the-classical-answer"><span class="header-section-number">6.2.2</span> Subset Selection: The Classical Answer</h3>
+<p>Before shrinkage, the standard approach was to <em>count</em> predictors rather than shrink them <span class="citation" data-cites="Guyon2003">[@Guyon2003]</span>.</p>
+<p><strong>Best subset</strong> fits all <span class="math inline">\(2^k\)</span> models and picks the winner — exact, and computationally hopeless past <span class="math inline">\(k \approx 30\)</span>. <strong>Stepwise</strong> adds the strongest predictor or drops the weakest, one at a time; it is greedy, and can miss the best combination entirely. Either way the choice is made by adjusted <span class="math inline">\(R^2\)</span>, AIC, AICc, BIC, or CV.</p>
+<div class="warningbox">
+<p>Subset selection is <strong>discrete</strong> — a predictor is in or out. Small changes in the data flip predictors in and out, so the <em>selected model</em> is itself high-variance. You have not removed the instability; you have moved it somewhere harder to see.</p>
+</div>
+<p><span class="neutral smaller">This is the approach in <em>FPP</em> §7.5. Shrinkage replaces the in-or-out decision with a continuous dial — more stable, and easier to tune.</span></p>
+<p>Before shrinkage, the standard approach was to <em>count</em> predictors rather than shrink them. It’s worth understanding properly, both because you’ll meet it and because its failure mode is instructive.</p>
+<p><strong>Best subset</strong> fits every possible model — all two-to-the-k of them — and picks the winner. It is exact. It is also computationally hopeless past about thirty predictors. Two to the thirty is over a billion models.</p>
+<p><strong>Stepwise</strong> is the practical cousin. Add the strongest predictor, or drop the weakest, one at a time. It’s tractable, and you’ll notice it’s the same greedy logic as CART from Lecture 4 — and it has the same weakness. It can miss the best combination entirely, because it never reconsiders an earlier decision.</p>
+<p>Either way you need a criterion to compare models of different sizes: adjusted R-squared, AIC, AICc, BIC, or cross-validation. Now the warning box, because this is the real objection and it’s subtle. Subset selection is <strong>discrete</strong>. A predictor is in, or it is out. There is no middle.</p>
+<p>And that means small changes in the data flip predictors in and out of the model. Add three weeks of data, rerun, and you get a different set of variables — sometimes a substantially different set. So the <em>selected model</em> is itself a high-variance object.</p>
+<p>Sit with that, because it’s easy to miss. You adopted subset selection to reduce variance. And you did reduce the variance of the coefficients, conditional on the model. But you introduced variance in <em>which model you chose</em>, and that variance is invisible — it doesn’t show up in any standard error your software prints. You haven’t removed the instability. You’ve moved it somewhere harder to see.</p>
+<p>This is the approach in FPP section seven point five, which is your reading this week alongside ISLP chapter six. It’s still taught, and it’s still reasonable when you have a handful of candidate predictors and you need a story you can defend. Shrinkage replaces the in-or-out switch with a continuous dial. More stable, and easier to tune.</p>
+</section>
+</section>
+<section id="shrinkage-methods" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="shrinkage-methods"><span class="header-section-number">6.3</span> Shrinkage Methods</h2>
+<p>Keep every predictor, but pull its coefficient toward zero.</p>
+<p>The core idea in one line: keep every predictor, but pull its coefficient toward zero.</p>
+<section id="ridge-regression-ell_2" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="ridge-regression-ell_2"><span class="header-section-number">6.3.1</span> Ridge Regression (<span class="math inline">\(\ell_2\)</span>)</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Ridge <span class="citation" data-cites="HoerlKennard1970">[@HoerlKennard1970]</span></p>
+</div>
+<p><span class="math display">\[\hat{\boldsymbol{\beta}}^{\text{ridge}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{k} \beta_j^2\]</span></p>
+</div>
+<p>Ridge shrinks every coefficient toward zero but sets none exactly to zero. At <span class="math inline">\(\lambda = 0\)</span> you have OLS; as <span class="math inline">\(\lambda \to \infty\)</span> all <span class="math inline">\(\beta_j \to 0\)</span>. Its particular strength is correlated predictors: rather than letting two collinear variables fight for the same coefficient, it splits the effect between them.</p>
+<p><strong>Use it when</strong> you believe most predictors carry a little signal and you want to keep them all.</p>
+<p><strong>Standardize first.</strong> The penalty is not scale-invariant — a predictor measured in dollars is penalized differently from the same predictor in thousands of dollars. Get this wrong and the units decide which variables survive.</p>
+<p>Ridge adds lambda times the sum of squared coefficients.</p>
+<p>Read what that does. Squaring means large coefficients are punished disproportionately — a coefficient of ten contributes a hundred to the penalty, while ten coefficients of one contribute ten total. So Ridge has a strong preference for spreading effect around rather than concentrating it.</p>
+<p>At lambda equals zero you have OLS exactly. As lambda goes to infinity every coefficient goes to zero. Everything useful happens in between.</p>
+<p>Ridge shrinks every coefficient toward zero but sets <strong>none</strong> of them exactly to zero. Hold onto that, because it’s the whole contrast with the next slide.</p>
+<p>Its particular strength is exactly the failure I described two slides ago. Remember plus eight hundred and minus seven hundred and forty? Ridge won’t do that. Rather than letting two collinear variables fight over the same coefficient, it splits the effect between them — you get something like plus thirty and plus twenty-eight instead. Far more stable, and far more honest about what the data can actually distinguish.</p>
+<p><strong>Use Ridge when</strong> you believe most of your predictors carry a little signal and you want to keep them all.</p>
+<p>Now the practical warning, and I want to be emphatic because it is the single most common implementation error with any of these methods. <strong>Standardize first.</strong></p>
+<p>The penalty is not scale-invariant. Lambda times beta-squared depends entirely on what units beta is in. Measure a predictor in dollars and its coefficient is small, so it’s barely penalized. Measure the same predictor in thousands of dollars and its coefficient is a thousand times larger, so it’s penalized a million times harder. Same variable. Same information. Completely different treatment.</p>
+<p>Get this wrong and your <em>units</em> decide which variables survive. Not your data. We’ll see the right way to do it in the code slide, and it is not what most people do first.</p>
+</section>
+<section id="lasso-ell_1" class="level3" data-number="6.3.2">
+<h3 data-number="6.3.2" class="anchored" data-anchor-id="lasso-ell_1"><span class="header-section-number">6.3.2</span> LASSO (<span class="math inline">\(\ell_1\)</span>)</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>LASSO <span class="citation" data-cites="Tibshirani1996">[@Tibshirani1996]</span></p>
+</div>
+<p><span class="math display">\[\hat{\boldsymbol{\beta}}^{\text{lasso}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2 + \lambda \sum_{j=1}^{k} |\beta_j|\]</span></p>
+</div>
+<p>Swap the squared penalty for an absolute one and the behavior changes qualitatively. LASSO sets some coefficients <strong>exactly</strong> to zero, performing selection and estimation in a single step, and leaving a sparse model you can actually read aloud to a stakeholder.</p>
+<p><strong>Use it when</strong> you believe only a handful of predictors genuinely matter and you want the model to tell you which.</p>
+<p><strong>But be careful what you conclude.</strong> Among a group of highly correlated predictors, LASSO keeps <em>one</em> more or less arbitrarily and zeros the rest. The survivor is not “the important one” — it is the one that happened to win a coin toss between near-identical variables.</p>
+<p>Now swap the squared penalty for an absolute one. Sum of absolute values instead of sum of squares. That looks like a small change. It is not — the behavior changes qualitatively.</p>
+<p>LASSO sets some coefficients <strong>exactly</strong> to zero. Not small. Zero. Which means it performs selection and estimation in a single step, and it leaves you with a sparse model you can actually read aloud to a stakeholder.</p>
+<p>That last part matters more than it sounds. A model with eight nonzero coefficients is something you can put on a slide and defend in a meeting. A model with sixty small ones is not, even if its RMSE is a hair better.</p>
+<p><strong>Use LASSO when</strong> you believe only a handful of predictors genuinely matter and you want the model to tell you which. But now be very careful about what you conclude, because this is where LASSO gets misused.</p>
+<p>Among a group of highly correlated predictors, LASSO keeps <strong>one</strong> — more or less arbitrarily — and zeros the rest.</p>
+<p>So suppose lag one, lag two, and lag four are all correlated, all genuinely informative, and LASSO keeps lag four. It is tempting — and I’ve seen this in professional work — to report that lag four is “the important lag.”</p>
+<p>It isn’t. It’s the one that happened to win a coin toss between near-identical variables. Rerun on slightly different data and lag one wins instead.</p>
+<p>The variable that survived is not the important one. It’s the survivor. Those are different claims, and only one of them is supported.</p>
+</section>
+<section id="why-lasso-zeros-out-and-ridge-does-not" class="level3" data-number="6.3.3">
+<h3 data-number="6.3.3" class="anchored" data-anchor-id="why-lasso-zeros-out-and-ridge-does-not"><span class="header-section-number">6.3.3</span> Why LASSO Zeros Out and Ridge Does Not</h3>
+<p>Both solve “minimize squared error subject to a budget on coefficient size.” The <em>shape</em> of the budget is the whole difference.</p>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>Ridge:</strong> <span class="math inline">\(\sum_j \beta_j^2 \le t\)</span> — a <strong>circle</strong></p>
+<ul>
+<li>Smooth boundary, no corners</li>
+<li>Error contours almost never touch it on an axis</li>
+<li>So coefficients get small, never zero</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>LASSO:</strong> <span class="math inline">\(\sum_j |\beta_j| \le t\)</span> — a <strong>diamond</strong></p>
+<ul>
+<li>Corners sit exactly on the axes</li>
+<li>Contours are likely to hit a corner first</li>
+<li>A corner means <span class="math inline">\(\beta_j = 0\)</span> exactly</li>
+</ul>
+</div>
+</div>
+<p>So the sparsity of LASSO is a geometric accident of the <span class="math inline">\(\ell_1\)</span> ball having corners — not a statistical test of significance. A zeroed coefficient means “not worth its budget here,” not “proven irrelevant.” See <span class="citation" data-cites="James2021">@James2021</span> §6.2.</p>
+<p>So why does one zero out and the other doesn’t? The geometry answers it, and once you see it you won’t forget it.</p>
+<p>Both methods can be written the same way: minimize squared error subject to a <em>budget</em> on coefficient size. Spend the budget however you like, but don’t exceed it. The <strong>shape</strong> of that budget is the entire difference.</p>
+<p><strong>Ridge.</strong> Sum of squared betas below some budget t. In two dimensions that constraint region is a <strong>circle</strong>. Smooth boundary, no corners anywhere.</p>
+<p>The solution sits where the error contours — the ellipses radiating out from the OLS estimate — first touch that circle. And on a smooth round boundary, the touch point almost never lands exactly on an axis. Landing on an axis would mean one coefficient is exactly zero, and that’s a measure-zero coincidence. So Ridge coefficients get small. They don’t get to zero.</p>
+<p><strong>LASSO.</strong> Sum of absolute betas below t. That region is a <strong>diamond</strong> — and a diamond has corners, sitting exactly on the axes.</p>
+<p>Now the contours expanding outward are quite likely to hit a <strong>corner</strong> first. Corners stick out. And a corner is precisely the point where one coefficient equals zero. That’s it. That’s the whole mechanism. Which leads to the interpretive point I most want you to take from this slide.</p>
+<p>The sparsity of LASSO is a <strong>geometric accident</strong> of the ℓ₁ ball having corners. It is not a statistical test of significance.</p>
+<p>When LASSO zeros a coefficient it is saying “this predictor isn’t worth its share of the budget at this lambda.” It is <em>not</em> saying “this predictor has been proven irrelevant.” There’s no null hypothesis anywhere in what we just did, and no p-value.</p>
+<p>I labor this because LASSO output gets read as if it were a significance table, in papers and in business reports, and it isn’t one. James and co-authors work through the geometry carefully in section six point two if you want the picture drawn out.</p>
+</section>
+<section id="elastic-net-both-penalties-at-once" class="level3" data-number="6.3.4">
+<h3 data-number="6.3.4" class="anchored" data-anchor-id="elastic-net-both-penalties-at-once"><span class="header-section-number">6.3.4</span> Elastic Net: Both Penalties at Once</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Elastic Net <span class="citation" data-cites="ZouHastie2005">[@ZouHastie2005]</span></p>
+</div>
+<p><span class="math display">\[\sum_{i=1}^{n}(y_i - \mathbf{x}_i'\boldsymbol{\beta})^2 + \lambda \left[ \alpha \sum_j |\beta_j| + (1-\alpha) \sum_j \beta_j^2 \right]\]</span></p>
+<p><span class="math inline">\(\lambda\)</span> sets the total penalty; <span class="math inline">\(\alpha \in [0,1]\)</span> sets the mix (<span class="math inline">\(\alpha=1\)</span> is LASSO, <span class="math inline">\(\alpha=0\)</span> is Ridge).</p>
+</div>
+<p>The mix keeps LASSO’s ability to zero out predictors while adding Ridge’s <strong>grouping effect</strong>: correlated predictors now enter or leave together instead of one surviving arbitrarily.</p>
+<p><strong>This is usually the right default for forecasting.</strong> Lagged predictors are correlated almost by construction — <span class="math inline">\(y_{t-1}\)</span> and <span class="math inline">\(y_{t-2}\)</span> move together — which is precisely the situation where pure LASSO picks a winner at random and pure Ridge refuses to simplify.</p>
+<p>Elastic Net says: why choose? Use both penalties.</p>
+<p>Two knobs now, and keep them straight. <strong>Lambda</strong> sets the total amount of penalty. <strong>Alpha</strong> sets the mix between the two types — alpha equals one is pure LASSO, alpha equals zero is pure Ridge, and anything between is a blend.</p>
+<p>What you get is LASSO’s ability to zero predictors out, plus Ridge’s <strong>grouping effect</strong>: correlated predictors now enter or leave the model <em>together</em>, instead of one surviving arbitrarily. Which is the direct fix for the coin-toss problem two slides back.</p>
+<p><strong>For forecasting, this is usually the right default</strong>, and the reason is structural rather than a matter of taste.</p>
+<p>Our predictors are lagged values of the same series. Lag one and lag two are correlated almost by construction — they’re the same series shifted by one week.</p>
+<p>That is precisely the situation where pure LASSO picks a winner at random, and pure Ridge refuses to simplify anything. Elastic Net is built for it.</p>
+<p>So if you want a default for the homework: start with Elastic Net, tune the mix, and let the data tell you how far toward LASSO or Ridge it wants to sit.</p>
+</section>
+</section>
+<section id="choosing-the-penalty" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="choosing-the-penalty"><span class="header-section-number">6.4</span> Choosing the Penalty</h2>
+<p><span class="math inline">\(\lambda\)</span> is not estimated from the model. It is tuned — and how you tune it decides whether the model generalizes.</p>
+<p>And here’s the part people rush. Lambda is not estimated from the model. It is <em>tuned</em> — and how you tune it decides whether the model generalizes.</p>
+<section id="the-regularization-path" class="level3" data-number="6.4.1">
+<h3 data-number="6.4.1" class="anchored" data-anchor-id="the-regularization-path"><span class="header-section-number">6.4.1</span> The Regularization Path</h3>
+<p>Fit the model across a grid of <span class="math inline">\(\lambda\)</span> values and trace each coefficient as it moves.</p>
+<p>Read the path left to right. At small <span class="math inline">\(\lambda\)</span> the coefficients sit near their OLS values and the model is dense and unstable. As <span class="math inline">\(\lambda\)</span> grows they shrink, and under LASSO they drop to zero one at a time. At large <span class="math inline">\(\lambda\)</span> only the most robust predictors survive, and in the limit you are left with the intercept — the mean forecast.</p>
+<p><strong>The order in which predictors leave is the useful output.</strong> The last survivors are the ones that hold up under the most pressure. Report that ordering rather than a single model’s coefficient table — far more stable across resamples, and far more honest about what the data can support.</p>
+<p>The regularization path is the best diagnostic these methods give you, and it’s underused.</p>
+<p>The idea: fit the model across a whole grid of lambda values, and trace each coefficient as it moves.</p>
+<p>Read it left to right. At <strong>small lambda</strong> the coefficients sit near their OLS values — the model is dense, and unstable in the way we discussed. As <strong>lambda grows</strong> they shrink, and under LASSO they drop to zero one at a time. At <strong>large lambda</strong> only the most robust predictors are left. And in the limit, everything is gone and you’re left with the intercept, which is just the mean forecast — the naive benchmark from Lecture 1.</p>
+<p>Now here’s the part I actually want you to use. <strong>The order in which predictors leave is the useful output.</strong></p>
+<p>Think about what that ordering means. A predictor that survives until very high lambda is one that keeps earning its place as the penalty gets punishing. The last survivors are the ones that hold up under the most pressure.</p>
+<p>That ordering is far more stable across resamples than any single model’s coefficient table. Move your training window a few weeks and the exact coefficients at your chosen lambda will shift. The dropout <em>order</em> mostly won’t.</p>
+<p>So when you report — in the homework and in your final project — report the ordering. “Under increasing penalty, the last three predictors standing were the four-week lag, the fifty-two-week lag, and SNAP days” is a much stronger claim than “the coefficient on lag four was two thousand one hundred.” It’s more honest about what the data supports, and it’s the version that survives someone rerunning your analysis.</p>
+</section>
+<section id="choosing-lambda-by-cross-validation" class="level3" data-number="6.4.2">
+<h3 data-number="6.4.2" class="anchored" data-anchor-id="choosing-lambda-by-cross-validation"><span class="header-section-number">6.4.2</span> Choosing <span class="math inline">\(\lambda\)</span> by Cross-Validation</h3>
+<p><span class="math inline">\(\lambda\)</span> is not estimated from the model — it is tuned, and how you tune it decides whether the model generalizes.</p>
+<ol type="1">
+<li>Define a grid of <span class="math inline">\(\lambda\)</span>, usually log-spaced</li>
+<li>For each <span class="math inline">\(\lambda\)</span>, run walk-forward CV and record the mean validation RMSE</li>
+<li>Pick the <span class="math inline">\(\lambda\)</span> minimizing CV error, then refit on all training data</li>
+</ol>
+<p><strong>The one-standard-error rule</strong> is worth knowing: rather than the outright minimum, take the <em>largest</em> <span class="math inline">\(\lambda\)</span> whose CV error is within one standard error of it. You give up almost no accuracy and get a simpler, more stable model.</p>
+<div class="warningbox">
+<p><strong>Never use <code>KFold</code> here.</strong> Random folds put future observations in the training set and past ones in validation. The CV error will look excellent and the forecast will fail <span class="citation" data-cites="Bergmeir2018">[@Bergmeir2018]</span>. Use <code>TimeSeriesSplit</code>, exactly as in Lecture 1’s walk-forward evaluation.</p>
+</div>
+<p>So how do you pick lambda? You tune it. Three steps.</p>
+<p><strong>One.</strong> Define a grid, usually log-spaced — lambda matters multiplicatively, so you want to try point zero one, point one, one, ten, not one through ten. <strong>Two.</strong> For each lambda, run walk-forward cross-validation and record the mean validation RMSE. <strong>Three.</strong> Pick the lambda that minimizes CV error, then refit on all the training data. Now, the <strong>one-standard-error rule</strong>, which is worth knowing and takes ten seconds to apply.</p>
+<p>Instead of taking the outright minimum, take the <strong>largest</strong> lambda whose CV error is within one standard error of that minimum.</p>
+<p>The reasoning: the CV curve is usually flat near its bottom, and the exact location of the minimum is itself noisy — rerun with a different split and it moves. Anything within one standard error is statistically indistinguishable from the best. So among all those equally-good options, take the one with the most regularization: simpler model, more stable, and essentially no accuracy given up.</p>
+<p>And now the warning box, which is the same warning I have given you in every lecture, and I am going to keep giving it. <strong>Never use KFold here.</strong></p>
+<p>Random folds put future observations in the training set and past observations in validation. You are letting the model see the future to predict the past.</p>
+<p>The consequence is nasty specifically because it’s silent. There’s no crash. No warning. Your CV error just looks excellent — often dramatically better than what you’d get honestly — and then the forecast fails in production and you have no idea why. Bergmeir and co-authors have the careful treatment of this if you want it. Use <code>TimeSeriesSplit</code>, exactly as in Lecture 1’s walk-forward evaluation. Every time.</p>
+</section>
+</section>
+<section id="in-practice" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="in-practice"><span class="header-section-number">6.5</span> In Practice</h2>
+<p>Standardize, tune on a time-aware split, and read the path.</p>
+<p>Three things: standardize, tune on a time-aware split, and read the path.</p>
+<section id="regularization-in-python" class="level3" data-number="6.5.1">
+<h3 data-number="6.5.1" class="anchored" data-anchor-id="regularization-in-python"><span class="header-section-number">6.5.1</span> Regularization in Python</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Code Template</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> ElasticNetCV</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> TimeSeriesSplit</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> make_pipeline(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    StandardScaler(),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    ElasticNetCV(l1_ratio<span class="op">=</span>[<span class="fl">.1</span>, <span class="fl">.5</span>, <span class="fl">.7</span>, <span class="fl">.9</span>, <span class="fl">.95</span>, <span class="dv">1</span>],</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                 cv<span class="op">=</span>TimeSeriesSplit(<span class="dv">5</span>), random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>).fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>make_pipeline</code> is the part that matters: it keeps standardization <em>inside</em> each CV fold. Scale on the full sample and you have leaked the validation set into training, and your CV error is optimistic.</p>
+<p><code>l1_ratio</code> is <span class="math inline">\(\alpha\)</span>, the Ridge/LASSO mix; the <code>...CV</code> variants tune <span class="math inline">\(\lambda\)</span> for you.</p>
+<p><span class="neutral smaller"><code>sklearn</code> calls the penalty <code>alpha</code>, not <code>lambda</code>.</span></p>
+<p>The code is short, and one line of it is doing something important that’s easy to miss.</p>
+<p>We import <code>ElasticNetCV</code>, <code>make_pipeline</code>, <code>StandardScaler</code>, and <code>TimeSeriesSplit</code>. Then we build a pipeline: scaler, then Elastic Net with a list of candidate <code>l1_ratio</code> values and <code>TimeSeriesSplit</code> for the CV. Fit it. <strong><code>make_pipeline</code> is the part that matters</strong>, and I want to explain why rather than just assert it.</p>
+<p>The obvious thing to do — and what almost everyone does the first time — is standardize your whole dataset once, up front, then run cross-validation on the scaled data. That is leakage.</p>
+<p>Because <code>StandardScaler</code> computes a mean and a standard deviation. If you compute those on the full sample, they incorporate the validation folds. So every training fold has been scaled using information from data it isn’t supposed to have seen.</p>
+<p>It’s a small leak — it won’t wreck you the way KFold will — but it’s real, it biases your CV error optimistically, and it is completely avoidable.</p>
+<p>Wrapping the scaler in a pipeline fixes it. The pipeline refits the scaler <em>inside each fold</em>, using only that fold’s training data. One function call, and the leak is gone. Two smaller notes.</p>
+<p><code>l1_ratio</code> is alpha — the Ridge-LASSO mix. Give it a list and the CV searches over the mix and the penalty strength together.</p>
+<p>And a naming trap that will bite you: <strong><code>sklearn</code> calls the penalty strength <code>alpha</code>, not <code>lambda</code>.</strong> Which is unfortunate, because in the textbook notation — and on the slide behind me — alpha is the <em>mix</em>. So <code>sklearn</code>’s <code>alpha</code> is the textbook’s lambda, and <code>sklearn</code>’s <code>l1_ratio</code> is the textbook’s alpha. Read the docstring, not your memory.</p>
+</section>
+</section>
+<section id="key-takeaways-and-roadmap" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="key-takeaways-and-roadmap"><span class="header-section-number">6.6</span> Key Takeaways and Roadmap</h2>
+<p>Shrinkage is the linear-model counterpart to what trees do by pruning.</p>
+<p>And here’s the line that this whole lecture has been building toward: shrinkage is the linear-model counterpart to what trees do by pruning.</p>
+<section id="linear-methods-which-one-when" class="level3" data-number="6.6.1">
+<h3 data-number="6.6.1" class="anchored" data-anchor-id="linear-methods-which-one-when"><span class="header-section-number">6.6.1</span> Linear Methods: Which One When</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Penalty</th>
+<th>Zeros out?</th>
+<th>Best when</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>OLS</td>
+<td>none</td>
+<td>no</td>
+<td><span class="math inline">\(k \ll n\)</span>, predictors uncorrelated</td>
+</tr>
+<tr class="even">
+<td>Stepwise</td>
+<td>discrete</td>
+<td>yes</td>
+<td>Few candidate predictors, need a story</td>
+</tr>
+<tr class="odd">
+<td>Ridge</td>
+<td><span class="math inline">\(\ell_2\)</span></td>
+<td>no</td>
+<td>Many predictors, all mildly useful</td>
+</tr>
+<tr class="even">
+<td>LASSO</td>
+<td><span class="math inline">\(\ell_1\)</span></td>
+<td>yes</td>
+<td>Few predictors truly matter</td>
+</tr>
+<tr class="odd">
+<td>Elastic Net</td>
+<td>both</td>
+<td>yes</td>
+<td>Many <em>correlated</em> predictors</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Connection to Lecture 5.</strong> Trees and shrinkage solve the same problem in different geometries. XGBoost’s <code>reg_lambda</code> is literally a Ridge penalty on leaf weights, and its <code>gamma</code> penalizes leaf count the way LASSO penalizes nonzero coefficients. Regularization is not a linear-model topic — it is how every flexible model is kept honest.</p>
+<p>The table is your decision guide, and it’s the thing to photograph.</p>
+<p><strong>OLS</strong> when k is much smaller than n and predictors are uncorrelated. That’s a real situation, just not a common one in forecasting. <strong>Stepwise</strong> when you have few candidates and need a story you can tell. <strong>Ridge</strong> when you have many predictors that are all mildly useful. <strong>LASSO</strong> when you believe few predictors truly matter. <strong>Elastic Net</strong> when you have many <em>correlated</em> predictors — which, as we said, is most forecasting problems.</p>
+<p>Now the connection to Lecture 5, which is the point of the whole lecture. Trees and shrinkage look like completely different technologies. They solve the same problem in different geometries.</p>
+<p>Look at XGBoost’s hyperparameters — the ones on the regularization slide last week. <code>reg_lambda</code> is <strong>literally a Ridge penalty on the leaf weights</strong>. Same ℓ₂ form, applied to leaf values instead of regression coefficients. And <code>gamma</code> penalizes the <em>number of leaves</em> the way LASSO penalizes the <em>number of nonzero coefficients</em> — a fixed charge per unit of complexity, which is what produces the drop-to-zero behavior in both. You were doing regularization last week. Nobody called it that.</p>
+<p>So: <strong>regularization is not a linear-model topic. It is how every flexible model is kept honest.</strong></p>
+<p>And you’ve now met it four times. The GAM smoothing penalty in Lecture 3. Cost-complexity pruning in Lecture 4. Shrinkage on trees in Lecture 5. Ridge and LASSO today.</p>
+<p>Next week it appears a fifth time, in neural networks, as weight decay and dropout. Weight decay is Ridge — the same ℓ₂ penalty, applied to network weights, under a different name.</p>
+<p>If you take one thing from the first half of this course, take that. The methods multiply. The underlying ideas don’t.</p>
+</section>
+<section id="lecture-6-key-takeaways" class="level3" data-number="6.6.2">
+<h3 data-number="6.6.2" class="anchored" data-anchor-id="lecture-6-key-takeaways"><span class="header-section-number">6.6.2</span> Lecture 6: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p>With many predictors OLS overfits: coefficient variance grows with <span class="math inline">\(k\)</span>, and with <span class="math inline">\(k &gt; n\)</span> there is no unique solution at all.</p></li>
+<li><p><strong>Subset selection</strong> counts predictors in or out. It is discrete, greedy, and unstable — small data changes flip the selected model.</p></li>
+<li><p><strong>Shrinkage</strong> replaces that switch with a dial. Ridge (<span class="math inline">\(\ell_2\)</span>) shrinks everything smoothly; LASSO (<span class="math inline">\(\ell_1\)</span>) shrinks and zeros out; Elastic Net does both and keeps correlated predictors together.</p></li>
+<li><p><strong>Standardize first</strong>, inside each CV fold — none of these penalties are scale-invariant. <strong><span class="math inline">\(\lambda\)</span> is tuned, not estimated</strong>: use <code>TimeSeriesSplit</code>, never random <span class="math inline">\(K\)</span>-fold, which leaks the future.</p></li>
+<li><p>The <strong>regularization path</strong> — the order in which predictors drop out — is a more stable finding than any single coefficient table.</p></li>
+</ol>
+</div>
+<p><em>Next: Introduction to Neural Networks (PyTorch) — where these same penalties reappear as weight decay and dropout.</em></p>
+<p>Five things.</p>
+<p><strong>One.</strong> With many predictors OLS overfits. Coefficient variance grows with k, and once k exceeds n there’s no unique solution at all.</p>
+<p><strong>Two.</strong> Subset selection counts predictors in or out. It’s discrete, greedy, and unstable — small data changes flip the selected model, and that instability is invisible in your output.</p>
+<p><strong>Three.</strong> Shrinkage replaces the switch with a dial. Ridge shrinks everything smoothly. LASSO shrinks and zeros out. Elastic Net does both and keeps correlated predictors together.</p>
+<p><strong>Four.</strong> Standardize first, inside each CV fold — none of these penalties are scale-invariant. And lambda is tuned, not estimated: <code>TimeSeriesSplit</code>, never random K-fold.</p>
+<p><strong>Five.</strong> The regularization path — the order in which predictors drop out — is a more stable finding than any single coefficient table. Report it.</p>
+<p>That closes the first half of the course. Everything so far has been a model you specify and estimate, or an algorithm that partitions your data. Both are things you can, with effort, look inside and explain.</p>
+<p>Next week we start neural networks, and that changes. We’ll trade a good deal of interpretability for flexibility — and the same penalties come with us, wearing the names weight decay and dropout.</p>
+<p>Assignment 4 is where today’s material and last week’s meet: XGBoost tuning alongside a LASSO regularization path, and Elastic Net against Ridge. Build the path plot — it’s the fastest way to develop intuition for what lambda is actually doing.</p>
+<p>And if you want to see the connection I just drew with your own hands, add <code>reg_lambda</code> to your XGBoost grid and watch what it does. It isn’t required, but it’s the cheapest way to convince yourself the two halves of that assignment are the same idea.</p>
+</section>
+<section id="references" class="level3" data-number="6.6.3">
+<h3 data-number="6.6.3" class="anchored" data-anchor-id="references"><span class="header-section-number">6.6.3</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+<p>References are on the slide. Two I’d single out.</p>
+<p><strong>Tibshirani nineteen ninety-six</strong> is the original LASSO paper, and it’s unusually readable for a foundational statistics paper — worth an hour if you’re curious where this came from.</p>
+<p><strong>Zou and Hastie two thousand five</strong> introduces Elastic Net, and the motivating section is essentially the correlated-predictor problem we spent this lecture on.</p>
+<p>For the homework, <strong>ISLP chapter six</strong> is the one to read. It covers this material at exactly the level you need, with Python code alongside. See you next week for neural networks.</p>
+</section>
+</section>
+<section id="timing-guide" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="timing-guide"><span class="header-section-number">6.7</span> Timing guide</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Segment</th>
+<th>Slides</th>
+<th style="text-align: right;">Target</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Opening &amp; the problem</td>
+<td>1–5</td>
+<td style="text-align: right;">~7 min</td>
+</tr>
+<tr class="even">
+<td>Ridge, LASSO, geometry</td>
+<td>6–10</td>
+<td style="text-align: right;">~9 min</td>
+</tr>
+<tr class="odd">
+<td>Choosing lambda</td>
+<td>11–13</td>
+<td style="text-align: right;">~5 min</td>
+</tr>
+<tr class="even">
+<td>Python &amp; the synthesis</td>
+<td>14–19</td>
+<td style="text-align: right;">~6 min</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>~27 min</strong></td>
+</tr>
+</tbody>
+</table>
+<p>If you must compress, slide 17’s method table survives trimming — it’s a reference students will photograph rather than absorb live. Do <strong>not</strong> compress slides 9 or 12: the ℓ₁-corner geometry and the regularization path are the two things that make the rest more than a list of estimators.</p>
+<p>Slide 17’s XGBoost connection is the payoff for the whole first half of the course. If you are running long, cut elsewhere and protect it.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture05_TreeEnsembles.html" class="pagination-link" aria-label="Tree Ensembles: Random Forests &amp; Boosted Trees">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture07_NeuralNets.html" class="pagination-link" aria-label="Introduction to Neural Networks">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

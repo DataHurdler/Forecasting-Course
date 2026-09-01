@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>11&nbsp; Bayesian Statistics I — Foundations – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture11_Part1_BayesianTS.html" rel="next">
+<link href="../chapters/Lecture09_Part2_Transformers.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture10_BayesianFoundations.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">11.1</span> Lecture Outline</a></li>
+  <li><a href="#why-bayesian-thinking" id="toc-why-bayesian-thinking" class="nav-link" data-scroll-target="#why-bayesian-thinking"><span class="header-section-number">11.2</span> Why Bayesian Thinking?</a>
+  <ul class="collapse">
+  <li><a href="#frequentist-vs.-bayesian-what-is-random" id="toc-frequentist-vs.-bayesian-what-is-random" class="nav-link" data-scroll-target="#frequentist-vs.-bayesian-what-is-random"><span class="header-section-number">11.2.1</span> Frequentist vs.&nbsp;Bayesian: What Is Random?</a></li>
+  <li><a href="#what-this-buys-you-in-a-meeting" id="toc-what-this-buys-you-in-a-meeting" class="nav-link" data-scroll-target="#what-this-buys-you-in-a-meeting"><span class="header-section-number">11.2.2</span> What This Buys You in a Meeting</a></li>
+  </ul></li>
+  <li><a href="#bayes-theorem" id="toc-bayes-theorem" class="nav-link" data-scroll-target="#bayes-theorem"><span class="header-section-number">11.3</span> Bayes’ Theorem</a>
+  <ul class="collapse">
+  <li><a href="#bayes-theorem-1" id="toc-bayes-theorem-1" class="nav-link" data-scroll-target="#bayes-theorem-1"><span class="header-section-number">11.3.1</span> Bayes’ Theorem</a></li>
+  <li><a href="#the-update-in-pictures" id="toc-the-update-in-pictures" class="nav-link" data-scroll-target="#the-update-in-pictures"><span class="header-section-number">11.3.2</span> The Update, in Pictures</a></li>
+  </ul></li>
+  <li><a href="#prior-distributions" id="toc-prior-distributions" class="nav-link" data-scroll-target="#prior-distributions"><span class="header-section-number">11.4</span> Prior Distributions</a>
+  <ul class="collapse">
+  <li><a href="#priors-you-will-actually-use" id="toc-priors-you-will-actually-use" class="nav-link" data-scroll-target="#priors-you-will-actually-use"><span class="header-section-number">11.4.1</span> Priors You Will Actually Use</a></li>
+  <li><a href="#choosing-a-prior-you-can-defend" id="toc-choosing-a-prior-you-can-defend" class="nav-link" data-scroll-target="#choosing-a-prior-you-can-defend"><span class="header-section-number">11.4.2</span> Choosing a Prior You Can Defend</a></li>
+  </ul></li>
+  <li><a href="#posterior-inference-with-pymc" id="toc-posterior-inference-with-pymc" class="nav-link" data-scroll-target="#posterior-inference-with-pymc"><span class="header-section-number">11.5</span> Posterior Inference with PyMC</a>
+  <ul class="collapse">
+  <li><a href="#mcmc-the-big-idea" id="toc-mcmc-the-big-idea" class="nav-link" data-scroll-target="#mcmc-the-big-idea"><span class="header-section-number">11.5.1</span> MCMC: The Big Idea</a></li>
+  <li><a href="#pymc-a-first-model" id="toc-pymc-a-first-model" class="nav-link" data-scroll-target="#pymc-a-first-model"><span class="header-section-number">11.5.2</span> PyMC: A First Model</a></li>
+  <li><a href="#did-the-sampler-actually-work" id="toc-did-the-sampler-actually-work" class="nav-link" data-scroll-target="#did-the-sampler-actually-work"><span class="header-section-number">11.5.3</span> Did the Sampler Actually Work?</a></li>
+  <li><a href="#prior-predictive-checks" id="toc-prior-predictive-checks" class="nav-link" data-scroll-target="#prior-predictive-checks"><span class="header-section-number">11.5.4</span> Prior Predictive Checks</a></li>
+  </ul></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">11.6</span> Key Takeaways</a>
+  <ul class="collapse">
+  <li><a href="#lecture-10-key-takeaways" id="toc-lecture-10-key-takeaways" class="nav-link" data-scroll-target="#lecture-10-key-takeaways"><span class="header-section-number">11.6.1</span> Lecture 10: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">11.6.2</span> References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 10 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">11.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Why Bayesian Thinking?</li>
+<li>Bayes’ Theorem</li>
+<li>Prior Distributions</li>
+<li>Posterior Inference with PyMC</li>
+<li>Key Takeaways</li>
+</ol>
+<p>Five parts. Why you’d think this way at all — and I’ll make that argument in business terms, not philosophical ones. Then Bayes’ theorem, which is one equation and simpler than its reputation. Then priors, which is the part people object to. Then PyMC and, critically, how to tell whether the answer you got is trustworthy. And takeaways.</p>
+</section>
+<section id="why-bayesian-thinking" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="why-bayesian-thinking"><span class="header-section-number">11.2</span> Why Bayesian Thinking?</h2>
+<p>A different answer to the question of what a forecast should tell you.</p>
+<section id="frequentist-vs.-bayesian-what-is-random" class="level3" data-number="11.2.1">
+<h3 data-number="11.2.1" class="anchored" data-anchor-id="frequentist-vs.-bayesian-what-is-random"><span class="header-section-number">11.2.1</span> Frequentist vs.&nbsp;Bayesian: What Is Random?</h3>
+<p>The whole difference is which thing you treat as uncertain.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Frequentist</th>
+<th>Bayesian</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The parameter</td>
+<td>A fixed, unknown constant</td>
+<td>A quantity you are uncertain about</td>
+</tr>
+<tr class="even">
+<td>The data</td>
+<td>Random — one draw of many possible samples</td>
+<td>Fixed — it is what you observed</td>
+</tr>
+<tr class="odd">
+<td>The answer</td>
+<td>A point estimate and a standard error</td>
+<td>A full distribution over values</td>
+</tr>
+<tr class="even">
+<td>Prior belief</td>
+<td>No formal place for it</td>
+<td>Stated explicitly, and updated</td>
+</tr>
+</tbody>
+</table>
+<p>Everything else follows from that first row. If the parameter is fixed, you can only describe how your <em>estimate</em> would vary across hypothetical repeated samples. If the parameter is uncertain, you can describe your uncertainty about <em>it</em> directly — which is almost always the question someone actually asked.</p>
+<p>The whole difference between the two frameworks is which thing you treat as uncertain. Everything else follows.</p>
+<p><strong>The parameter.</strong> For a frequentist, it’s a fixed unknown constant — there is one true value, you just don’t know it. For a Bayesian, it’s a quantity you are uncertain about, and you describe that uncertainty with a distribution.</p>
+<p><strong>The data.</strong> For a frequentist, the data is random — your sample is one draw from many possible samples. For a Bayesian, the data is <em>fixed</em>. It’s what you observed. It’s sitting on your disk. <strong>The answer.</strong> A point estimate and a standard error, versus a full distribution over values. <strong>Prior belief.</strong> No formal place for it, versus stated explicitly and updated. Everything else follows from that first row, so let me make it concrete.</p>
+<p>If the parameter is fixed and the data is random, then all you can describe is how your <em>estimate</em> would vary across hypothetical repeated samples that you never actually took. If the parameter is uncertain, you can describe your uncertainty about <em>it</em>, directly. And that second thing is almost always what someone actually asked you. I want to head off a misconception, because it costs people a lot of confusion later.</p>
+<p>These are not rival theories of probability where one is correct and the other is a mistake. They are different questions, and each framework answers its own question well. Frequentist methods give you guarantees about <em>procedures</em> repeated over the long run, which is exactly right for quality control on a production line.</p>
+<p>Bayesian methods give you a statement about <em>this</em> parameter given <em>this</em> data, which is what you need when you have one dataset and one decision to make on Thursday.</p>
+<p>Most forecasting sits in that second category. That’s the reason for these three lectures — not that the last nine weeks were wrong.</p>
+</section>
+<section id="what-this-buys-you-in-a-meeting" class="level3" data-number="11.2.2">
+<h3 data-number="11.2.2" class="anchored" data-anchor-id="what-this-buys-you-in-a-meeting"><span class="header-section-number">11.2.2</span> What This Buys You in a Meeting</h3>
+<p>A 95% confidence interval of <span class="math inline">\([0.02,\ 0.08]\)</span> does <em>not</em> mean there is a 95% chance the parameter lies in that range. It means that intervals built this way would contain the true value 95% of the time across repeated samples. That is a statement about the procedure.</p>
+<p>A 95% <strong>credible</strong> interval of <span class="math inline">\([0.02,\ 0.08]\)</span> does mean there is a 95% probability the parameter lies in that range, given your model and data.</p>
+<div class="keybox">
+<p>That is not a technicality. It is the difference between a sentence you can say out loud to a decision-maker and one you have to keep correcting.</p>
+</div>
+<p>And because the answer is a full distribution, you can ask questions of it directly: <em>What is the probability the promotion lifts demand by more than 5%? What is the chance we stock out if we order 400 units?</em> Those are the questions a planner has, and a point estimate with a standard error does not answer them.</p>
+<p><span class="neutral smaller">The cost is that you must state a prior, and defend it. That is the rest of this lecture.</span></p>
+<p>Here’s the sharpest version of the difference.</p>
+<p>A ninety-five percent <strong>confidence</strong> interval of point-oh-two to point-oh-eight does <strong>not</strong> mean there’s a ninety-five percent chance the parameter lies in that range. It means intervals constructed this way would contain the true value ninety-five percent of the time across repeated samples. That is a statement about the <em>procedure</em>, not about your parameter.</p>
+<p>A ninety-five percent <strong>credible</strong> interval of point-oh-two to point-oh-eight <em>does</em> mean there is a ninety-five percent probability the parameter lies in that range, given your model and your data. Now — I know that sounds like a technicality that only statisticians care about. It isn’t.</p>
+<p>It is the difference between a sentence you can say out loud to a decision-maker and a sentence you have to keep correcting. Everyone in every meeting you have ever been in interprets a confidence interval as a credible interval. The Bayesian version is the one that means what everybody already thinks it means.</p>
+<p>And there’s a second, larger payoff. Because the answer is a full distribution, you can interrogate it directly.</p>
+<p><em>What is the probability the promotion lifts demand by more than five percent?</em> Count the posterior samples above five percent. <em>What’s the chance we stock out if we order four hundred units?</em> Count the samples above four hundred.</p>
+<p>Those are the questions a planner actually has. A point estimate with a standard error does not answer them — not because it’s inaccurate, but because it isn’t that kind of object.</p>
+<p>The cost is that you must state a prior, and defend it. That’s the rest of the lecture.</p>
+</section>
+</section>
+<section id="bayes-theorem" class="level2" data-number="11.3">
+<h2 data-number="11.3" class="anchored" data-anchor-id="bayes-theorem"><span class="header-section-number">11.3</span> Bayes’ Theorem</h2>
+<p>One equation, and it is a bookkeeping rule rather than a philosophy.</p>
+<p>Here’s the equation. Posterior equals likelihood times prior, over the evidence.</p>
+<p>Read it as a sentence, and it stops being intimidating: <strong>what I believe after seeing the data</strong> equals <strong>how well each parameter value explains the data</strong>, times <strong>what I believed beforehand</strong>, rescaled so it sums to one. That’s it. It’s a bookkeeping rule for updating beliefs in light of evidence.</p>
+<p>The denominator — p of D, the evidence — is only that rescaling. It doesn’t change the <em>shape</em> of the distribution, only its normalization. So in practice people write the working form: <strong>Posterior is proportional to likelihood times prior.</strong></p>
+<p>That proportionality is what we’ll actually use, and it’s why the denominator being uncomputable turns out not to matter — which is the subject of slide 13. One reassurance, since some of you are looking at that equation with concern.</p>
+<p><strong>You will not compute this by hand.</strong> This course never asks you to. There is no integral on any homework in this course.</p>
+<p>What you are responsible for is three things: choosing a prior you can defend, checking that the sampler actually worked, and reading the posterior correctly. Those are judgement skills, and they are the ones that matter in practice.</p>
+<p>And it’s worth registering that the equation itself is not controversial. It’s a theorem — it follows from the definition of conditional probability in two lines, and no statistician of any persuasion disputes it.</p>
+<p>What was historically contested is whether you’re entitled to put a probability distribution on a <em>parameter</em> at all, as opposed to on data. That’s a philosophical argument, it ran for most of the twentieth century, and it is not one we’re going to settle in this room.</p>
+<p>What settled it in practice was computation. These methods were mathematically fine and practically impossible until MCMC and cheap computers arrived in the 1990s. The philosophy didn’t change; the feasibility did.</p>
+<section id="bayes-theorem-1" class="level3" data-number="11.3.1">
+<h3 data-number="11.3.1" class="anchored" data-anchor-id="bayes-theorem-1"><span class="header-section-number">11.3.1</span> Bayes’ Theorem</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>The update rule</p>
+</div>
+<p><span class="math display">\[\underbrace{p(\theta \mid \mathcal{D})}_{\text{posterior}} = \frac{\overbrace{p(\mathcal{D} \mid \theta)}^{\text{likelihood}} \cdot \overbrace{p(\theta)}^{\text{prior}}}{\underbrace{p(\mathcal{D})}_{\text{evidence}}}\]</span></p>
+</div>
+<p>Read it as a sentence <span class="citation" data-cites="Gelman2013">[@Gelman2013]</span>. <strong>What I believe after seeing the data</strong> equals <strong>how well each value explains the data</strong>, times <strong>what I believed beforehand</strong>, rescaled to sum to one.</p>
+<p>The denominator is only that rescaling — it does not change the <em>shape</em>. So the working form is:</p>
+<p><span class="math display">\[\text{posterior} \;\propto\; \text{likelihood} \times \text{prior}\]</span></p>
+<p><strong>You will not compute this by hand</strong>, and this course never asks you to. You are responsible for choosing the prior, checking the sampler worked, and reading the posterior.</p>
+<p>Here’s the equation. Posterior equals likelihood times prior, over the evidence.</p>
+<p>Read it as a sentence, and it stops being intimidating: <strong>what I believe after seeing the data</strong> equals <strong>how well each parameter value explains the data</strong>, times <strong>what I believed beforehand</strong>, rescaled so it sums to one. That’s it. It’s a bookkeeping rule for updating beliefs in light of evidence.</p>
+<p>The denominator — p of D, the evidence — is only that rescaling. It doesn’t change the <em>shape</em> of the distribution, only its normalization. So in practice people write the working form: <strong>Posterior is proportional to likelihood times prior.</strong></p>
+<p>That proportionality is what we’ll actually use, and it’s why the denominator being uncomputable turns out not to matter — which is the subject of slide 13. One reassurance, since some of you are looking at that equation with concern.</p>
+<p><strong>You will not compute this by hand.</strong> This course never asks you to. There is no integral on any homework in this course.</p>
+<p>What you are responsible for is three things: choosing a prior you can defend, checking that the sampler actually worked, and reading the posterior correctly. Those are judgement skills, and they are the ones that matter in practice.</p>
+<p>And it’s worth registering that the equation itself is not controversial. It’s a theorem — it follows from the definition of conditional probability in two lines, and no statistician of any persuasion disputes it.</p>
+<p>What was historically contested is whether you’re entitled to put a probability distribution on a <em>parameter</em> at all, as opposed to on data. That’s a philosophical argument, it ran for most of the twentieth century, and it is not one we’re going to settle in this room.</p>
+<p>What settled it in practice was computation. These methods were mathematically fine and practically impossible until MCMC and cheap computers arrived in the 1990s. The philosophy didn’t change; the feasibility did.</p>
+</section>
+<section id="the-update-in-pictures" class="level3" data-number="11.3.2">
+<h3 data-number="11.3.2" class="anchored" data-anchor-id="the-update-in-pictures"><span class="header-section-number">11.3.2</span> The Update, in Pictures</h3>
+<p>Take a concrete case: estimating a conversion rate <span class="math inline">\(\theta\)</span> from 200 trials.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Prior</strong></td>
+<td>A curve over <span class="math inline">\(\theta\)</span> from 0 to 1, showing what you thought before. Broad if you know little; peaked if you have history.</td>
+</tr>
+<tr class="even">
+<td><strong>Likelihood</strong></td>
+<td>A second curve, from the data alone: 30 successes out of 200 peaks near 0.15.</td>
+</tr>
+<tr class="odd">
+<td><strong>Posterior</strong></td>
+<td>Multiply the two curves point by point and rescale. It sits <em>between</em> them, closer to whichever was more confident.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Our numbers:</strong> the prior is centred on 0.10, the data say 0.15, and the posterior mean lands at <span class="hi"><strong>0.14</strong></span> — between them, nearer the data, because 200 observations outweigh a prior worth about 50.</p>
+<p>More data sharpens the likelihood, so the posterior moves toward it and the prior matters less. With little data the prior does most of the work — a feature when it is defensible, a problem when it is not.</p>
+<p>Let’s make it concrete with a case you could actually meet. Estimating a conversion rate — theta — from two hundred trials.</p>
+<p>The <strong>prior</strong> is a curve over theta, from zero to one, showing what you thought before you looked. Broad if you know little; peaked if you have history.</p>
+<p>The <strong>likelihood</strong> is a second curve, coming from the data alone. Thirty successes out of two hundred peaks near point-one-five.</p>
+<p>The <strong>posterior</strong> is what you get when you multiply those two curves point by point and rescale. And it lands <em>between</em> them — closer to whichever one was more confident.</p>
+<p>Our numbers. The prior is centred on point-one-zero. The data say point-one-five. And the posterior mean comes out at <strong>point-one-four</strong>.</p>
+<p>Between the two, much nearer the data — because two hundred observations outweigh a prior worth about fifty.</p>
+<p>That’s the whole mechanism, and it behaves the way you’d want. More data sharpens the likelihood, so the posterior moves toward it and the prior matters less. With very little data the prior does most of the work — which is a feature when the prior is defensible, and a problem when it isn’t.</p>
+</section>
+</section>
+<section id="prior-distributions" class="level2" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="prior-distributions"><span class="header-section-number">11.4</span> Prior Distributions</h2>
+<p>The part you have to justify, and the part people worry about.</p>
+<section id="priors-you-will-actually-use" class="level3" data-number="11.4.1">
+<h3 data-number="11.4.1" class="anchored" data-anchor-id="priors-you-will-actually-use"><span class="header-section-number">11.4.1</span> Priors You Will Actually Use</h3>
+<p>A prior is a distribution over a parameter, chosen to match what that parameter <em>can</em> be.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Prior</th>
+<th>Support</th>
+<th>Use it for</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\theta \sim \text{Beta}(\alpha, \beta)\)</span></td>
+<td><span class="math inline">\([0, 1]\)</span></td>
+<td>Rates and proportions — conversion, click-through, defect rate</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\theta \sim \mathcal{N}(\mu_0, \sigma_0^2)\)</span></td>
+<td>all reals</td>
+<td>Regression coefficients, trends, anything that can be negative</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\theta \sim \text{Exp}(\lambda)\)</span></td>
+<td><span class="math inline">\([0, \infty)\)</span></td>
+<td>Standard deviations, waiting times, anything that must be positive</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The support is the first thing to get right.</strong> Putting a Normal prior on a standard deviation allows negative values, which are impossible — the sampler will struggle and the model may not be wrong so much as incoherent.</p>
+<p><span class="neutral smaller"><span class="math inline">\(\text{Beta}(5, 45)\)</span> has mean <span class="math inline">\(5/50 = 0.1\)</span> — a prior centred on a 10% rate, worth about 50 observations of prior evidence.</span></p>
+<p>A prior is just a distribution over a parameter, chosen to match what that parameter <em>can</em> be. <strong>Beta</strong>, on the interval zero to one — for rates and proportions. Conversion rates, click-through, defect rates. <strong>Normal</strong>, on all the reals — for regression coefficients, trends, anything that can legitimately be negative. <strong>Exponential</strong>, on zero to infinity — for standard deviations, waiting times, anything that must be positive.</p>
+<p>And the first thing to get right is the <strong>support</strong> — the set of values the distribution allows.</p>
+<p>Put a Normal prior on a standard deviation and you have allowed negative standard deviations, which are not a modelling approximation, they’re impossible. The sampler will struggle, and the model isn’t so much wrong as <strong>incoherent</strong>.</p>
+<p>That’s the most common beginner error in Bayesian modelling, and it’s entirely avoidable: match the support to the parameter.</p>
+<p>One arithmetic note worth internalizing. Beta of five and forty-five has a mean of five over fifty — point-one. And it carries about as much weight as fifty prior observations. That’s a useful way to think about prior strength: how many observations is this worth?</p>
+<p>That question — <em>how many observations is my prior worth?</em> — is the most useful one to ask when you’re choosing, and it turns an abstract decision into a concrete one.</p>
+<p>If you have two hundred data points and your prior is worth fifty, the data will dominate but the prior will still pull. If your prior is worth five thousand, you have effectively decided the answer in advance and the data is decoration.</p>
+<p>And notice the asymmetry that creates. With plenty of data, the prior barely matters and people argue about it anyway. With very little data, the prior matters enormously — and that is exactly the situation where Bayesian methods are most useful, and where you owe the most careful justification.</p>
+</section>
+<section id="choosing-a-prior-you-can-defend" class="level3" data-number="11.4.2">
+<h3 data-number="11.4.2" class="anchored" data-anchor-id="choosing-a-prior-you-can-defend"><span class="header-section-number">11.4.2</span> Choosing a Prior You Can Defend</h3>
+<p>The standard objection to Bayesian work is that the prior is arbitrary. The standard answer is that you should not be choosing arbitrary priors.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Weakly informative</strong></td>
+<td>Rules out the absurd, stays agnostic about the plausible. A Normal(0, 1) on a standardized coefficient says “probably not larger than about 2,” which is nearly always true and nearly never controversial. <strong>This is the default.</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Informative</strong></td>
+<td>Encodes real prior evidence — last year’s conversion rate, a published elasticity. Defensible when you can name the source.</td>
+</tr>
+<tr class="odd">
+<td><strong>Flat / “uninformative”</strong></td>
+<td>Sounds neutral, often is not, and can be improper. Avoid it as a reflex choice.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The honest framing:</strong> a prior is an assumption stated in public, where it can be argued with. Frequentist analyses contain assumptions too — functional form, variable selection, sampling scheme — they are just not written as distributions.</p>
+<p>Now the objection. The standard criticism of Bayesian work is that the prior is arbitrary — that you can get any answer you like by choosing the right one. The standard answer is that you should not be choosing arbitrary priors.</p>
+<p><strong>Weakly informative</strong> is your default, and it’s the one you’ll use in this course. It rules out the absurd while staying agnostic about the plausible. A Normal zero-one on a standardized coefficient says “probably not larger than about two,” which is nearly always true and nearly never controversial.</p>
+<p><strong>Informative</strong> priors encode real evidence — last year’s conversion rate, a published elasticity. Perfectly defensible <em>when you can name the source</em>.</p>
+<p><strong>Flat</strong>, or so-called uninformative, sounds neutral. It often isn’t, it can be improper, and it is a bad reflex choice. Avoid it. And here’s the honest framing of the whole objection.</p>
+<p>A prior is an assumption <strong>stated in public</strong>, in a form where it can be argued with. Somebody can read your model, disagree with your prior, change it, and re-run.</p>
+<p>Frequentist analyses contain assumptions too — functional form, which variables you included, which you dropped, the sampling scheme, what you did with outliers. They are just not written down as distributions, so they’re harder to see and harder to contest. The Bayesian prior isn’t an extra assumption. It’s an assumption made visible.</p>
+</section>
+</section>
+<section id="posterior-inference-with-pymc" class="level2" data-number="11.5">
+<h2 data-number="11.5" class="anchored" data-anchor-id="posterior-inference-with-pymc"><span class="header-section-number">11.5</span> Posterior Inference with PyMC</h2>
+<p>Sampling, the code, and how to tell whether the answer is trustworthy.</p>
+<section id="mcmc-the-big-idea" class="level3" data-number="11.5.1">
+<h3 data-number="11.5.1" class="anchored" data-anchor-id="mcmc-the-big-idea"><span class="header-section-number">11.5.1</span> MCMC: The Big Idea</h3>
+<p>For any model more complicated than a textbook example, the rescaling denominator in Bayes’ theorem cannot be computed. So we do not compute the posterior — we <strong>draw samples from it</strong>, and work with the samples.</p>
+<p><strong>The picture to hold.</strong> You are exploring a hilly landscape in the dark, where height is posterior probability. You take a step, and if the ground is higher you move; if it is lower you usually move back. Over thousands of steps you spend most of your time on the high ground.</p>
+<p>The record of where you walked <em>is</em> the answer. A histogram of your visited positions has the shape of the posterior, without ever having computed it.</p>
+<div class="keybox">
+<p><strong>The samples are the answer.</strong> Posterior mean, credible interval, and the probability of any event you care about are all just summaries of that list of visited values — counted, not derived.</p>
+</div>
+<p><span class="neutral smaller">PyMC’s default sampler is NUTS, which takes smarter steps than the random walk above. The intuition is unchanged.</span></p>
+<p>Back to that denominator. For any model more complicated than a textbook example, it cannot be computed — it’s an integral over every possible parameter combination.</p>
+<p>So we don’t compute the posterior. We <strong>draw samples from it</strong>, and then work entirely with the samples.</p>
+<p>Here’s the picture I want you to hold. You are exploring a hilly landscape in the dark, where height corresponds to posterior probability. You take a step. If the ground is higher, you move there. If it’s lower, you usually move back — usually, not always.</p>
+<p>Do that thousands of times and you spend most of your time on the high ground, proportionally to how high it is.</p>
+<p>And here is the trick that makes it all work: <strong>the record of where you walked is the answer.</strong></p>
+<p>A histogram of the positions you visited has the shape of the posterior. You never computed the posterior. You just wandered around in it and wrote down where you’d been.</p>
+<p>So everything downstream is counting. Posterior mean is the average of your visited values. Credible interval is a percentile of them. The probability that a parameter exceeds a threshold is the fraction of samples above it.</p>
+<p><strong>Counted, not derived.</strong> That’s why Bayesian output can answer arbitrary questions — you’re just querying a list of numbers.</p>
+<p>PyMC’s actual sampler is NUTS, which takes far smarter steps than the random walk I described. The intuition is unchanged.</p>
+<p>One consequence of the sampling approach is worth flagging now, because it will shape how you plan your work.</p>
+<p>This is <strong>slow</strong>. Not slow like XGBoost is slow — slow in a different category. A random forest on our panel fits in seconds. A Bayesian model on the same data can take minutes, and a poorly specified one can take much longer.</p>
+<p>You are not solving an optimization problem and stopping. You are wandering around a distribution, thousands of steps, four times over.</p>
+<p>That has a practical implication for the remaining assignments: start them early, and test your model on a small subset before you run the full thing. Discovering a specification error forty minutes into sampling is a genuinely miserable experience, and one you can avoid.</p>
+</section>
+<section id="pymc-a-first-model" class="level3" data-number="11.5.2">
+<h3 data-number="11.5.2" class="anchored" data-anchor-id="pymc-a-first-model"><span class="header-section-number">11.5.2</span> PyMC: A First Model</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Estimating a conversion rate — 30 successes in 200 trials</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> pm.Beta(<span class="st">"theta"</span>, alpha<span class="op">=</span><span class="dv">5</span>, beta<span class="op">=</span><span class="dv">45</span>)        <span class="co"># prior</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    obs   <span class="op">=</span> pm.Binomial(<span class="st">"obs"</span>, n<span class="op">=</span><span class="dv">200</span>, p<span class="op">=</span>theta,        <span class="co"># likelihood</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                        observed<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, chains<span class="op">=</span><span class="dv">4</span>)      <span class="co"># posterior</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>az.plot_posterior(idata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A PyMC model describes <strong>how the data could have been generated</strong>: what I believe about the rate, and how observations arise given it. You write the story; the sampler infers.</p>
+<p><code>tune=1000</code> discards the first 1,000 steps, while the sampler is still finding the high ground. <code>chains=4</code> runs four independent walks — which is what makes the next slide possible.</p>
+<p>Here’s the conversion-rate problem, in six lines.</p>
+<p>A Beta prior with alpha five and beta forty-five — that’s our point-one prior worth fifty observations. A Binomial likelihood: two hundred trials, thirty observed successes. Then <code>pm.sample</code>, and you’re done.</p>
+<p>Notice what you actually wrote. You did not specify an estimation procedure. You did not choose an optimizer or a loss function.</p>
+<p>You described <strong>how the data could have been generated</strong>: here’s what I believe about the rate, and here’s how observations arise given a rate. That’s a <em>story about the world</em>.</p>
+<p>You write the story; the sampler does the inference. That is a genuinely different way of working from everything else in this course, where you chose a fitting algorithm.</p>
+<p>Two arguments to understand. <code>tune=1000</code> discards the first thousand steps, while the sampler is still finding the high ground — those steps aren’t from the posterior yet. And <code>chains=4</code> runs four <em>independent</em> walks from different starting points. That second one seems wasteful. It’s what makes the next slide possible.</p>
+<p>Think about why four independent walks are worth the compute. If a single chain wanders into some corner of the parameter space and gets stuck there, it will happily report a confident, tight, completely wrong posterior — and from inside that one chain, there is no way to tell.</p>
+<p>Run four from different starting points and ask whether they agree. If they do, that’s evidence they all found the same distribution. If they don’t, you know something is wrong even though no individual chain looks troubled.</p>
+<p>It’s the same logic as the ensemble in Lecture 5, applied to diagnosis rather than prediction: independent attempts agreeing is evidence; a single confident attempt is not.</p>
+</section>
+<section id="did-the-sampler-actually-work" class="level3" data-number="11.5.3">
+<h3 data-number="11.5.3" class="anchored" data-anchor-id="did-the-sampler-actually-work"><span class="header-section-number">11.5.3</span> Did the Sampler Actually Work?</h3>
+<p>MCMC can fail quietly. It always returns samples; whether they came from the posterior is a separate question <span class="citation" data-cites="MartinKumarLao2021">[@MartinKumarLao2021]</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Check</th>
+<th>Want</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\hat{R}\)</span></td>
+<td><span class="math inline">\(&lt; 1.01\)</span></td>
+<td>Did the chains land in the same place? If not, nothing else matters.</td>
+</tr>
+<tr class="even">
+<td>ESS</td>
+<td><span class="math inline">\(&gt; 400\)</span></td>
+<td>Effective sample size — 8,000 correlated draws may carry as much information as 200 independent ones.</td>
+</tr>
+<tr class="odd">
+<td>Divergences</td>
+<td><span class="math inline">\(0\)</span></td>
+<td>The sampler hit terrain it could not navigate. Even a few means the posterior is explored wrongly.</td>
+</tr>
+</tbody>
+</table>
+<p><code>az.summary(idata, ci_kind="hdi", ci_prob=0.94)</code> prints the interval, <span class="math inline">\(\hat{R}\)</span> and ESS. <strong>Pass both arguments</strong> — ArviZ now defaults to an 89% equal-tailed interval, not the HDI.</p>
+<p>On the model above: <span class="math inline">\(\hat{R} = 1.00\)</span>, ESS 3,686, zero divergences. <strong>Report all three.</strong></p>
+<p>MCMC can fail <strong>quietly</strong>. It always returns samples. Whether those samples came from your posterior is an entirely separate question, and nothing raises an exception if they didn’t. So there are three checks, and this course requires all three on every model from here on.</p>
+<p><strong>R-hat</strong>, and you want it below one-point-oh-one. It compares the four chains: did independent walks, started in different places, end up describing the same distribution? If they didn’t, nothing else on the output matters.</p>
+<p><strong>ESS</strong> — effective sample size — and you want it above four hundred. MCMC draws are correlated with each other, so eight thousand draws may carry only as much information as two hundred independent ones. ESS tells you how many you effectively have.</p>
+<p><strong>Divergences</strong>, and you want exactly zero. A divergence means the sampler hit terrain it could not navigate — typically a sharp funnel. Even a handful means parts of the posterior were explored wrongly. We’ll meet this for real in Lecture 11, twice. One practical note that will save you confusion. Call <code>az.summary</code> with <strong>both</strong> <code>ci_kind="hdi"</code> and <code>ci_prob=0.94</code>.</p>
+<p>ArviZ now defaults to an eighty-nine percent <em>equal-tailed</em> interval, not the HDI. If you don’t pass those arguments you will get a different interval than the one you think you’re reading, and than the one on these slides.</p>
+<p>On our simple model: R-hat one-point-oh-oh, ESS three thousand six hundred eighty-six, zero divergences. <strong>Report all three, every time.</strong> A posterior mean without its diagnostics is not a result.</p>
+</section>
+<section id="prior-predictive-checks" class="level3" data-number="11.5.4">
+<h3 data-number="11.5.4" class="anchored" data-anchor-id="prior-predictive-checks"><span class="header-section-number">11.5.4</span> Prior Predictive Checks</h3>
+<p>Before touching the data, simulate from the prior alone <span class="citation" data-cites="McElreath2020">[@McElreath2020]</span>.</p>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Two lines</p>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    prior_pred <span class="op">=</span> pm.sample_prior_predictive(<span class="dv">500</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>az.plot_ppc(prior_pred, group<span class="op">=</span><span class="st">"prior"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Ask whether the simulated data could plausibly have come from your business.</strong> Impossible values — negative sales, probabilities above one — mean the prior is misspecified, not merely wide. Data spanning a billion units means it is too vague; identical simulations mean it is too tight.</p>
+<div class="keybox">
+<p>A prior predictive check is <strong>model debugging</strong> that costs two lines — and the habit most often skipped.</p>
+</div>
+<p>One more habit, and it’s the one most often skipped. <strong>Before you touch the data</strong>, simulate from the prior alone. Two lines: <code>sample_prior_predictive</code>, then plot it.</p>
+<p>What you’re doing is asking your model to hallucinate datasets, using only your priors, and then looking at whether those datasets could plausibly have come from your business. Three things to look for.</p>
+<p><strong>Impossible values</strong> — negative sales, probabilities above one. That means the prior is misspecified, not merely wide. Fix the support.</p>
+<p><strong>Absurd ranges</strong> — simulated weekly demand spanning zero to a billion units. That prior is too vague, and vague is not the same as neutral.</p>
+<p><strong>Identical simulations</strong> — every simulated dataset looking the same. Now the prior is too tight and the data won’t be able to move it.</p>
+<p>This is <strong>model debugging that costs two lines</strong>, and it catches errors before you’ve spent an hour sampling. It’s required in Homework 6, and I’d encourage you to make it reflexive.</p>
+<p>The general principle is one you’ve met in other forms all semester: check the thing that could silently be wrong, before it costs you.</p>
+</section>
+</section>
+<section id="key-takeaways" class="level2" data-number="11.6">
+<h2 data-number="11.6" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">11.6</span> Key Takeaways</h2>
+<p>Bayesian inference: beliefs in, beliefs out. Data updates your prior into a posterior.</p>
+<section id="lecture-10-key-takeaways" class="level3" data-number="11.6.1">
+<h3 data-number="11.6.1" class="anchored" data-anchor-id="lecture-10-key-takeaways"><span class="header-section-number">11.6.1</span> Lecture 10: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p><strong>Bayesian inference</strong> treats parameters as random variables with probability distributions. The posterior distribution <span class="math inline">\(p(\theta \mid \mathcal{D})\)</span> represents updated beliefs after seeing data.</p></li>
+<li><p><strong>Bayes’ theorem:</strong> posterior <span class="math inline">\(\propto\)</span> likelihood <span class="math inline">\(\times\)</span> prior. The normalizing constant <span class="math inline">\(p(\mathcal{D})\)</span> is usually intractable, so we sample instead of computing it.</p></li>
+<li><p><strong>Priors</strong> encode prior knowledge. Use weakly informative priors (Beta, Normal, HalfNormal) to constrain parameters to plausible values without overwhelming the data.</p></li>
+<li><p><strong>MCMC</strong> (specifically NUTS in PyMC) draws samples from the posterior. From samples, compute any summary statistic: mean, median, HDI, or the probability that a parameter exceeds a threshold.</p></li>
+<li><p><strong>Prior predictive checks</strong> verify that your model generates plausible data before fitting. Run them every time.</p></li>
+</ol>
+</div>
+<p><span class="neutral">Next: Bayesian Statistics II — Bayesian time series models, trend and seasonality, hierarchical models.</span></p>
+<p>One. Bayesian inference treats parameters as random variables with probability distributions. The posterior represents your updated beliefs after seeing the data.</p>
+<p>Two. Bayes’ theorem: posterior is proportional to likelihood times prior. The normalizing constant is usually intractable, so we sample instead of computing it.</p>
+<p>Three. Priors encode knowledge. Use weakly informative ones — Beta, Normal, HalfNormal — to constrain parameters to plausible values without overwhelming the data. And match the support to the parameter.</p>
+<p>Four. MCMC, specifically NUTS in PyMC, draws samples from the posterior. From samples you can compute any summary you like: mean, median, HDI, or the probability a parameter exceeds a threshold. Counted, not derived. Five. Prior predictive checks verify your model generates plausible data before you fit. Run them every time.</p>
+<p>And the one that isn’t numbered, which is really the point of the hour: <strong>this doesn’t make your forecast more accurate.</strong> It changes what the forecast <em>is</em>, from a number into a distribution — and that’s what lets you answer a question about probability.</p>
+<p>Next time: Bayesian time series. Trend and seasonality with priors attached — and a sampler failure that looks exactly like success.</p>
+</section>
+<section id="references" class="level3" data-number="11.6.2">
+<h3 data-number="11.6.2" class="anchored" data-anchor-id="references"><span class="header-section-number">11.6.2</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture09_Part2_Transformers.html" class="pagination-link" aria-label="Transformers">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="pagination-link" aria-label="Bayesian Statistics II --- Time Series">
+        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

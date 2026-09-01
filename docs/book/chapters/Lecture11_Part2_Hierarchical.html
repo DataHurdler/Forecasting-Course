@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>13&nbsp; Bayesian Statistics II — Hierarchical Models – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture12_BayesianRegression.html" rel="next">
+<link href="../chapters/Lecture11_Part1_BayesianTS.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture11_Part2_Hierarchical.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">13.1</span> Lecture Outline</a></li>
+  <li><a href="#which-series-may-be-pooled" id="toc-which-series-may-be-pooled" class="nav-link" data-scroll-target="#which-series-may-be-pooled"><span class="header-section-number">13.2</span> Which Series May Be Pooled</a>
+  <ul class="collapse">
+  <li><a href="#the-question" id="toc-the-question" class="nav-link" data-scroll-target="#the-question"><span class="header-section-number">13.2.1</span> The Question</a></li>
+  <li><a href="#exchangeability-the-assumption-under-every-hierarchy" id="toc-exchangeability-the-assumption-under-every-hierarchy" class="nav-link" data-scroll-target="#exchangeability-the-assumption-under-every-hierarchy"><span class="header-section-number">13.2.2</span> Exchangeability: the Assumption Under Every Hierarchy</a></li>
+  <li><a href="#complete-pooling-and-no-pooling" id="toc-complete-pooling-and-no-pooling" class="nav-link" data-scroll-target="#complete-pooling-and-no-pooling"><span class="header-section-number">13.2.3</span> Complete Pooling and No Pooling</a></li>
+  </ul></li>
+  <li><a href="#partial-pooling" id="toc-partial-pooling" class="nav-link" data-scroll-target="#partial-pooling"><span class="header-section-number">13.3</span> Partial Pooling</a>
+  <ul class="collapse">
+  <li><a href="#the-hierarchy-is-one-extra-line" id="toc-the-hierarchy-is-one-extra-line" class="nav-link" data-scroll-target="#the-hierarchy-is-one-extra-line"><span class="header-section-number">13.3.1</span> The Hierarchy Is One Extra Line</a></li>
+  <li><a href="#why-this-is-the-right-answer-not-a-compromise" id="toc-why-this-is-the-right-answer-not-a-compromise" class="nav-link" data-scroll-target="#why-this-is-the-right-answer-not-a-compromise"><span class="header-section-number">13.3.2</span> Why This Is the Right Answer, Not a Compromise</a></li>
+  </ul></li>
+  <li><a href="#fitting-it-and-the-trap" id="toc-fitting-it-and-the-trap" class="nav-link" data-scroll-target="#fitting-it-and-the-trap"><span class="header-section-number">13.4</span> Fitting It, and the Trap</a>
+  <ul class="collapse">
+  <li><a href="#the-model-in-pymc" id="toc-the-model-in-pymc" class="nav-link" data-scroll-target="#the-model-in-pymc"><span class="header-section-number">13.4.1</span> The Model in PyMC</a></li>
+  <li><a href="#the-trap-write-it-the-obvious-way-and-it-breaks" id="toc-the-trap-write-it-the-obvious-way-and-it-breaks" class="nav-link" data-scroll-target="#the-trap-write-it-the-obvious-way-and-it-breaks"><span class="header-section-number">13.4.2</span> The Trap: Write It the Obvious Way and It Breaks</a></li>
+  </ul></li>
+  <li><a href="#reading-the-result" id="toc-reading-the-result" class="nav-link" data-scroll-target="#reading-the-result"><span class="header-section-number">13.5</span> Reading the Result</a>
+  <ul class="collapse">
+  <li><a href="#shrinkage-measured" id="toc-shrinkage-measured" class="nav-link" data-scroll-target="#shrinkage-measured"><span class="header-section-number">13.5.1</span> Shrinkage, Measured</a></li>
+  <li><a href="#checked-against-data-the-model-never-saw" id="toc-checked-against-data-the-model-never-saw" class="nav-link" data-scroll-target="#checked-against-data-the-model-never-saw"><span class="header-section-number">13.5.2</span> Checked Against Data the Model Never Saw</a></li>
+  <li><a href="#what-the-model-actually-concluded" id="toc-what-the-model-actually-concluded" class="nav-link" data-scroll-target="#what-the-model-actually-concluded"><span class="header-section-number">13.5.3</span> What the Model Actually Concluded</a></li>
+  </ul></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">13.6</span> Key Takeaways</a>
+  <ul class="collapse">
+  <li><a href="#lecture-11-part-2-key-takeaways" id="toc-lecture-11-part-2-key-takeaways" class="nav-link" data-scroll-target="#lecture-11-part-2-key-takeaways"><span class="header-section-number">13.6.1</span> Lecture 11 Part 2: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">13.6.2</span> References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 11, Part 2 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">13.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Which Series May Be Pooled</li>
+<li>Partial Pooling</li>
+<li>Fitting It, and the Trap</li>
+<li>Reading the Result</li>
+<li>Key Takeaways</li>
+</ol>
+<p>Five parts. Which series may be pooled — the question before the model. Then partial pooling itself, which is one extra line of code. Then fitting it, and a trap that catches nearly everyone the first time. Then reading the result, checked against data the model never saw. And takeaways.</p>
+</section>
+<section id="which-series-may-be-pooled" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="which-series-may-be-pooled"><span class="header-section-number">13.2</span> Which Series May Be Pooled</h2>
+<p>Before you pool anything, ask what the groups have in common.</p>
+<section id="the-question" class="level3" data-number="13.2.1">
+<h3 data-number="13.2.1" class="anchored" data-anchor-id="the-question"><span class="header-section-number">13.2.1</span> The Question</h3>
+<p>A concrete one, and you have met it before. <strong>Does demand rise in weeks when SNAP benefits are disbursed, and by how much — store by store?</strong> Homework 3’s memo had you stock up for SNAP weeks store by store, which assumed those differences are real. Today we check.</p>
+<p><strong>But one question comes before the model.</strong> SNAP is a <em>food</em> assistance programme. Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Category</th>
+<th style="text-align: right;">Mean effect</th>
+<th style="text-align: right;">Spread across stores</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FOODS</strong> (10 series)</td>
+<td style="text-align: right;"><span class="math inline">\(+0.089\)</span></td>
+<td style="text-align: right;">0.058</td>
+</tr>
+<tr class="even">
+<td>HOBBIES (10 series)</td>
+<td style="text-align: right;"><span class="math inline">\(+0.006\)</span></td>
+<td style="text-align: right;">0.010</td>
+</tr>
+<tr class="odd">
+<td>HOUSEHOLD (10 series)</td>
+<td style="text-align: right;"><span class="math inline">\(+0.011\)</span></td>
+<td style="text-align: right;">0.014</td>
+</tr>
+</tbody>
+</table>
+<p><strong>These are not thirty versions of the same thing.</strong> FOODS responds; the other two barely move. Pooling all thirty would tell the model they are interchangeable.</p>
+<p>Here’s a concrete business question, and you’ve met it before. <strong>Does demand rise in weeks when SNAP benefits are disbursed, and by how much — store by store?</strong></p>
+<p>Homework 3’s memo had you decide which store-categories to stock up for a SNAP week rather than applying one national uplift. That question <em>assumed</em> the per-series differences were real. Today we check. But one question comes before the model, and it costs nothing to ask.</p>
+<p>SNAP is a <strong>food</strong> assistance programme. So let’s measure the raw SNAP-week effect — no model, just the difference in mean log units — in all thirty series, grouped by category. FOODS, ten series: plus point-oh-eight-nine, with a spread across stores of point-oh-five-eight. HOBBIES, ten series: plus point-oh-oh-six. HOUSEHOLD, ten series: plus point-oh-one-one.</p>
+<p>Look at that first column. FOODS responds. The other two barely move — and that is not a surprise once you say it out loud, because SNAP is food assistance. You could have predicted the sign of that table before computing it.</p>
+<p><strong>These are not thirty versions of the same thing.</strong> Pooling all thirty would be telling the model they are interchangeable, and the model would believe you.</p>
+<p>And I want to stress how cheap that check was. Three group-bys and a subtraction. No model, no sampler, no priors. Two minutes of work.</p>
+<p>That is characteristic of the most valuable checks in this course — the leakage checks, the benchmark, the planted noise control in Homework 3. They are nearly free, they happen before the modelling, and they are the ones people skip because they don’t feel like real analysis.</p>
+</section>
+<section id="exchangeability-the-assumption-under-every-hierarchy" class="level3" data-number="13.2.2">
+<h3 data-number="13.2.2" class="anchored" data-anchor-id="exchangeability-the-assumption-under-every-hierarchy"><span class="header-section-number">13.2.2</span> Exchangeability: the Assumption Under Every Hierarchy</h3>
+<p>Partial pooling rests on one assumption, worth naming before we use it.</p>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Exchangeable</p>
+</div>
+<p>Groups are <strong>exchangeable</strong> when, before seeing the data, you have no reason to expect one to differ from another in a particular direction. Swapping their labels would not change what you believe.</p>
+</div>
+<p>The ten FOODS series qualify: same category, different stores, and you could not say in advance which store’s SNAP effect should be largest. FOODS against HOBBIES does <strong>not</strong> — you know before looking that a food-assistance programme moves food.</p>
+<p><strong>The setup for today.</strong> We work with the <strong>ten FOODS series</strong>, and deliberately thin <strong>five</strong> of them down to <strong>8 weeks</strong>. Five series are data-rich, five are data-poor. That imbalance is the whole point.</p>
+<p><span class="neutral smaller">The lab pools all thirty anyway, and measures what it costs.</span></p>
+<p>So let’s name the assumption properly, because it sits under every hierarchical model you will ever build.</p>
+<p>Groups are <strong>exchangeable</strong> when, <em>before seeing the data</em>, you have no reason to expect one to differ from another in a particular direction. Swapping their labels would not change what you believe. That’s the test. Not “are they similar?” — but “would relabelling them change my expectations?”</p>
+<p>That distinction matters, so let me push on it. Exchangeable does <strong>not</strong> mean identical. The ten FOODS stores certainly differ — different neighbourhoods, different sizes, different customers. Exchangeability doesn’t deny that.</p>
+<p>It says something weaker and more useful: that before seeing data, you have no basis for ordering them. You cannot say <em>in advance</em> that the Texas store’s SNAP effect should exceed California’s.</p>
+<p>That’s a claim about your knowledge, not about the world. Which is why it’s a judgement call you have to make and defend — and why no diagnostic can make it for you.</p>
+<p>Apply it. The ten FOODS series <strong>qualify</strong>: same category, ten different stores, and you genuinely could not say in advance which store’s SNAP effect should be largest. Swap the store labels and you’d believe exactly the same things.</p>
+<p>FOODS against HOBBIES does <strong>not</strong> qualify. You know before looking that a food-assistance programme moves food. There’s a direction, and you knew it in advance.</p>
+<p>So for today we work with the <strong>ten FOODS series</strong> — the defensible set — and we deliberately thin <strong>five</strong> of them down to eight weeks of data. Five data-rich, five data-poor. That imbalance is the whole point of the exercise.</p>
+<p>And in the lab, we pool all thirty anyway — on purpose — and measure exactly what it costs. I’d encourage you to do that one carefully. It is the most instructive forty minutes of the semester, because the wrong model looks <em>completely fine</em> until you check it against held-out data.</p>
+</section>
+<section id="complete-pooling-and-no-pooling" class="level3" data-number="13.2.3">
+<h3 data-number="13.2.3" class="anchored" data-anchor-id="complete-pooling-and-no-pooling"><span class="header-section-number">13.2.3</span> Complete Pooling and No Pooling</h3>
+<p>Within that exchangeable set there are two obvious approaches, and each fails in a different direction.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>What it does</th>
+<th>How it fails</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Complete pooling</strong></td>
+<td>One SNAP effect for all ten series. <code>b = pm.Normal("b", 0, 1)</code></td>
+<td>Denies that stores differ at all. A genuinely different store is averaged away.</td>
+</tr>
+<tr class="even">
+<td><strong>No pooling</strong></td>
+<td>A separate effect per series, estimated independently. <code>shape=10</code></td>
+<td>A series with 8 weeks gets an estimate built from 8 weeks. Mostly noise, reported as a finding.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>You have used both already without naming them.</strong> Homework 3’s random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modelling decision and lets the data settle it.</p>
+<p>Within that exchangeable set, there are two obvious things you could do, and each fails in a different direction.</p>
+<p><strong>Complete pooling</strong>: one SNAP effect for all ten series. One parameter. This denies that stores differ at all, so a genuinely different store gets averaged away into the crowd.</p>
+<p><strong>No pooling</strong>: a separate effect per series, estimated independently — <code>shape=10</code>. Now a series with eight weeks of data gets an estimate built from eight weeks of data. That’s mostly noise, reported as a finding. And here’s the thing — <strong>you have used both of these already, without naming them.</strong></p>
+<p>Homework 3’s random forest pooled all thirty series into one model with store dummies. That’s close to complete pooling. Homework 1 fitted ARIMA to one series at a time, completely independently. That’s no pooling.</p>
+<p>You made that choice twice, and both times you made it by <strong>convenience</strong> — by what the library made easy. Partial pooling turns it into a modelling decision, with a parameter, and lets the data settle where between the two extremes you should sit.</p>
+<p>It’s worth noticing that this is a recurring shape in the course. Something you had been deciding implicitly, by tooling default, gets promoted into an explicit parameter with a posterior.</p>
+<p>Lecture 6 did it for which predictors survive — you were choosing by intuition, then LASSO made it a penalty. Lecture 11 Part 1 did it for how fast the level may move. Today it’s how much groups share.</p>
+<p>Each time, the gain is the same: the decision becomes visible, arguable, and estimable rather than buried in a default nobody wrote down.</p>
+</section>
+</section>
+<section id="partial-pooling" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="partial-pooling"><span class="header-section-number">13.3</span> Partial Pooling</h2>
+<p>Let each series have its own effect — drawn from a shared distribution the data also estimates.</p>
+<section id="the-hierarchy-is-one-extra-line" class="level3" data-number="13.3.1">
+<h3 data-number="13.3.1" class="anchored" data-anchor-id="the-hierarchy-is-one-extra-line"><span class="header-section-number">13.3.1</span> The Hierarchy Is One Extra Line</h3>
+<p>Give each series its own effect <span class="math inline">\(b_j\)</span>, but say where those effects come from:</p>
+<p><span class="math display">\[b_j \sim \mathcal{N}(\mu_b,\ \sigma_b), \qquad j = 1, \ldots, 10\]</span></p>
+<p><span class="math inline">\(\mu_b\)</span> is the typical SNAP effect across FOODS, and <span class="math inline">\(\sigma_b\)</span> is <strong>how much stores genuinely differ</strong>. Crucially, both are estimated from the data rather than assumed.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\sigma_b \rightarrow 0\)</span></td>
+<td>The model concludes stores do not differ, and reproduces complete pooling.</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\sigma_b\)</span> large</td>
+<td>The model concludes they differ a lot, and approaches no pooling.</td>
+</tr>
+<tr class="odd">
+<td>In between</td>
+<td>Each <span class="math inline">\(b_j\)</span> is pulled toward <span class="math inline">\(\mu_b\)</span> — <em>how far</em> depending on how much data that series has.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>That last row is the whole idea.</strong> A series with 277 weeks barely moves; one with 8 weeks moves a long way. Nobody chose those weights — they fall out of the model.</p>
+<p>Here is the whole idea, and it really is one line.</p>
+<p>Give each series its own effect, b-j. But then say <strong>where those effects come from</strong>: b-j is drawn from a Normal with mean mu-b and standard deviation sigma-b. mu-b is the typical SNAP effect across FOODS. sigma-b is <strong>how much stores genuinely differ</strong>. And critically — both of those are <em>estimated from the data</em>, not assumed by you. Think about the two extremes.</p>
+<p>If sigma-b goes to zero, the model has concluded stores don’t differ, and every b-j collapses onto mu-b. That reproduces complete pooling.</p>
+<p>If sigma-b is large, the model has concluded they differ a lot, and each b-j is free to sit wherever its own data says. That approaches no pooling.</p>
+<p>And in between — which is where you almost always end up — each b-j is pulled toward mu-b, and <strong>how far depends on how much data that series has.</strong></p>
+<p>That last row is the whole idea, so let me say it plainly. A series with two hundred seventy-seven weeks barely moves, because its own estimate is already trustworthy. A series with eight weeks moves a long way, because its own estimate carries almost no information.</p>
+<p><strong>Nobody chose those weights.</strong> There is no threshold, no rule, no “if n is less than thirty.” They fall out of estimating sigma-b.</p>
+</section>
+<section id="why-this-is-the-right-answer-not-a-compromise" class="level3" data-number="13.3.2">
+<h3 data-number="13.3.2" class="anchored" data-anchor-id="why-this-is-the-right-answer-not-a-compromise"><span class="header-section-number">13.3.2</span> Why This Is the Right Answer, Not a Compromise</h3>
+<p>Partial pooling sounds like splitting the difference between two bad options. It is better than that, and the reason is worth stating.</p>
+<p>When a series has 8 observations, its unpooled estimate is mostly sampling noise. The hierarchy’s pull toward <span class="math inline">\(\mu_b\)</span> is not a fudge — it is the correct response to a noisy measurement. You already believe this in another form: it is why you would not conclude a coin is biased after three flips.</p>
+<div class="keybox">
+<p><strong>This is regularization again, for the sixth time.</strong> A hierarchical prior shrinks per-group estimates toward a common value exactly as Ridge shrinks coefficients toward zero — and here the shrinkage strength <span class="math inline">\(\sigma_b\)</span> is <em>estimated</em> rather than tuned by cross-validation.</p>
+</div>
+<p><span class="neutral smaller">GAM smoothing penalty (L3) <span class="math inline">\(\rightarrow\)</span> tree pruning (L4) <span class="math inline">\(\rightarrow\)</span> <code>reg_lambda</code> (L5) <span class="math inline">\(\rightarrow\)</span> Ridge and LASSO (L6) <span class="math inline">\(\rightarrow\)</span> weight decay (L7) <span class="math inline">\(\rightarrow\)</span> hierarchical priors (today).</span></p>
+<p>I want to address an objection that’s probably forming, because it’s a reasonable one.</p>
+<p>Partial pooling sounds like <strong>splitting the difference</strong> between two bad options. A fudge. Meeting in the middle because you can’t decide. It is better than that, and the reason is worth stating.</p>
+<p>When a series has eight observations, its unpooled estimate is mostly sampling noise. Pulling it toward the group mean is not a compromise — it is the <strong>correct response to a noisy measurement</strong>.</p>
+<p>You already believe this in another form. You would not conclude a coin is biased after three flips, even if all three came up heads. You’d pull your estimate toward one-half, because three flips is not much evidence. That’s shrinkage, and you do it instinctively. And this is <strong>regularization, for the sixth time this semester.</strong></p>
+<p>A hierarchical prior shrinks per-group estimates toward a common value exactly as Ridge shrinks coefficients toward zero. Same operation, different name.</p>
+<p>The smoothing penalty in Lecture 3. Cost-complexity pruning in Lecture 4. <code>reg_lambda</code> in Lecture 5. Ridge and LASSO in Lecture 6. Weight decay in Lecture 7. And now the hierarchical prior.</p>
+<p>But this version has something none of the other five had. In every previous case, you chose the shrinkage strength by cross-validation — you tried values and picked one. Here, sigma-b is <strong>estimated</strong>, as part of the model, with its own posterior and its own uncertainty. That makes it the cleanest version of the idea in the course.</p>
+</section>
+</section>
+<section id="fitting-it-and-the-trap" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="fitting-it-and-the-trap"><span class="header-section-number">13.4</span> Fitting It, and the Trap</h2>
+<p>The obvious code does not work, and the reason is geometry rather than statistics.</p>
+<section id="the-model-in-pymc" class="level3" data-number="13.4.1">
+<h3 data-number="13.4.1" class="anchored" data-anchor-id="the-model-in-pymc"><span class="header-section-number">13.4.1</span> The Model in PyMC</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Non-centred hierarchical model</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    mu_b <span class="op">=</span> pm.Normal(<span class="st">"mu_b"</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)        <span class="co"># typical SNAP effect</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    sd_b <span class="op">=</span> pm.HalfNormal(<span class="st">"sd_b"</span>, <span class="fl">0.25</span>)      <span class="co"># how much stores differ</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    z    <span class="op">=</span> pm.Normal(<span class="st">"z"</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>J)    <span class="co"># non-centred</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    b    <span class="op">=</span> pm.Deterministic(<span class="st">"b"</span>, mu_b <span class="op">+</span> z <span class="op">*</span> sd_b)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> pm.Normal(<span class="st">"a"</span>, y.mean(), <span class="dv">1</span>, shape<span class="op">=</span>J)  <span class="co"># per-series level</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> pm.Exponential(<span class="st">"s"</span>, <span class="fl">1.0</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    pm.Normal(<span class="st">"obs"</span>, mu<span class="op">=</span>a[idx] <span class="op">+</span> b[idx]<span class="op">*</span>snap, sigma<span class="op">=</span>s, observed<span class="op">=</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>idx</code> maps each row to its series, so <code>b[idx]</code> picks out the right effect for every observation. That indexing pattern is how every hierarchical model in PyMC is written.</p>
+<p><strong>Note what is <em>not</em> here.</strong> No decision about how much to pool, no weighting scheme, no threshold for “enough data.” Those all come out of estimating <span class="math inline">\(\sigma_b\)</span>.</p>
+<p>Here it is in PyMC. Nine lines.</p>
+<p>mu-b and sd-b are the group-level parameters — the typical effect and how much stores differ. Then z, a vector of standard Normals. Then b is constructed as mu-b plus z times sd-b. Then a per-series intercept, observation noise, and the likelihood.</p>
+<p>The pattern to internalize is <code>b[idx]</code>. <code>idx</code> maps each row to its series number, so <code>b[idx]</code> picks out the right effect for every observation. Every hierarchical model in PyMC is written that way — once you can read that line, you can read most of the applied Bayesian literature. And notice what is <strong>not</strong> in that code.</p>
+<p>There is no decision about how much to pool. No weighting scheme. No threshold for “enough data.” No rule that says series with fewer than twenty observations get shrunk by half. All of that comes out of estimating one parameter, sigma-b. That’s the elegance of it.</p>
+<p>One practical note on priors, since we’re looking at the code. <code>sd_b</code> gets a HalfNormal with scale point-two-five — positive-only, because a standard deviation must be, and concentrated on small values because we’re working in log units where an effect of point-two-five is already very large.</p>
+<p>That prior is doing real work. With only ten groups, there is not much information about how much groups differ, so the data cannot pin sigma-b down on its own. A vague prior here lets it wander large, which weakens the pooling — you’d drift toward the unpooled answer.</p>
+<p>This is the general situation with group-level scale parameters: they are the hardest thing in the model to estimate, and the place where your prior matters most.</p>
+</section>
+<section id="the-trap-write-it-the-obvious-way-and-it-breaks" class="level3" data-number="13.4.2">
+<h3 data-number="13.4.2" class="anchored" data-anchor-id="the-trap-write-it-the-obvious-way-and-it-breaks"><span class="header-section-number">13.4.2</span> The Trap: Write It the Obvious Way and It Breaks</h3>
+<p>The natural way to write the hierarchy is <code>b = pm.Normal("b", mu_b, sd_b, shape=J)</code> — the <em>centred</em> form, which reads exactly like the equation. On our data it produces:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Centred</th>
+<th style="text-align: right;">Non-centred</th>
+<th>Want</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Divergences</td>
+<td style="text-align: right;"><strong>127</strong></td>
+<td style="text-align: right;"><strong>1</strong></td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\hat{R}\)</span></td>
+<td style="text-align: right;"><strong>1.044</strong></td>
+<td style="text-align: right;">1.002</td>
+<td><span class="math inline">\(&lt; 1.01\)</span></td>
+</tr>
+<tr class="odd">
+<td>ESS (bulk)</td>
+<td style="text-align: right;">413</td>
+<td style="text-align: right;">1,728</td>
+<td><span class="math inline">\(&gt; 400\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why:</strong> when <span class="math inline">\(\sigma_b\)</span> is small, the <span class="math inline">\(b_j\)</span> must crowd into a narrow band, and the posterior takes on a funnel shape — wide where <span class="math inline">\(\sigma_b\)</span> is large, pinched where it is small. A sampler tuned for the wide part cannot navigate the neck, and reports divergences.</p>
+<p><strong>Note how the alarms differ in kind.</strong> ESS <em>passes</em> — 413, just over the line, and you would not look twice. <span class="math inline">\(\hat{R}\)</span> at 1.044 fails, but it is the sort of near-miss people talk themselves out of. <strong>127 divergences against a threshold of exactly zero admits no such conversation.</strong> On hierarchical models divergences fire first and least ambiguously; do not wait for <span class="math inline">\(\hat{R}\)</span> to decide for you.</p>
+<p><span class="neutral smaller">BMCP §4.6.1, <em>Posterior Geometry Matters</em> — the single most common failure in applied hierarchical modelling.</span></p>
+<p>Now, why did I write <code>b</code> as <code>mu_b + z * sd_b</code> instead of the obvious thing?</p>
+<p>The obvious thing is <code>pm.Normal("b", mu_b, sd_b, shape=J)</code> — which reads <em>exactly</em> like the equation on slide 8. It is the natural translation. Everybody writes it that way first. And on our data it produces this. Divergences: <strong>one hundred twenty-seven</strong>, where we want zero. R-hat: one-point-oh-four-four. <strong>Fails</strong>, but only just enough to argue about. ESS: four hundred thirteen. <strong>Passes</strong> — barely, thirteen over the line. Look at those three numbers again, because they do not fail in the same way.</p>
+<p>ESS clears its threshold. You would not look twice at four hundred thirteen. R-hat is over the line at one-point-oh-four-four — and be honest about what happens in practice when a number is a little over a threshold: people run it again, or say it is close enough, or quietly widen the threshold.</p>
+<p><strong>One hundred twenty-seven divergences against a threshold of exactly zero admits none of that.</strong> There is no version of “close to zero” that gets you to a hundred and twenty-seven.</p>
+<p>So the rule to carry forward: on hierarchical models, <strong>divergences fire first and least ambiguously.</strong> Do not wait for R-hat to decide for you. Do not wait for R-hat to tell you something is wrong. It may never say so.</p>
+<p>Why does it happen? When sigma-b is small, all the b-j have to crowd into a very narrow band. So the posterior takes on a <strong>funnel</strong> shape — wide and open where sigma-b is large, pinched to a point where sigma-b is small.</p>
+<p>A sampler tunes its step size for the wide part of the funnel. Then it tries to get into the neck with steps that are far too big, fails, and reports a divergence.</p>
+<p>The non-centred form samples z from a plain standard Normal — a nice round shape with no funnel — and <em>constructs</em> b afterwards. Same model. Same posterior. Geometry the sampler can actually walk. This is BMCP section four-point-six-point-one, and it is the single most common failure in applied hierarchical modelling.</p>
+<p>The instinct when you see divergences is to raise <code>target_accept</code> — force smaller steps. Sometimes that helps a little. Here it mostly doesn’t: at point-nine-five you still get divergences, you just get fewer, and the sampler runs much slower for the privilege.</p>
+<p>Reparameterizing is the actual fix, and it costs nothing. Same answer, no divergences, and it runs faster than the centred version did.</p>
+<p>So the habit: when a hierarchical model diverges, your first move is to check whether you wrote it centred — not to tune the sampler.</p>
+</section>
+</section>
+<section id="reading-the-result" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="reading-the-result"><span class="header-section-number">13.5</span> Reading the Result</h2>
+<p>Shrinkage, measured — and checked against data the model never saw.</p>
+<section id="shrinkage-measured" class="level3" data-number="13.5.1">
+<h3 data-number="13.5.1" class="anchored" data-anchor-id="shrinkage-measured"><span class="header-section-number">13.5.1</span> Shrinkage, Measured</h3>
+<p>Fit both models. Compare each series’ estimated SNAP effect before and after pooling.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Series group</th>
+<th style="text-align: right;">Unpooled spread</th>
+<th style="text-align: right;">After pooling</th>
+<th style="text-align: right;">Mean move</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Thin</strong> — 8 weeks (5 series)</td>
+<td style="text-align: right;">0.108</td>
+<td style="text-align: right;">0.010</td>
+<td style="text-align: right;"><strong>0.120</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Full</strong> — 277 weeks (5 series)</td>
+<td style="text-align: right;">0.055</td>
+<td style="text-align: right;">0.037</td>
+<td style="text-align: right;">0.015</td>
+</tr>
+</tbody>
+</table>
+<p><span class="key-result"><strong>The data-poor series moved 8.2 times further toward the group mean than the data-rich ones.</strong></span> Nobody told the model which series were thin. It inferred that from how much each series had to say.</p>
+<p>Read the two right-hand columns together. The thin series’ apparent spread of <span class="math inline">\(0.108\)</span> nearly vanishes, while the full series <strong>keep most of theirs</strong> (<span class="math inline">\(0.055 \rightarrow 0.037\)</span>). The hierarchy did not flatten everything: it discarded spread that 8 weeks could not support and kept spread that 277 weeks could.</p>
+<p><strong>That is the claim to be sceptical of, so the next slide tests it.</strong></p>
+<p>Now let’s see what the pooling actually did. Fit both models — unpooled and hierarchical — and compare each series’ estimate before and after.</p>
+<p>The <strong>thin</strong> series, eight weeks each: unpooled spread of point-one-oh-eight, collapsing to point-oh-one-oh after pooling. Mean movement: point-one-two-zero. The <strong>full</strong> series, two hundred seventy-seven weeks: spread of point-oh-five-five, going to point-oh-three-seven. Mean movement: point-oh-one-five.</p>
+<p>So the data-poor series moved <strong>eight times further</strong> toward the group mean than the data-rich ones. And nobody told the model which series were thin. It inferred that entirely from how much each series had to say. Now read those two columns together, because this is what separates partial pooling from just averaging everything.</p>
+<p>The thin series’ apparent spread of point-one-oh-eight nearly <strong>vanishes</strong> — down to point-oh-one. But the full series <strong>keep most of theirs</strong> — point-oh-five-five down to point-oh-three-seven.</p>
+<p>The hierarchy did not flatten everything. It discarded spread that eight weeks could not support, and kept spread that two hundred seventy-seven weeks <em>could</em>.</p>
+<p>That’s a strong claim, and you should be sceptical of it. So the next slide tests it against data the model never saw.</p>
+</section>
+<section id="checked-against-data-the-model-never-saw" class="level3" data-number="13.5.2">
+<h3 data-number="13.5.2" class="anchored" data-anchor-id="checked-against-data-the-model-never-saw"><span class="header-section-number">13.5.2</span> Checked Against Data the Model Never Saw</h3>
+<p>We thinned those five series ourselves, so the weeks we removed are still there. Compare each estimate against the SNAP effect actually observed in the held-out weeks.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Thin series</th>
+<th style="text-align: right;">Unpooled</th>
+<th style="text-align: right;">Hierarchical</th>
+<th style="text-align: right;">Held-out truth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CA_1_FOODS</td>
+<td style="text-align: right;">0.286</td>
+<td style="text-align: right;">0.097</td>
+<td style="text-align: right;">0.087</td>
+</tr>
+<tr class="even">
+<td>CA_3_FOODS</td>
+<td style="text-align: right;">0.105</td>
+<td style="text-align: right;">0.082</td>
+<td style="text-align: right;">0.102</td>
+</tr>
+<tr class="odd">
+<td>TX_1_FOODS</td>
+<td style="text-align: right;">0.052</td>
+<td style="text-align: right;">0.075</td>
+<td style="text-align: right;">0.082</td>
+</tr>
+<tr class="even">
+<td>TX_3_FOODS</td>
+<td style="text-align: right;">0.219</td>
+<td style="text-align: right;">0.091</td>
+<td style="text-align: right;">0.072</td>
+</tr>
+<tr class="odd">
+<td>WI_2_FOODS</td>
+<td style="text-align: right;">0.338</td>
+<td style="text-align: right;">0.103</td>
+<td style="text-align: right;">0.207</td>
+</tr>
+<tr class="even">
+<td><strong>RMSE against truth</strong></td>
+<td style="text-align: right;"><strong>0.126</strong></td>
+<td style="text-align: right;"><strong>0.049</strong></td>
+<td style="text-align: right;">—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Partial pooling was two and a half times more accurate</strong>, beating the unpooled fit on four series out of five. Those estimates were not just noisy — they were confidently wrong, and the confidence came from 8 weeks of data.</p>
+<p><span class="neutral smaller">Borrowing strength is not a figure of speech: the thin series were estimated better <em>because</em> the other five existed.</span></p>
+<p>Here’s the nice thing about having thinned those series ourselves: <strong>the weeks we removed still exist.</strong> So we can compute the SNAP effect that actually occurred in them, and grade both models against it. CA_1 FOODS. Unpooled says point-two-eight-six. Hierarchical says point-oh-nine-seven. The truth in the held-out weeks: <strong>point-oh-eight-seven.</strong> CA_3. Unpooled point-one-oh-five, hierarchical point-oh-eight-two, truth point-one-oh-two.</p>
+<p>TX_1. Unpooled point-oh-five-two, hierarchical point-oh-seven-five, truth point-oh-eight-two — note the hierarchical estimate is <em>higher</em> here, and closer. Shrinkage moves estimates both ways. TX_3. Two-one-nine, oh-nine-one, truth oh-seven-two.</p>
+<p>WI_2. Three-three-eight, one-oh-three, truth two-oh-seven. This is the one where the unpooled fit was directionally right and the hierarchical was too conservative. RMSE against the truth: unpooled point-one-two-six. Hierarchical <strong>point-oh-four-eight.</strong></p>
+<p><strong>Partial pooling was two and a half times more accurate</strong>, and it beat the unpooled fit on four of the five series.</p>
+<p>And notice the character of the unpooled errors. They were not merely noisy — they were <strong>confidently wrong</strong>. Point-three-three-eight is a specific, precise-looking claim that a store’s SNAP uplift is thirty-four percent. It came from eight weeks of data, and the truth was about twenty-one percent.</p>
+<p>Borrowing strength is not a figure of speech. The thin series were estimated better <strong>because the other five existed.</strong></p>
+</section>
+<section id="what-the-model-actually-concluded" class="level3" data-number="13.5.3">
+<h3 data-number="13.5.3" class="anchored" data-anchor-id="what-the-model-actually-concluded"><span class="header-section-number">13.5.3</span> What the Model Actually Concluded</h3>
+<p>The estimated hierarchy: <span class="math inline">\(\mu_b = 0.077\)</span> with a 94% HDI of <span class="math inline">\([0.016,\ 0.150]\)</span>, and <span class="math inline">\(\sigma_b = 0.066\)</span>.</p>
+<p>In words: a SNAP week lifts FOODS units by roughly <strong>8%</strong>, and stores genuinely differ around that by about <strong>7 percentage points</strong>. Both numbers are answers, and the second one is the one no point estimate would have given you.</p>
+<div class="warningbox">
+<p><strong>It does not license the store-level policy the unpooled fit suggested.</strong> An analyst reading the unpooled numbers would report uplifts from <span class="math inline">\(5\%\)</span> to <span class="math inline">\(40\%\)</span> and stock accordingly. The held-out weeks say that range was mostly noise — but <span class="math inline">\(\sigma_b = 0.066\)</span> says it is not <em>all</em> noise either.</p>
+</div>
+<p><strong>The defensible recommendation:</strong> plan on an 8% FOODS uplift everywhere, allow real but modest store variation around it, and do not act on a store’s own estimate until that store has the weeks to support one.</p>
+<p>So what’s the business answer?</p>
+<p>The estimated hierarchy: mu-b of point-oh-seven-eight, with a ninety-four percent HDI from point-oh-one-seven to point-one-five-zero. And sigma-b of point-oh-six-five.</p>
+<p>In words: a SNAP week lifts FOODS units by roughly <strong>eight percent</strong>, and stores genuinely differ around that by about <strong>seven percentage points</strong>.</p>
+<p>Both of those are answers, and the second one is the one no point estimate would ever have given you. “How much do stores differ?” is a question with a number attached now. But be careful what you conclude from it.</p>
+<p>This does <strong>not</strong> license the store-level policy the unpooled fit suggested. An analyst reading those unpooled numbers would report uplifts from five percent to forty percent and build a differentiated stocking plan on it. The held-out weeks say most of that range was noise.</p>
+<p>But — and this is the part that requires care — sigma-b of point-oh-six-five says it is <strong>not all</strong> noise either. Stores do differ. Just far less than eight weeks of data made it look.</p>
+<p>So the defensible recommendation is a three-part sentence: plan on an eight percent FOODS uplift everywhere; allow for real but modest store variation around it; and do not act on any individual store’s own estimate until that store has the weeks to support one.</p>
+<p>That’s a more nuanced answer than either extreme, it’s backed by held-out data, and it is exactly what the hierarchy was for.</p>
+</section>
+</section>
+<section id="key-takeaways" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">13.6</span> Key Takeaways</h2>
+<p>What hierarchy buys, and what it costs.</p>
+<section id="lecture-11-part-2-key-takeaways" class="level3" data-number="13.6.1">
+<h3 data-number="13.6.1" class="anchored" data-anchor-id="lecture-11-part-2-key-takeaways"><span class="header-section-number">13.6.1</span> Lecture 11 Part 2: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p><strong>Ask what may be pooled before you pool it.</strong> Groups must be <strong>exchangeable</strong>. FOODS and HOBBIES are not, and no amount of good sampling fixes a hierarchy built over the wrong set.</p></li>
+<li><p><strong>Complete pooling</strong> denies groups differ; <strong>no pooling</strong> lets a group with 8 observations report noise as a finding. You have used both without naming them.</p></li>
+<li><p><strong>Partial pooling</strong> gives each group its own parameter drawn from a shared distribution, and estimates how much groups genuinely differ.</p></li>
+<li><p><strong>Shrinkage is automatic and proportionate.</strong> Our thin series moved <strong>8.1<span class="math inline">\(\times\)</span></strong> further toward the group mean than data-rich ones, with nobody specifying that — and on held-out weeks it was <strong>2.6<span class="math inline">\(\times\)</span></strong> more accurate.</p></li>
+<li><p>This is <strong>regularization for the sixth time</strong> — and the only version where the shrinkage strength is estimated rather than tuned.</p></li>
+<li><p><strong>Write it non-centred.</strong> The obvious form gave 127 divergences; the reparameterized form gave 1. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p></li>
+</ol>
+</div>
+<p><span class="neutral">Next: Bayesian linear regression — coefficients as distributions, and what you can ask them.</span></p>
+<p>One, and it’s first for a reason. <strong>Ask what may be pooled before you pool it.</strong> Groups must be exchangeable. FOODS and HOBBIES are not, and no amount of good sampling fixes a hierarchy built over the wrong set.</p>
+<p>Two. Complete pooling denies groups differ; no pooling lets a group with eight observations report noise as a finding. You’ve used both without naming them.</p>
+<p>Three. Partial pooling gives each group its own parameter drawn from a shared distribution, and estimates how much groups genuinely differ.</p>
+<p>Four. Shrinkage is automatic and proportionate. Our thin series moved <strong>eight point one times</strong> further toward the group mean than data-rich ones, with nobody specifying that — and on held-out weeks it was <strong>two point six times</strong> more accurate.</p>
+<p>Five. This is regularization for the sixth time, and the only version where the shrinkage strength is estimated rather than tuned.</p>
+<p>And six. <strong>Write it non-centred.</strong> The obvious form gave a hundred and twenty-seven divergences; the reparameterized form gave one. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p>
+<p>Next time: Bayesian linear regression. Coefficients as distributions, what you can ask them — and a preprocessing step you have used all semester that will silently destroy the answer.</p>
+</section>
+<section id="references" class="level3" data-number="13.6.2">
+<h3 data-number="13.6.2" class="anchored" data-anchor-id="references"><span class="header-section-number">13.6.2</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="pagination-link" aria-label="Bayesian Statistics II --- Time Series">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture12_BayesianRegression.html" class="pagination-link" aria-label="Bayesian Statistics III --- Bayesian Linear Regression">
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; ARIMA, VAR &amp; Multivariate Models – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture03_GAMs.html" rel="next">
+<link href="../chapters/Lecture01_ETS_Eval.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture02_ARIMA_VAR.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">2.1</span> Lecture Outline</a></li>
+  <li><a href="#stationarity-and-differencing" id="toc-stationarity-and-differencing" class="nav-link" data-scroll-target="#stationarity-and-differencing"><span class="header-section-number">2.2</span> Stationarity and Differencing</a>
+  <ul class="collapse">
+  <li><a href="#what-is-stationarity" id="toc-what-is-stationarity" class="nav-link" data-scroll-target="#what-is-stationarity"><span class="header-section-number">2.2.1</span> What Is Stationarity?</a></li>
+  <li><a href="#unit-roots-and-differencing" id="toc-unit-roots-and-differencing" class="nav-link" data-scroll-target="#unit-roots-and-differencing"><span class="header-section-number">2.2.2</span> Unit Roots and Differencing</a></li>
+  <li><a href="#why-the-rule-exists-spurious-regression" id="toc-why-the-rule-exists-spurious-regression" class="nav-link" data-scroll-target="#why-the-rule-exists-spurious-regression"><span class="header-section-number">2.2.3</span> Why the Rule Exists: Spurious Regression</a></li>
+  <li><a href="#acf-and-pacf-model-identification" id="toc-acf-and-pacf-model-identification" class="nav-link" data-scroll-target="#acf-and-pacf-model-identification"><span class="header-section-number">2.2.4</span> ACF and PACF: Model Identification</a></li>
+  <li><a href="#what-those-patterns-actually-look-like" id="toc-what-those-patterns-actually-look-like" class="nav-link" data-scroll-target="#what-those-patterns-actually-look-like"><span class="header-section-number">2.2.5</span> What Those Patterns Actually Look Like</a></li>
+  </ul></li>
+  <li><a href="#arima-models" id="toc-arima-models" class="nav-link" data-scroll-target="#arima-models"><span class="header-section-number">2.3</span> ARIMA Models</a>
+  <ul class="collapse">
+  <li><a href="#arimapdq" id="toc-arimapdq" class="nav-link" data-scroll-target="#arimapdq"><span class="header-section-number">2.3.1</span> ARIMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(d\)</span>,<span class="math inline">\(q\)</span>)</a></li>
+  <li><a href="#sarima-adding-seasonal-terms" id="toc-sarima-adding-seasonal-terms" class="nav-link" data-scroll-target="#sarima-adding-seasonal-terms"><span class="header-section-number">2.3.2</span> SARIMA: Adding Seasonal Terms</a></li>
+  </ul></li>
+  <li><a href="#var-models" id="toc-var-models" class="nav-link" data-scroll-target="#var-models"><span class="header-section-number">2.4</span> VAR Models</a>
+  <ul class="collapse">
+  <li><a href="#why-use-multiple-series" id="toc-why-use-multiple-series" class="nav-link" data-scroll-target="#why-use-multiple-series"><span class="header-section-number">2.4.1</span> Why Use Multiple Series?</a></li>
+  <li><a href="#the-varp-model" id="toc-the-varp-model" class="nav-link" data-scroll-target="#the-varp-model"><span class="header-section-number">2.4.2</span> The VAR(<span class="math inline">\(p\)</span>) Model</a></li>
+  <li><a href="#granger-causality-test" id="toc-granger-causality-test" class="nav-link" data-scroll-target="#granger-causality-test"><span class="header-section-number">2.4.3</span> Granger Causality Test</a></li>
+  <li><a href="#arimax-exogenous-variables-with-arima-errors" id="toc-arimax-exogenous-variables-with-arima-errors" class="nav-link" data-scroll-target="#arimax-exogenous-variables-with-arima-errors"><span class="header-section-number">2.4.4</span> ARIMAX: Exogenous Variables with ARIMA Errors</a></li>
+  </ul></li>
+  <li><a href="#key-takeaways-and-roadmap" id="toc-key-takeaways-and-roadmap" class="nav-link" data-scroll-target="#key-takeaways-and-roadmap"><span class="header-section-number">2.5</span> Key Takeaways and Roadmap</a>
+  <ul class="collapse">
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">2.5.1</span> Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">2.5.2</span> References</a></li>
+  </ul></li>
+  <li><a href="#timing-guide" id="toc-timing-guide" class="nav-link" data-scroll-target="#timing-guide"><span class="header-section-number">2.6</span> Timing guide</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 2 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">2.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Stationarity and Differencing</li>
+<li>ARIMA Models</li>
+<li>VAR Models</li>
+<li>Key Takeaways</li>
+</ol>
+<p>Four parts.</p>
+<p>First, stationarity — which is the entry requirement for everything else today. If you skip it, nothing downstream is valid. Then ARIMA and its seasonal cousin SARIMA. Then VAR, for when two series move each other. And we’ll close with the takeaways.</p>
+</section>
+<section id="stationarity-and-differencing" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="stationarity-and-differencing"><span class="header-section-number">2.2</span> Stationarity and Differencing</h2>
+<p>Before fitting any model, the series must have a stable mean and variance.</p>
+<p>Part one. Stationarity.</p>
+<p>Before fitting any model today, the series has to have a stable mean and variance. Let me explain what that means and why it isn’t optional.</p>
+<section id="what-is-stationarity" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="what-is-stationarity"><span class="header-section-number">2.2.1</span> What Is Stationarity?</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Weak (Covariance) Stationarity</p>
+</div>
+<p>A time series <span class="math inline">\(\{y_t\}\)</span> is <strong>weakly stationary</strong> if:</p>
+<ol type="1">
+<li><span class="math inline">\(\mathbb{E}[y_t] = \mu\)</span> — constant mean over time</li>
+<li><span class="math inline">\(\mathrm{Var}(y_t) = \sigma^2 &lt; \infty\)</span> — constant, bounded variance</li>
+<li><span class="math inline">\(\mathrm{Cov}(y_t, y_{t-k}) = \gamma_k\)</span> depends only on lag <span class="math inline">\(k\)</span>, not on <span class="math inline">\(t\)</span></li>
+</ol>
+</div>
+<p><strong>Why the definition earns its keep:</strong> if the mean drifts, there is no single value to forecast. If the variance grows, prediction intervals widen without bound. Stationarity is what makes the past informative about the future — it is the assumption every model in this lecture rests on.</p>
+<p><strong>The usual culprits</strong> are trending series — GDP, prices, sales — and variance that grows with the level. First-differencing removes a stochastic trend; a log transform stabilizes variance.</p>
+<p><span class="neutral smaller">Rule of thumb: visible trend or growing variance ⟹ likely non-stationary. Test formally with ADF or KPSS.</span></p>
+<p>Three conditions. A series is <strong>weakly stationary</strong> if the mean is constant over time, the variance is constant and finite, and the covariance between two points depends only on how far apart they are — the lag — not on <em>when</em> you are.</p>
+<p>Read that third condition carefully, because it’s the one people skim. It says the relationship between January and February should be the same as the relationship between June and July. The gap matters; the location doesn’t. Now, why does the definition earn its keep?</p>
+<p>If the mean drifts, there is no single value to forecast toward. Ask “what is the long-run level of this series?” and there’s no answer — it depends when you ask. If the variance grows, prediction intervals widen without bound. Your forecast is technically correct and operationally useless.</p>
+<p>Stationarity is what makes the past informative about the future. Every model today rests on it. When we get to neural networks in Week 7, that assumption is still hiding in there — it’s just less visible.</p>
+<p>The usual culprits are trending series — GDP, prices, sales, almost anything measured in dollars over time — and variance that grows with the level. First-differencing removes a stochastic trend. A log transform stabilizes variance. Often you need both.</p>
+<p>Rule of thumb: visible trend or growing variance means probably not stationary. But test it formally — ADF or KPSS — rather than trusting your eye.</p>
+</section>
+<section id="unit-roots-and-differencing" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="unit-roots-and-differencing"><span class="header-section-number">2.2.2</span> Unit Roots and Differencing</h3>
+<p><strong>AR(1):</strong> <span class="math inline">\(y_t = \phi_1\,y_{t-1} + \varepsilon_t\)</span>. Everything turns on whether <span class="math inline">\(\phi_1\)</span> is below one or exactly one.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 29%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th>Behavior</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\|\phi_1\| &lt; 1\)</span></td>
+<td>Shock decays, reverts to mean</td>
+<td>Stationary AR(1)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\phi_1 = 1\)</span></td>
+<td>Shock persists <em>permanently</em></td>
+<td>Random walk (unit root)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>First differencing</strong> removes a stochastic trend: <span class="math inline">\(\Delta y_t = y_t - y_{t-1}\)</span>. So <span class="math inline">\(d=0\)</span> means already stationary, <span class="math inline">\(d=1\)</span> means one first difference, and <span class="math inline">\(D=1\)</span> means a seasonal difference, <span class="math inline">\(\Delta_{12}y_t = y_t - y_{t-12}\)</span>.</p>
+<p><strong>Testing:</strong> <strong>ADF</strong> (<span class="math inline">\(H_0\)</span>: unit root) and <strong>KPSS</strong> (<span class="math inline">\(H_0\)</span>: stationary) test <em>opposite</em> nulls — so run both, and be suspicious when they disagree.</p>
+<p><strong>Do not over-difference.</strong> A second difference on an already-stationary series induces negative autocorrelation that you then have to model away — you have manufactured the problem you are now solving. Test <em>after</em> differencing, and stop at <span class="math inline">\(d=1\)</span> once the result is stationary.</p>
+<p>Here’s the sharpest version of the idea. Take a simple AR(1): today equals phi times yesterday, plus noise. Everything turns on whether phi is below one, or exactly one.</p>
+<p>If the absolute value of phi is <strong>less than one</strong>, a shock decays. Something happens, the series is knocked off course, and it works its way back. That’s a stationary AR(1).</p>
+<p>If phi equals <strong>exactly one</strong>, the shock never decays. It’s absorbed permanently into the level of the series. That’s a random walk — a unit root.</p>
+<p>That distinction has real consequences. In a mean-reverting series, a bad quarter is a bad quarter. In a random walk, a bad quarter permanently lowers the level you forecast from, forever. Same data, completely different business implication.</p>
+<p><strong>First differencing</strong> is the fix: model the change rather than the level. So <span class="math inline">\(d\)</span> equals zero means the series was already stationary. <span class="math inline">\(d\)</span> equals one means you took one difference. And capital <span class="math inline">\(D\)</span> equals one means a <em>seasonal</em> difference — this December minus last December.</p>
+<p>For testing, you have ADF and KPSS, and here’s the thing worth remembering: they test <strong>opposite nulls</strong>. ADF’s null hypothesis is that there <em>is</em> a unit root. KPSS’s null is that the series <em>is</em> stationary. So run both. When they agree, you’re confident. When they disagree, be suspicious — you’re probably in a borderline case, and you should look at the plot again.</p>
+<p>And do not over-difference. If you difference an already-stationary series, you induce negative autocorrelation that you then have to model away — you’ve manufactured the very problem you’re now solving. Test <em>after</em> differencing, and stop at <span class="math inline">\(d\)</span> equals one once the result is stationary.</p>
+</section>
+<section id="why-the-rule-exists-spurious-regression" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="why-the-rule-exists-spurious-regression"><span class="header-section-number">2.2.3</span> Why the Rule Exists: Spurious Regression</h3>
+<p>Differencing is not bookkeeping. Skip it and the statistics actively lie to you.</p>
+<div style="text-align:center">
+<svg viewbox="0 0 380 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;height:auto" role="img" aria-label="Two independent random walks that appear to trend together">
+<line x1="10" y1="145" x2="360" y2="145" stroke="currentColor" stroke-opacity=".55"></line> <line x1="10" y1="12" x2="10" y2="145" stroke="currentColor" stroke-opacity=".55"></line> <polyline points="10.0,136.9 18.4,129.3 26.8,131.5 35.2,125.1 43.6,112.6 52.0,105.6 60.4,86.3 68.8,93.1 77.2,89.7 85.6,94.5 94.0,100.2 102.4,99.5 110.8,94.5 119.2,87.4 127.6,79.3 136.0,52.9 144.4,41.0 152.8,55.3 161.2,50.5 169.6,54.5 178.0,57.3 186.4,40.7 194.8,40.5 203.2,58.6 211.6,52.6 220.0,53.0 228.4,62.9 236.8,70.0 245.2,74.0 253.6,71.6 262.0,73.5 270.4,70.1 278.8,47.9 287.2,53.7 295.6,59.6 304.0,59.6 312.4,45.3 320.8,50.2 329.2,32.2 337.6,43.5" fill="none" stroke="#D71920" stroke-width="2"></polyline> <polyline points="10.0,132.6 18.4,149.5 26.8,155.7 35.2,152.8 43.6,135.1 52.0,132.9 60.4,148.5 68.8,143.1 77.2,153.7 85.6,138.6 94.0,139.2 102.4,118.2 110.8,117.5 119.2,126.3 127.6,139.8 136.0,141.6 144.4,134.8 152.8,120.0 161.2,115.1 169.6,120.9 178.0,113.4 186.4,126.6 194.8,119.2 203.2,125.1 211.6,107.1 220.0,94.4 228.4,88.4 236.8,97.2 245.2,89.3 253.6,83.3 262.0,87.0 270.4,91.5 278.8,75.9 287.2,78.1 295.6,71.3 304.0,54.4 312.4,68.1 320.8,47.0 329.2,34.1 337.6,38.9" fill="none" stroke="currentColor" stroke-width="2"></polyline> <text x="352" y="38" font-size="11" fill="#D71920">x</text> <text x="352" y="72" font-size="11" fill="currentColor">y</text>
+</svg>
+</div>
+<p>Two independent random walks — <strong>no shared cause, no relationship at all</strong>. Their <em>changes</em> correlate at −0.13, which is the truth. But their <em>levels</em> correlate at +0.62, and that is what OLS sees.</p>
+<div class="warningbox">
+<p><span class="citation" data-cites="GrangerNewbold1974">@GrangerNewbold1974</span> showed this rejects “no relationship” about <strong>three-quarters</strong> of the time at the 5% level. The regression is not finding a relationship — it is finding that both series wander. <strong>Difference first.</strong></p>
+</div>
+<p>Before we go on, I want to show you <em>why</em> that differencing rule exists — because told as a rule it sounds like bookkeeping, and it is not.</p>
+<p>Look at these two series. Both trending up. They look related. If you saw this in a business deck you’d assume one drives the other.</p>
+<p>They have <strong>nothing to do with each other.</strong> Both are random walks I generated independently. Different random seeds, no shared shocks, no common cause. There is no relationship to find. Now look at the two numbers on the slide, because they’re the whole lesson.</p>
+<p>The correlation of their <em>changes</em> — week to week — is <strong>minus zero point one three</strong>. Essentially zero. That’s the truth: these series are independent.</p>
+<p>The correlation of their <em>levels</em> is <strong>plus zero point six two</strong>. And the levels are what you’d hand to a regression.</p>
+<p>Granger and Newbold demonstrated this in 1974. Regress two independent random walks on each other, and you reject the null of no relationship roughly <strong>three-quarters of the time</strong> at the five percent level. Not five percent, as the test promises. Seventy-five.</p>
+<p>Think about what that means. Your t-statistic is large. Your R-squared is high. Every diagnostic you were taught to check looks excellent — and the relationship does not exist.</p>
+<p>The regression isn’t detecting a relationship between the series. It’s detecting that both of them wander. Two things that drift will drift <em>somewhere</em>, and over any finite sample they’ll appear to drift together or apart, and the regression will happily report that as signal.</p>
+<p>This is why economics has a long history of embarrassing published findings between non-stationary series. And it’s why the rule is: <strong>difference first, then regress.</strong></p>
+<p>Once you difference, you’re modelling changes rather than levels — and the spurious correlation goes away, because the changes really are independent. Minus zero point one three.</p>
+</section>
+<section id="acf-and-pacf-model-identification" class="level3" data-number="2.2.4">
+<h3 data-number="2.2.4" class="anchored" data-anchor-id="acf-and-pacf-model-identification"><span class="header-section-number">2.2.4</span> ACF and PACF: Model Identification</h3>
+<p>The <strong>autocorrelation function</strong>, <span class="math inline">\(\rho_k = \mathrm{Corr}(y_t, y_{t-k})\)</span>, measures how <span class="math inline">\(y_t\)</span> relates to its own past. The <strong>partial</strong> autocorrelation measures the same thing while controlling for the lags in between — which is what separates a direct effect from one inherited through intermediate lags.</p>
+<p>Read them together and they identify the model:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 38%">
+<col style="width: 27%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>ACF</th>
+<th>PACF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AR(<span class="math inline">\(p\)</span>)</td>
+<td>Tails off geometrically</td>
+<td><span class="positive">Cuts off</span> after lag <span class="math inline">\(p\)</span></td>
+</tr>
+<tr class="even">
+<td>MA(<span class="math inline">\(q\)</span>)</td>
+<td><span class="positive">Cuts off</span> after lag <span class="math inline">\(q\)</span></td>
+<td>Tails off geometrically</td>
+</tr>
+<tr class="odd">
+<td>ARMA</td>
+<td>Tails off</td>
+<td>Tails off</td>
+</tr>
+<tr class="even">
+<td>RW / I(1)</td>
+<td>Decays slowly</td>
+<td>Big spike at lag 1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Always unit-root test and difference <em>before</em> reading either plot.</strong> The ACF of a non-stationary series decays slowly no matter what the underlying process is, so it tells you nothing about <span class="math inline">\(p\)</span> or <span class="math inline">\(q\)</span> — only that you have not differenced yet.</p>
+<p>Two diagnostic plots, and together they tell you what model to fit.</p>
+<p>The <strong>autocorrelation function</strong> — the ACF — is the correlation between <span class="math inline">\(y_t\)</span> and <span class="math inline">\(y_{t-k}\)</span>. Straightforward: how does today relate to <span class="math inline">\(k\)</span> periods ago?</p>
+<p>The <strong>partial</strong> autocorrelation asks the same question but controls for everything in between. And that distinction matters more than it sounds. If today correlates with three days ago purely <em>because</em> today correlates with yesterday and yesterday correlates with three days ago, the ACF will show it and the PACF will not. The PACF isolates the direct link. Now the table, which is the practical payoff.</p>
+<p>For an <strong>AR(p)</strong> process, the ACF tails off geometrically, and the PACF <strong>cuts off</strong> sharply after lag <span class="math inline">\(p\)</span>. So if the PACF has two clear spikes and then nothing, you’re looking at an AR(2).</p>
+<p>For an <strong>MA(q)</strong> it’s the mirror image: the ACF cuts off after lag <span class="math inline">\(q\)</span>, the PACF tails off.</p>
+<p>For an <strong>ARMA</strong>, both tail off — which is less informative, and in practice is why people reach for automatic order selection.</p>
+<p>And for a <strong>random walk</strong>, the ACF decays very slowly and the PACF has one big spike at lag one. That pattern is your warning sign.</p>
+<p>One rule, and it is absolute. <strong>Always unit-root test and difference before reading either plot.</strong> The ACF of a non-stationary series decays slowly no matter what the underlying process is. So a slowly-decaying ACF tells you nothing about <span class="math inline">\(p\)</span> or <span class="math inline">\(q\)</span>. It only tells you that you haven’t differenced yet. Students lose a lot of time reading tea leaves in the ACF of an undifferenced series. Don’t.</p>
+</section>
+<section id="what-those-patterns-actually-look-like" class="level3" data-number="2.2.5">
+<h3 data-number="2.2.5" class="anchored" data-anchor-id="what-those-patterns-actually-look-like"><span class="header-section-number">2.2.5</span> What Those Patterns Actually Look Like</h3>
+<div style="text-align:center">
+<svg viewbox="0 0 360 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:760px;height:auto" role="img" aria-label="ACF and PACF patterns for AR(1) and MA(1) processes">
+<g transform="translate(15,22)"> <text x="75.0" y="-6" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">AR(1): ACF tails off</text> <line x1="0" y1="19.2" x2="150" y2="19.2" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"></line> <line x1="0" y1="44.8" x2="150" y2="44.8" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"></line> <line x1="0" y1="32.0" x2="150" y2="32.0" stroke="currentColor" stroke-opacity=".55"></line> <line x1="0" y1="4" x2="0" y2="60" stroke="currentColor" stroke-opacity=".55"></line> <line x1="14" y1="32.0" x2="14" y2="6.5" stroke="#D71920" stroke-width="2.4"></line> <circle cx="14" cy="6.5" r="2.2" fill="#D71920"></circle> <line x1="29" y1="32.0" x2="29" y2="14.1" stroke="#D71920" stroke-width="2.4"></line> <circle cx="29" cy="14.1" r="2.2" fill="#D71920"></circle> <line x1="44" y1="32.0" x2="44" y2="19.5" stroke="#D71920" stroke-width="2.4"></line> <circle cx="44" cy="19.5" r="2.2" fill="#D71920"></circle> <line x1="59" y1="32.0" x2="59" y2="23.2" stroke="#D71920" stroke-width="2.4"></line> <circle cx="59" cy="23.2" r="2.2" fill="#D71920"></circle> <line x1="74" y1="32.0" x2="74" y2="25.8" stroke="#D71920" stroke-width="2.4"></line> <circle cx="74" cy="25.8" r="2.2" fill="#D71920"></circle> <line x1="89" y1="32.0" x2="89" y2="27.6" stroke="#D71920" stroke-width="2.4"></line> <circle cx="89" cy="27.6" r="2.2" fill="#D71920"></circle> <line x1="104" y1="32.0" x2="104" y2="28.9" stroke="#D71920" stroke-width="2.4"></line> <circle cx="104" cy="28.9" r="2.2" fill="#D71920"></circle> <line x1="119" y1="32.0" x2="119" y2="29.9" stroke="#D71920" stroke-width="2.4"></line> <circle cx="119" cy="29.9" r="2.2" fill="#D71920"></circle> </g> <g transform="translate(195,22)"> <text x="75.0" y="-6" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">AR(1): PACF cuts off at 1</text> <line x1="0" y1="19.2" x2="150" y2="19.2" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"></line> <line x1="0" y1="44.8" x2="150" y2="44.8" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"></line> <line x1="0" y1="32.0" x2="150" y2="32.0" stroke="currentColor" stroke-opacity=".55"></line> <line x1="0" y1="4" x2="0" y2="60" stroke="currentColor" stroke-opacity=".55"></line> <line x1="14" y1="32.0" x2="14" y2="6.5" stroke="#D71920" stroke-width="2.4"></line> <circle cx="14" cy="6.5" r="2.2" fill="#D71920"></circle> <line x1="29" y1="32.0" x2="29" y2="30.4" stroke="#D71920" stroke-width="2.4"></line> <circle cx="29" cy="30.4" r="2.2" fill="#D71920"></circle> <line x1="44" y1="32.0" x2="44" y2="33.0" stroke="#D71920" stroke-width="2.4"></line> <circle cx="44" cy="33.0" r="2.2" fill="#D71920"></circle> <line x1="59" y1="32.0" x2="59" y2="30.7" stroke="#D71920" stroke-width="2.4"></line> <circle cx="59" cy="30.7" r="2.2" fill="#D71920"></circle> <line x1="74" y1="32.0" x2="74" y2="32.8" stroke="#D71920" stroke-width="2.4"></line> <circle cx="74" cy="32.8" r="2.2" fill="#D71920"></circle> <line x1="89" y1="32.0" x2="89" y2="30.7" stroke="#D71920" stroke-width="2.4"></line> <circle cx="89" cy="30.7" r="2.2" fill="#D71920"></circle> <line x1="104" y1="32.0" x2="104" y2="31.5" stroke="#D71920" stroke-width="2.4"></line> <circle cx="104" cy="31.5" r="2.2" fill="#D71920"></circle> <line x1="119" y1="32.0" x2="119" y2="33.0" stroke="#D71920" stroke-width="2.4"></line> <circle cx="119" cy="33.0" r="2.2" fill="#D71920"></circle> </g> <g transform="translate(15,130)"> <text x="75.0" y="-6" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">MA(1): ACF cuts off at 1</text> <line x1="0" y1="19.2" x2="150" y2="19.2" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"></line> <line x1="0" y1="44.8" x2="150" y2="44.8" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"></line> <line x1="0" y1="32.0" x2="150" y2="32.0" stroke="currentColor" stroke-opacity=".55"></line> <line x1="0" y1="4" x2="0" y2="60" stroke="currentColor" stroke-opacity=".55"></line> <line x1="14" y1="32.0" x2="14" y2="7.6" stroke="#D71920" stroke-width="2.4"></line> <circle cx="14" cy="7.6" r="2.2" fill="#D71920"></circle> <line x1="29" y1="32.0" x2="29" y2="30.7" stroke="#D71920" stroke-width="2.4"></line> <circle cx="29" cy="30.7" r="2.2" fill="#D71920"></circle> <line x1="44" y1="32.0" x2="44" y2="32.8" stroke="#D71920" stroke-width="2.4"></line> <circle cx="44" cy="32.8" r="2.2" fill="#D71920"></circle> <line x1="59" y1="32.0" x2="59" y2="30.4" stroke="#D71920" stroke-width="2.4"></line> <circle cx="59" cy="30.4" r="2.2" fill="#D71920"></circle> <line x1="74" y1="32.0" x2="74" y2="31.5" stroke="#D71920" stroke-width="2.4"></line> <circle cx="74" cy="31.5" r="2.2" fill="#D71920"></circle> <line x1="89" y1="32.0" x2="89" y2="33.0" stroke="#D71920" stroke-width="2.4"></line> <circle cx="89" cy="33.0" r="2.2" fill="#D71920"></circle> <line x1="104" y1="32.0" x2="104" y2="31.2" stroke="#D71920" stroke-width="2.4"></line> <circle cx="104" cy="31.2" r="2.2" fill="#D71920"></circle> <line x1="119" y1="32.0" x2="119" y2="31.5" stroke="#D71920" stroke-width="2.4"></line> <circle cx="119" cy="31.5" r="2.2" fill="#D71920"></circle> </g> <g transform="translate(195,130)"> <text x="75.0" y="-6" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">MA(1): PACF tails off</text> <line x1="0" y1="19.2" x2="150" y2="19.2" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"></line> <line x1="0" y1="44.8" x2="150" y2="44.8" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="3 3"></line> <line x1="0" y1="32.0" x2="150" y2="32.0" stroke="currentColor" stroke-opacity=".55"></line> <line x1="0" y1="4" x2="0" y2="60" stroke="currentColor" stroke-opacity=".55"></line> <line x1="14" y1="32.0" x2="14" y2="7.6" stroke="#D71920" stroke-width="2.4"></line> <circle cx="14" cy="7.6" r="2.2" fill="#D71920"></circle> <line x1="29" y1="32.0" x2="29" y2="46.6" stroke="#D71920" stroke-width="2.4"></line> <circle cx="29" cy="46.6" r="2.2" fill="#D71920"></circle> <line x1="44" y1="32.0" x2="44" y2="22.6" stroke="#D71920" stroke-width="2.4"></line> <circle cx="44" cy="22.6" r="2.2" fill="#D71920"></circle> <line x1="59" y1="32.0" x2="59" y2="38.0" stroke="#D71920" stroke-width="2.4"></line> <circle cx="59" cy="38.0" r="2.2" fill="#D71920"></circle> <line x1="74" y1="32.0" x2="74" y2="28.1" stroke="#D71920" stroke-width="2.4"></line> <circle cx="74" cy="28.1" r="2.2" fill="#D71920"></circle> <line x1="89" y1="32.0" x2="89" y2="34.6" stroke="#D71920" stroke-width="2.4"></line> <circle cx="89" cy="34.6" r="2.2" fill="#D71920"></circle> <line x1="104" y1="32.0" x2="104" y2="30.4" stroke="#D71920" stroke-width="2.4"></line> <circle cx="104" cy="30.4" r="2.2" fill="#D71920"></circle> <line x1="119" y1="32.0" x2="119" y2="33.0" stroke="#D71920" stroke-width="2.4"></line> <circle cx="119" cy="33.0" r="2.2" fill="#D71920"></circle> </g>
+</svg>
+</div>
+<p>Read the pair, never one alone. The <span class="positive">sharp cut-off</span> tells you the order; the <em>slow decay</em> tells you which side it belongs on. Dashed lines are the significance bands — spikes inside them are noise, not signal.</p>
+<p>Now let’s actually look at them, because “tails off” and “cuts off” mean very little until you’ve seen the shapes.</p>
+<p>Four panels. Top row is an AR(1). Bottom row is an MA(1). Left column is the ACF, right column the PACF.</p>
+<p>Top left — the ACF of an AR(1). See the geometric decay? Each bar is a constant fraction of the one before it. It fades out rather than stopping. That’s “tails off.”</p>
+<p>Top right — the PACF of the same process. One spike at lag one, and then essentially nothing. The bars after it sit inside the dashed lines, which are the significance bands. Anything in there is noise. That’s “cuts off,” and the lag where it cuts off is your <span class="math inline">\(p\)</span>.</p>
+<p>Bottom row, the MA(1), and it’s the mirror image. The ACF has one spike then stops. The PACF decays — and notice it alternates sign, flipping above and below the axis. That alternating decay is characteristic of an MA process, and it’s a pattern you’ll start to recognize. So the diagnostic is: <strong>find the one that cuts off sharply.</strong></p>
+<p>If the PACF cuts off, you have an AR, and the cut-off lag gives you <span class="math inline">\(p\)</span>. If the ACF cuts off, you have an MA, and it gives you <span class="math inline">\(q\)</span>. If neither cuts off — both just fade — you have a mixed ARMA, and that’s when you stop squinting at plots and let <code>auto_arima</code> search.</p>
+<p>And the dashed bands matter. A bar poking slightly outside them at lag seven is almost certainly noise. With twenty lags plotted, you expect one of them to breach the band by chance. Don’t build a model around it.</p>
+</section>
+</section>
+<section id="arima-models" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="arima-models"><span class="header-section-number">2.3</span> ARIMA Models</h2>
+<p>Combine differencing with AR and MA components into one unified model.</p>
+<p>Part two. ARIMA — combining differencing with the AR and MA components into one model.</p>
+<section id="arimapdq" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="arimapdq"><span class="header-section-number">2.3.1</span> ARIMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(d\)</span>,<span class="math inline">\(q\)</span>)</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>ARIMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(d\)</span>,<span class="math inline">\(q\)</span>) Model</p>
+</div>
+<p>Apply an ARMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(q\)</span>) to the <span class="math inline">\(d\)</span>-times differenced series:</p>
+<p><span class="math display">\[y_t = c + \sum_{i=1}^{p}\phi_i y_{t-i} + \varepsilon_t + \sum_{j=1}^{q}\theta_j\varepsilon_{t-j}\]</span></p>
+</div>
+<p><span class="math inline">\(p\)</span> is the number of AR lags, <span class="math inline">\(d\)</span> the number of differences, <span class="math inline">\(q\)</span> the number of MA lags. Several familiar models are just corners of this space: <strong>ARIMA(0,1,0)</strong> is a random walk, <strong>ARIMA(1,0,0)</strong> is an AR(1), and <strong>ARIMA(0,1,1)</strong> is algebraically equivalent to simple exponential smoothing from Lecture 1.</p>
+<p><strong>A forecast by hand.</strong> Take ARIMA(1,1,0) with <span class="math inline">\(\hat{\phi}_1 = 0.5\)</span>. If <span class="math inline">\(y_{100} = 120\)</span> and <span class="math inline">\(y_{99} = 118\)</span>, then <span class="math inline">\(\Delta y_{100} = 2\)</span>, and</p>
+<p><span class="math display">\[\hat{y}_{101|100} = 120 + 0.5 \times 2 = \mathbf{121}.\]</span></p>
+<p><strong>In Python:</strong> <code>pmdarima.auto_arima()</code> searches orders automatically; <code>statsmodels.SARIMAX</code> fits any order you specify.</p>
+<p>Here it is. Take the series, difference it <span class="math inline">\(d\)</span> times, then fit an ARMA with <span class="math inline">\(p\)</span> autoregressive lags and <span class="math inline">\(q\)</span> moving-average lags. That’s what the three letters mean. <span class="math inline">\(p\)</span> is AR lags, <span class="math inline">\(d\)</span> is differences, <span class="math inline">\(q\)</span> is MA lags.</p>
+<p>What I like about this framework is how much of what you already know turns out to live inside it.</p>
+<p><strong>ARIMA(0,1,0)</strong> — no AR, one difference, no MA — is a random walk. That’s the naive forecast from Lecture 1. <strong>ARIMA(1,0,0)</strong> is a plain AR(1).</p>
+<p>And <strong>ARIMA(0,1,1)</strong> is algebraically equivalent to simple exponential smoothing. The model we spent twenty minutes on last week is a single point in this space.</p>
+<p>So ARIMA isn’t a competitor to what we did in Lecture 1. It’s a larger room that contains it. Let’s do one by hand, because the mechanics are less mysterious once you’ve turned the crank.</p>
+<p>ARIMA(1,1,0) with phi-hat of one-half. We have <span class="math inline">\(y_{100} = 120\)</span> and <span class="math inline">\(y_{99} = 118\)</span>. So the change last period, delta-<span class="math inline">\(y_{100}\)</span>, is 2.</p>
+<p>The model says the next change is half of the last change: half of 2 is 1. Add that to where we are: 120 plus 1 equals <strong>121</strong>. That’s it. Differencing means we model the <em>change</em>, then add it back to the level.</p>
+<p>A word on where this comes from, because the name will follow you. Box and Jenkins formalized this in 1970 as a three-stage cycle: <strong>identify</strong> a candidate order from the ACF and PACF, <strong>estimate</strong> the parameters, then <strong>check</strong> the residuals — and if the residuals fail, go back to identification. It is a loop, not a pipeline. Half a century later that loop is still the methodology, and it’s why every ARIMA workflow you’ll see has the same three stages.</p>
+<p>In Python, <code>auto_arima</code> from pmdarima automates the identify step. It searches a grid of orders and returns whichever minimizes AIC — usually stepwise, so it doesn’t try all of them.</p>
+<p>Use it. But understand its failure mode: it optimizes a number, and it has no idea what your data means. I’ve seen it return an ARIMA(5,2,4) on a series that visibly needs one difference and an AR(1) — technically the lowest AIC on that sample, and complete nonsense out of sample. AIC rewards fit with a complexity penalty, and on a short noisy series the penalty isn’t strong enough to stop it.</p>
+<p>So: run the search, then look at the ACF and PACF anyway, and ask whether the answer is sensible. If <code>auto_arima</code> returns a second difference and your ADF test said one was enough, trust the test.</p>
+</section>
+<section id="sarima-adding-seasonal-terms" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="sarima-adding-seasonal-terms"><span class="header-section-number">2.3.2</span> SARIMA: Adding Seasonal Terms</h3>
+<p>For monthly or quarterly data, autocorrelation often appears at lags <span class="math inline">\(m, 2m, 3m, \ldots\)</span> SARIMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(d\)</span>,<span class="math inline">\(q\)</span>)(<span class="math inline">\(P\)</span>,<span class="math inline">\(D\)</span>,<span class="math inline">\(Q\)</span>)[<span class="math inline">\(m\)</span>] adds seasonal AR and MA polynomials alongside the non-seasonal ones.</p>
+<p>The useful mental model is <strong>two ARIMA models running at different time scales</strong>: the non-seasonal part <span class="math inline">\((p,d,q)\)</span> captures week-to-week dynamics, while the seasonal part <span class="math inline">\((P,D,Q)[m]\)</span> captures the year-over-year pattern at lag <span class="math inline">\(m\)</span>.</p>
+<p><strong>Practical workflow:</strong></p>
+<ol type="1">
+<li>ADF / KPSS → choose <span class="math inline">\(d\)</span></li>
+<li>Seasonal unit root test → choose <span class="math inline">\(D\)</span></li>
+<li>ACF / PACF on the differenced series → guide <span class="math inline">\(p, q, P, Q\)</span></li>
+<li>Minimize AIC, then check the residual ACF with a Ljung-Box test</li>
+</ol>
+<p><span class="neutral smaller">For monthly retail data with trend and December seasonality, SARIMA(1,1,1)(0,1,1)[12] is a strong starting point — and a good default to beat before trying anything more elaborate.</span></p>
+<p>For monthly or quarterly data, autocorrelation shows up not just at lags one and two, but at lag <span class="math inline">\(m\)</span>, two-<span class="math inline">\(m\)</span>, three-<span class="math inline">\(m\)</span> — the seasonal lags. December relates to last December.</p>
+<p>SARIMA handles this by adding a second set of AR and MA polynomials operating at the seasonal frequency. The notation gets heavy — <span class="math inline">\(p\)</span>, <span class="math inline">\(d\)</span>, <span class="math inline">\(q\)</span> in lowercase, then capital <span class="math inline">\(P\)</span>, <span class="math inline">\(D\)</span>, <span class="math inline">\(Q\)</span>, then <span class="math inline">\(m\)</span> in brackets — but the idea is simple.</p>
+<p><strong>Think of it as two ARIMA models running at different time scales.</strong> The lowercase part handles week-to-week dynamics. The uppercase part handles year-over-year. They’re fitted together. The practical workflow is four steps.</p>
+<p>ADF and KPSS to choose <span class="math inline">\(d\)</span>. A seasonal unit root test to choose capital <span class="math inline">\(D\)</span>. Then ACF and PACF on the differenced series to guide the four order parameters. Then minimize AIC and check the residual ACF with a Ljung-Box test. That last step is the one people skip, so let me explain what it’s actually doing.</p>
+<p>The Ljung-Box test asks: <strong>are the residuals white noise?</strong> It takes the autocorrelations of the residuals across the first several lags and tests whether they are <em>jointly</em> zero.</p>
+<p>The null hypothesis is that they are — that nothing is left. So here, unusually, you <em>want</em> a large p-value. Failing to reject is the good outcome. That trips people up, because in most tests you’re hunting for significance.</p>
+<p>And think about why it matters. If your residuals still have autocorrelation, there’s structure in the data your model hasn’t captured. Today’s error tells you something about tomorrow’s error — which means your forecast is leaving information on the table, and your prediction intervals are too narrow, because they assume the errors are independent.</p>
+<p>So a model can have a great AIC and still fail Ljung-Box. AIC compares models to each other. Ljung-Box asks whether <em>this</em> model is adequate on its own terms. They’re different questions, and you want both answered.</p>
+<p>For monthly retail data with trend and December seasonality, SARIMA(1,1,1)(0,1,1)[12] is a strong starting point. Not because it’s optimal, but because it’s a good default to beat before you try anything more elaborate.</p>
+</section>
+</section>
+<section id="var-models" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="var-models"><span class="header-section-number">2.4</span> VAR Models</h2>
+<p>When two series influence each other, model them together symmetrically.</p>
+<p>Part three. VAR — when two series influence each other, model them together.</p>
+<section id="why-use-multiple-series" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="why-use-multiple-series"><span class="header-section-number">2.4.1</span> Why Use Multiple Series?</h3>
+<p>Every model so far — ETS, ARIMA — uses only <span class="math inline">\(y_t\)</span>’s own history. But business variables are linked: consumer sentiment today moves retail spending next month, interest rates move housing starts within two quarters, advertising spend moves sales over the following weeks.</p>
+<p>The principle underneath all of it: <strong>if <span class="math inline">\(x_t\)</span> carries information about <span class="math inline">\(y_{t+h}\)</span> that is not already in <span class="math inline">\(y_t\)</span>’s own history, including <span class="math inline">\(x_t\)</span> reduces forecast error.</strong> <strong>Granger causality</strong> <span class="citation" data-cites="Granger1969">[@Granger1969]</span> is the formal test of exactly that claim, and we get to it in two slides.</p>
+<p>That leaves a modelling choice, and it turns on whether the influence runs one way or both:</p>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>VAR — symmetric</strong></p>
+<ul>
+<li>Every variable predicts every other</li>
+<li>Use when influence runs both ways</li>
+<li>No variable is privileged</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>ARIMAX — one direction</strong></p>
+<ul>
+<li><span class="math inline">\(x_t\)</span> drives <span class="math inline">\(y_t\)</span>, not the reverse</li>
+<li>Use when the causal story is clear</li>
+<li>Needs a forecast of <span class="math inline">\(x_t\)</span> itself</li>
+</ul>
+</div>
+</div>
+<p>Everything so far — all of Lecture 1, everything today — uses only the series’ own history. <span class="math inline">\(y\)</span> predicted from past <span class="math inline">\(y\)</span>.</p>
+<p>But business variables are linked, and often the link runs forward in time. Consumer sentiment today moves retail spending next month. Interest rates today move housing starts within two quarters. Advertising spend this week moves sales over the following few.</p>
+<p>The principle underneath all of it is this: <strong>if <span class="math inline">\(x_t\)</span> carries information about <span class="math inline">\(y_{t+h}\)</span> that is not already in <span class="math inline">\(y_t\)</span>’s own history, then including <span class="math inline">\(x_t\)</span> reduces forecast error.</strong></p>
+<p>Note the qualifier — “not already in <span class="math inline">\(y\)</span>’s own history.” That’s doing real work. If <span class="math inline">\(x\)</span> is just a lagged reflection of <span class="math inline">\(y\)</span>, it adds nothing. It has to bring genuinely new information.</p>
+<p>Granger causality is the formal test of exactly that claim, and we get to it in two slides. That leaves you a modelling choice, and it turns on whether influence runs one way or both.</p>
+<p><strong>VAR</strong> treats everything symmetrically. Every variable predicts every other variable. No variable is privileged. Use it when the influence genuinely runs in both directions.</p>
+<p><strong>ARIMAX</strong> is one-directional. <span class="math inline">\(x\)</span> drives <span class="math inline">\(y\)</span>, and not the reverse. Use it when the causal story is clear — but note the third bullet, because it’s the catch we’ll come back to: ARIMAX needs a forecast of <span class="math inline">\(x\)</span> itself.</p>
+</section>
+<section id="the-varp-model" class="level3" data-number="2.4.2">
+<h3 data-number="2.4.2" class="anchored" data-anchor-id="the-varp-model"><span class="header-section-number">2.4.2</span> The VAR(<span class="math inline">\(p\)</span>) Model</h3>
+<p>For two stationary series <span class="math inline">\(y_{1t}\)</span> and <span class="math inline">\(y_{2t}\)</span>, each equation regresses on the lags of <em>both</em>:</p>
+<p><span class="math display">\[\begin{cases} y_{1t} = c_1 + a_{11}\,y_{1,t-1} + a_{12}\,y_{2,t-1} + \varepsilon_{1t}\\ y_{2t} = c_2 + a_{21}\,y_{1,t-1} + a_{22}\,y_{2,t-1} + \varepsilon_{2t} \end{cases}\]</span></p>
+<p>The cross terms are where the value is: <span class="math inline">\(a_{12}\)</span> is how much <span class="math inline">\(y_{2,t-1}\)</span> predicts <span class="math inline">\(y_{1t}\)</span>, which is precisely what a univariate AR throws away. If <span class="math inline">\(a_{12} = a_{21} = 0\)</span>, the system collapses back into two separate AR models and you have learned that too. Each equation is estimated by OLS; the order <span class="math inline">\(p\)</span> is chosen by BIC.</p>
+<div class="warningbox">
+<p><strong>Parameter explosion.</strong> A VAR(<span class="math inline">\(p\)</span>) with <span class="math inline">\(k\)</span> variables has <span class="math inline">\(k^2 p\)</span> coefficients. At <span class="math inline">\(k=5\)</span> and <span class="math inline">\(p=4\)</span> that is <strong>100 coefficients</strong> — typically more than a monthly business series has observations. Keep <span class="math inline">\(k \leq 4\)</span> unless you are using a LASSO-VAR.</p>
+</div>
+<p><span class="neutral smaller"><strong>Python:</strong> <code>statsmodels.tsa.api.VAR</code>; <code>var.fit(maxlags=p, ic='bic')</code> selects the order.</span></p>
+<p>Here’s the structure for two series. Two equations, and each one regresses on the lags of <em>both</em> variables.</p>
+<p>Look at where the value is: the <strong>cross terms</strong>. <span class="math inline">\(a_{12}\)</span> is how much <span class="math inline">\(y_2\)</span> yesterday predicts <span class="math inline">\(y_1\)</span> today. That coefficient is precisely what a univariate AR throws away — it has no place to put it.</p>
+<p>And here’s the elegant part. If <span class="math inline">\(a_{12}\)</span> and <span class="math inline">\(a_{21}\)</span> both come back at zero, the system collapses into two separate AR models. You’ve learned something: these series don’t inform each other. That’s a finding, not a failure.</p>
+<p>Each equation is estimated by ordinary least squares — it really is just regression — and the order <span class="math inline">\(p\)</span> is chosen by BIC. It’s worth knowing why this model exists, because it was a reaction to something.</p>
+<p>Christopher Sims proposed VAR in 1980, in a paper arguing that the large structural macroeconomic models of the day rested on assumptions nobody could defend. To identify those models, economists had to declare in advance which variables affected which — and Sims argued those restrictions were, in his word, incredible. Not wrong. Unbelievable.</p>
+<p>His alternative: stop pretending you know the structure. Let every variable depend on the lagged values of every variable, symmetrically, and let the data speak. He shared the Nobel Prize for it in 2011.</p>
+<p>I mention this because it frames what a VAR is <em>for</em>. It is deliberately agnostic. That’s its strength — you impose almost nothing — and it’s also why it can’t answer causal questions on its own, and why the parameter count explodes. You traded assumptions for parameters. Now the warning, and this one bites people in practice.</p>
+<p><strong>Parameter explosion.</strong> A VAR with <span class="math inline">\(k\)</span> variables and <span class="math inline">\(p\)</span> lags has <span class="math inline">\(k\)</span>-squared times <span class="math inline">\(p\)</span> coefficients. It’s quadratic in the number of variables. Five variables, four lags: one hundred coefficients.</p>
+<p>Sit with that number. A monthly business series over ten years gives you a hundred and twenty observations. You’d be estimating a hundred parameters from a hundred and twenty data points. That model will fit your sample beautifully and forecast like a coin flip.</p>
+<p>So keep <span class="math inline">\(k\)</span> at four or fewer, unless you’re using a regularized LASSO-VAR — which is the kind of thing Lecture 6 gives you the tools for.</p>
+</section>
+<section id="granger-causality-test" class="level3" data-number="2.4.3">
+<h3 data-number="2.4.3" class="anchored" data-anchor-id="granger-causality-test"><span class="header-section-number">2.4.3</span> Granger Causality Test</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Granger Causality</p>
+</div>
+<p><span class="math inline">\(x_t\)</span> <strong>Granger-causes</strong> <span class="math inline">\(y_t\)</span> if past values of <span class="math inline">\(x_t\)</span> help predict <span class="math inline">\(y_t\)</span> <em>beyond what <span class="math inline">\(y_t\)</span>’s own past already explains</em>.</p>
+</div>
+<p><strong>The test:</strong> fit the <span class="math inline">\(y\)</span>-equation with and without the <span class="math inline">\(x\)</span>-lags, then run an <span class="math inline">\(F\)</span>-test of <span class="math inline">\(H_0\)</span>: all <span class="math inline">\(x\)</span>-lag coefficients are zero. Rejecting means <span class="math inline">\(x_t\)</span> Granger-causes <span class="math inline">\(y_t\)</span>.</p>
+<p><strong>A concrete question.</strong> Does unemployment (<code>UNRATE</code>) Granger-cause retail sales (<code>RSXFS</code>)? <strong>We run exactly this in the lab</strong> — and the answer is instructive: it fires <em>both</em> ways, and which direction looks stronger depends on whether COVID is in the sample.</p>
+<p><strong>Granger causality is not structural causality.</strong> It tests <em>predictive content</em>, not whether <span class="math inline">\(x\)</span> mechanically brings <span class="math inline">\(y\)</span> about — a rooster reliably predicts sunrise. Report it as “predictive of,” never “causes.”</p>
+<p><span class="neutral smaller">Impulse response functions trace how a shock propagates through the system over time.</span></p>
+<p>The formal definition: <span class="math inline">\(x\)</span> <strong>Granger-causes</strong> <span class="math inline">\(y\)</span> if past values of <span class="math inline">\(x\)</span> help predict <span class="math inline">\(y\)</span> beyond what <span class="math inline">\(y\)</span>’s own past already explains.</p>
+<p>That final clause is the whole test. Not “does <span class="math inline">\(x\)</span> predict <span class="math inline">\(y\)</span>” — but “does <span class="math inline">\(x\)</span> add anything once we’ve already used <span class="math inline">\(y\)</span>’s own history?”</p>
+<p>The procedure is a straightforward F-test. Fit the <span class="math inline">\(y\)</span>-equation with the <span class="math inline">\(x\)</span>-lags and without them. Test whether all the <span class="math inline">\(x\)</span>-lag coefficients are jointly zero. Reject, and <span class="math inline">\(x\)</span> Granger-causes <span class="math inline">\(y\)</span>.</p>
+<p>Here’s a concrete question we run in the lab: does unemployment Granger-cause retail sales? The null is that every unemployment lag is zero in the retail equation. And notice we’re using macroeconomic series here rather than store sales. That’s deliberate.</p>
+<p>Two Walmart stores in the same state absolutely <em>do</em> move together — you’ll find a significant Granger test between them in the homework. The problem is that finding tells you almost nothing, because both stores are responding to the same regional promotions and the same weather. The test fires, and you still cannot say which one drives the other.</p>
+<p>Now, I ran the unemployment question before writing this slide, and I want to tell you what came back, because it is better than the tidy answer I expected.</p>
+<p>On the full sample, 1992 to today, the test is significant — and unemployment looks like the stronger driver. Exactly the story everyone expects. People lose jobs, people stop spending.</p>
+<p>Then drop the COVID window and rerun. The intuitive direction weakens sharply. Restrict to before 2020 and it <strong>disappears entirely</strong> — not significant at any lag. Meanwhile the <em>reverse</em> direction — retail sales predicting unemployment — is rock solid in every single sample.</p>
+<p>Sit with that, because there are two lessons in it and both are worth more than the tidy answer would have been.</p>
+<p>The first is economic, and it’s obvious in hindsight: retail sales are a coincident-to-leading indicator, and unemployment is a lagging one. Spending falls first. Layoffs follow. The data was telling us the sequence, and my intuition had it backwards.</p>
+<p>The second is methodological, and it’s the one I want you to carry into your own work. On the full sample you would have reported a strong, intuitive, publishable finding. It was being driven by one enormous shared shock. One episode, in a thirty-four-year sample, flipping the headline result. You’ll do all three windows yourself in the lab.</p>
+<p>Now the caveat, and I want you to take it seriously because it is the single most abused result in applied forecasting. <strong>Granger causality is not structural causality.</strong> It tests <em>predictive content</em>. It does not establish that <span class="math inline">\(x\)</span> mechanically brings <span class="math inline">\(y\)</span> about. A rooster reliably predicts sunrise. The rooster Granger-causes the sunrise. The rooster does not cause the sunrise.</p>
+<p>So report it as “predictive of.” Never “causes.” Say it the careful way and you will never have to walk a claim back in front of a room of executives.</p>
+<p>One more thing before we leave ARIMA and VAR, and it’s something these models give you that we’ve barely mentioned: <strong>prediction intervals</strong>.</p>
+<p>Everything we’ve produced so far is a point forecast — a single number. But every one of these models also produces a distribution, and <code>statsmodels</code> will hand you an eighty or ninety-five percent interval alongside the point.</p>
+<p>Use them. A forecast of forty thousand units means one thing if the interval is thirty-nine to forty-one, and something completely different if it’s twenty-five to fifty-five. Same point forecast. Entirely different inventory decision.</p>
+<p>And notice how the intervals behave as the horizon grows: they <strong>widen</strong>, and for a differenced series they widen without bound. That is the model being honest. It’s telling you that a random walk has no long-run level to forecast toward, so far enough out, it genuinely does not know.</p>
+<p>A point forecast hides that. An interval shows it. When we get to Bayesian methods in Week 10, we stop treating the interval as an add-on and make the whole distribution the output.</p>
+</section>
+<section id="arimax-exogenous-variables-with-arima-errors" class="level3" data-number="2.4.4">
+<h3 data-number="2.4.4" class="anchored" data-anchor-id="arimax-exogenous-variables-with-arima-errors"><span class="header-section-number">2.4.4</span> ARIMAX: Exogenous Variables with ARIMA Errors</h3>
+<p>When one variable clearly <em>drives</em> another rather than the relationship being symmetric, use ARIMAX.</p>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>ARIMAX Model</p>
+</div>
+<p><span class="math display">\[y_t = \mathbf{x}_t'\boldsymbol{\beta} + \eta_t, \qquad \eta_t \sim \mathrm{ARIMA}(p,d,q)\]</span></p>
+<p><span class="math inline">\(\mathbf{x}_t\)</span> are exogenous regressors; <span class="math inline">\(\eta_t\)</span> absorbs whatever autocorrelation is left in the residuals.</p>
+</div>
+<p><strong>Use it when</strong> the causal direction is clear (advertising → sales), you already have <span class="math inline">\(x_t\)</span> or can forecast it, and adding <span class="math inline">\(x_t\)</span> actually reduces cross-validated forecast error — check that last one rather than assuming it.</p>
+<p><strong>The catch that surprises people:</strong> to forecast <span class="math inline">\(y_{t+h}\)</span> you need <span class="math inline">\(x_{t+h}\)</span> — a forecast of your own predictor. If that is unavailable, ARIMAX buys you nothing at forecast time and you should use a VAR instead, which generates its own.</p>
+<p><span class="neutral smaller"><strong>Python:</strong> <code>SARIMAX(y, exog=X, order=(p,d,q)).fit()</code></span></p>
+<p>Last model today. When one variable clearly <em>drives</em> another rather than the relationship being symmetric, use ARIMAX.</p>
+<p>The structure: regress <span class="math inline">\(y\)</span> on your exogenous predictors in the usual way, and then let the <em>errors</em> follow an ARIMA process. That second part is what makes it more than ordinary regression. Regression on time series data almost always leaves autocorrelated residuals, and ARIMAX gives that autocorrelation somewhere legitimate to live instead of quietly breaking your standard errors.</p>
+<p>Use it when three things hold. The causal direction is clear — advertising drives sales, not the other way. You already have <span class="math inline">\(x\)</span>, or can forecast it. And adding <span class="math inline">\(x\)</span> actually reduces cross-validated forecast error — check that, rather than assuming it. Adding a predictor does not automatically help. And now the catch that surprises people.</p>
+<p>To forecast <span class="math inline">\(y\)</span> at time <span class="math inline">\(t+h\)</span>, you need <span class="math inline">\(x\)</span> at time <span class="math inline">\(t+h\)</span>. A forecast of your own predictor.</p>
+<p>Think about what that means operationally. You build a beautiful model of sales driven by unemployment. It fits wonderfully. Then someone asks for next quarter’s sales — and you realize you first need next quarter’s unemployment, which is its own forecasting problem, with its own error, which now propagates into yours.</p>
+<p>If you can’t forecast <span class="math inline">\(x\)</span>, ARIMAX buys you nothing at forecast time. Use a VAR instead, because a VAR generates forecasts for all its variables simultaneously. It solves the problem by construction.</p>
+</section>
+</section>
+<section id="key-takeaways-and-roadmap" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="key-takeaways-and-roadmap"><span class="header-section-number">2.5</span> Key Takeaways and Roadmap</h2>
+<p>Stationarity, ARIMA, VAR, and ARIMAX form the classical time series toolkit.</p>
+<p>Let’s pull it together.</p>
+<section id="key-takeaways" class="level3" data-number="2.5.1">
+<h3 data-number="2.5.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">2.5.1</span> Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p><strong>Stationarity</strong> is required before fitting time series models. Test with ADF (<span class="math inline">\(H_0\)</span>: unit root) and KPSS (<span class="math inline">\(H_0\)</span>: stationary). First-differencing removes a stochastic trend.</p></li>
+<li><p><strong>ACF</strong> identifies MA order; <strong>PACF</strong> identifies AR order. Always inspect after differencing.</p></li>
+<li><p><strong>ARIMA(<span class="math inline">\(p\)</span>,<span class="math inline">\(d\)</span>,<span class="math inline">\(q\)</span>)</strong> combines differencing with AR/MA. SARIMA adds seasonal polynomials. Use <code>auto_arima</code> for automatic selection.</p></li>
+<li><p><strong>VAR</strong> models all variables symmetrically and captures cross-variable dynamics. Keep <span class="math inline">\(k \leq 4\)</span>. Use <strong>Granger causality</strong> to test predictive content.</p></li>
+<li><p><strong>ARIMAX</strong> adds exogenous predictors to ARIMA. Use when causal direction is clear and <span class="math inline">\(x_t\)</span> is forecastable.</p></li>
+</ol>
+</div>
+<p><em>Next: Generalized Additive Models (GAMs) — flexible, interpretable nonlinear forecasting with Prophet and pyGAM.</em></p>
+<p>Five things.</p>
+<p><strong>One.</strong> Stationarity is required before fitting anything today. Test with ADF and KPSS — opposite nulls, so run both. First-differencing removes a stochastic trend. <strong>Two.</strong> ACF identifies MA order, PACF identifies AR order. Always inspect <em>after</em> differencing, never before.</p>
+<p><strong>Three.</strong> ARIMA combines differencing with AR and MA components, and it contains the naive forecast and simple exponential smoothing as special cases. SARIMA adds seasonal polynomials. Use <code>auto_arima</code>, but keep your eyes open.</p>
+<p><strong>Four.</strong> VAR models all variables symmetrically and captures the cross-dynamics a univariate model discards. Keep <span class="math inline">\(k\)</span> at four or fewer. Granger causality tests predictive content — and predictive content only.</p>
+<p><strong>Five.</strong> ARIMAX adds exogenous predictors. Use it when the causal direction is clear and <span class="math inline">\(x\)</span> is genuinely forecastable.</p>
+<p>If you take one thing: <strong>stationarity first.</strong> Almost every ARIMA mistake I see traces back to someone reading an ACF they should never have looked at.</p>
+</section>
+<section id="references" class="level3" data-number="2.5.2">
+<h3 data-number="2.5.2" class="anchored" data-anchor-id="references"><span class="header-section-number">2.5.2</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+<p>Readings are in the syllabus — Chapter 9 for ARIMA, Chapter 10 for dynamic regression, and section 12.3 for VAR. Either edition works; the chapter numbers are the same.</p>
+<p>Next week: Generalized Additive Models. We keep the interpretability we’ve had so far, but give up the assumption that effects have to be straight lines. See you then.</p>
+</section>
+</section>
+<section id="timing-guide" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="timing-guide"><span class="header-section-number">2.6</span> Timing guide</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Segment</th>
+<th>Slides</th>
+<th style="text-align: right;">Target</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Opening &amp; stationarity</td>
+<td>1–8</td>
+<td style="text-align: right;">~14 min</td>
+</tr>
+<tr class="even">
+<td>ARIMA &amp; SARIMA</td>
+<td>9–11</td>
+<td style="text-align: right;">~6 min</td>
+</tr>
+<tr class="odd">
+<td>VAR, Granger, ARIMAX</td>
+<td>12–16</td>
+<td style="text-align: right;">~15 min</td>
+</tr>
+<tr class="even">
+<td>Close</td>
+<td>17–19</td>
+<td style="text-align: right;">~3 min</td>
+</tr>
+</tbody>
+</table>
+<p>If you need to compress, slide 9’s four-step workflow survives trimming. Do <strong>not</strong> compress slides 5, 6, or 13 — the differencing rule, the “difference before you read the ACF” rule, and the Granger caveat are the three things students most reliably get wrong.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture01_ETS_Eval.html" class="pagination-link" aria-label="Introduction, Exponential Smoothing &amp; Forecast Evaluation">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture03_GAMs.html" class="pagination-link" aria-label="Generalized Additive Models">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

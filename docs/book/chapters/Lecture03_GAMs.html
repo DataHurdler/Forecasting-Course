@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Generalized Additive Models – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture04_DecisionTrees.html" rel="next">
+<link href="../chapters/Lecture02_ARIMA_VAR.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture03_GAMs.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">3.1</span> Lecture Outline</a></li>
+  <li><a href="#motivation-beyond-linear-without-black-boxes" id="toc-motivation-beyond-linear-without-black-boxes" class="nav-link" data-scroll-target="#motivation-beyond-linear-without-black-boxes"><span class="header-section-number">3.2</span> Motivation: Beyond Linear, Without Black Boxes</a>
+  <ul class="collapse">
+  <li><a href="#the-flexibilityinterpretability-tradeoff" id="toc-the-flexibilityinterpretability-tradeoff" class="nav-link" data-scroll-target="#the-flexibilityinterpretability-tradeoff"><span class="header-section-number">3.2.1</span> The Flexibility–Interpretability Tradeoff</a></li>
+  <li><a href="#why-additivity-matters-for-interpretation" id="toc-why-additivity-matters-for-interpretation" class="nav-link" data-scroll-target="#why-additivity-matters-for-interpretation"><span class="header-section-number">3.2.2</span> Why Additivity Matters for Interpretation</a></li>
+  </ul></li>
+  <li><a href="#gam-structure-and-smoothing" id="toc-gam-structure-and-smoothing" class="nav-link" data-scroll-target="#gam-structure-and-smoothing"><span class="header-section-number">3.3</span> GAM Structure and Smoothing</a>
+  <ul class="collapse">
+  <li><a href="#what-is-a-gam" id="toc-what-is-a-gam" class="nav-link" data-scroll-target="#what-is-a-gam"><span class="header-section-number">3.3.1</span> What Is a GAM?</a></li>
+  <li><a href="#what-the-generalized-actually-means" id="toc-what-the-generalized-actually-means" class="nav-link" data-scroll-target="#what-the-generalized-actually-means"><span class="header-section-number">3.3.2</span> What the “Generalized” Actually Means</a></li>
+  <li><a href="#controlling-smoothness-the-penalty-term" id="toc-controlling-smoothness-the-penalty-term" class="nav-link" data-scroll-target="#controlling-smoothness-the-penalty-term"><span class="header-section-number">3.3.3</span> Controlling Smoothness: The Penalty Term</a></li>
+  </ul></li>
+  <li><a href="#prophet-for-time-series-gams" id="toc-prophet-for-time-series-gams" class="nav-link" data-scroll-target="#prophet-for-time-series-gams"><span class="header-section-number">3.4</span> Prophet for Time Series GAMs</a>
+  <ul class="collapse">
+  <li><a href="#prophet-forecasting-at-scale" id="toc-prophet-forecasting-at-scale" class="nav-link" data-scroll-target="#prophet-forecasting-at-scale"><span class="header-section-number">3.4.1</span> Prophet: Forecasting at Scale</a></li>
+  <li><a href="#prophet-code-and-workflow" id="toc-prophet-code-and-workflow" class="nav-link" data-scroll-target="#prophet-code-and-workflow"><span class="header-section-number">3.4.2</span> Prophet: Code and Workflow</a></li>
+  </ul></li>
+  <li><a href="#pygam-for-general-additive-modeling" id="toc-pygam-for-general-additive-modeling" class="nav-link" data-scroll-target="#pygam-for-general-additive-modeling"><span class="header-section-number">3.5</span> pyGAM for General Additive Modeling</a>
+  <ul class="collapse">
+  <li><a href="#pygam-flexible-additive-modeling" id="toc-pygam-flexible-additive-modeling" class="nav-link" data-scroll-target="#pygam-flexible-additive-modeling"><span class="header-section-number">3.5.1</span> pyGAM: Flexible Additive Modeling</a></li>
+  <li><a href="#interpreting-gam-results-partial-dependence-plots" id="toc-interpreting-gam-results-partial-dependence-plots" class="nav-link" data-scroll-target="#interpreting-gam-results-partial-dependence-plots"><span class="header-section-number">3.5.2</span> Interpreting GAM Results: Partial Dependence Plots</a></li>
+  </ul></li>
+  <li><a href="#key-takeaways-and-roadmap" id="toc-key-takeaways-and-roadmap" class="nav-link" data-scroll-target="#key-takeaways-and-roadmap"><span class="header-section-number">3.6</span> Key Takeaways and Roadmap</a>
+  <ul class="collapse">
+  <li><a href="#gams-vs.-other-methods-when-to-choose-each" id="toc-gams-vs.-other-methods-when-to-choose-each" class="nav-link" data-scroll-target="#gams-vs.-other-methods-when-to-choose-each"><span class="header-section-number">3.6.1</span> GAMs vs.&nbsp;Other Methods: When to Choose Each</a></li>
+  <li><a href="#lecture-3-key-takeaways" id="toc-lecture-3-key-takeaways" class="nav-link" data-scroll-target="#lecture-3-key-takeaways"><span class="header-section-number">3.6.2</span> Lecture 3: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">3.6.3</span> References</a></li>
+  </ul></li>
+  <li><a href="#timing-guide" id="toc-timing-guide" class="nav-link" data-scroll-target="#timing-guide"><span class="header-section-number">3.7</span> Timing guide</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 3 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">3.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Motivation: Beyond Linear, Without Black Boxes</li>
+<li>GAM Structure and Smoothing</li>
+<li>Prophet for Time Series GAMs</li>
+<li>pyGAM for General Additive Modeling</li>
+<li>Key Takeaways</li>
+</ol>
+<p>Five parts. The motivation — why we want something between linear and black-box. Then the structure of a GAM and how smoothing is controlled. Then Prophet, which is a GAM built specifically for time series. Then pyGAM, for the general case. And the takeaways.</p>
+</section>
+<section id="motivation-beyond-linear-without-black-boxes" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="motivation-beyond-linear-without-black-boxes"><span class="header-section-number">3.2</span> Motivation: Beyond Linear, Without Black Boxes</h2>
+<p>We want flexibility to capture nonlinear relationships while still being able to <em>explain</em> what the model is doing.</p>
+<p>Part one. Why we want flexibility without giving up the ability to explain what the model is doing.</p>
+<section id="the-flexibilityinterpretability-tradeoff" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="the-flexibilityinterpretability-tradeoff"><span class="header-section-number">3.2.1</span> The Flexibility–Interpretability Tradeoff</h3>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>Linear models (ARIMA, regression):</strong></p>
+<ul>
+<li><span class="positive">✓</span> Each coefficient has a clear meaning</li>
+<li><span class="positive">✓</span> Stable, well-understood properties</li>
+<li><span class="negative">✗</span> Assume a constant slope everywhere</li>
+<li><span class="negative">✗</span> Miss curvature and threshold effects</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>Fully nonlinear models (trees, neural nets):</strong></p>
+<ul>
+<li><span class="positive">✓</span> Capture almost any pattern</li>
+<li><span class="positive">✓</span> High accuracy on complex data</li>
+<li><span class="negative">✗</span> Hard to explain any single prediction</li>
+<li><span class="negative">✗</span> Interactions entangle all variables</li>
+</ul>
+</div>
+</div>
+<p><strong>GAMs sit between the two.</strong> They allow a nonlinear, flexible relationship for each variable, but keep the model <strong>additive</strong> — so each variable’s effect can still be plotted and explained on its own. That is the whole bargain, and the rest of this lecture is about what it costs.</p>
+<p>Two columns, and this is one of the few genuine side-by-side comparisons in the course.</p>
+<p>On the left, <strong>linear models</strong> — regression, ARIMA. Each coefficient has a clear meaning. You can say “a one-point rise in unemployment lowers sales by four hundred units,” and everyone in the room knows what you mean. The properties are stable and well understood.</p>
+<p>But they assume a constant slope everywhere. The effect of unemployment going from 4% to 5% is assumed identical to it going from 9% to 10%. That’s an assumption, and it’s usually false. They miss curvature and threshold effects entirely.</p>
+<p>On the right, <strong>fully nonlinear models</strong> — trees, neural networks. They capture almost any pattern, and on complex data they’re accurate.</p>
+<p>But ask why a specific prediction came out the way it did, and you’ll struggle. And because interactions entangle the variables, you can’t cleanly separate what any single variable contributes.</p>
+<p><strong>GAMs sit between the two.</strong> Each variable gets a flexible, nonlinear relationship. But the model stays <strong>additive</strong> — the effects are added together, not multiplied or entangled — so each one can still be plotted and explained on its own.</p>
+<p>That is the whole bargain. And the rest of this lecture is about what it costs, because it does cost something.</p>
+</section>
+<section id="why-additivity-matters-for-interpretation" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="why-additivity-matters-for-interpretation"><span class="header-section-number">3.2.2</span> Why Additivity Matters for Interpretation</h3>
+<p>In a non-additive model the effect of one variable depends on the value of another, so you cannot describe them separately.</p>
+<p><strong>Concretely.</strong> Suppose the truth is <span class="math inline">\(y = x_1^2 x_2^2 + \varepsilon\)</span>. Then <span class="math inline">\(\partial y / \partial x_1 = 2x_1 x_2^{2}\)</span> — it depends on <em>both</em> variables. There is no answer to “what does <span class="math inline">\(x_1\)</span> do to <span class="math inline">\(y\)</span>?” that does not begin with “it depends on <span class="math inline">\(x_2\)</span>.”</p>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>GAM Marginal Effects Are Simple</p>
+</div>
+<p>In a GAM, <span class="math inline">\(y = f_1(x_1) + f_2(x_2) + \varepsilon\)</span>, so the marginal effect of <span class="math inline">\(x_1\)</span> is just <span class="math inline">\(f_1'(x_1)\)</span> — a function of <span class="math inline">\(x_1\)</span> alone, whatever <span class="math inline">\(x_2\)</span> happens to be.</p>
+<p><strong>That is why you can plot each variable’s effect separately and hand the plot to a stakeholder.</strong></p>
+</div>
+<p>Let me make the additivity point precise, because it’s easy to nod along without seeing what’s at stake.</p>
+<p>In a non-additive model, the effect of one variable depends on the value of another. You cannot describe them separately. Concretely. Suppose the truth is <span class="math inline">\(y\)</span> equals <span class="math inline">\(x_1\)</span> squared times <span class="math inline">\(x_2\)</span> squared, plus noise. Take the derivative with respect to <span class="math inline">\(x_1\)</span>: you get two <span class="math inline">\(x_1\)</span> <span class="math inline">\(x_2\)</span>-squared. That expression contains <em>both</em> variables.</p>
+<p>So there is no answer to “what does <span class="math inline">\(x_1\)</span> do to <span class="math inline">\(y\)</span>?” that doesn’t begin with “it depends on <span class="math inline">\(x_2\)</span>.” Not because we haven’t worked hard enough — because the question has no variable-by-variable answer. The model doesn’t decompose. Now the GAM. <span class="math inline">\(y\)</span> equals <span class="math inline">\(f_1\)</span> of <span class="math inline">\(x_1\)</span>, plus <span class="math inline">\(f_2\)</span> of <span class="math inline">\(x_2\)</span>, plus noise.</p>
+<p>The marginal effect of <span class="math inline">\(x_1\)</span> is just <span class="math inline">\(f_1\)</span>-prime of <span class="math inline">\(x_1\)</span>. A function of <span class="math inline">\(x_1\)</span> alone. Whatever <span class="math inline">\(x_2\)</span> happens to be doing, the answer is the same.</p>
+<p><strong>That is why you can plot each variable’s effect separately and hand the plot to a stakeholder.</strong> One curve per variable, each one true on its own terms.</p>
+<p>And that is also precisely what GAMs give up. If the effect of price genuinely does depend on whether it’s a holiday week, a GAM cannot represent that. We’ll come back to it at the end.</p>
+</section>
+</section>
+<section id="gam-structure-and-smoothing" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="gam-structure-and-smoothing"><span class="header-section-number">3.3</span> GAM Structure and Smoothing</h2>
+<p>Additive nonlinear functions, penalized for wiggliness.</p>
+<p>Part two. The structure — additive nonlinear functions, penalized for wiggliness.</p>
+<section id="what-is-a-gam" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="what-is-a-gam"><span class="header-section-number">3.3.1</span> What Is a GAM?</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Generalized Additive Model</p>
+</div>
+<p><span class="math display">\[y = \alpha + f_1(x_1) + f_2(x_2) + \cdots + f_k(x_k) + \varepsilon\]</span></p>
+<p>where each <span class="math inline">\(f_j(\cdot)\)</span> is a <strong>smooth, nonlinear function</strong> estimated from the data <span class="citation" data-cites="Wood2017">[@Wood2017]</span>.</p>
+</div>
+<p>Each <span class="math inline">\(f_j\)</span> is free to be linear, curved, U-shaped, or threshold-like — the data decides. Because the terms are <em>added</em> rather than multiplied, the effects stay independent and each one can be visualized on its own. Every function is fitted to minimize prediction error subject to a smoothness penalty, which is the next slide.</p>
+<p><strong>A retail example.</strong> Model weekly sales as <span class="math inline">\(f_1(\text{time})\)</span> for the long-run trend, plus <span class="math inline">\(f_2(\text{week of year})\)</span> for seasonality, plus <span class="math inline">\(f_3(\text{unemployment})\)</span> for economic sensitivity. Three curves, each plotted and interpreted separately — and none of them requiring you to hold the others fixed to make sense of it.</p>
+<p>Here’s the definition. <span class="math inline">\(y\)</span> equals a constant, plus <span class="math inline">\(f_1\)</span> of <span class="math inline">\(x_1\)</span>, plus <span class="math inline">\(f_2\)</span> of <span class="math inline">\(x_2\)</span>, and so on — where each <span class="math inline">\(f\)</span> is a smooth nonlinear function estimated from the data.</p>
+<p>Compare that to linear regression, where each term is beta-<span class="math inline">\(j\)</span> <em>times</em> <span class="math inline">\(x_j\)</span>. We’ve replaced a coefficient with a function. That’s the entire generalization.</p>
+<p>Each <span class="math inline">\(f_j\)</span> is free to be linear, curved, U-shaped, or threshold-like. You don’t specify the shape. The data decides.</p>
+<p>Because the terms are <em>added</em> rather than multiplied, the effects stay independent and each can be visualized on its own. And every function is fitted to minimize prediction error subject to a smoothness penalty — which is the next slide, and is what stops the curves from chasing noise. A retail example, to make it concrete.</p>
+<p>Model weekly sales as <span class="math inline">\(f_1\)</span> of time, capturing the long-run trend. Plus <span class="math inline">\(f_2\)</span> of week-of-year, capturing seasonality. Plus <span class="math inline">\(f_3\)</span> of unemployment, capturing economic sensitivity.</p>
+<p>Three curves. Each plotted and interpreted separately. And none of them requiring you to hold the others fixed to make sense of it.</p>
+<p>Notice this is doing the same decomposition Prophet will do in twenty minutes — trend, seasonality, external effects. Prophet is a GAM with the time series structure built in.</p>
+</section>
+<section id="what-the-generalized-actually-means" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="what-the-generalized-actually-means"><span class="header-section-number">3.3.2</span> What the “Generalized” Actually Means</h3>
+<p>So far every <span class="math inline">\(y\)</span> we have modelled has been continuous and roughly symmetric — sales in dollars, demand in units. For that case an <em>additive</em> model is enough. The <strong>G</strong> in GAM is what happens when <span class="math inline">\(y\)</span> is not that kind of variable.</p>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Generalized Additive Model, in full</p>
+</div>
+<p><span class="math display">\[g\big(\mathbb{E}[y]\big) = \alpha + f_1(x_1) + \cdots + f_k(x_k)\]</span></p>
+<p>The additive predictor models a <em>transformation</em> of the mean. That transformation <span class="math inline">\(g(\cdot)\)</span> is the <strong>link function</strong>.</p>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>If <span class="math inline">\(y\)</span> is…</th>
+<th>Distribution</th>
+<th>Link <span class="math inline">\(g(\cdot)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Continuous, symmetric (sales)</td>
+<td>Gaussian</td>
+<td>Identity — <span class="math inline">\(g(\mu)=\mu\)</span></td>
+</tr>
+<tr class="even">
+<td>A count (units, visits, claims)</td>
+<td>Poisson</td>
+<td>Log — keeps the forecast positive</td>
+</tr>
+<tr class="odd">
+<td>Binary (churn, stockout, yes/no)</td>
+<td>Binomial</td>
+<td>Logit — keeps it inside <span class="math inline">\([0,1]\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><span class="neutral smaller">In <code>pyGAM</code> this is the difference between <code>LinearGAM</code>, <code>PoissonGAM</code>, and <code>LogisticGAM</code> — same additive structure, different link. Everything else in this lecture is unchanged.</span></p>
+<p>Someone should have asked this two slides ago, so let me answer it before we go on.</p>
+<p>The method is called a <strong>Generalized</strong> Additive Model. So far I’ve shown you an <em>additive</em> model. Where is the “generalized”?</p>
+<p>Everything we’ve modelled has been continuous and roughly symmetric — sales in dollars, demand in units. For that kind of outcome, adding smooth functions together works directly.</p>
+<p>But suppose your outcome is a <strong>count</strong>. Units sold at a small store: zero, one, two, seven. An additive model can happily predict <em>minus three units</em>, which is not a thing.</p>
+<p>Or suppose it’s <strong>binary</strong>. Did this customer churn? Did we stock out? The answer is a probability, between zero and one, and again an additive model will cheerfully predict one point four.</p>
+<p>The fix is on the slide. Instead of modelling the mean directly, we model a <strong>transformation</strong> of the mean — <span class="math inline">\(g\)</span> of the expected value of <span class="math inline">\(y\)</span> equals the additive predictor. That <span class="math inline">\(g\)</span> is called the <strong>link function</strong>, and it’s the entire “generalized.”</p>
+<p>Look at the table. For continuous symmetric data, the link is the <strong>identity</strong> — do nothing, which is the case we’ve been in all along. For counts, the link is the <strong>log</strong>, which means you model the log of the mean and exponentiate to get back, so the forecast can never go negative. For binary outcomes, the link is the <strong>logit</strong>, which maps the whole real line into zero-to-one, so the probability is bounded by construction.</p>
+<p>In pyGAM this is one word: <code>LinearGAM</code>, <code>PoissonGAM</code>, <code>LogisticGAM</code>. Same additive structure, same splines, same smoothing penalty. Only the link changes.</p>
+<p>And if this sounds familiar from a regression course — it should. It’s exactly the same idea as a generalized <em>linear</em> model. A GAM is a GLM where the linear terms have been replaced by smooth functions. That’s the whole family tree in one sentence.</p>
+</section>
+<section id="controlling-smoothness-the-penalty-term" class="level3" data-number="3.3.3">
+<h3 data-number="3.3.3" class="anchored" data-anchor-id="controlling-smoothness-the-penalty-term"><span class="header-section-number">3.3.3</span> Controlling Smoothness: The Penalty Term</h3>
+<p>A GAM minimizes a <strong>penalized</strong> sum of squared errors:</p>
+<p><span class="math display">\[\text{PSSE} = \underbrace{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}_{\text{fit}} + \underbrace{\lambda \int (f''(x))^2\,dx}_{\text{smoothness penalty}}\]</span></p>
+<p>The second derivative <span class="math inline">\(f''(x)\)</span> measures how fast the slope is changing, so a wiggly function accumulates a large integral and a smooth one accumulates a small one. The penalty therefore charges the model for wiggliness, and <span class="math inline">\(\lambda\)</span> sets the price.</p>
+<p>The two extremes are worth holding in mind. As <strong><span class="math inline">\(\lambda \to 0\)</span></strong> the penalty vanishes and the curve is free to chase every point — overfitting. As <strong><span class="math inline">\(\lambda \to \infty\)</span></strong> every <span class="math inline">\(f_j\)</span> is forced straight and the GAM collapses back into ordinary least squares. Everything useful happens in between, and <span class="math inline">\(\lambda\)</span> is chosen by <strong>cross-validation</strong> or GCV rather than by eye.</p>
+<p><span class="neutral smaller"><strong>Splines</strong> are how <span class="math inline">\(f(x)\)</span> is represented: piecewise polynomials joined smoothly at <strong>knot</strong> points.</span></p>
+<p>If each <span class="math inline">\(f\)</span> can be any shape, what stops it from being a squiggle that passes through every data point? This slide.</p>
+<p>A GAM minimizes a <strong>penalized</strong> sum of squared errors. Two terms. The first is the ordinary fit term — squared errors, exactly as in OLS. The second is the penalty. Look at what’s being penalized: the integral of the <em>squared second derivative</em>.</p>
+<p>The second derivative measures how fast the slope is changing. A straight line has a second derivative of zero everywhere. A wiggly function has a large second derivative, wiggling in both directions, and squaring it before integrating means all that wiggle accumulates. So the penalty charges the model for wiggliness. And lambda sets the price. The two extremes are worth holding in mind.</p>
+<p>As <strong>lambda goes to zero</strong>, the penalty vanishes. The curve is free to chase every point. That’s overfitting — a model that memorizes your sample.</p>
+<p>As <strong>lambda goes to infinity</strong>, the penalty dominates. Any curvature is infinitely expensive, so every <span class="math inline">\(f\)</span> is forced straight, and the GAM collapses back into ordinary least squares.</p>
+<p>So OLS isn’t a different method from a GAM. It’s a GAM with the smoothness dial turned all the way up. Everything useful happens in between.</p>
+<p>And lambda is chosen by <strong>cross-validation</strong> or GCV — not by eye. You’ll hear that refrain all semester: the tuning parameter is selected against held-out error, never by what looks nice.</p>
+<p>Let me say a little more about splines, because “piecewise polynomials joined at knots” is one of those phrases that sounds like an answer without being one.</p>
+<p>Here’s the picture. Take the range of your predictor and put down a handful of points along it — those are the <strong>knots</strong>. Between each pair of knots, fit a low-order polynomial, usually a cubic. Then require that where two pieces meet, they join up: same value, same slope, same curvature. That’s what makes it look like one smooth curve rather than a chain of segments.</p>
+<p>The number of knots controls how much wiggle is <em>available</em>. Few knots, and the curve can only bend gently. Many knots, and it can bend almost anywhere.</p>
+<p>Now, you might expect that choosing the number of knots is the crucial modelling decision. It mostly isn’t — and this is the elegant part of the penalized approach. You give the model plenty of knots, more than you think you need, and then let <strong>lambda</strong> control how much of that available flexibility actually gets used.</p>
+<p>So the knots set the ceiling, and lambda sets where under the ceiling you land. That’s why you tune lambda by cross-validation and generally leave the knot count alone. One tuning decision instead of two — and the one that’s easier to make honestly.</p>
+</section>
+</section>
+<section id="prophet-for-time-series-gams" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="prophet-for-time-series-gams"><span class="header-section-number">3.4</span> Prophet for Time Series GAMs</h2>
+<p>Facebook’s Prophet decomposes a time series into trend, seasonality, and holiday effects using a GAM.</p>
+<p>Part three. Prophet — a GAM built specifically for business time series.</p>
+<section id="prophet-forecasting-at-scale" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="prophet-forecasting-at-scale"><span class="header-section-number">3.4.1</span> Prophet: Forecasting at Scale</h3>
+<p><span class="citation" data-cites="TaylorLetham2018">@TaylorLetham2018</span> built Prophet for large-scale forecasting at Meta. It is a GAM in time-series clothing — the series is decomposed additively:</p>
+<p><span class="math display">\[y(t) = \underbrace{g(t)}_{\text{trend}} + \underbrace{s(t)}_{\text{seasonality}} + \underbrace{h(t)}_{\text{holidays}} + \varepsilon_t\]</span></p>
+<p><strong>Trend <span class="math inline">\(g(t)\)</span></strong> is piecewise linear or logistic, with <em>changepoints</em> where the slope is allowed to shift. <strong>Seasonality <span class="math inline">\(s(t)\)</span></strong> is a Fourier series, which is how Prophet handles weekly and yearly cycles simultaneously. <strong>Holidays <span class="math inline">\(h(t)\)</span></strong> are irregular events you supply yourself — Black Friday, a product launch, a lockdown.</p>
+<p>The design goals were practical rather than statistical: one fit-and-forecast call, robust to missing data and outliers, and interpretable because every component can be plotted on its own. That is why it spread so quickly among analysts who are not statisticians.</p>
+<p><span class="neutral smaller"><code>changepoint_prior_scale</code> controls trend flexibility: high adapts quickly and risks overfitting; low keeps the trend stable.</span></p>
+<p>Taylor and Letham built Prophet at Meta for large-scale forecasting. And it is a GAM in time-series clothing — look at the decomposition.</p>
+<p><span class="math inline">\(y\)</span> at time <span class="math inline">\(t\)</span> equals trend, plus seasonality, plus holidays, plus noise. Three additive components. That is the GAM structure from two slides ago, with the terms chosen for what business time series actually contain.</p>
+<p><strong>Trend</strong> is piecewise linear or logistic, with <em>changepoints</em> — specific dates where the slope is allowed to shift. That’s important, because real business series do change direction: a new competitor arrives, a store is renovated, a pandemic starts.</p>
+<p><strong>Seasonality</strong> is a Fourier series. That’s how Prophet handles weekly and yearly cycles simultaneously — something none of our Lecture 1 or 2 methods could do.</p>
+<p><strong>Holidays</strong> are irregular events you supply yourself. Black Friday. A product launch. A lockdown. These aren’t periodic, so no seasonal term captures them, and you tell Prophet the dates directly.</p>
+<p>Now — the design goals were practical rather than statistical. One fit-and-forecast call. Robust to missing data and outliers. Interpretable, because every component plots on its own. That’s why it spread so quickly among analysts who aren’t statisticians.</p>
+<p>Now let me be honest about its track record, because you’ll hear Prophet talked about as if it were state of the art, and it isn’t.</p>
+<p>In head-to-head comparisons, Prophet frequently <strong>loses</strong> to a well-tuned ARIMA or ETS on forecast error. Our own textbook says so directly — the authors note that Prophet rarely gives better accuracy than the alternatives. It did not win the M-competitions. It doesn’t top benchmark leaderboards. So why is it in this course, and why is it everywhere in industry?</p>
+<p>Because accuracy is not the only thing being optimized. Consider what Prophet actually gives an analyst: a defensible forecast in twenty minutes, from a series with gaps and outliers, with a component plot you can put in front of a manager who will ask what drove it.</p>
+<p>Getting an ARIMA to that same point takes stationarity testing, order identification, residual checking, and someone who knows what a PACF is. If you have that person, use ARIMA and get the better number. If you’re one analyst covering four hundred product lines, you do not have that person four hundred times.</p>
+<p>That’s the real lesson, and it goes wider than Prophet. <strong>The best model in a paper and the best model in an organization are frequently different models</strong>, and the gap between them is usually maintenance cost and explainability, not accuracy. Part of your job is knowing which one you’re being asked for.</p>
+<p>One knob to know: <code>changepoint_prior_scale</code>. High means the trend adapts quickly and risks overfitting. Low means a stable trend. It’s the main thing you’ll tune.</p>
+</section>
+<section id="prophet-code-and-workflow" class="level3" data-number="3.4.2">
+<h3 data-number="3.4.2" class="anchored" data-anchor-id="prophet-code-and-workflow"><span class="header-section-number">3.4.2</span> Prophet: Code and Workflow</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Prophet on Retail Sales</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'ds'</span>: dates, <span class="st">'y'</span>: sales})</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Prophet(changepoint_prior_scale<span class="op">=</span><span class="fl">0.05</span>, yearly_seasonality<span class="op">=</span><span class="va">True</span>).fit(df)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>future <span class="op">=</span> m.make_future_dataframe(periods<span class="op">=</span><span class="dv">12</span>, freq<span class="op">=</span><span class="st">'M'</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> m.predict(future)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>m.plot_components(forecast)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>plot_components</code> is the call that matters here: it draws the trend with its changepoints, the yearly wave, and the day-of-week pattern as separate panels — the additive structure made visible.</p>
+<p><strong>Reach for Prophet</strong> on seasonal series with known holiday effects, especially when someone will ask you to explain the forecast. <strong>Reach for pyGAM</strong> when you have many correlated external predictors instead.</p>
+<p>The code is genuinely this short.</p>
+<p>Build a dataframe with two columns — <code>ds</code> for dates and <code>y</code> for values. Prophet insists on those names. Instantiate, set the changepoint scale and turn on yearly seasonality, and fit. Then <code>make_future_dataframe</code> to extend the index forward, <code>predict</code>, and you have a forecast. But the call that matters for this course is the last one: <strong><code>plot_components</code></strong>.</p>
+<p>That draws the trend with its changepoints, the yearly seasonal wave, and the day-of-week pattern as three separate panels. It’s the additive structure made visible — you’re literally looking at the terms of the equation, one at a time.</p>
+<p>That plot is what you put in front of a manager. Not the forecast line — the components. It lets them check your model against their own knowledge of the business. “Yes, December looks right. No, that changepoint in March is wrong, that was the fire.” That conversation is worth more than a small RMSE improvement.</p>
+<p><strong>Reach for Prophet</strong> on seasonal series with known holiday effects, especially when someone will ask you to explain the forecast.</p>
+<p><strong>Reach for pyGAM</strong> when you have many correlated external predictors instead — which is where we’re going next.</p>
+</section>
+</section>
+<section id="pygam-for-general-additive-modeling" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="pygam-for-general-additive-modeling"><span class="header-section-number">3.5</span> pyGAM for General Additive Modeling</h2>
+<p>When you have multiple predictors and want flexible nonlinear effects for each.</p>
+<p>Part four. pyGAM, for when you have several predictors and want a flexible effect for each.</p>
+<section id="pygam-flexible-additive-modeling" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="pygam-flexible-additive-modeling"><span class="header-section-number">3.5.1</span> pyGAM: Flexible Additive Modeling</h3>
+<p><code>pyGAM</code> fits a GAM with a smooth function you specify per predictor:</p>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>pyGAM Example</p>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, f, l</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>gam <span class="op">=</span> LinearGAM(s(<span class="dv">0</span>) <span class="op">+</span> s(<span class="dv">1</span>) <span class="op">+</span> s(<span class="dv">2</span>) <span class="op">+</span> f(<span class="dv">3</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>gam <span class="op">=</span> gam.gridsearch(X, y)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>pdep, confi <span class="op">=</span> gam.partial_dependence(term<span class="op">=</span><span class="dv">0</span>, width<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>y_hat <span class="op">=</span> gam.predict(X_new)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The three term types are the whole vocabulary: <code>s(j)</code> is a smooth spline of feature <span class="math inline">\(j\)</span> — the flexible nonlinear effect; <code>l(j)</code> forces a straight line, which is worth using when theory says the effect should be linear; and <code>f(j)</code> handles a binary or categorical feature.</p>
+<p><code>gridsearch</code> then tunes <span class="math inline">\(\lambda\)</span> by cross-validation — though you should still look at the resulting curves and ask whether they are plausible.</p>
+<p>Prophet is specialized for time structure. pyGAM is the general case: you specify a smooth function per predictor and it fits the whole additive model.</p>
+<p>The code shows the pattern. Import, then build the model by <em>adding terms together</em> — which is a rather nice piece of API design, because the code mirrors the equation. Three term types, and that’s the whole vocabulary.</p>
+<p><strong><code>s(j)</code></strong> is a smooth spline of feature <span class="math inline">\(j\)</span>. The flexible nonlinear effect. This is the default and the reason you’re using a GAM.</p>
+<p><strong><code>l(j)</code></strong> forces a straight line. Worth using deliberately when theory says the effect should be linear — don’t spend flexibility where you don’t need it. <strong><code>f(j)</code></strong> handles a binary or categorical feature — a factor. Then <code>gridsearch</code> tunes lambda by cross-validation, so you don’t pick it yourself.</p>
+<p>One habit I’d ask you to build: after <code>gridsearch</code> returns, <strong>look at the curves</strong>. The search optimizes held-out error, and it will happily give you a curve that’s statistically optimal and economically absurd — sales rising as unemployment rises, say. When that happens the model isn’t broken; it’s telling you something is confounded. But you only find out if you look.</p>
+<p>And there’s a specific failure worth naming, because it has a name and it will bite you: <strong>concurvity</strong>.</p>
+<p>You know multicollinearity from regression — two predictors so correlated that the model can’t tell which one is doing the work, so the coefficients go unstable and flip sign between samples.</p>
+<p>Concurvity is the same disease in a GAM, but worse, because the terms are <em>smooth functions</em> rather than straight lines. One smooth term can mimic another even when the raw variables aren’t strongly correlated at all. A smooth function of time and a smooth function of a trending economic indicator can trace nearly the same shape — and the model has no principled way to allocate credit between them.</p>
+<p>The symptom is a partial dependence plot that looks wrong or wildly uncertain, and that changes a lot when you drop an apparently unrelated variable.</p>
+<p>The reason it matters more here than in ordinary regression is that GAMs are sold on interpretability. Under concurvity, the individual curves become unreliable <em>even when the overall forecast is fine</em>. So you get a model that predicts well and explains badly — which is precisely the thing you chose a GAM to avoid. pyGAM won’t warn you. Check by dropping terms and seeing whether the remaining curves hold their shape.</p>
+</section>
+<section id="interpreting-gam-results-partial-dependence-plots" class="level3" data-number="3.5.2">
+<h3 data-number="3.5.2" class="anchored" data-anchor-id="interpreting-gam-results-partial-dependence-plots"><span class="header-section-number">3.5.2</span> Interpreting GAM Results: Partial Dependence Plots</h3>
+<p>A partial dependence plot shows <span class="math inline">\(\hat{f}_j(x_j)\)</span> across the observed range, with confidence bands. Reading the shape is most of the interpretation.</p>
+<div style="text-align:center">
+<svg viewbox="0 0 340 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;height:auto" role="img" aria-label="Three partial dependence shapes: flat, rising, U-shaped">
+<text x="55.0" y="10" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">Flat</text><polygon points="13.0,17.5 15.1,18.6 17.2,19.7 19.3,20.7 21.4,21.7 23.5,22.6 25.6,23.5 27.7,24.3 29.8,25.0 31.9,25.7 34.0,26.3 36.1,26.8 38.2,27.3 40.3,27.8 42.4,28.2 44.5,28.5 46.6,28.7 48.7,29.0 50.8,29.1 52.9,29.2 55.0,29.2 57.1,29.2 59.2,29.1 61.3,29.0 63.4,28.7 65.5,28.5 67.6,28.2 69.7,27.8 71.8,27.3 73.9,26.8 76.0,26.3 78.1,25.7 80.2,25.0 82.3,24.3 84.4,23.5 86.5,22.6 88.6,21.7 90.7,20.7 92.8,19.7 94.9,18.6 97.0,17.5 97.0,48.5 94.9,47.4 92.8,46.3 90.7,45.3 88.6,44.3 86.5,43.4 84.4,42.5 82.3,41.7 80.2,41.0 78.1,40.3 76.0,39.7 73.9,39.2 71.8,38.7 69.7,38.2 67.6,37.8 65.5,37.5 63.4,37.3 61.3,37.0 59.2,36.9 57.1,36.8 55.0,36.8 52.9,36.8 50.8,36.9 48.7,37.0 46.6,37.3 44.5,37.5 42.4,37.8 40.3,38.2 38.2,38.7 36.1,39.2 34.0,39.7 31.9,40.3 29.8,41.0 27.7,41.7 25.6,42.5 23.5,43.4 21.4,44.3 19.3,45.3 17.2,46.3 15.1,47.4 13.0,48.5" fill="#D71920" fill-opacity=".13"></polygon><polyline points="13.0,33.0 15.1,33.0 17.2,33.0 19.3,33.0 21.4,33.0 23.5,33.0 25.6,33.0 27.7,33.0 29.8,33.0 31.9,33.0 34.0,33.0 36.1,33.0 38.2,33.0 40.3,33.0 42.4,33.0 44.5,33.0 46.6,33.0 48.7,33.0 50.8,33.0 52.9,33.0 55.0,33.0 57.1,33.0 59.2,33.0 61.3,33.0 63.4,33.0 65.5,33.0 67.6,33.0 69.7,33.0 71.8,33.0 73.9,33.0 76.0,33.0 78.1,33.0 80.2,33.0 82.3,33.0 84.4,33.0 86.5,33.0 88.6,33.0 90.7,33.0 92.8,33.0 94.9,33.0 97.0,33.0" fill="none" stroke="#D71920" stroke-width="2.2"></polyline><line x1="13" y1="56" x2="101" y2="56" stroke="currentColor" stroke-opacity=".55"></line><line x1="13" y1="14" x2="13" y2="56" stroke="currentColor" stroke-opacity=".55"></line><text x="55.0" y="74" font-size="9" text-anchor="middle" fill="currentColor" opacity=".75">no effect at all</text> <text x="165.0" y="10" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">Rising</text><polygon points="123.0,33.4 125.1,29.8 127.2,28.7 129.3,28.0 131.4,27.5 133.5,27.1 135.6,26.7 137.7,26.4 139.8,26.0 141.9,25.7 144.0,25.4 146.1,25.0 148.2,24.7 150.3,24.3 152.4,23.8 154.5,23.4 156.6,22.9 158.7,22.4 160.8,21.8 162.9,21.2 165.0,20.5 167.1,19.8 169.2,19.1 171.3,18.3 173.4,17.4 175.5,16.6 177.6,15.6 179.7,14.6 181.8,13.6 183.9,12.5 186.0,11.4 188.1,10.2 190.2,9.0 192.3,7.7 194.4,6.4 196.5,5.0 198.6,3.6 200.7,2.1 202.8,0.5 204.9,-1.1 207.0,-2.7 207.0,28.4 204.9,27.7 202.8,27.2 200.7,26.6 198.6,26.2 196.5,25.8 194.4,25.5 192.3,25.2 190.2,25.0 188.1,24.9 186.0,24.8 183.9,24.9 181.8,24.9 179.7,25.1 177.6,25.3 175.5,25.6 173.4,25.9 171.3,26.4 169.2,26.9 167.1,27.4 165.0,28.1 162.9,28.8 160.8,29.6 158.7,30.4 156.6,31.4 154.5,32.4 152.4,33.5 150.3,34.7 148.2,36.0 146.1,37.4 144.0,38.8 141.9,40.4 139.8,42.1 137.7,43.9 135.6,45.8 133.5,47.8 131.4,50.1 129.3,52.5 127.2,55.3 125.1,58.6 123.0,64.5" fill="#D71920" fill-opacity=".13"></polygon><polyline points="123.0,49.0 125.1,44.2 127.2,42.0 129.3,40.3 131.4,38.8 133.5,37.5 135.6,36.2 137.7,35.1 139.8,34.1 141.9,33.1 144.0,32.1 146.1,31.2 148.2,30.3 150.3,29.5 152.4,28.7 154.5,27.9 156.6,27.1 158.7,26.4 160.8,25.7 162.9,25.0 165.0,24.3 167.1,23.6 169.2,23.0 171.3,22.3 173.4,21.7 175.5,21.1 177.6,20.5 179.7,19.9 181.8,19.3 183.9,18.7 186.0,18.1 188.1,17.6 190.2,17.0 192.3,16.5 194.4,15.9 196.5,15.4 198.6,14.9 200.7,14.4 202.8,13.8 204.9,13.3 207.0,12.8" fill="none" stroke="#D71920" stroke-width="2.2"></polyline><line x1="123" y1="56" x2="211" y2="56" stroke="currentColor" stroke-opacity=".55"></line><line x1="123" y1="14" x2="123" y2="56" stroke="currentColor" stroke-opacity=".55"></line><text x="165.0" y="74" font-size="9" text-anchor="middle" fill="currentColor" opacity=".75">positive, changing rate</text> <text x="275.0" y="10" font-size="10" font-weight="600" text-anchor="middle" fill="currentColor">U-shaped</text><polygon points="233.0,-0.3 235.1,3.6 237.2,7.3 239.3,10.9 241.4,14.2 243.5,17.3 245.6,20.3 247.7,23.0 249.8,25.6 251.9,27.9 254.0,30.1 256.1,32.0 258.2,33.8 260.3,35.4 262.4,36.8 264.5,37.9 266.6,38.9 268.7,39.7 270.8,40.3 272.9,40.7 275.0,40.9 277.1,40.9 279.2,40.8 281.3,40.4 283.4,39.8 285.5,39.0 287.6,38.1 289.7,36.9 291.8,35.6 293.9,34.0 296.0,32.3 298.1,30.3 300.2,28.2 302.3,25.9 304.4,23.3 306.5,20.6 308.6,17.7 310.7,14.6 312.8,11.3 314.9,7.8 317.0,4.1 317.0,35.1 314.9,36.5 312.8,37.9 310.7,39.1 308.6,40.3 306.5,41.4 304.4,42.4 302.3,43.4 300.2,44.2 298.1,45.0 296.0,45.7 293.9,46.3 291.8,46.9 289.7,47.4 287.6,47.8 285.5,48.1 283.4,48.3 281.3,48.5 279.2,48.6 277.1,48.6 275.0,48.5 272.9,48.3 270.8,48.1 268.7,47.8 266.6,47.4 264.5,47.0 262.4,46.4 260.3,45.8 258.2,45.1 256.1,44.4 254.0,43.5 251.9,42.6 249.8,41.6 247.7,40.5 245.6,39.4 243.5,38.1 241.4,36.8 239.3,35.4 237.2,33.9 235.1,32.4 233.0,30.8" fill="#D71920" fill-opacity=".13"></polygon><polyline points="233.0,15.2 235.1,18.0 237.2,20.6 239.3,23.1 241.4,25.5 243.5,27.7 245.6,29.8 247.7,31.8 249.8,33.6 251.9,35.3 254.0,36.8 256.1,38.2 258.2,39.5 260.3,40.6 262.4,41.6 264.5,42.5 266.6,43.2 268.7,43.8 270.8,44.2 272.9,44.5 275.0,44.7 277.1,44.8 279.2,44.7 281.3,44.4 283.4,44.1 285.5,43.6 287.6,42.9 289.7,42.1 291.8,41.2 293.9,40.2 296.0,39.0 298.1,37.7 300.2,36.2 302.3,34.6 304.4,32.9 306.5,31.0 308.6,29.0 310.7,26.8 312.8,24.6 314.9,22.2 317.0,19.6" fill="none" stroke="#D71920" stroke-width="2.2"></polyline><line x1="233" y1="56" x2="321" y2="56" stroke="currentColor" stroke-opacity=".55"></line><line x1="233" y1="14" x2="233" y2="56" stroke="currentColor" stroke-opacity=".55"></line><text x="275.0" y="74" font-size="9" text-anchor="middle" fill="currentColor" opacity=".75">an optimal level exists</text>
+</svg>
+</div>
+<p>Watch the <strong>bands</strong> as much as the curve — they widen where the data thin out, which is exactly where a reader is tempted to extrapolate.</p>
+<div class="keybox">
+<p>The output is a sentence someone can act on: <em>“as unemployment rises from 5% to 10%, predicted sales fall by <span class="math inline">\(X\)</span>% — and the decline steepens past 8%.”</em> No linear model could tell them that second clause.</p>
+</div>
+<p>This is the payoff slide — the thing you actually deliver.</p>
+<p>A partial dependence plot shows the estimated function <span class="math inline">\(f\)</span>-hat-<span class="math inline">\(j\)</span> across the range of values actually observed, with confidence bands around it. Reading the shape is most of the interpretation.</p>
+<p>A <strong>flat line</strong> means the variable does nothing for <span class="math inline">\(y\)</span>. And notice — in a linear model that variable might still have had a significant coefficient. Here you see immediately that it isn’t buying you anything.</p>
+<p>A <strong>rising curve</strong> means a positive effect, but not at a constant rate. That’s the case a linear model would report as a single number and get wrong at both ends.</p>
+<p>A <strong>U-shape</strong> means there’s an optimal level, and both too little and too much are worse. Inventory works like this. So does advertising spend. A linear model finds a slope near zero here and concludes the variable doesn’t matter — which is exactly backwards.</p>
+<p>Watch the bands as well as the curve. They widen wherever the data thin out, which is usually at the extremes — exactly where a reader is most tempted to extrapolate. If the band is wide, the curve there is a guess. Say so.</p>
+<p>And this is what makes a GAM worth its accuracy cost. The output isn’t a number. It’s a sentence someone can act on: <em>“as unemployment rises from 5% to 10%, predicted sales fall by X percent — and the decline steepens past 8%.”</em> That second clause is the part no linear model could ever have told them.</p>
+</section>
+</section>
+<section id="key-takeaways-and-roadmap" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="key-takeaways-and-roadmap"><span class="header-section-number">3.6</span> Key Takeaways and Roadmap</h2>
+<p>GAMs: flexible, interpretable, and underutilized in business forecasting.</p>
+<p>Let’s pull it together — and set up where the course goes next.</p>
+<section id="gams-vs.-other-methods-when-to-choose-each" class="level3" data-number="3.6.1">
+<h3 data-number="3.6.1" class="anchored" data-anchor-id="gams-vs.-other-methods-when-to-choose-each"><span class="header-section-number">3.6.1</span> GAMs vs.&nbsp;Other Methods: When to Choose Each</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Nonlinear</th>
+<th>Interactions</th>
+<th>Interpretable</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ARIMA / ETS</td>
+<td>No</td>
+<td>No</td>
+<td>High</td>
+<td>Univariate time series</td>
+</tr>
+<tr class="even">
+<td>Linear regression</td>
+<td>No</td>
+<td>Manual</td>
+<td>High</td>
+<td>Few predictors</td>
+</tr>
+<tr class="odd">
+<td><strong>GAM</strong></td>
+<td>Yes</td>
+<td>No</td>
+<td>High</td>
+<td>Few predictors, explain effects</td>
+</tr>
+<tr class="even">
+<td>Random Forest</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Medium</td>
+<td>Many predictors, tabular</td>
+</tr>
+<tr class="odd">
+<td>XGBoost</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Low</td>
+<td>Best accuracy, tabular</td>
+</tr>
+</tbody>
+</table>
+<p>The column that decides it is usually <strong>Interactions</strong>. A GAM is additive by construction, so if the effect of price genuinely depends on whether it is a holiday week, a GAM cannot represent that and a tree can.</p>
+<p><strong>Choose a GAM when</strong> you must explain each predictor’s effect, when those effects are curved rather than straight, when a time series has complex trend and seasonality (reach for Prophet), and when interpretability matters more than the last few points of accuracy. That last clause is the honest one — on tabular data, XGBoost will usually win on RMSE, and Lecture 6 is where we take that seriously.</p>
+<p>This table is the honest summary of the whole course so far, and it’s worth reading down the columns rather than across.</p>
+<p>ARIMA and ETS: not nonlinear, no interactions, highly interpretable, univariate time series. Linear regression: same, with manual interactions if you build them. GAM: <strong>nonlinear, yes. Interactions, no. Interpretable, high.</strong> Random Forest: nonlinear and interactions, medium interpretability. XGBoost: same, but low. The column that decides it is usually <strong>Interactions</strong>.</p>
+<p>A GAM is additive by construction. That’s the source of its interpretability, and it’s also a hard limit. If the effect of price genuinely depends on whether it’s a holiday week, a GAM cannot represent that. A tree can — that’s exactly what a tree does, and it’s why the next three lectures exist.</p>
+<p>So the additivity is a bargain, not a free lunch. You buy explainability with the ability to model interactions.</p>
+<p><strong>Choose a GAM when</strong> you must explain each predictor’s effect. When those effects are curved rather than straight. When a time series has complex trend and seasonality — reach for Prophet. And when interpretability matters more than the last few points of accuracy.</p>
+<p>That last clause is the honest one. On tabular data, XGBoost will usually win on RMSE. Lecture 6 is where we take that seriously and stop pretending otherwise.</p>
+</section>
+<section id="lecture-3-key-takeaways" class="level3" data-number="3.6.2">
+<h3 data-number="3.6.2" class="anchored" data-anchor-id="lecture-3-key-takeaways"><span class="header-section-number">3.6.2</span> Lecture 3: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p><strong>GAMs</strong> offer nonlinear flexibility while maintaining interpretability: <span class="math inline">\(y = \alpha + f_1(x_1) + f_2(x_2) + \cdots + f_k(x_k) + \varepsilon\)</span>. Because the model is additive, each variable’s effect can be visualized and explained independently.</p></li>
+<li><p><strong>Smoothness penalty</strong> (PSSE) prevents overfitting. The penalty <span class="math inline">\(\lambda\)</span> controls the trade-off between fit and smoothness. It is chosen by cross-validation.</p></li>
+<li><p><strong>Prophet</strong> decomposes a time series into trend, seasonality, and holiday effects using a GAM. Ideal for business time series with seasonal patterns and known irregular events.</p></li>
+<li><p><strong>pyGAM</strong> fits a general GAM with any combination of predictors. Use <code>s()</code> for smooth effects, <code>l()</code> for linear, <code>f()</code> for categorical. <code>gridsearch</code> tunes <span class="math inline">\(\lambda\)</span> automatically.</p></li>
+<li><p>Partial dependence plots make results <strong>actionable for stakeholders</strong>: show clearly how each variable affects the forecast.</p></li>
+</ol>
+</div>
+<p><em>Next: Decision Trees — moving to tree-based methods that capture interactions automatically.</em></p>
+<p>Five things.</p>
+<p><strong>One.</strong> GAMs give nonlinear flexibility while keeping interpretability, because the model is additive. Each variable’s effect can be visualized and explained independently.</p>
+<p><strong>Two.</strong> The smoothness penalty prevents overfitting. Lambda trades fit against smoothness, and it’s chosen by cross-validation — never by eye.</p>
+<p><strong>Three.</strong> Prophet decomposes a series into trend, seasonality, and holidays using a GAM. Ideal for business series with seasonal patterns and known irregular events.</p>
+<p><strong>Four.</strong> pyGAM handles the general case. <code>s()</code> for smooth, <code>l()</code> for linear, <code>f()</code> for categorical, and <code>gridsearch</code> for lambda. <strong>Five.</strong> Partial dependence plots are what make results actionable. They’re what you deliver.</p>
+<p>And the meta-point, which matters more than any of the five: this is the last method in the course that is both genuinely nonlinear and genuinely explainable. From next week, every increase in flexibility costs you something in interpretability, and part of your job as a forecaster is deciding when that trade is worth making.</p>
+</section>
+<section id="references" class="level3" data-number="3.6.3">
+<h3 data-number="3.6.3" class="anchored" data-anchor-id="references"><span class="header-section-number">3.6.3</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+<p>Readings are in the syllabus — section 7.7 for regression splines, and 12.1 and 12.2 for complex seasonality and Prophet.</p>
+<p>Next week: Decision Trees. We move to tree-based methods, and the first thing we gain is exactly what we gave up today — interactions, captured automatically. See you then.</p>
+</section>
+</section>
+<section id="timing-guide" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="timing-guide"><span class="header-section-number">3.7</span> Timing guide</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Segment</th>
+<th>Slides</th>
+<th style="text-align: right;">Target</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Opening &amp; motivation</td>
+<td>1–5</td>
+<td style="text-align: right;">~9 min</td>
+</tr>
+<tr class="even">
+<td>GAM structure, links &amp; smoothing</td>
+<td>6–9</td>
+<td style="text-align: right;">~10 min</td>
+</tr>
+<tr class="odd">
+<td>Prophet</td>
+<td>10–12</td>
+<td style="text-align: right;">~9 min</td>
+</tr>
+<tr class="even">
+<td>pyGAM &amp; interpretation</td>
+<td>13–15</td>
+<td style="text-align: right;">~9 min</td>
+</tr>
+<tr class="odd">
+<td>Close</td>
+<td>16–19</td>
+<td style="text-align: right;">~5 min</td>
+</tr>
+</tbody>
+</table>
+<p>If you need to compress, slide 13’s term-type list survives trimming. Do <strong>not</strong> compress slides 5, 14, or 16 — the additivity argument, the partial dependence plot, and the interactions tradeoff are the three ideas this lecture exists to deliver.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture02_ARIMA_VAR.html" class="pagination-link" aria-label="ARIMA, VAR &amp; Multivariate Models">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture04_DecisionTrees.html" class="pagination-link" aria-label="Decision Trees">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

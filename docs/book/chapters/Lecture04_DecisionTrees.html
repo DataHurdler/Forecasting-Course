@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Decision Trees – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture05_TreeEnsembles.html" rel="next">
+<link href="../chapters/Lecture03_GAMs.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture04_DecisionTrees.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">4.1</span> Lecture Outline</a></li>
+  <li><a href="#why-go-beyond-linear-models" id="toc-why-go-beyond-linear-models" class="nav-link" data-scroll-target="#why-go-beyond-linear-models"><span class="header-section-number">4.2</span> Why Go Beyond Linear Models?</a>
+  <ul class="collapse">
+  <li><a href="#the-limits-of-linear-models" id="toc-the-limits-of-linear-models" class="nav-link" data-scroll-target="#the-limits-of-linear-models"><span class="header-section-number">4.2.1</span> The Limits of Linear Models</a></li>
+  <li><a href="#the-biasvariance-tradeoff" id="toc-the-biasvariance-tradeoff" class="nav-link" data-scroll-target="#the-biasvariance-tradeoff"><span class="header-section-number">4.2.2</span> The Bias–Variance Tradeoff</a></li>
+  </ul></li>
+  <li><a href="#how-decision-trees-work" id="toc-how-decision-trees-work" class="nav-link" data-scroll-target="#how-decision-trees-work"><span class="header-section-number">4.3</span> How Decision Trees Work</a>
+  <ul class="collapse">
+  <li><a href="#what-is-a-decision-tree" id="toc-what-is-a-decision-tree" class="nav-link" data-scroll-target="#what-is-a-decision-tree"><span class="header-section-number">4.3.1</span> What Is a Decision Tree?</a></li>
+  <li><a href="#the-cart-algorithm-regression" id="toc-the-cart-algorithm-regression" class="nav-link" data-scroll-target="#the-cart-algorithm-regression"><span class="header-section-number">4.3.2</span> The CART Algorithm (Regression)</a></li>
+  <li><a href="#greedy-is-not-optimal-and-that-matters" id="toc-greedy-is-not-optimal-and-that-matters" class="nav-link" data-scroll-target="#greedy-is-not-optimal-and-that-matters"><span class="header-section-number">4.3.3</span> Greedy Is Not Optimal — and That Matters</a></li>
+  <li><a href="#depth-controls-the-biasvariance-tradeoff" id="toc-depth-controls-the-biasvariance-tradeoff" class="nav-link" data-scroll-target="#depth-controls-the-biasvariance-tradeoff"><span class="header-section-number">4.3.4</span> Depth Controls the Bias–Variance Tradeoff</a></li>
+  <li><a href="#two-ways-to-stop-a-tree-overfitting" id="toc-two-ways-to-stop-a-tree-overfitting" class="nav-link" data-scroll-target="#two-ways-to-stop-a-tree-overfitting"><span class="header-section-number">4.3.5</span> Two Ways to Stop a Tree Overfitting</a></li>
+  </ul></li>
+  <li><a href="#implementing-decision-trees-in-python" id="toc-implementing-decision-trees-in-python" class="nav-link" data-scroll-target="#implementing-decision-trees-in-python"><span class="header-section-number">4.4</span> Implementing Decision Trees in Python</a>
+  <ul class="collapse">
+  <li><a href="#decision-tree-regression-in-python" id="toc-decision-tree-regression-in-python" class="nav-link" data-scroll-target="#decision-tree-regression-in-python"><span class="header-section-number">4.4.1</span> Decision Tree Regression in Python</a></li>
+  <li><a href="#feature-importance" id="toc-feature-importance" class="nav-link" data-scroll-target="#feature-importance"><span class="header-section-number">4.4.2</span> Feature Importance</a></li>
+  <li><a href="#interpreting-and-communicating-tree-predictions" id="toc-interpreting-and-communicating-tree-predictions" class="nav-link" data-scroll-target="#interpreting-and-communicating-tree-predictions"><span class="header-section-number">4.4.3</span> Interpreting and Communicating Tree Predictions</a></li>
+  </ul></li>
+  <li><a href="#limitations-and-preview-ensembles" id="toc-limitations-and-preview-ensembles" class="nav-link" data-scroll-target="#limitations-and-preview-ensembles"><span class="header-section-number">4.5</span> Limitations and Preview: Ensembles</a>
+  <ul class="collapse">
+  <li><a href="#when-a-single-tree-falls-short" id="toc-when-a-single-tree-falls-short" class="nav-link" data-scroll-target="#when-a-single-tree-falls-short"><span class="header-section-number">4.5.1</span> When a Single Tree Falls Short</a></li>
+  <li><a href="#lecture-4-key-takeaways" id="toc-lecture-4-key-takeaways" class="nav-link" data-scroll-target="#lecture-4-key-takeaways"><span class="header-section-number">4.5.2</span> Lecture 4: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">4.5.3</span> References</a></li>
+  </ul></li>
+  <li><a href="#timing-guide" id="toc-timing-guide" class="nav-link" data-scroll-target="#timing-guide"><span class="header-section-number">4.6</span> Timing guide</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 4 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">4.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Why Go Beyond Linear Models?</li>
+<li>How Decision Trees Work</li>
+<li>Implementing Decision Trees in Python</li>
+<li>Limitations and Preview: Ensembles</li>
+</ol>
+<p>Four parts. Why we go beyond linear models. How a tree actually works. Implementing one in Python. And where a single tree falls short — which sets up the next two weeks.</p>
+</section>
+<section id="why-go-beyond-linear-models" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="why-go-beyond-linear-models"><span class="header-section-number">4.2</span> Why Go Beyond Linear Models?</h2>
+<p>Real-world relationships are often nonlinear, involve interactions, and shift with context.</p>
+<p>Part one. What linear models can’t represent.</p>
+<section id="the-limits-of-linear-models" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="the-limits-of-linear-models"><span class="header-section-number">4.2.1</span> The Limits of Linear Models</h3>
+<p><strong>Three things a constant slope cannot represent:</strong></p>
+<ul>
+<li><strong>Interactions</strong> — the holiday-season advertising effect is not a constant slope</li>
+<li><strong>Threshold effects</strong> — spending may be flat until unemployment drops below 5%, then jump</li>
+<li><strong>Asymmetry</strong> — extreme values distort coefficients equally in both directions</li>
+</ul>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Retail Sales Example</p>
+</div>
+<p>Monthly sales depend on last year’s same-month sales (trend), whether it is December (seasonality), and the unemployment rate (conditions). The December effect is <em>larger</em> in a strong economy — an interaction a linear model misses.</p>
+</div>
+<p><strong>Decision trees capture nonlinearity and interactions automatically</strong>, without your having to specify them in advance.</p>
+<p>Three things a constant slope cannot do.</p>
+<p><strong>Interactions.</strong> The effect of advertising during the holiday season isn’t the same as its effect in March. A linear model can only assign advertising one slope. You can add an interaction term by hand — but only if you already suspected it was there.</p>
+<p><strong>Threshold effects.</strong> Spending might be flat while unemployment sits above five percent, then move sharply once it drops below. That’s a kink. A straight line has no kinks.</p>
+<p><strong>Asymmetry.</strong> Extreme values pull coefficients equally hard in both directions, whether or not the underlying relationship is symmetric.</p>
+<p>The retail example on the slide ties them together. Monthly sales depend on last year’s same-month sales, on whether it’s December, and on the unemployment rate. And the December effect is <em>larger</em> in a strong economy — that’s an interaction between seasonality and the macro environment.</p>
+<p>A linear model can represent each of those three variables. It cannot represent the fact that they modify each other.</p>
+<p><strong>Decision trees capture nonlinearity and interactions automatically.</strong> That’s the promise. The rest of the lecture is about the mechanism and the cost.</p>
+</section>
+<section id="the-biasvariance-tradeoff" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="the-biasvariance-tradeoff"><span class="header-section-number">4.2.2</span> The Bias–Variance Tradeoff</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Bias–Variance Decomposition</p>
+</div>
+<p><span class="math display">\[\text{Expected MSE} = \underbrace{\text{Bias}^2}_{\text{systematic error}} + \underbrace{\text{Variance}}_{\text{sensitivity to data}} + \underbrace{\sigma^2}_{\text{irreducible noise}}\]</span></p>
+</div>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>High bias (underfitting):</strong></p>
+<ul>
+<li>Model is too simple</li>
+<li>Misses real patterns in the data</li>
+<li>Bad on both training AND test sets</li>
+<li>Example: linear model on a curved relationship</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>High variance (overfitting):</strong></p>
+<ul>
+<li>Model is too complex</li>
+<li>Memorizes training data noise</li>
+<li>Great on training, bad on test set</li>
+<li>Example: a very deep decision tree</li>
+</ul>
+</div>
+</div>
+<p><strong>Goal:</strong> find the complexity that balances the two — which you can only see <em>out-of-sample</em>.</p>
+<p>Before the tree itself, the framework we’ll use to judge every model from here to December. Expected mean squared error decomposes into three pieces: bias squared, variance, and irreducible noise.</p>
+<p><strong>Bias</strong> is systematic error — the model is too simple to represent the truth. A straight line through a curved relationship has bias, and collecting more data won’t fix it.</p>
+<p><strong>Variance</strong> is sensitivity to the particular sample you happened to draw. A model with high variance would look quite different if you’d collected a different year of data.</p>
+<p><strong>Sigma squared</strong> is irreducible noise. And I want to be precise here, because this gets misstated: sigma squared is a property of the data-generating process, not of your sample. It is not “the error you’d remove with better data.” More observations shrink variance. Nothing shrinks sigma squared. Now the two columns.</p>
+<p><strong>High bias — underfitting.</strong> Model too simple, misses real patterns, and — this is the diagnostic — performs badly on <em>both</em> training and test sets. If your model is bad on data it has already seen, it’s underfitting.</p>
+<p><strong>High variance — overfitting.</strong> Model too complex, memorizes noise, great on training, bad on test. The gap between the two is the tell.</p>
+<p>Concretely, from work you’ve already done. In Homework 1 the undamped Holt model had <strong>low bias</strong> — it fit the training data’s upward trend faithfully — and <strong>high variance</strong> in the sense that matters here: it was exquisitely sensitive to the trend estimated from that particular window, and when the trend flattened it was catastrophically wrong. The seasonal naive benchmark had more bias and far less sensitivity, and it won.</p>
+<p>That’s the tradeoff, and it wasn’t a story about trees. It’s the frame for everything.</p>
+<p>The goal is the complexity that balances them, and you can only find it out-of-sample. Which is why Lecture 1 spent so long on that rule.</p>
+</section>
+</section>
+<section id="how-decision-trees-work" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="how-decision-trees-work"><span class="header-section-number">4.3</span> How Decision Trees Work</h2>
+<p>Partition the feature space into rectangles; predict the mean in each region.</p>
+<p>Part two. The mechanism — partition the feature space, predict the mean in each region.</p>
+<section id="what-is-a-decision-tree" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="what-is-a-decision-tree"><span class="header-section-number">4.3.1</span> What Is a Decision Tree?</h3>
+<p>A decision tree is a flowchart: ask yes/no questions about the features to arrive at a prediction.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+    A["y(t-12) &amp;le; 38,000?"] --&gt;|Yes| B["ŷ = 28,400"]
+    A --&gt;|No| C["y(t-1) &amp;le; 52,000?"]
+    C --&gt;|Yes| D["ŷ = 44,100"]
+    C --&gt;|No| E["ŷ = 61,300"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p><strong>Non-parametric</strong> · <strong>nonlinear</strong> (captures thresholds) · <strong>interpretable</strong> · <strong>scale-invariant</strong> · handles lags, rolling statistics, and dummies together.</p>
+<p>A single <em>deep</em> tree <strong>overfits severely</strong>. Ensembles are the fix, and are where the next two lectures go.</p>
+<p>Here’s the whole idea in one picture. A tree asks a series of yes/no questions about the features and arrives at a prediction.</p>
+<p>Start at the top. Was last year’s same-month sales below thirty-eight thousand? If yes, go left, and we’re done — the forecast is twenty-eight thousand four hundred.</p>
+<p>If no, go right, and there’s a second question: was last month above fifty-two thousand? If yes, forecast forty-four thousand one hundred. If no, sixty-one thousand three hundred. That’s it. Every prediction is the answer at the bottom of one path. Four properties worth naming.</p>
+<p>It’s <strong>non-parametric</strong> — no functional form is assumed anywhere. It’s <strong>nonlinear</strong>, and notice it captures a threshold effect natively, which is what a linear model couldn’t do. It’s <strong>interpretable</strong>, because you can trace the exact path. And it’s <strong>scale-invariant</strong> — no standardization needed, because the tree only ever asks “is this value above or below a threshold,” and that question doesn’t care about units. That last one will matter in Lecture 6, where standardization becomes mandatory.</p>
+<p>And the warning at the bottom is the whole reason Lectures 5 and 6 exist: a single deep tree overfits severely.</p>
+</section>
+<section id="the-cart-algorithm-regression" class="level3" data-number="4.3.2">
+<h3 data-number="4.3.2" class="anchored" data-anchor-id="the-cart-algorithm-regression"><span class="header-section-number">4.3.2</span> The CART Algorithm (Regression)</h3>
+<p><strong>CART</strong> builds the tree greedily, top to bottom. At each node it searches over every feature <span class="math inline">\(j\)</span> and threshold <span class="math inline">\(t\)</span> for the split that most reduces within-region variance:</p>
+<p><span class="math display">\[\min_{j,\, t} \left[ \sum_{i: x_{ij} \leq t} (y_i - \bar{y}_{L})^2 + \sum_{i: x_{ij} &gt; t} (y_i - \bar{y}_{R})^2 \right]\]</span></p>
+<p>Start with all the data at the root; split until nodes get too small or a depth cap is reached. The <strong>prediction</strong> at a leaf is simply the mean of the observations that land there.</p>
+<p>At every node the algorithm is really asking: <em>“what is the single yes/no question that best separates high-sales months from low-sales months?”</em> — then repeating it within each group.</p>
+<p><span class="neutral smaller">For classification, replace variance with Gini impurity or entropy (information gain).</span></p>
+<p>How does the tree decide what to ask?</p>
+<p>CART builds greedily, top to bottom. At each node it searches over <strong>every feature and every possible threshold</strong>, and picks the split that most reduces within-region variance.</p>
+<p>Look at what’s being minimized: the sum of squared deviations from the mean in the left region plus the same in the right. Split the data in two, and ask how much total variability you removed. Hold onto the word <strong>greedily</strong> — the next slide is entirely about what it costs. The prediction at a leaf is just the mean of the training observations that landed there.</p>
+<p>The framing I’d offer: at every node the algorithm is asking <em>“what is the single yes/no question that best separates high-sales months from low-sales months?”</em> Then it repeats that question within each group.</p>
+<p>Let me turn the crank once, on our actual data, because the arithmetic is less mysterious than the notation.</p>
+<p>Take CA_1 food sales — two hundred seventy-three weeks. Before any split, the mean is about nineteen thousand eight hundred units, and the total sum of squared deviations around that mean is roughly <strong>one point nine billion</strong>. That number is large because units are large and we’re squaring; ignore its scale and watch what happens to it.</p>
+<p>Now the algorithm tries every feature and every threshold. The winner is: <em>was the four-week lag at or below eighteen thousand six hundred?</em></p>
+<p>That splits the data into eighty-five weeks on the left, averaging about <strong>sixteen thousand nine hundred</strong>, and one hundred eighty-eight weeks on the right, averaging about <strong>twenty-one thousand one hundred</strong>.</p>
+<p>Add up the squared deviations <em>within</em> each of those two groups and you get about <strong>nine hundred million</strong>.</p>
+<p>One point nine billion down to nine hundred million. <strong>A single yes/no question removed fifty-two percent of the variance.</strong></p>
+<p>That’s the entire algorithm. Ask the question that removes the most variance, then repeat inside each group, then repeat again — until the groups get too small or you hit the depth cap.</p>
+<p>For classification, replace variance with Gini impurity or entropy. Same algorithm, different measure of how mixed a region is.</p>
+</section>
+<section id="greedy-is-not-optimal-and-that-matters" class="level3" data-number="4.3.3">
+<h3 data-number="4.3.3" class="anchored" data-anchor-id="greedy-is-not-optimal-and-that-matters"><span class="header-section-number">4.3.3</span> Greedy Is Not Optimal — and That Matters</h3>
+<p>CART is <strong>exhaustive</strong> at each node: it really does try every feature and every threshold. But it is <strong>greedy</strong> across nodes — it never looks ahead.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Split at the root</th>
+<th style="text-align: center;">Variance removed now</th>
+<th style="text-align: center;">…plus what it enables</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>On price</td>
+<td style="text-align: center;"><strong>40%</strong></td>
+<td style="text-align: center;"><span class="math inline">\(+\)</span> 12% (total 52%)</td>
+</tr>
+<tr class="even">
+<td>On promotion</td>
+<td style="text-align: center;">38%</td>
+<td style="text-align: center;"><span class="math inline">\(+\)</span> 50% <strong>(total 88%)</strong></td>
+</tr>
+</tbody>
+</table>
+<p>CART takes the 40%. It has no way to see the 50% coming, because it evaluates one split at a time and commits.</p>
+<p>A fitted tree is therefore <strong>not the optimal tree</strong> — it is the result of a sequence of locally optimal decisions. Finding the genuinely optimal tree is computationally intractable for any realistic number of features, which is why nobody does it.</p>
+<p><span class="key-result">Two consequences: a tree can <strong>miss structure that is really there</strong>, and a small change in the data can send the whole greedy sequence down a different path — exactly the instability we turn to next.</span></p>
+<p>I want to slow down on “greedy,” because it is the single most important word on the previous slide and it is easy to hear it as a criticism when it is really a description.</p>
+<p>CART is <strong>exhaustive at each node</strong>. It really does try every feature and every cut point — no shortcuts, no sampling. So it is not lazy. What it never does is <strong>look ahead</strong>. It evaluates one split, commits to it, and moves down.</p>
+<p>The table shows what that costs. Suppose splitting on price removes forty percent of the variance right now. Splitting on promotion removes thirty-eight — slightly worse. But <em>because</em> of how promotion divides the data, it sets up two further splits that would together remove another fifty percent. Forty-plus-twelve, versus thirty-eight-plus-fifty. Fifty-two against eighty-eight.</p>
+<p>CART takes the forty. Not because it weighed the options and chose badly — because it has no mechanism to see the fifty coming at all.</p>
+<p>So the tree you fit is <strong>not the optimal tree</strong>. It is the result of a sequence of locally optimal decisions, and those are genuinely different objects.</p>
+<p>The obvious question is why we tolerate that. The answer is that finding the truly optimal tree is computationally intractable for any realistic number of features — the search space explodes combinatorially. So the greedy approximation isn’t a shortcut somebody settled for; it’s what makes trees usable at all. Two consequences to carry forward, and both matter for the next three weeks.</p>
+<p>First, <strong>a tree can miss structure that is really there</strong> — not from lack of data, but from the order in which it asked its questions.</p>
+<p>Second, and this is the one that pays off next week: a small change in the data can send the whole greedy sequence down a different path. That is the instability we turn to right now.</p>
+</section>
+<section id="depth-controls-the-biasvariance-tradeoff" class="level3" data-number="4.3.4">
+<h3 data-number="4.3.4" class="anchored" data-anchor-id="depth-controls-the-biasvariance-tradeoff"><span class="header-section-number">4.3.4</span> Depth Controls the Bias–Variance Tradeoff</h3>
+<p>A <strong>depth-1 stump</strong> asks one question: high bias, low variance. A <strong>full tree</strong> with one observation per leaf memorizes the sample: zero bias, extreme variance.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Depth</th>
+<th>Bias</th>
+<th>Variance</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 (stump)</td>
+<td>High</td>
+<td>Low</td>
+<td>One question; underfits</td>
+</tr>
+<tr class="even">
+<td>5–10</td>
+<td>Balanced</td>
+<td>Balanced</td>
+<td>Usually the useful range</td>
+</tr>
+<tr class="odd">
+<td>Full tree</td>
+<td>Zero</td>
+<td>Extreme</td>
+<td>Memorizes the training sample</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why trees are unstable:</strong> one changed observation can flip the split at the root, and every prediction below it changes with it.</p>
+<p>Tune <code>max_depth</code> and <code>min_samples_leaf</code> by <code>TimeSeriesSplit</code> cross-validation.</p>
+<p>Now connect the tree back to slide 5. A <strong>depth-one stump</strong> asks one question. Massive bias, almost no variance.</p>
+<p>A <strong>full tree</strong> with one observation per leaf reproduces the training data exactly. Zero bias, extreme variance — it has memorized rather than learned.</p>
+<p>Between them sits the depth that minimizes total error, and the table shows the shape. Five to ten is usually the useful range. So: here is why trees are unstable, which matters enormously next week.</p>
+<p>Change one training observation. If that changes the split at the root — and it easily can, because the algorithm is picking the single best threshold — then <em>every prediction below it</em> changes. Not slightly. The whole structure downstream is different.</p>
+<p>That’s not a flaw in the implementation. It’s inherent to a greedy hierarchical partition. And it is precisely the property that averaging will exploit in Lecture 5. Tune with <code>max_depth</code> and <code>min_samples_leaf</code>, selected by <code>TimeSeriesSplit</code> cross-validation.</p>
+</section>
+<section id="two-ways-to-stop-a-tree-overfitting" class="level3" data-number="4.3.5">
+<h3 data-number="4.3.5" class="anchored" data-anchor-id="two-ways-to-stop-a-tree-overfitting"><span class="header-section-number">4.3.5</span> Two Ways to Stop a Tree Overfitting</h3>
+<p><code>max_depth</code> caps the tree in advance. Two other controls do the job better.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 44%">
+<col style="width: 56%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>min_samples_leaf</code></td>
+<td><strong>Stop early.</strong> At the default of 1, a leaf may hold a single observation and “predict” that one value. Set it to 5–10 and every prediction is an average over a real group.</td>
+</tr>
+<tr class="even">
+<td><code>ccp_alpha</code></td>
+<td><strong>Prune after.</strong> Grow the tree out fully, then charge a penalty <span class="math inline">\(\alpha\)</span> per leaf and cut back the branches that do not pay for themselves.</td>
+</tr>
+</tbody>
+</table>
+<p>Cost-complexity pruning minimizes</p>
+<p><span class="math display">\[\underbrace{\textstyle\sum_{\text{leaves}} \text{SSE}}_{\text{fit}} \;+\; \underbrace{\alpha \cdot |T|}_{\text{complexity}}, \qquad |T| = \text{number of leaves}\]</span></p>
+<p><span class="key-result"><strong>You have seen this before</strong> — it is the GAM smoothing penalty from Lecture 3, and it returns in Lecture 6 as Ridge and LASSO. Three model families, one idea, and <span class="math inline">\(\alpha\)</span> chosen the same way each time: by cross-validation.</span></p>
+<p><code>max_depth</code> is the blunt instrument — it caps the tree in advance, before you know how deep it needed to go. Two other controls do the job better, and they usually get one line each in a table, which is not enough.</p>
+<p><strong><code>min_samples_leaf</code></strong> is the one I’d reach for first. Leave it at the default of one and the tree may build a leaf holding a single observation, whose “prediction” is that one observation’s value. That is memorization with extra steps. Set it to ten and every prediction is an average over at least ten weeks — smoother, and far more honest about what the data supports.</p>
+<p><strong><code>ccp_alpha</code></strong> works the other way around. Grow the tree out fully, <em>then</em> charge a penalty per leaf and cut back the branches that don’t pay for themselves. Larger alpha, smaller tree.</p>
+<p>Look at what cost-complexity pruning actually minimizes: fit on the left, a penalty proportional to the number of leaves on the right, and alpha setting the exchange rate between them.</p>
+<p>You have seen this before. That is the GAM smoothing penalty from Lecture 3 with a different symbol on it — fit against complexity, one parameter tuning the trade. And you’ll meet it a third time in Lecture 6, as Ridge and LASSO.</p>
+<p>Three model families that look nothing alike, one idea underneath. I’d rather you remember the idea than the three implementations, because the idea is what transfers. And alpha is chosen the same way every time: by cross-validation. Which for us means <code>TimeSeriesSplit</code>.</p>
+</section>
+</section>
+<section id="implementing-decision-trees-in-python" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="implementing-decision-trees-in-python"><span class="header-section-number">4.4</span> Implementing Decision Trees in Python</h2>
+<p>One class, a few hyperparameters, interpretable results.</p>
+<p>Part three. One class, a few hyperparameters.</p>
+<section id="decision-tree-regression-in-python" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="decision-tree-regression-in-python"><span class="header-section-number">4.4.1</span> Decision Tree Regression in Python</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>sklearn Code Template</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeRegressor</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> TimeSeriesSplit</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> make_lag_features(df, lags<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">12</span>])</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">'sales'</span>]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">5</span>, min_samples_leaf<span class="op">=</span><span class="dv">10</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>tree.fit(X_train, y_train)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>y_hat <span class="op">=</span> tree.predict(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>max_depth</code></td>
+<td>Cap tree depth</td>
+</tr>
+<tr class="even">
+<td><code>min_samples_leaf</code></td>
+<td>Minimum observations per leaf</td>
+</tr>
+<tr class="odd">
+<td><code>max_features</code></td>
+<td>Feature subsampling</td>
+</tr>
+<tr class="even">
+<td><code>ccp_alpha</code></td>
+<td>Cost-complexity pruning</td>
+</tr>
+</tbody>
+</table>
+<p>Cross-validate with <code>TimeSeriesSplit</code>, never <code>KFold</code> — <strong>random folds leak the future into the training set</strong>.</p>
+<p>The code is short. Import <code>DecisionTreeRegressor</code>. Build lag features. Instantiate with <code>max_depth=5</code>, <code>min_samples_leaf=10</code>, and <code>random_state=42</code>. Fit. Predict.</p>
+<p>The table gives you the four hyperparameters worth knowing. Two of them — <code>min_samples_leaf</code> and <code>ccp_alpha</code> — we just spent a slide on. <code>max_depth</code> caps the depth. And <code>max_features</code> does feature subsampling: remember that one, because it becomes the central idea next week.</p>
+<p>And the line at the bottom, which you’ve now heard in every lecture: cross-validate with <code>TimeSeriesSplit</code>, never <code>KFold</code>. Random folds leak the future into the training set.</p>
+<p>I’ll keep saying it because it’s the error that survives longest. It doesn’t produce a crash or a warning — it produces a number that looks better than the truth.</p>
+</section>
+<section id="feature-importance" class="level3" data-number="4.4.2">
+<h3 data-number="4.4.2" class="anchored" data-anchor-id="feature-importance"><span class="header-section-number">4.4.2</span> Feature Importance</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Impurity-Based Feature Importance</p>
+</div>
+<p>For each feature <span class="math inline">\(j\)</span>, sum the total reduction in variance across all splits where <span class="math inline">\(j\)</span> was used, weighted by the fraction of observations in each node. Normalize so the importances sum to 1.</p>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Feature (CA_1 FOODS, weekly)</th>
+<th>Importance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>units_lag4</code></td>
+<td>0.62</td>
+</tr>
+<tr class="even">
+<td><code>units_lag52</code></td>
+<td>0.15</td>
+</tr>
+<tr class="odd">
+<td><code>units_lag1</code></td>
+<td>0.13</td>
+</tr>
+<tr class="even">
+<td><code>snap_days</code></td>
+<td>0.04</td>
+</tr>
+<tr class="odd">
+<td><code>avg_price</code></td>
+<td>0.04</td>
+</tr>
+</tbody>
+</table>
+<p>This tells you which variables the tree found most useful for splitting — a fast way to screen predictors.</p>
+<p><span class="neutral smaller">But impurity importance is biased toward high-cardinality features. Permutation importance and SHAP give more reliable attributions; we return to this in Lecture 5.</span></p>
+<p>A tree will tell you which variables it found useful.</p>
+<p>Impurity-based importance sums, for each feature, the total variance reduction across every split where that feature was used, weighted by how many observations passed through. Then normalize so it sums to one.</p>
+<p>On our weekly Walmart data a depth-five tree ranks them like this: the <strong>four-week lag</strong> dominates at about zero point six two, then the <strong>same week last year</strong> at zero point one five, then <strong>last week</strong> at zero point one three, and then <strong>SNAP benefit days</strong> and <strong>price</strong>, both around zero point zero four.</p>
+<p>Notice how concentrated that is — one feature takes almost two-thirds of the total. That is characteristic of a single tree, and it is a symptom of the greediness we discussed: the root split commits to one feature and everything below inherits that choice. Next week you’ll see the same table from a random forest, and the mass is spread much more evenly.</p>
+<p>Read that as a screening device. It says which variables the tree leaned on — a fast way to narrow forty candidate predictors down to eight worth thinking about.</p>
+<p>And notice SNAP appearing at all, because it’s the kind of thing this method is good for. Nobody specified that food sales respond to benefit disbursement days. The tree found it, and ranked it level with price. That’s a real business finding no linear specification would have surfaced unless someone already thought to look. But be careful, because impurity importance is <strong>biased toward high-cardinality features</strong>.</p>
+<p>Look at our own table. <code>avg_price</code> is continuous — it offers hundreds of distinct split points, so the algorithm gets hundreds of chances to find one that happens to help. <code>snap_days</code> takes a handful of integer values, and <code>event_days</code> fewer still. Price gets more opportunities to look useful purely because it has more thresholds to try, not because it carries more signal.</p>
+<p>Which means the gap between price at zero point zero four and SNAP at zero point zero four is not something I’d read anything into at all — and if anything, the bias runs in price’s favor.</p>
+<p>Permutation importance is the honest alternative: shuffle one column, and measure how much accuracy falls. Slower, and worth it whenever the ranking will inform a decision. We’ll use it properly next week.</p>
+</section>
+<section id="interpreting-and-communicating-tree-predictions" class="level3" data-number="4.4.3">
+<h3 data-number="4.4.3" class="anchored" data-anchor-id="interpreting-and-communicating-tree-predictions"><span class="header-section-number">4.4.3</span> Interpreting and Communicating Tree Predictions</h3>
+<p>A tree’s main advantage is that you can explain <em>why</em> a specific prediction was made.</p>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Explaining a Prediction to a Manager</p>
+</div>
+<p>“Our model forecasts $61,300 in sales for next month because:</p>
+<ol type="1">
+<li>Last year’s same-month sales were above $38,000 (economy growing)</li>
+<li>Last month’s sales were above $52,000 (current momentum strong)</li>
+<li>When both conditions hold, the average outcome in our training data was $61,300.”</li>
+</ol>
+</div>
+<p>Produce the path with <code>sklearn.tree.plot_tree(tree)</code> or <code>export_text(tree, feature_names=[...])</code>.</p>
+<p><span class="neutral smaller">This is where business buy-in comes from — a manager can check that the tree is splitting on variables they consider sensible.</span></p>
+<p>This is the tree’s real advantage, and it’s worth dwelling on because you lose it steadily from here. You can explain <strong>why</strong> a specific prediction came out the way it did.</p>
+<p>Notice what that explanation is: it’s just the decision path, read aloud. Last year’s same-month sales were above thirty-eight thousand. Last month was above fifty-two thousand. When both hold, the average outcome in our training data was sixty-one thousand three hundred. No coefficients. No “holding all else constant.” A sequence of conditions and an average. <code>plot_tree</code> or <code>export_text</code> will produce this for you.</p>
+<p>And here’s why it matters commercially. A manager who can see the splits can tell you when the model is wrong — “that threshold is picking up the year we had the fire, not a real pattern.” You cannot get that feedback from a model nobody can read. It’s the cheapest source of domain knowledge you have, and every method after this one makes it harder to access.</p>
+</section>
+</section>
+<section id="limitations-and-preview-ensembles" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="limitations-and-preview-ensembles"><span class="header-section-number">4.5</span> Limitations and Preview: Ensembles</h2>
+<p>A single tree is a weak learner. Combine hundreds to build a strong one.</p>
+<p>Part four. Where a single tree falls short.</p>
+<section id="when-a-single-tree-falls-short" class="level3" data-number="4.5.1">
+<h3 data-number="4.5.1" class="anchored" data-anchor-id="when-a-single-tree-falls-short"><span class="header-section-number">4.5.1</span> When a Single Tree Falls Short</h3>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Interpretable — can show the path</li>
+<li>No feature scaling needed</li>
+<li>Captures nonlinear relationships</li>
+<li>Handles missing values well</li>
+<li>Fast to train</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li>High variance — small data changes give a very different tree</li>
+<li>Flat predictions within each leaf</li>
+<li>Cannot extrapolate beyond the training range</li>
+<li>Sensitive to outliers in a leaf</li>
+</ul>
+</div>
+</div>
+<p><strong>The ensemble solution:</strong> average many trees trained on different bootstrap samples. Variance falls sharply while feature-importance interpretability survives — typically a 20–40% RMSE improvement over a single tree.</p>
+<p>Strengths on the left, and they’re real: interpretable, no scaling needed, captures nonlinearity, handles missing values, fast to train. Weaknesses on the right, and the first one is fatal.</p>
+<p><strong>High variance.</strong> We covered the mechanism on slide 9 — small data changes give a very different tree.</p>
+<p><strong>Flat predictions within each leaf.</strong> Every observation in a leaf gets the identical forecast. The prediction surface is a step function.</p>
+<p><strong>Cannot extrapolate beyond the training range.</strong> This one deserves a beat. A tree predicts the mean of a leaf, and no leaf can contain values it never saw. So on a trending series, a tree will flatten out exactly when you need it to keep climbing. If your sales have grown every year and you ask a tree to forecast next year, it will predict something inside the range it already knows.</p>
+<p>Put a number on it. CA_1 food sales grew about twenty-nine percent over five years. Train a tree on the first four and ask it for year five, and the highest value it can possibly output is the highest leaf mean it learned — a number from the <em>old</em>, lower range. It will systematically under-forecast, and no amount of tuning fixes it, because the model has no representation of “up.”</p>
+<p>An ARIMA with a drift term has no such problem. It will happily forecast values it has never seen.</p>
+<p>That limitation never goes away. Random forests have it. XGBoost has it. It’s a property of trees, and it’s why the classical methods from weeks one and two don’t simply become obsolete today.</p>
+<p>And the ensemble solution, which is next week: average many trees trained on different bootstrap samples. Variance falls sharply while the feature-importance interpretability survives — typically twenty to forty percent better RMSE than a single tree.</p>
+</section>
+<section id="lecture-4-key-takeaways" class="level3" data-number="4.5.2">
+<h3 data-number="4.5.2" class="anchored" data-anchor-id="lecture-4-key-takeaways"><span class="header-section-number">4.5.2</span> Lecture 4: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p>Linear models cannot capture <strong>interactions</strong> or <strong>threshold effects</strong>. Decision trees can, without needing to specify these relationships in advance.</p></li>
+<li><p>The <strong>bias–variance tradeoff</strong> means a too-simple tree underfits (high bias) and a too-deep tree overfits (high variance). Tune with <code>max_depth</code> and <code>min_samples_leaf</code>.</p></li>
+<li><p><strong>CART</strong> greedily minimizes within-region variance at each split. Prediction = mean of observations in the leaf.</p></li>
+<li><p>Decision trees are <strong>interpretable</strong>: you can trace the exact decision path that led to any prediction.</p></li>
+<li><p>Single trees have <strong>high variance</strong> — they change dramatically when the data changes slightly. Ensembles (Random Forests, XGBoost) solve this.</p></li>
+</ol>
+</div>
+<p><em>Next: Tree Ensembles — variance reduction through bootstrap aggregation, and sequential error correction with boosting.</em></p>
+<p>Five things. <strong>One.</strong> Linear models cannot capture interactions or threshold effects. Trees can, without your specifying them in advance. <strong>Two.</strong> The bias–variance tradeoff: too-simple underfits, too-deep overfits. Tune with <code>max_depth</code> and <code>min_samples_leaf</code>. <strong>Three.</strong> CART greedily minimizes within-region variance at each split. The prediction is the mean of the leaf. <strong>Four.</strong> Trees are interpretable — you can trace the exact path to any prediction. <strong>Five.</strong> Single trees have high variance. Ensembles solve this, and that’s Lecture 5.</p>
+<p>If you take one thing: <strong>a tree is a step function that cannot extrapolate.</strong> Everything good and everything bad about today follows from that sentence.</p>
+</section>
+<section id="references" class="level3" data-number="4.5.3">
+<h3 data-number="4.5.3" class="anchored" data-anchor-id="references"><span class="header-section-number">4.5.3</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+<p>Reading is ISLP section 8.1 — the basics of decision trees. That’s the chapter we’ll live in for the next two weeks as well. Next time: Tree Ensembles. We take this unstable, high-variance model and turn its instability into an advantage. See you then.</p>
+</section>
+</section>
+<section id="timing-guide" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="timing-guide"><span class="header-section-number">4.6</span> Timing guide</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Segment</th>
+<th>Slides</th>
+<th style="text-align: right;">Target</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Opening &amp; why beyond linear</td>
+<td>1–5</td>
+<td style="text-align: right;">~5 min</td>
+</tr>
+<tr class="even">
+<td>How trees work</td>
+<td>6–11</td>
+<td style="text-align: right;">~10 min</td>
+</tr>
+<tr class="odd">
+<td>Python &amp; interpretation</td>
+<td>12–15</td>
+<td style="text-align: right;">~5 min</td>
+</tr>
+<tr class="even">
+<td>Limitations &amp; close</td>
+<td>16–19</td>
+<td style="text-align: right;">~2 min</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>~22 min</strong></td>
+</tr>
+</tbody>
+</table>
+<p>If you’re compressing, slide 13’s hyperparameter table survives trimming — slide 11 has already covered the two parameters that matter. Do <strong>not</strong> compress slides 9, 10, or 17: the greedy approximation, the instability it produces, and the extrapolation limit are the three things Lectures 5 and 6 are built on.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture03_GAMs.html" class="pagination-link" aria-label="Generalized Additive Models">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture05_TreeEnsembles.html" class="pagination-link" aria-label="Tree Ensembles: Random Forests &amp; Boosted Trees">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

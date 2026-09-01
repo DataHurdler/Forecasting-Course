@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>14&nbsp; Bayesian Statistics III — Bayesian Linear Regression – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture13_Synthesis.html" rel="next">
+<link href="../chapters/Lecture11_Part2_Hierarchical.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture12_BayesianRegression.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">14.1</span> Lecture Outline</a></li>
+  <li><a href="#bayesian-linear-regression" id="toc-bayesian-linear-regression" class="nav-link" data-scroll-target="#bayesian-linear-regression"><span class="header-section-number">14.2</span> Bayesian Linear Regression</a>
+  <ul class="collapse">
+  <li><a href="#ols-vs.-bayesian-regression-what-changes" id="toc-ols-vs.-bayesian-regression-what-changes" class="nav-link" data-scroll-target="#ols-vs.-bayesian-regression-what-changes"><span class="header-section-number">14.2.1</span> OLS vs.&nbsp;Bayesian Regression: What Changes?</a></li>
+  <li><a href="#bayesian-linear-regression-in-pymc" id="toc-bayesian-linear-regression-in-pymc" class="nav-link" data-scroll-target="#bayesian-linear-regression-in-pymc"><span class="header-section-number">14.2.2</span> Bayesian Linear Regression in PyMC</a></li>
+  </ul></li>
+  <li><a href="#reading-the-posterior" id="toc-reading-the-posterior" class="nav-link" data-scroll-target="#reading-the-posterior"><span class="header-section-number">14.3</span> Reading the Posterior</a>
+  <ul class="collapse">
+  <li><a href="#reading-a-posterior-coefficient" id="toc-reading-a-posterior-coefficient" class="nav-link" data-scroll-target="#reading-a-posterior-coefficient"><span class="header-section-number">14.3.1</span> Reading a Posterior Coefficient</a></li>
+  <li><a href="#asking-the-posterior-a-direct-question" id="toc-asking-the-posterior-a-direct-question" class="nav-link" data-scroll-target="#asking-the-posterior-a-direct-question"><span class="header-section-number">14.3.2</span> Asking the Posterior a Direct Question</a></li>
+  </ul></li>
+  <li><a href="#causal-structure-and-dags" id="toc-causal-structure-and-dags" class="nav-link" data-scroll-target="#causal-structure-and-dags"><span class="header-section-number">14.4</span> Causal Structure and DAGs</a>
+  <ul class="collapse">
+  <li><a href="#directed-acyclic-graphs" id="toc-directed-acyclic-graphs" class="nav-link" data-scroll-target="#directed-acyclic-graphs"><span class="header-section-number">14.4.1</span> Directed Acyclic Graphs</a></li>
+  <li><a href="#confounding-measured" id="toc-confounding-measured" class="nav-link" data-scroll-target="#confounding-measured"><span class="header-section-number">14.4.2</span> Confounding, Measured</a></li>
+  <li><a href="#scenario-analysis-with-posterior-samples" id="toc-scenario-analysis-with-posterior-samples" class="nav-link" data-scroll-target="#scenario-analysis-with-posterior-samples"><span class="header-section-number">14.4.3</span> Scenario Analysis with Posterior Samples</a></li>
+  </ul></li>
+  <li><a href="#course-synthesis-and-next-steps" id="toc-course-synthesis-and-next-steps" class="nav-link" data-scroll-target="#course-synthesis-and-next-steps"><span class="header-section-number">14.5</span> Course Synthesis and Next Steps</a>
+  <ul class="collapse">
+  <li><a href="#course-method-map" id="toc-course-method-map" class="nav-link" data-scroll-target="#course-method-map"><span class="header-section-number">14.5.1</span> Course Method Map</a></li>
+  <li><a href="#lecture-12-key-takeaways" id="toc-lecture-12-key-takeaways" class="nav-link" data-scroll-target="#lecture-12-key-takeaways"><span class="header-section-number">14.5.2</span> Lecture 12: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">14.5.3</span> References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 12 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="14.1">
+<h2 data-number="14.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">14.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Bayesian Linear Regression</li>
+<li>Reading the Posterior</li>
+<li>Causal Structure and DAGs</li>
+<li>Course Synthesis and Next Steps</li>
+</ol>
+<p>Four parts. Bayesian linear regression, which is mostly familiar. Then reading a posterior coefficient — three questions you can ask a distribution that you cannot ask a point estimate. Then causal structure and DAGs, which is where the coefficient starts meaning something. And then a map of everything we’ve built this semester.</p>
+</section>
+<section id="bayesian-linear-regression" class="level2" data-number="14.2">
+<h2 data-number="14.2" class="anchored" data-anchor-id="bayesian-linear-regression"><span class="header-section-number">14.2</span> Bayesian Linear Regression</h2>
+<p>The same regression you already know — returning a distribution for every coefficient.</p>
+<section id="ols-vs.-bayesian-regression-what-changes" class="level3" data-number="14.2.1">
+<h3 data-number="14.2.1" class="anchored" data-anchor-id="ols-vs.-bayesian-regression-what-changes"><span class="header-section-number">14.2.1</span> OLS vs.&nbsp;Bayesian Regression: What Changes?</h3>
+<p>You have fitted linear models since Lecture 2, and regularized them in Lecture 6. OLS solves for a single best coefficient vector:</p>
+<p><span class="math display">\[\hat{\boldsymbol{\beta}} = (\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}\]</span></p>
+<p>One number per predictor, with a standard error resting on large-sample theory. The Bayesian version replaces that with the update rule from Lecture 10:</p>
+<p><span class="math display">\[p(\boldsymbol{\beta} \mid \mathbf{y}) \;\propto\; p(\mathbf{y} \mid \boldsymbol{\beta}) \cdot p(\boldsymbol{\beta})\]</span></p>
+<div class="keybox">
+<p><strong>Every coefficient comes back as a distribution.</strong> Not an estimate plus an error bar computed from an asymptotic formula — a full posterior you can ask questions of directly.</p>
+</div>
+<p>And one thing you know reappears: <strong>regularization is a prior</strong>. A Normal prior on <span class="math inline">\(\beta\)</span> is Ridge; a Laplace prior is LASSO. Lecture 6’s penalty is, here, a statement of belief.</p>
+<p>You have been fitting linear models since Lecture 2, and regularizing them since Lecture 6.</p>
+<p>OLS solves for a single best coefficient vector — the closed-form expression on the slide. One number per predictor, plus a standard error that rests on large-sample theory.</p>
+<p>The Bayesian version replaces that with the update rule from Lecture 10: the posterior over beta is proportional to the likelihood times the prior. And the consequence is the thing to hold onto: <strong>every coefficient comes back as a distribution.</strong></p>
+<p>Not an estimate with an error bar computed from an asymptotic formula. A full posterior — a cloud of plausible values, which you can query however you like. And here’s something that should make Lecture 6 click retroactively.</p>
+<p><strong>Regularization is a prior.</strong> A Normal prior on beta is <em>exactly</em> Ridge regression. A Laplace prior — double-exponential, with that sharp peak at zero — is <em>exactly</em> LASSO.</p>
+<p>The penalty you tuned by cross-validation in Lecture 6 was a statement of belief all along. You were saying “coefficients are probably small,” you just weren’t saying it in probability notation.</p>
+<p>Same estimates, two vocabularies. Which is the seventh time this semester one idea has shown up wearing different clothes. And the equivalence is genuinely useful, not just cute. It tells you what a penalty is <em>assuming</em>.</p>
+<p>Ridge’s Normal prior says coefficients are probably small, and symmetric around zero, with no particular preference for exactly zero. LASSO’s Laplace prior has a sharp spike at zero — it says you believe many coefficients are exactly zero.</p>
+<p>That’s why LASSO produces sparse solutions and Ridge doesn’t. It’s not a quirk of the optimizer. It’s the prior doing what you asked. Once you see the penalty as a belief, the behaviour stops being a rule to memorize and becomes something you can reason about.</p>
+</section>
+<section id="bayesian-linear-regression-in-pymc" class="level3" data-number="14.2.2">
+<h3 data-number="14.2.2" class="anchored" data-anchor-id="bayesian-linear-regression-in-pymc"><span class="header-section-number">14.2.2</span> Bayesian Linear Regression in PyMC</h3>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>Log units on log price, SNAP and events</p>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    a       <span class="op">=</span> pm.Normal(<span class="st">"a"</span>, y.mean(), <span class="dv">1</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    b_price <span class="op">=</span> pm.Normal(<span class="st">"b_price"</span>, <span class="dv">0</span>, <span class="dv">1</span>)      <span class="co"># weakly informative</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    b_snap  <span class="op">=</span> pm.Normal(<span class="st">"b_snap"</span>,  <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    b_event <span class="op">=</span> pm.Normal(<span class="st">"b_event"</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    sigma   <span class="op">=</span> pm.Exponential(<span class="st">"sigma"</span>, <span class="fl">1.0</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> a <span class="op">+</span> b_price<span class="op">*</span>lpc <span class="op">+</span> b_snap<span class="op">*</span>snap <span class="op">+</span> b_event<span class="op">*</span>event</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    pm.Normal(<span class="st">"obs"</span>, mu<span class="op">=</span>mu, sigma<span class="op">=</span>sigma, observed<span class="op">=</span>y)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">1000</span>, tune<span class="op">=</span><span class="dv">1500</span>, chains<span class="op">=</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Do not standardize log price</strong> — with both in logs <code>b_price</code> is an <strong>elasticity</strong>, percent change in demand per percent change in price. Standardizing rescales it to “per SD” and destroys that reading. <code>lpc</code> is log price centred within series, which fixed ESS 184 <span class="math inline">\(\rightarrow\)</span> 3,097.</p>
+<p>Here’s the model. Log units regressed on log price, a SNAP indicator, and an event indicator. Weakly informative Normal priors on every coefficient, Exponential on sigma. Nothing here is new after Lecture 10. But look at the bolded line, because it runs against a habit you have built all semester. <strong>Do not standardize log price.</strong></p>
+<p>You have standardized predictors in nearly every model since Lecture 6. It makes penalties comparable, it helps samplers, it’s a good default. And here it will quietly destroy your answer.</p>
+<p>Here’s why. With units and price both in logs, <code>b_price</code> is an <strong>elasticity</strong> — the percent change in demand per percent change in price. That is a quantity a category manager already uses and can act on directly.</p>
+<p>Standardize log price, and the coefficient becomes “change in log units per <strong>standard deviation</strong> of log price.” Still a valid number. No longer an elasticity. And every percentage claim you build on it downstream will be wrong by exactly the factor you divided by.</p>
+<p>The lab does this deliberately, and the business answer moves by a factor of twenty-two. With clean diagnostics throughout. No warning of any kind.</p>
+<p>One thing you <em>should</em> do: subtract each series’ own mean log price. That’s <strong>centring</strong>, not scaling — it shifts the variable without changing its units, so the elasticity survives intact. And it fixed our sampling badly: effective sample size went from one hundred eighty-four to three thousand ninety-seven. Centre, don’t scale. That’s the rule. And there’s a general principle underneath it that outlives this example. Ask, for every transformation you apply: <strong>does my coefficient still answer the question I asked?</strong></p>
+<p>Logging both sides gives you an elasticity, which is interpretable. Centring preserves it. Scaling destroys it. Taking a difference changes it into something else again.</p>
+<p>None of those are wrong operations. What’s wrong is applying one out of habit and then reading the coefficient as though you hadn’t. The transformation and the interpretation have to be decided together — and if you can’t say what one unit of your variable <em>is</em>, you cannot say what your coefficient means.</p>
+</section>
+</section>
+<section id="reading-the-posterior" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="reading-the-posterior"><span class="header-section-number">14.3</span> Reading the Posterior</h2>
+<p>Three questions you can ask a distribution that you cannot ask a point estimate.</p>
+<section id="reading-a-posterior-coefficient" class="level3" data-number="14.3.1">
+<h3 data-number="14.3.1" class="anchored" data-anchor-id="reading-a-posterior-coefficient"><span class="header-section-number">14.3.1</span> Reading a Posterior Coefficient</h3>
+<p>Fitted on the weekly panel, controlling for series and trend:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 30%">
+<col style="width: 23%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Coefficient</th>
+<th style="text-align: right;">Mean</th>
+<th>94% HDI</th>
+<th>Reading</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>b_price</code></td>
+<td style="text-align: right;"><span class="math inline">\(-0.493\)</span></td>
+<td><span class="math inline">\([-0.596,\ -0.387]\)</span></td>
+<td>Near the elastic boundary</td>
+</tr>
+<tr class="even">
+<td><code>b_trend</code></td>
+<td style="text-align: right;"><span class="math inline">\(0.110\)</span></td>
+<td><span class="math inline">\([0.107,\ 0.113]\)</span></td>
+<td>About 11% growth per year</td>
+</tr>
+<tr class="odd">
+<td><code>b_snap</code></td>
+<td style="text-align: right;"><span class="math inline">\(0.036\)</span></td>
+<td><span class="math inline">\([0.027,\ 0.046]\)</span></td>
+<td>About a 3.7% SNAP-week lift</td>
+</tr>
+<tr class="even">
+<td><code>b_event</code></td>
+<td style="text-align: right;"><span class="math inline">\(-0.003\)</span></td>
+<td><span class="math inline">\([-0.011,\ 0.004]\)</span></td>
+<td><strong>Spans zero</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>HDI</strong> — highest density interval — is the shortest interval containing 94% of the posterior. Unlike a confidence interval it says what everyone wants it to say: there is a 94% probability the coefficient lies in there.</p>
+<p><strong>The last row is the useful one.</strong> <code>b_event</code>’s interval spans zero, so the data do not establish a direction. That is a more honest report than “not significant,” because it also shows the effect is <em>small</em> — at most about half a percent either way.</p>
+<p>Here’s the fitted model, controlling for series and trend.</p>
+<p><code>b_price</code>: minus point-four-nine-three, HDI from minus point-five-nine-six to minus point-three-eight-seven. Right near the elastic boundary — we’ll come back to that. <code>b_trend</code>: point-one-one-zero, a tight interval. About eleven percent growth per year.</p>
+<p><code>b_snap</code>: point-oh-three-six. About a three-point-seven percent SNAP-week lift — consistent with what the hierarchy told us last week. <code>b_event</code>: minus point-oh-oh-three, interval from minus point-oh-one-one to plus point-oh-oh-four. <strong>Spans zero.</strong></p>
+<p>Quick note on the <strong>HDI</strong> — highest density interval. It’s the shortest interval containing ninety-four percent of the posterior. And unlike a confidence interval, it means what everyone wants it to mean: there is a ninety-four percent probability the coefficient is in there. Now, the last row is the useful one, and I want to be precise about why.</p>
+<p><code>b_event</code>’s interval spans zero, so the data do not establish a direction. Events might raise demand slightly; they might lower it slightly.</p>
+<p>That is a <strong>more honest report</strong> than “not statistically significant,” and it’s more informative too. Because it also tells you the effect is <strong>small</strong> — at most about half a percent either way.</p>
+<p>“Not significant” conflates two completely different situations: an effect you can’t detect because it’s tiny, and an effect you can’t detect because your data is thin. The interval distinguishes them. Here it’s the first. And those two situations call for opposite actions, which is why conflating them is expensive.</p>
+<p>An effect that is genuinely tiny means stop investigating — you have your answer, and it’s that events don’t matter much for this series. An effect you cannot detect because the data is thin means collect more data, or find a better design, because the question is still open.</p>
+<p>A p-value above point-oh-five is compatible with both, and gives you no way to tell which you’re in. The interval tells you immediately: narrow and centred on zero is the first, wide and spanning zero is the second.</p>
+</section>
+<section id="asking-the-posterior-a-direct-question" class="level3" data-number="14.3.2">
+<h3 data-number="14.3.2" class="anchored" data-anchor-id="asking-the-posterior-a-direct-question"><span class="header-section-number">14.3.2</span> Asking the Posterior a Direct Question</h3>
+<p>The posterior is a set of samples, so any question about <span class="math inline">\(\beta\)</span> is answered by counting.</p>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>One line each</p>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> idata.posterior[<span class="st">"b_price"</span>].values.ravel()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>(b <span class="op">&lt;</span> <span class="dv">0</span>).mean()               <span class="co"># P(demand falls when price rises)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>(b <span class="op">&lt;</span> <span class="op">-</span><span class="fl">0.5</span>).mean()            <span class="co"># P(elasticity beyond -0.5)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>((b <span class="op">&gt;</span> <span class="op">-</span><span class="fl">0.5</span>) <span class="op">&amp;</span> (b <span class="op">&lt;</span> <span class="dv">0</span>)).mean()  <span class="co"># P(inelastic but negative)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>On our fit, <span class="math inline">\(P(\text{elasticity} &lt; 0) = \mathbf{1.00}\)</span> — the direction is not in doubt. But <span class="math inline">\(P(\text{elasticity} &lt; -0.5) = \mathbf{0.446}\)</span>: the data cannot settle whether demand is elastic or inelastic.</p>
+<div class="keybox">
+<p><strong>Two findings, and a p-value conflates them.</strong> “Significant” reports only the direction. The question the business asks — <em>how big?</em> — gets the answer 46/54.</p>
+</div>
+<p><span class="neutral smaller">Posterior mass inside a range of negligible values is a <strong>ROPE</strong> — region of practical equivalence.</span></p>
+<p>Because the posterior is a set of samples, any question about beta is answered by <strong>counting</strong>.</p>
+<p>Pull the samples into an array. Then: what fraction are below zero? What fraction are below minus point-five? What fraction sit between minus point-five and zero? Three one-line questions, three direct answers. No test statistic, no null hypothesis, no table.</p>
+<p>On our fit, the probability the elasticity is below zero is <strong>one point zero zero</strong>. Every single posterior sample is negative. Demand falls when price rises, and there is no doubt about it whatsoever. Fine. That’s the boring question, and a p-value would have told you something similar.</p>
+<p>Now the interesting one. The probability the elasticity is below minus point-five — the boundary between elastic and inelastic demand, which is a genuine business threshold — is <strong>point four six.</strong> Forty-six percent. Essentially a coin flip.</p>
+<p>So the data <strong>cannot settle</strong> whether demand is elastic or inelastic. And that is the honest, useful, actionable finding — because “should we treat this product as price-sensitive?” is a decision that hinges on exactly that threshold.</p>
+<p>Two different findings, and a p-value conflates them. “Statistically significant” reports only the <strong>direction</strong>. The question the business actually asks is <em>how big</em>, and the answer is forty-six/fifty-four. No significance test would ever have given you that number. And a reasonable question is what a manager actually does with forty-six percent.</p>
+<p>They do not get a yes or a no, and that’s the point — the honest answer is that the evidence is balanced. What they get is the ability to reason about the <em>consequences</em> of being wrong in each direction. If treating the product as elastic and being wrong is cheap, and treating it as inelastic and being wrong is expensive, then a forty-six percent probability is more than enough to act on the cautious side.</p>
+<p>That’s a decision-theoretic argument, and it needs a probability as an input. A significance test cannot supply one.</p>
+<p>Asking how much posterior mass falls inside a range of negligible values has a name — a <strong>ROPE</strong>, a region of practical equivalence. Homework 7 asks you to compute one.</p>
+</section>
+</section>
+<section id="causal-structure-and-dags" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="causal-structure-and-dags"><span class="header-section-number">14.4</span> Causal Structure and DAGs</h2>
+<p>Which coefficients mean what you think they mean.</p>
+<section id="directed-acyclic-graphs" class="level3" data-number="14.4.1">
+<h3 data-number="14.4.1" class="anchored" data-anchor-id="directed-acyclic-graphs"><span class="header-section-number">14.4.1</span> Directed Acyclic Graphs</h3>
+<p>A <strong>DAG</strong> is a picture of what you believe causes what: <strong>nodes</strong> are variables, <strong>arrows</strong> run from cause to effect, and <strong>acyclic</strong> means nothing causes itself.</p>
+<p>It is drawn before the model, from domain knowledge, and its purpose is to tell you <em>which variables belong in the regression</em>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Confounder</strong></td>
+<td>Causes both your predictor and your outcome. <strong>Must</strong> be controlled for, or its influence is absorbed into your coefficient.</td>
+</tr>
+<tr class="even">
+<td><strong>Collider</strong></td>
+<td>Is caused by both. Controlling for it <strong>creates</strong> a spurious association that was not there.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>That second row is why “add every control you have” is bad advice.</strong> Which variables to include is a question about causal structure, and no amount of model fit will answer it.</p>
+<p><span class="neutral smaller">Whether a given DAG is right is a substantive question about your business, not a statistical one. This course uses DAGs to reason about what a coefficient means — estimating causal effects credibly is a separate subject.</span></p>
+<p>Everything so far has been about <em>estimating</em> a coefficient well. Now: what does it mean?</p>
+<p>A <strong>DAG</strong> is a picture of what you believe causes what. Nodes are variables, arrows run from cause to effect, and acyclic means nothing causes itself.</p>
+<p>Crucially, you draw it <strong>before</strong> the model, from domain knowledge. And its purpose is specific: it tells you <strong>which variables belong in the regression.</strong></p>
+<p>A <strong>confounder</strong> causes both your predictor and your outcome. You <strong>must</strong> control for it — otherwise its influence gets absorbed into your coefficient and you attribute someone else’s effect to your variable.</p>
+<p>A <strong>collider</strong> is caused by both. And controlling for a collider <strong>creates</strong> a spurious association that was not there to begin with. That second row is why “add every control you have” is bad advice, and it surprises people.</p>
+<p>More controls is not safer. Conditioning on a collider actively manufactures a relationship out of nothing. So which variables to include is a question about <strong>causal structure</strong> — and no amount of model fit, no cross-validation score, no information criterion will answer it. Two models can fit identically and mean opposite things.</p>
+<p>One honest limit. Whether a given DAG is <em>right</em> is a substantive question about your business, not a statistical one. This course uses DAGs to reason about <strong>what a coefficient means</strong>. Estimating causal effects credibly — instruments, natural experiments, all of that — is a separate subject and a separate course.</p>
+</section>
+<section id="confounding-measured" class="level3" data-number="14.4.2">
+<h3 data-number="14.4.2" class="anchored" data-anchor-id="confounding-measured"><span class="header-section-number">14.4.2</span> Confounding, Measured</h3>
+<p>Our panel has thirty store-category series. Categories differ in <em>both</em> typical price and typical volume — so series identity is an arrow into price <em>and</em> into units. A textbook confounder.</p>
+<p>Fit the same elasticity twice:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 40%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th style="text-align: right;">Elasticity</th>
+<th>94% HDI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Price, SNAP, events only</td>
+<td style="text-align: right;"><span class="math inline">\(-2.805\)</span></td>
+<td><span class="math inline">\([-2.856,\ -2.756]\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(+\)</span> series effects and trend</td>
+<td style="text-align: right;"><span class="math inline">\(\mathbf{-0.493}\)</span></td>
+<td><span class="math inline">\([-0.596,\ -0.387]\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><span class="key-result"><strong>The uncontrolled estimate is nearly six times too large</strong></span> — it claims demand collapses when price rises. It is not noisier either: its interval is <em>half the width</em>. It is confidently, precisely wrong.</p>
+<div class="warningbox">
+<p>A tight credible interval says the model is sure. It says nothing about whether the model is answering your question. Bayesian machinery does not protect you from omitting a confounder — only the DAG does.</p>
+</div>
+<p>Let’s make that concrete on our own data, because the size of the effect is startling.</p>
+<p>Our panel has thirty store-category series. Categories differ in <strong>both</strong> typical price and typical volume — hobby items cost more per unit and sell fewer of them. So series identity is an arrow into price <em>and</em> an arrow into units. That is a textbook confounder. Fit the elasticity with price, SNAP and events only: <strong>minus two point eight zero five.</strong> Add series effects and a trend: <strong>minus point four nine three.</strong></p>
+<p>The uncontrolled estimate is nearly <strong>six times too large</strong>. It claims demand collapses when price rises — a one percent price increase costing almost three percent of volume. And here’s the part I want you to remember for the rest of your career.</p>
+<p>It is <strong>not noisier</strong>. Look at the intervals. The uncontrolled one runs from minus two eight-five-six to minus two seven-five-six — that’s a width of about point one. The controlled one is roughly point two wide. <strong>The wrong answer has an interval half the width of the right one.</strong> It is confidently, precisely wrong. And nothing in the output flags it.</p>
+<p>A tight credible interval says the model is <strong>sure</strong>. It says nothing whatsoever about whether the model is answering <strong>your question</strong>.</p>
+<p>Bayesian machinery does not protect you from omitting a confounder. Neither does more data — more data would tighten that wrong interval further. Only the DAG protects you, and the DAG is drawn before you fit anything.</p>
+</section>
+<section id="scenario-analysis-with-posterior-samples" class="level3" data-number="14.4.3">
+<h3 data-number="14.4.3" class="anchored" data-anchor-id="scenario-analysis-with-posterior-samples"><span class="header-section-number">14.4.3</span> Scenario Analysis with Posterior Samples</h3>
+<p>Because the posterior is samples, you can push a business scenario through it and get a <strong>distribution of outcomes</strong> rather than a single projected number.</p>
+<div class="examplebox">
+<div class="examplebox-title">
+<p>What if we raise price 5%?</p>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> idata.posterior[<span class="st">"b_price"</span>].values.ravel()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pct_change <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> (np.exp(b <span class="op">*</span> np.log(<span class="fl">1.05</span>)) <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>pct_change.mean(), np.percentile(pct_change, [<span class="dv">3</span>, <span class="dv">97</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With an elasticity near <span class="math inline">\(-0.493\)</span>, a 5% price rise implies roughly a <strong>2.4% fall in units</strong>, 94% of the posterior between <span class="math inline">\(-2.9\%\)</span> and <span class="math inline">\(-1.9\%\)</span> — so you can report the pessimistic end too.</p>
+<p><strong>Then the decision follows.</strong> Revenue rises if the volume loss is smaller than the price gain: here <span class="math inline">\(+2.5\%\)</span> on average, and <span class="math inline">\(P(\text{revenue rises}) = 1.00\)</span> across every posterior sample. Note this holds <em>even though</em> the elasticity might be past <span class="math inline">\(-0.5\)</span>.</p>
+<p><span class="neutral smaller">Valid only to the extent the DAG is — this is a causal claim about intervening on price.</span></p>
+<p>Here’s the payoff for having a distribution instead of a number.</p>
+<p>Because the posterior is samples, you can push a business scenario through it and get back a <strong>distribution of outcomes</strong>.</p>
+<p>Three lines. Pull the elasticity samples. Apply the price change to each one. Report the mean and the interval.</p>
+<p>With an elasticity near minus point four nine three, a five percent price rise implies roughly a <strong>two point four percent fall in units</strong> — with ninety-four percent of the posterior between minus two point nine and minus one point nine percent.</p>
+<p>So you can report the pessimistic end, which is what a planner actually wants. Not “demand will fall about two percent” but “demand will fall about two percent, and it’s unlikely to be worse than three.”</p>
+<p>And then the decision follows directly. Revenue rises if the volume loss is smaller than the price gain. Compute that for every posterior sample and count.</p>
+<p>Here: revenue rises by about <strong>two and a half percent</strong> on average, and the probability that revenue rises is <strong>one point zero zero</strong> — every single posterior sample.</p>
+<p>Now notice something subtle, because it’s the kind of thing that makes this worth doing. That conclusion holds <strong>even though</strong> the elasticity might well be past minus point five. Two facts that sound contradictory — “we can’t tell if demand is elastic” and “raising price definitely increases revenue” — are both true, simultaneously, and the posterior lets you say both.</p>
+<p>With one caveat, and it’s the one from slide 10. This is valid only to the extent the <strong>DAG</strong> is. It’s a causal claim about intervening on price, and it inherits every assumption in that diagram.</p>
+</section>
+</section>
+<section id="course-synthesis-and-next-steps" class="level2" data-number="14.5">
+<h2 data-number="14.5" class="anchored" data-anchor-id="course-synthesis-and-next-steps"><span class="header-section-number">14.5</span> Course Synthesis and Next Steps</h2>
+<p>From classical time series to Bayesian hierarchical models: a complete forecasting toolkit.</p>
+<section id="course-method-map" class="level3" data-number="14.5.1">
+<h3 data-number="14.5.1" class="anchored" data-anchor-id="course-method-map"><span class="header-section-number">14.5.1</span> Course Method Map</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Data</th>
+<th>Uncertainty</th>
+<th>Interpretable</th>
+<th>Strengths</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ETS / ARIMA (L01–02)</td>
+<td>Univariate TS</td>
+<td>CI</td>
+<td>High</td>
+<td>Fast, automatic</td>
+</tr>
+<tr class="even">
+<td>GAM / Prophet (L03)</td>
+<td>TS + predictors</td>
+<td>Limited</td>
+<td>High</td>
+<td>Nonlinear + interpretable</td>
+</tr>
+<tr class="odd">
+<td>Decision Tree (L04)</td>
+<td>Tabular</td>
+<td>No</td>
+<td>High</td>
+<td>Rule-based explanation</td>
+</tr>
+<tr class="even">
+<td>Random Forest (L05)</td>
+<td>Tabular</td>
+<td>OOB CI</td>
+<td>Medium</td>
+<td>Robust, minimal tuning</td>
+</tr>
+<tr class="odd">
+<td>XGBoost (L06)</td>
+<td>Tabular</td>
+<td>No</td>
+<td>Low</td>
+<td>Best tabular accuracy</td>
+</tr>
+<tr class="even">
+<td>FFN / 1D CNN (L07–08)</td>
+<td>Tabular / TS</td>
+<td>No</td>
+<td>Low</td>
+<td>Smooth functions, fast</td>
+</tr>
+<tr class="odd">
+<td>LSTM / Transformer (L09)</td>
+<td>Sequences</td>
+<td>No</td>
+<td>Very low</td>
+<td>Long-range dependencies</td>
+</tr>
+<tr class="even">
+<td>Bayesian (L10–12)</td>
+<td>Any</td>
+<td>Full posterior</td>
+<td>High</td>
+<td>Uncertainty, small samples</td>
+</tr>
+</tbody>
+</table>
+<div class="keybox">
+<p>No single method dominates. Choose based on: (1) data type and size, (2) need for uncertainty quantification, (3) need for interpretability, (4) time to deploy. In practice, combine: use XGBoost for the point forecast and a Bayesian model for uncertainty intervals.</p>
+</div>
+<p>Everything we’ve built, on four axes: what data it takes, what uncertainty it gives you, how interpretable it is, and what it’s good at.</p>
+<p>ETS and ARIMA — univariate series, confidence intervals, highly interpretable, fast and automatic. And remember the benchmark beat every one of them in Homework 1, which is the first thing this table should remind you of. GAMs and Prophet — series plus predictors, limited uncertainty, interpretable, good at nonlinear and interpretable together. Decision trees — tabular, no uncertainty, but a rule-based explanation anyone can read. Random forests — robust, minimal tuning, OOB gives you something.</p>
+<p>XGBoost — best tabular accuracy in this course, and low interpretability. Feedforward nets and CNNs — smooth functions, fast, opaque. LSTMs and Transformers — sequences and long-range dependencies, very low interpretability. Bayesian — any data, <strong>full posterior</strong>, highly interpretable, and strongest exactly where samples are small.</p>
+<p><strong>No single method dominates.</strong> That’s the honest summary of eleven weeks, and it’s what the scoreboard has been telling you all semester.</p>
+<p>Choose on four things: your data type and size, whether you need uncertainty quantified, whether someone needs to understand the model, and how fast you need it deployed.</p>
+<p>And in practice, <strong>combine</strong>. A very common production pattern is XGBoost for the point forecast, because it’s accurate, plus a Bayesian model for the intervals, because they’re honest. You are not obliged to pick one column of that table.</p>
+</section>
+<section id="lecture-12-key-takeaways" class="level3" data-number="14.5.2">
+<h3 data-number="14.5.2" class="anchored" data-anchor-id="lecture-12-key-takeaways"><span class="header-section-number">14.5.2</span> Lecture 12: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p><strong>Bayesian linear regression</strong> places priors on coefficients and returns a full posterior distribution for each <span class="math inline">\(\beta_j\)</span>. A Normal prior is equivalent to Ridge regularization; a Laplace prior is equivalent to LASSO.</p></li>
+<li><p>Posterior coefficient plots give: posterior mean, HDI, and <span class="math inline">\(P(\beta_j &gt; 0)\)</span> — richer information than a single <span class="math inline">\(p\)</span>-value.</p></li>
+<li><p><strong>DAGs</strong> make the causal structure explicit, helping identify confounders (must include) and colliders (must exclude). Always draw the DAG before specifying a regression model.</p></li>
+<li><p><strong>Scenario analysis</strong> with posterior samples: plug any counterfactual <span class="math inline">\(\mathbf{x}^*\)</span> into posterior draws to get a full predictive distribution for that scenario.</p></li>
+<li><p><strong>No single method is best for all forecasting problems.</strong> Build intuition for when to use each tool in this course’s toolkit, and combine methods (e.g., point forecast + Bayesian uncertainty) when the decision stakes are high.</p></li>
+</ol>
+</div>
+<p>One. Bayesian linear regression places priors on coefficients and returns a full posterior for each one. A Normal prior <em>is</em> Ridge; a Laplace prior <em>is</em> LASSO.</p>
+<p>Two. Posterior coefficient plots give you the mean, the HDI, and the probability the coefficient exceeds any threshold you care about — richer than a p-value, and answering the question people actually ask.</p>
+<p>Three. <strong>DAGs</strong> make causal structure explicit, identifying confounders you must include and colliders you must exclude. Draw the DAG before specifying the regression.</p>
+<p>Four. Scenario analysis with posterior samples: push any counterfactual through the posterior draws and get a full distribution for that scenario, not a point projection.</p>
+<p>Five. No single method is best for all forecasting problems. Build intuition for when to reach for each one, and combine them when the stakes justify it.</p>
+<p>And the one to carry out of this room, which is really the lesson of the whole semester.</p>
+<p>The uncontrolled elasticity was six times too large, with an interval <strong>half the width</strong> of the correct one. Precision is not accuracy. A confident model is not a correct model. And the thing that caught it was not a diagnostic, not a score, not a cross-validation fold — it was a picture you draw before fitting anything, from what you know about the business. That habit is the most transferable thing in this course.</p>
+</section>
+<section id="references" class="level3" data-number="14.5.3">
+<h3 data-number="14.5.3" class="anchored" data-anchor-id="references"><span class="header-section-number">14.5.3</span> References</h3>
+<div id="refs" role="list" style="display: none">
+
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="pagination-link" aria-label="Bayesian Statistics II --- Hierarchical Models">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture13_Synthesis.html" class="pagination-link" aria-label="Synthesis --- What the Semester Measured">
+        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

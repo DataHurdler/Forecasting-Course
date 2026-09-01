@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>1&nbsp; Introduction, Exponential Smoothing &amp; Forecast Evaluation – Business Forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture02_ARIMA_VAR.html" rel="next">
+<link href="../index.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_ETS_Eval.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_ETS_Eval.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Generalized Additive Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_DecisionTrees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Decision Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_TreeEnsembles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tree Ensembles: Random Forests &amp; Boosted Trees</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularization &amp; Model Selection</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_NeuralNets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_CNNs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">CNN Architectures</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_RNN_LSTM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">RNNs and LSTMs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_Transformers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Transformers</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_BayesianFoundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Statistics I — Foundations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_BayesianTS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Time Series</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bayesian Statistics II — Hierarchical Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_BayesianRegression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Bayesian Statistics III — Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture13_Synthesis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Synthesis — What the Semester Measured</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-outline" id="toc-lecture-outline" class="nav-link active" data-scroll-target="#lecture-outline"><span class="header-section-number">1.1</span> Lecture Outline</a></li>
+  <li><a href="#why-forecasting-matters" id="toc-why-forecasting-matters" class="nav-link" data-scroll-target="#why-forecasting-matters"><span class="header-section-number">1.2</span> Why Forecasting Matters</a>
+  <ul class="collapse">
+  <li><a href="#forecasting-is-everywhere-in-business" id="toc-forecasting-is-everywhere-in-business" class="nav-link" data-scroll-target="#forecasting-is-everywhere-in-business"><span class="header-section-number">1.2.1</span> Forecasting Is Everywhere in Business</a></li>
+  <li><a href="#the-basic-setup" id="toc-the-basic-setup" class="nav-link" data-scroll-target="#the-basic-setup"><span class="header-section-number">1.2.2</span> The Basic Setup</a></li>
+  <li><a href="#components-of-a-time-series" id="toc-components-of-a-time-series" class="nav-link" data-scroll-target="#components-of-a-time-series"><span class="header-section-number">1.2.3</span> Components of a Time Series</a></li>
+  <li><a href="#always-beat-a-benchmark-first" id="toc-always-beat-a-benchmark-first" class="nav-link" data-scroll-target="#always-beat-a-benchmark-first"><span class="header-section-number">1.2.4</span> Always Beat a Benchmark First</a></li>
+  </ul></li>
+  <li><a href="#exponential-smoothing" id="toc-exponential-smoothing" class="nav-link" data-scroll-target="#exponential-smoothing"><span class="header-section-number">1.3</span> Exponential Smoothing</a>
+  <ul class="collapse">
+  <li><a href="#the-problem-with-equal-weights" id="toc-the-problem-with-equal-weights" class="nav-link" data-scroll-target="#the-problem-with-equal-weights"><span class="header-section-number">1.3.1</span> The Problem with Equal Weights</a></li>
+  <li><a href="#simple-exponential-smoothing-ses" id="toc-simple-exponential-smoothing-ses" class="nav-link" data-scroll-target="#simple-exponential-smoothing-ses"><span class="header-section-number">1.3.2</span> Simple Exponential Smoothing (SES)</a></li>
+  <li><a href="#holts-method-adding-trend" id="toc-holts-method-adding-trend" class="nav-link" data-scroll-target="#holts-method-adding-trend"><span class="header-section-number">1.3.3</span> Holt’s Method: Adding Trend</a></li>
+  <li><a href="#holt-winters-level-trend-and-seasonality" id="toc-holt-winters-level-trend-and-seasonality" class="nav-link" data-scroll-target="#holt-winters-level-trend-and-seasonality"><span class="header-section-number">1.3.4</span> Holt-Winters: Level, Trend, and Seasonality</a></li>
+  <li><a href="#the-ets-framework-a-unified-view" id="toc-the-ets-framework-a-unified-view" class="nav-link" data-scroll-target="#the-ets-framework-a-unified-view"><span class="header-section-number">1.3.5</span> The ETS Framework: A Unified View</a></li>
+  </ul></li>
+  <li><a href="#forecast-evaluation" id="toc-forecast-evaluation" class="nav-link" data-scroll-target="#forecast-evaluation"><span class="header-section-number">1.4</span> Forecast Evaluation</a>
+  <ul class="collapse">
+  <li><a href="#how-do-we-measure-forecast-accuracy" id="toc-how-do-we-measure-forecast-accuracy" class="nav-link" data-scroll-target="#how-do-we-measure-forecast-accuracy"><span class="header-section-number">1.4.1</span> How Do We Measure Forecast Accuracy?</a></li>
+  <li><a href="#the-golden-rule-always-evaluate-out-of-sample" id="toc-the-golden-rule-always-evaluate-out-of-sample" class="nav-link" data-scroll-target="#the-golden-rule-always-evaluate-out-of-sample"><span class="header-section-number">1.4.2</span> The Golden Rule: Always Evaluate Out-of-Sample</a></li>
+  </ul></li>
+  <li><a href="#course-roadmap" id="toc-course-roadmap" class="nav-link" data-scroll-target="#course-roadmap"><span class="header-section-number">1.5</span> Course Roadmap</a>
+  <ul class="collapse">
+  <li><a href="#econ-8310-four-part-structure" id="toc-econ-8310-four-part-structure" class="nav-link" data-scroll-target="#econ-8310-four-part-structure"><span class="header-section-number">1.5.1</span> ECON 8310: Four-Part Structure</a></li>
+  <li><a href="#tools-and-what-you-will-be-able-to-do" id="toc-tools-and-what-you-will-be-able-to-do" class="nav-link" data-scroll-target="#tools-and-what-you-will-be-able-to-do"><span class="header-section-number">1.5.2</span> Tools and What You Will Be Able to Do</a></li>
+  <li><a href="#lecture-1-key-takeaways" id="toc-lecture-1-key-takeaways" class="nav-link" data-scroll-target="#lecture-1-key-takeaways"><span class="header-section-number">1.5.3</span> Lecture 1: Key Takeaways</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">1.5.4</span> References</a></li>
+  </ul></li>
+  <li><a href="#timing-guide" id="toc-timing-guide" class="nav-link" data-scroll-target="#timing-guide"><span class="header-section-number">1.6</span> Timing guide</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction, Exponential Smoothing &amp; Forecast Evaluation</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Lecture 1 of ECON 8310.</em></p>
+<section id="lecture-outline" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="lecture-outline"><span class="header-section-number">1.1</span> Lecture Outline</h2>
+<ol type="1">
+<li>Why Forecasting Matters</li>
+<li>Exponential Smoothing</li>
+<li>Forecast Evaluation</li>
+<li>Course Roadmap</li>
+</ol>
+<p>Four parts today.</p>
+<p>We start with why forecasting matters — the business framing, the notation, and the benchmarks you must beat before anyone should take your model seriously.</p>
+<p>Then exponential smoothing: simple exponential smoothing, Holt’s method, Holt-Winters, and the ETS framework that ties them all together. Then forecast evaluation — the accuracy metrics and the one rule you must never break. And we’ll close with a roadmap for the semester.</p>
+</section>
+<section id="why-forecasting-matters" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="why-forecasting-matters"><span class="header-section-number">1.2</span> Why Forecasting Matters</h2>
+<p>Every business decision made today depends on expectations about tomorrow.</p>
+<p>Part one. Why forecasting matters.</p>
+<p>The framing I want you to carry all semester is this: every business decision made today rests on some expectation about tomorrow. Forecasting is just the discipline of making that expectation explicit, and checkable.</p>
+<section id="forecasting-is-everywhere-in-business" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="forecasting-is-everywhere-in-business"><span class="header-section-number">1.2.1</span> Forecasting Is Everywhere in Business</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 84%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Domain</th>
+<th>The question someone is actually asking</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Operations &amp; supply chain</td>
+<td>How much inventory should Walmart order for Black Friday? How many nurses does a hospital need next Tuesday night?</td>
+</tr>
+<tr class="even">
+<td>Finance &amp; risk</td>
+<td>Will credit card defaults rise next quarter? What will the Fed Funds rate be in six months?</td>
+</tr>
+<tr class="odd">
+<td>Marketing &amp; strategy</td>
+<td>How many units will this new product sell in year one? What is the lifetime value of this customer cohort?</td>
+</tr>
+<tr class="even">
+<td>Macro &amp; public policy</td>
+<td>Will GDP grow by 2% or 3% next year? What will unemployment be in Q4?</td>
+</tr>
+</tbody>
+</table>
+<p>Every one of these is a <em>decision</em> waiting on a number. <strong>A decision is only as good as the forecast it rests on.</strong></p>
+<p>Look at this table. Four domains, and in each one, a question somebody is actually being paid to answer.</p>
+<p>Operations and supply chain. How much inventory should Walmart order for Black Friday? How many nurses does a hospital need next Tuesday night? Get the first one wrong and you either have empty shelves on the busiest day of the year, or a warehouse full of unsold goods in January. Get the second one wrong and you either burn out your staff or you pay for nurses standing around.</p>
+<p>Finance and risk. Will credit card defaults rise next quarter? What will the Fed Funds rate be in six months? Banks hold capital against these answers. Regulators check the answers.</p>
+<p>Marketing and strategy. How many units will this new product sell in year one? What’s the lifetime value of this customer cohort? These numbers decide whether a product launches at all.</p>
+<p>And macro and public policy. Will GDP grow by two percent or three percent next year? What will unemployment be in Q4? A one-point difference here moves billions in tax revenue.</p>
+<p>Here’s what I want you to notice. Not one of these is a question about statistics. Every single one is a <em>decision</em> waiting on a number. Somebody has to place an order, set a capital reserve, approve a launch, write a budget — and they’re stuck until the number arrives.</p>
+<p>That’s the line at the bottom of the slide, and it’s the sentence I’d most like you to remember from today. A decision is only as good as the forecast it rests on.</p>
+<p>Which cuts both ways. A brilliant forecast attached to no decision is an academic exercise. And a decision resting on a lazy forecast is just a guess wearing a suit.</p>
+</section>
+<section id="the-basic-setup" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="the-basic-setup"><span class="header-section-number">1.2.2</span> The Basic Setup</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Time Series</p>
+</div>
+<p>A <span class="hi">time series</span> is an ordered sequence of observations <span class="math inline">\(\{y_1, y_2, \ldots, y_T\}\)</span> where <span class="math inline">\(t\)</span> indexes time.</p>
+</div>
+<p><strong>Notation used throughout the course:</strong></p>
+<ul>
+<li><span class="math inline">\(y_t\)</span> — observed value at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(h\)</span> — <span class="hi">forecast horizon</span>, how many periods ahead</li>
+<li><span class="math inline">\(\hat{y}_{t+h|t}\)</span> — forecast of <span class="math inline">\(y_{t+h}\)</span> made using information at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(e_t = y_t - \hat{y}_{t|t-1}\)</span> — <span class="hi">forecast error</span></li>
+</ul>
+<p>Forecasting monthly retail sales, <span class="math inline">\(h=1\)</span> is next month and <span class="math inline">\(h=12\)</span> is a year out. The problem gets harder as <span class="math inline">\(h\)</span> grows, because uncertainty compounds.</p>
+<p>Under squared-error loss the optimal forecast is the <strong>conditional expectation</strong>, <span class="math inline">\(\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]\)</span>, where <span class="math inline">\(\mathcal{F}_t\)</span> is everything known at time <span class="math inline">\(t\)</span>.</p>
+<p>Let’s get precise. Some notation, and we’ll use it for the rest of the semester.</p>
+<p>A <strong>time series</strong> is an ordered sequence of observations, y-one through y-T, where t indexes time. The word doing the work in that definition is <em>ordered</em>. Order is what makes this different from every other dataset you’ve worked with. If I shuffle the rows of a customer database, I’ve lost nothing. If I shuffle a time series, I’ve destroyed it. Four pieces of notation. y-sub-t is the observed value at time t. Straightforward.</p>
+<p>h is the <strong>forecast horizon</strong> — how many periods ahead we’re looking.</p>
+<p>y-hat, subscript t-plus-h given t, is our forecast of the value at time t-plus-h, made using only the information we have at time t. That vertical bar matters enormously. It says: here is what I knew when I made this call. We’ll come back to that bar repeatedly. And e-sub-t is the <strong>forecast error</strong> — what actually happened minus what we said would happen.</p>
+<p>Concretely: forecasting monthly retail sales, h equals one is next month, and h equals twelve is a year out. And the problem gets harder as h grows, because uncertainty compounds. Next month is mostly determined by conditions that already exist. Twelve months out, the economy could turn, a competitor could enter, your supply chain could break. Now the line at the bottom is the theoretical anchor for the whole course.</p>
+<p>Under squared-error loss, the optimal forecast is the <strong>conditional expectation</strong> — the expected value of y at time t-plus-h, given everything we know at time t.</p>
+<p>Two things worth flagging. First, “under squared-error loss.” That qualifier is doing real work. If you care about squared errors, the conditional mean is optimal. Change the loss function and the optimal forecast changes — under absolute error, for instance, you’d want the conditional <em>median</em>. Optimal is always optimal <em>with respect to something</em>.</p>
+<p>Second, that script-F is the information set. Every model we build this semester is essentially a different guess about how to turn an information set into a conditional expectation. Exponential smoothing does it one way. Neural networks do it another. But that’s the target, all twelve lectures.</p>
+</section>
+<section id="components-of-a-time-series" class="level3" data-number="1.2.3">
+<h3 data-number="1.2.3" class="anchored" data-anchor-id="components-of-a-time-series"><span class="header-section-number">1.2.3</span> Components of a Time Series</h3>
+<p>Any series can be decomposed into four parts (additive form): <span class="math inline">\(y_t = T_t + S_t + C_t + I_t\)</span>.</p>
+<ul>
+<li><span class="hi"><span class="math inline">\(T_t\)</span> Trend</span> — long-run direction</li>
+<li><span class="hi"><span class="math inline">\(S_t\)</span> Seasonality</span> — regular, calendar-driven pattern</li>
+<li><span class="hi"><span class="math inline">\(C_t\)</span> Cycle</span> — medium-run business-cycle swings</li>
+<li><span class="hi"><span class="math inline">\(I_t\)</span> Irregular</span> — random shocks</li>
+</ul>
+<p>Which parts matter depends entirely on the series: retail sales are trend + seasonality, quarterly GDP is trend + cycle, daily stock returns are mostly irregular, and energy demand has all four.</p>
+<div class="warningbox">
+<p><strong>Ignoring seasonality causes large, systematic errors.</strong> A non-seasonal model on monthly retail data will consistently under-forecast December and over-forecast January — every single year.</p>
+</div>
+<p>Before modeling anything, it helps to know what you’re looking at. The classical decomposition says any series is the sum of four parts. Trend — the long-run direction. Is this growing, shrinking, or flat over years?</p>
+<p>Seasonality — the regular, calendar-driven pattern. December retail. Summer electricity. Monday morning traffic. The key word is <em>regular</em>: it repeats on a known cycle.</p>
+<p>Cycle — medium-run swings. Business cycles. These are the ones people confuse with seasonality, so let me separate them clearly. Seasonality has a fixed, known period. Cycles don’t. A recession doesn’t arrive every forty-eight months on schedule. And irregular — the random shocks. Everything left over.</p>
+<p>Which parts matter depends entirely on the series. Retail sales are trend plus seasonality. Quarterly GDP is trend plus cycle. Daily stock returns are mostly irregular — which is why predicting them is so hard. Energy demand has all four. Now read the warning box with me, because this is a mistake I see constantly.</p>
+<p>Ignoring seasonality causes large, <em>systematic</em> errors. Not random ones — systematic. A non-seasonal model on monthly retail data will consistently under-forecast December and over-forecast January. Every single year.</p>
+<p>That word “systematic” is why this matters. Random error averages out. Systematic error doesn’t. If you’re wrong by the same amount in the same direction every December, you will be short of stock in the same month every year, and no amount of data collection fixes it. The model is structurally wrong.</p>
+</section>
+<section id="always-beat-a-benchmark-first" class="level3" data-number="1.2.4">
+<h3 data-number="1.2.4" class="anchored" data-anchor-id="always-beat-a-benchmark-first"><span class="header-section-number">1.2.4</span> Always Beat a Benchmark First</h3>
+<p>Before presenting any forecast model, check that it beats a <strong>naive benchmark</strong>. A model that cannot beat the baseline has zero value.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 32%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Benchmark</th>
+<th>Forecast</th>
+<th>Use when</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Naïve</td>
+<td><span class="math inline">\(\hat{y}_{t+h\|t} = y_t\)</span></td>
+<td>Asset prices, random walks</td>
+</tr>
+<tr class="even">
+<td>Seasonal naïve</td>
+<td><span class="math inline">\(\hat{y}_{t+h\|t} = y_{t+h-m}\)</span></td>
+<td>Any series with a season</td>
+</tr>
+<tr class="odd">
+<td>Mean</td>
+<td><span class="math inline">\(\hat{y}_{t+h\|t} = \bar{y}_t\)</span></td>
+<td>No trend, no season</td>
+</tr>
+<tr class="even">
+<td>Drift</td>
+<td><span class="math inline">\(\hat{y}_{t+h\|t} = y_t + h\hat{c}\)</span></td>
+<td>Trend, no season</td>
+</tr>
+</tbody>
+</table>
+<p><span class="neutral smaller">This is not a formality. In the M4 Competition many machine learning models <em>failed</em> to beat simple exponential smoothing <span class="citation" data-cites="Makridakis2020">[@Makridakis2020]</span>.</span></p>
+<p>This slide is a professional standard, and I want to be blunt about it.</p>
+<p>Before you present any forecast model to anyone, check that it beats a naive benchmark. A model that can’t beat the baseline has zero value. Not “a little value.” Zero. Four standard benchmarks in the table.</p>
+<p>The <strong>naive</strong> forecast: tomorrow equals today. y-hat equals y-sub-t. Sounds stupid. It is extremely hard to beat for asset prices, because if you could reliably beat it, you’d be rich rather than in this class.</p>
+<p>The <strong>seasonal naive</strong>: this December equals last December. Use it for any series with a season, and it is a genuinely tough benchmark for retail. The <strong>mean</strong>: forecast the historical average. Use when there’s no trend and no season.</p>
+<p>And <strong>drift</strong>: take the last value and extend the average historical slope. Use when there’s trend but no season. Now the line at the bottom. This is not a formality.</p>
+<p>In the M4 Competition — one of the big open forecasting competitions, a hundred thousand series — many machine learning models <em>failed to beat</em> simple exponential smoothing.</p>
+<p>Sit with that. Sophisticated methods, real researchers, and they lost to a method from the 1950s that you’ll learn in about ten minutes.</p>
+<p>There are two lessons. One: complexity is not accuracy. A model isn’t better because it’s harder to explain. Two: the benchmark is how you find out. Without it, you have no idea whether your fancy model is adding anything at all.</p>
+<p>So: benchmark first, always. And if your model loses to seasonal naive, that is a finding, not a failure. Report it.</p>
+</section>
+</section>
+<section id="exponential-smoothing" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="exponential-smoothing"><span class="header-section-number">1.3</span> Exponential Smoothing</h2>
+<p>Recent observations should carry more weight than old ones.</p>
+<p>Part two. Exponential smoothing. The core intuition is one sentence: recent observations should carry more weight than old ones.</p>
+<section id="the-problem-with-equal-weights" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="the-problem-with-equal-weights"><span class="header-section-number">1.3.1</span> The Problem with Equal Weights</h3>
+<p>Most classical methods treat every historical observation equally — but what if the world <strong>changes</strong>? When a retailer’s sales pattern shifts after a store renovation, equal-weighting the pre-renovation data buys months of systematic over- or under-forecasting.</p>
+<p><strong>Exponential weighting</strong> assigns geometrically declining weights, so recent observations matter more:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Observation</th>
+<th>Age</th>
+<th>Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(y_T\)</span></td>
+<td>0</td>
+<td><span class="math inline">\(\alpha\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(y_{T-1}\)</span></td>
+<td>1</td>
+<td><span class="math inline">\(\alpha(1-\alpha)\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(y_{T-2}\)</span></td>
+<td>2</td>
+<td><span class="math inline">\(\alpha(1-\alpha)^2\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><span class="neutral smaller"><span class="math inline">\(\alpha \in (0,1]\)</span> is the forgetting rate. High <span class="math inline">\(\alpha\)</span> = short memory; low <span class="math inline">\(\alpha\)</span> = long memory.</span></p>
+<p>Here’s the problem we’re solving.</p>
+<p>Most classical methods treat every historical observation equally. Every data point gets the same vote. That’s fine if the world is stable — but what if it changes?</p>
+<p>Take a concrete case. A retailer renovates a store. Traffic patterns shift, the product mix shifts, sales shift. If your model is equal-weighting three years of pre-renovation data, it will keep forecasting the old store. And it won’t be wrong once — it’ll be wrong for months, in the same direction, until the new data finally outweighs the old. <strong>Exponential weighting</strong> fixes this. Assign geometrically declining weights, so recent observations matter more.</p>
+<p>Look at the table. The most recent observation, y-sub-T, gets weight alpha. The one before it gets alpha times one-minus-alpha. The one before that, alpha times one-minus-alpha squared. Each step back in time, the weight shrinks by a constant factor.</p>
+<p>Two things worth noticing. The weights never hit exactly zero — old data still counts, just less and less. And they sum to one, so this is a proper weighted average, not an arbitrary reweighting.</p>
+<p>Alpha is the forgetting rate. High alpha means short memory — you react fast, you forget fast. Low alpha means long memory — you’re stable, but slow to notice change. Hold onto alpha. It’s about to become the single parameter of our first model.</p>
+</section>
+<section id="simple-exponential-smoothing-ses" class="level3" data-number="1.3.2">
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="simple-exponential-smoothing-ses"><span class="header-section-number">1.3.2</span> Simple Exponential Smoothing (SES)</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>SES Update Equation</p>
+</div>
+<p>Let <span class="math inline">\(\ell_t\)</span> be the <strong>level</strong> at time <span class="math inline">\(t\)</span>:</p>
+<p><span class="math display">\[\ell_t = \alpha\, y_t + (1-\alpha)\,\ell_{t-1}, \qquad 0 &lt; \alpha \leq 1\]</span></p>
+<p><strong>Forecast:</strong> <span class="math inline">\(\hat{y}_{T+h|T} = \ell_T\)</span> for all horizons <span class="math inline">\(h \geq 1\)</span> (flat)</p>
+</div>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>Large <span class="math inline">\(\alpha\)</span> (e.g.&nbsp;0.8):</strong></p>
+<ul>
+<li>Reacts quickly to shocks</li>
+<li>Noisy, volatile forecasts</li>
+<li>Good for rapidly changing series</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>Small <span class="math inline">\(\alpha\)</span> (e.g.&nbsp;0.1):</strong></p>
+<ul>
+<li>Slow to adapt</li>
+<li>Smooth, stable forecasts</li>
+<li>Good for slowly evolving series</li>
+</ul>
+</div>
+</div>
+<p>SES <strong>nests both benchmarks</strong>: <span class="math inline">\(\alpha = 1\)</span> gives the naïve forecast, and <span class="math inline">\(\alpha \to 0\)</span> gives the historical mean.</p>
+<p><span class="neutral smaller">Use when there is no trend and no seasonality.</span></p>
+<p>Here’s the model. One equation.</p>
+<p>The level at time t equals alpha times the current observation, plus one-minus-alpha times the previous level. Alpha between zero and one.</p>
+<p>Read that as a compromise. Every period you get new information, y-sub-t, and you have your existing belief, ell-t-minus-one. Alpha is how much you let the new information move you. It’s a learning rate.</p>
+<p>And the forecast is just: y-hat equals ell-T, for every horizon h. Flat. Whatever the level is now is what we predict forever.</p>
+<p>That flatness is the model’s honest admission of its own limits. Simple exponential smoothing has no concept of trend. If your series is climbing, SES will forecast a horizontal line and be wrong by more every period. We’ll fix that on the next slide. Now the comparison in the middle.</p>
+<p>Large alpha — say zero point eight. You react quickly to shocks. But your forecasts are noisy and volatile, because you’re chasing every wiggle. Good for rapidly changing series.</p>
+<p>Small alpha — say zero point one. You adapt slowly. Your forecasts are smooth and stable. Good for slowly evolving series.</p>
+<p>There’s no universally right answer. It’s a genuine bias-variance tradeoff, and we’ll name it that way in Lecture 4. In practice you estimate alpha from the data by minimizing squared error.</p>
+<p>And here’s the elegant part. SES <em>nests both benchmarks</em> from slide seven. Set alpha to exactly one, and the level becomes y-sub-t — that’s the naive forecast. Let alpha go to zero, and you get the historical mean.</p>
+<p>So SES isn’t a competitor to those benchmarks. It’s a dial that spans them, and estimating alpha is letting the data pick the point on that dial. Use it when there’s no trend and no seasonality.</p>
+</section>
+<section id="holts-method-adding-trend" class="level3" data-number="1.3.3">
+<h3 data-number="1.3.3" class="anchored" data-anchor-id="holts-method-adding-trend"><span class="header-section-number">1.3.3</span> Holt’s Method: Adding Trend</h3>
+<p>SES produces a <em>flat</em> forecast. If the series trends, track both the level and the slope.</p>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Holt’s Linear Exponential Smoothing <span class="citation" data-cites="Holt2004">[@Holt2004]</span></p>
+</div>
+<p><strong>Level:</strong> <span class="math inline">\(\ell_t = \alpha\, y_t + (1-\alpha)\,(\ell_{t-1} + b_{t-1})\)</span></p>
+<p><strong>Trend:</strong> <span class="math inline">\(b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}\)</span></p>
+<p><strong>Forecast:</strong> <span class="math inline">\(\hat{y}_{T+h|T} = \ell_T + h\,b_T\)</span></p>
+</div>
+<p>Read <span class="math inline">\(\ell_t\)</span> as where the series <em>is</em> now and <span class="math inline">\(b_t\)</span> as its current growth rate.</p>
+<p><strong>Linear extrapolation gets unrealistic at long horizons.</strong> For <span class="math inline">\(h &gt; 6\)</span> use the <strong>damped trend</strong> variant, <span class="math inline">\(\hat{y}_{T+h|T} = \ell_T + \sum_{j=1}^{h}\phi^j b_T\)</span> with <span class="math inline">\(0 &lt; \phi &lt; 1\)</span>. At <span class="math inline">\(\phi = 0.85\)</span> the forecast converges to a finite ceiling instead of growing forever.</p>
+<p>SES gives a flat forecast. So if the series trends, we need more. Holt’s insight, from 1957, is to track two things instead of one: the level, and the slope. Three equations in the box.</p>
+<p>The <strong>level</strong> equation looks like SES, with one change: instead of comparing against the old level, we compare against the old level plus the old trend. We account for the fact that the series was expected to move.</p>
+<p>The <strong>trend</strong> equation is the same smoothing idea applied to the slope. How much did the level change this period? Blend that with our previous estimate of the slope, controlled by beta-star.</p>
+<p>And the <strong>forecast</strong> is level plus h times trend. Now we get a sloped line instead of a flat one.</p>
+<p>The reading I’d offer: ell-t is where the series <em>is</em> right now, and b-sub-t is how fast it’s moving. Position and velocity. Now the caution, and this one has cost people real money.</p>
+<p>Linear extrapolation gets unrealistic at long horizons. That forecast is a straight line extended forever. Twelve months out, fine. Five years out, your model is projecting a company that grows without limit. Nothing grows without limit.</p>
+<p>The fix is the <strong>damped trend</strong>. Multiply the trend by phi, then phi squared, then phi cubed, with phi between zero and one. Each step forward, the trend contributes a little less.</p>
+<p>At phi equals zero point eight-five, the forecast converges to a finite ceiling instead of growing forever. And empirically, damped trend is one of the strongest performers in forecasting competitions — often beating far more sophisticated models. Use it for anything beyond about six periods.</p>
+</section>
+<section id="holt-winters-level-trend-and-seasonality" class="level3" data-number="1.3.4">
+<h3 data-number="1.3.4" class="anchored" data-anchor-id="holt-winters-level-trend-and-seasonality"><span class="header-section-number">1.3.4</span> Holt-Winters: Level, Trend, and Seasonality</h3>
+<div class="definitionbox">
+<div class="definitionbox-title">
+<p>Holt-Winters Additive Method <span class="citation" data-cites="Winters1960">[@Winters1960]</span></p>
+</div>
+<p><span class="math inline">\(\ell_t = \alpha(y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1}+b_{t-1})\)</span></p>
+<p><span class="math inline">\(b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)\,b_{t-1}\)</span></p>
+<p><span class="math inline">\(s_t = \gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma)\,s_{t-m}\)</span></p>
+<p><strong>Forecast:</strong> <span class="math inline">\(\hat{y}_{T+h|T} = \ell_T + h\,b_T + s_{T+h-m}\)</span>   (<span class="math inline">\(m\)</span> = seasonal period)</p>
+</div>
+<div class="columns">
+<div class="column" style="width:48%;">
+<p><strong>Additive seasonality:</strong></p>
+<ul>
+<li>Seasonal swings are constant in size</li>
+<li>Same ± amount every December</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>Multiplicative seasonality:</strong></p>
+<ul>
+<li>Swings grow with the level</li>
+<li>Retail sales, tourism</li>
+</ul>
+</div>
+</div>
+<p>In US retail sales the December spike grows every year as overall sales grow, which makes it <strong>multiplicative</strong>.</p>
+<p><span class="neutral smaller">Requires at least <span class="math inline">\(2m\)</span> observations to initialize (<span class="math inline">\(m=12\)</span> for monthly data).</span></p>
+<p>One more component. Holt-Winters adds seasonality, so now we’re tracking three things.</p>
+<p>The equations look intimidating, so let me just point at the structure. Level, trend, and now a <strong>seasonal</strong> equation with a third smoothing parameter, gamma. And notice the subscript: s-sub-t-minus-m, where m is the seasonal period — twelve for monthly data, four for quarterly, seven for daily data with a weekly cycle. We’re looking back one full season.</p>
+<p>In the level equation, we subtract the seasonal component before updating. We de-seasonalize first, then update. Then the forecast adds the season back in. Now the comparison — and this is a real decision you’ll have to make.</p>
+<p><strong>Additive</strong> seasonality: swings are constant in size. December adds the same amount every year, whether the store is big or small.</p>
+<p><strong>Multiplicative</strong> seasonality: swings grow with the level. December is plus thirty <em>percent</em>, not plus a fixed number of dollars.</p>
+<p>How do you tell? Look at the plot. If the seasonal swings get visibly bigger as the series grows, it’s multiplicative.</p>
+<p>US retail sales are the textbook case. The December spike grows every year as overall sales grow — so it’s multiplicative. Retail and tourism usually are.</p>
+<p>One practical constraint at the bottom: you need at least two full seasons of data to initialize. For monthly data, that’s twenty-four observations minimum. With eighteen months of history you cannot fit a seasonal model, no matter how much you want to.</p>
+</section>
+<section id="the-ets-framework-a-unified-view" class="level3" data-number="1.3.5">
+<h3 data-number="1.3.5" class="anchored" data-anchor-id="the-ets-framework-a-unified-view"><span class="header-section-number">1.3.5</span> The ETS Framework: A Unified View</h3>
+<p><span class="citation" data-cites="Hyndman2021">@Hyndman2021</span> unify every exponential smoothing method as a <strong>state space model</strong>: Error × Trend × Seasonal.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>Options</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Error (<span class="math inline">\(E\)</span>)</td>
+<td>A, M</td>
+<td>Additive / Multiplicative</td>
+</tr>
+<tr class="even">
+<td>Trend (<span class="math inline">\(T\)</span>)</td>
+<td>N, A, A<sub>d</sub></td>
+<td>None / Additive / Damped</td>
+</tr>
+<tr class="odd">
+<td>Seasonal (<span class="math inline">\(S\)</span>)</td>
+<td>N, A, M</td>
+<td>None / Additive / Multiplicative</td>
+</tr>
+</tbody>
+</table>
+<p>That gives 15 valid combinations, and the ones we have just built are among them: <strong>ETS(A,N,N)</strong> is SES, <strong>ETS(A,A,N)</strong> is Holt linear, <strong>ETS(A,A<sub>d</sub>,N)</strong> is Holt damped, <strong>ETS(A,A,A)</strong> is Holt-Winters additive, and <strong>ETS(A,A,M)</strong> is Holt-Winters multiplicative.</p>
+<p><strong>Automatic selection:</strong> fit all 15 and pick the minimum AIC. In Python, <code>statsmodels.tsa.exponential_smoothing.ets.ETSModel</code>.</p>
+<p>Now let’s tie it together, because it may feel like we’ve collected three unrelated techniques. We haven’t. They’re one family.</p>
+<p>Hyndman and Athanasopoulos — the authors of our textbook — unify every exponential smoothing method as a <strong>state space model</strong>, described by three letters: Error, Trend, Seasonal.</p>
+<p>The <strong>Error</strong> can be additive or multiplicative. The <strong>Trend</strong> can be none, additive, or damped. The <strong>Seasonal</strong> can be none, additive, or multiplicative. Fifteen valid combinations. And every method from the last three slides is one of them. ETS(A,N,N) — additive error, no trend, no season — that’s simple exponential smoothing. ETS(A,A,N) is Holt linear. ETS(A,A-damped,N) is Holt with a damped trend. ETS(A,A,A) is Holt-Winters additive, and ETS(A,A,M) is Holt-Winters multiplicative.</p>
+<p>So they weren’t three tricks. They were four points in a structured space, and now you can see the whole space at once — including combinations we never discussed.</p>
+<p>And here’s the practical payoff. <strong>Automatic selection.</strong> You don’t have to agonize over which of the fifteen to use. Fit all fifteen, and pick the one with the minimum AIC. In Python, that’s the ETSModel class in statsmodels, and it will do the search for you.</p>
+<p>Which raises a fair question: if the computer picks the model, why did we walk through the equations? Because when the automatic selection returns something strange — a multiplicative trend on a series that shouldn’t have one — you need to recognize that and know why it’s wrong. Automation is a labor-saving device, not a substitute for judgment.</p>
+</section>
+</section>
+<section id="forecast-evaluation" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="forecast-evaluation"><span class="header-section-number">1.4</span> Forecast Evaluation</h2>
+<p>Forecasting without evaluation is not science — it is storytelling.</p>
+<p>Part three. Forecast evaluation.</p>
+<p>And the line on this slide is one I mean literally: forecasting without evaluation is not science. It’s storytelling.</p>
+<section id="how-do-we-measure-forecast-accuracy" class="level3" data-number="1.4.1">
+<h3 data-number="1.4.1" class="anchored" data-anchor-id="how-do-we-measure-forecast-accuracy"><span class="header-section-number">1.4.1</span> How Do We Measure Forecast Accuracy?</h3>
+<p>Given out-of-sample errors <span class="math inline">\(e_{T+h} = y_{T+h} - \hat{y}_{T+h|T}\)</span>:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Scale-dependent:</strong></p>
+<p><span class="math display">\[\text{RMSE} = \sqrt{\tfrac{1}{H}\sum_{h=1}^{H} e_{T+h}^2}\]</span></p>
+<p><span class="math display">\[\text{MAE} = \tfrac{1}{H}\sum_{h=1}^{H} |e_{T+h}|\]</span></p>
+<p><span class="neutral smaller">Same units as <span class="math inline">\(y_t\)</span>. Compare models on the <em>same</em> series.</span></p>
+</div><div class="column" style="width:46%;">
+<p><strong>Scale-free:</strong></p>
+<p><span class="math display">\[\text{MAPE} = \tfrac{100\%}{H}\sum_{h=1}^{H}\left|\tfrac{e_{T+h}}{y_{T+h}}\right|\]</span></p>
+<p><span class="math display">\[\text{MASE} = \tfrac{\text{MAE}}{\text{MAE}_{\text{seas. naïve}}}\]</span></p>
+<p><span class="neutral smaller">Compare <em>across</em> series.</span></p>
+</div>
+</div>
+<p><strong>RMSE vs.&nbsp;MAE:</strong> RMSE punishes large errors harder. When big misses are especially costly — a stockout, an understaffed shift — prefer RMSE.</p>
+<p><strong>MASE</strong> is the one to report across series: <span class="math inline">\(\text{MASE} &lt; 1\)</span> beats seasonal naïve, <span class="math inline">\(\text{MASE} &gt; 1\)</span> is <span class="negative">worse</span> than doing nothing clever. It is the standard in the M-Competitions <span class="citation" data-cites="Makridakis2020">[@Makridakis2020]</span>.</p>
+<p>We have out-of-sample errors — actual minus forecast. How do we summarize them into one number? Two families.</p>
+<p>On the left, <strong>scale-dependent</strong> measures. RMSE is the square root of the mean squared error. MAE is the mean absolute error. Both come out in the same units as your data — dollars, units, patients. Which makes them easy to explain to a manager: “we’re off by about four hundred units a month.” But it also means you can only compare models on the <em>same</em> series. An RMSE of four hundred means nothing next to an RMSE of two.</p>
+<p>On the right, <strong>scale-free</strong> measures. MAPE is mean absolute <em>percentage</em> error. MASE is the mean absolute error divided by the MAE of a seasonal naive forecast. These let you compare <em>across</em> series.</p>
+<p>Now, RMSE versus MAE. Because RMSE squares the errors before averaging, it punishes large errors much harder. One catastrophic miss hurts RMSE far more than several small ones.</p>
+<p>So which should you use? It depends on your cost function. If big misses are especially costly — a stockout, an understaffed shift, a blown capital reserve — prefer RMSE, because it reflects that asymmetry. If all errors hurt roughly in proportion to size, MAE is more representative. That’s a business judgment, not a statistical one. Ask what the error actually costs.</p>
+<p>And <strong>MASE</strong> is the one I’d have you report when comparing across series. It’s built on the benchmark idea from slide seven. If MASE is less than one, you beat seasonal naive. If it’s greater than one, you’re worse than doing nothing clever — and you should say so.</p>
+<p>It’s the standard in the M-Competitions, and it has a property the others lack: the number carries its own verdict. An RMSE of eight hundred needs context. A MASE of one point two tells you immediately that you’ve failed.</p>
+</section>
+<section id="the-golden-rule-always-evaluate-out-of-sample" class="level3" data-number="1.4.2">
+<h3 data-number="1.4.2" class="anchored" data-anchor-id="the-golden-rule-always-evaluate-out-of-sample"><span class="header-section-number">1.4.2</span> The Golden Rule: Always Evaluate Out-of-Sample</h3>
+<p><strong>Never evaluate a forecast model on the data used to fit it.</strong> In-sample fit measures how well the model memorized the past, not how well it predicts the future.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A["Training set&lt;br/&gt;t = 1 … T"] --&gt;|forecast origin| B["Test set&lt;br/&gt;t = T+1 … T+H"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<div class="warningbox">
+<p><strong>Never randomly shuffle time series observations.</strong> Use <code>TimeSeriesSplit</code> in scikit-learn, never <code>KFold</code>. Shuffling lets future data train the model — data leakage that makes results look excellent and forecast badly.</p>
+</div>
+<p>If you take one operational rule from this lecture, take this one. <strong>Never evaluate a forecast model on the data used to fit it.</strong></p>
+<p>In-sample fit measures how well the model memorized the past. It says almost nothing about how well it predicts the future. And the two can point in opposite directions — a model complex enough to fit your history perfectly will usually forecast terribly, because it has learned the noise along with the signal.</p>
+<p>The diagram shows the correct setup. Training set up to time T. Then the forecast origin. Then the test set beyond it. The model sees only the training data. We judge it only on the test data. The split is <em>chronological</em> — the test set is the future. Now the warning box, and this is the single most common technical error I see. <strong>Never randomly shuffle time series observations.</strong></p>
+<p>In scikit-learn, use <code>TimeSeriesSplit</code>, never <code>KFold</code>. <code>KFold</code> is the default in most tutorials, and it shuffles. On a time series, that puts future observations into the training set and past observations into validation. The model gets to peek at the answer.</p>
+<p>This is called data leakage, and the reason it’s dangerous is that it doesn’t look like an error. Your cross-validation scores get <em>better</em>. The model looks excellent. Then it goes into production and fails, and nobody can work out why — because the bug was in the evaluation, not the model. So: <code>TimeSeriesSplit</code>. Every time. This will come back in every remaining lecture.</p>
+</section>
+</section>
+<section id="course-roadmap" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="course-roadmap"><span class="header-section-number">1.5</span> Course Roadmap</h2>
+<p>What we will cover, and how it fits together.</p>
+<p>Last part. Let’s look at where the semester goes.</p>
+<section id="econ-8310-four-part-structure" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="econ-8310-four-part-structure"><span class="header-section-number">1.5.1</span> ECON 8310: Four-Part Structure</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 37%">
+<col style="width: 62%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th>Lectures</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>I. Time series</td>
+<td>1. Intro, ETS &amp; evaluation <em>(today)</em>   2. ARIMA &amp; VAR   3. Generalized additive models</td>
+</tr>
+<tr class="even">
+<td>II. Tree-based</td>
+<td>4. Decision trees   5. Tree ensembles: random forests &amp; boosted trees   6. Regularization &amp; model selection</td>
+</tr>
+<tr class="odd">
+<td>III. Deep learning</td>
+<td>7. Neural networks (PyTorch)   8. CNN architectures   9. RNNs, LSTMs &amp; Transformers</td>
+</tr>
+<tr class="even">
+<td>IV. Bayesian</td>
+<td>10. Foundations   11. Time series &amp; hierarchical models   12. Bayesian linear regression</td>
+</tr>
+</tbody>
+</table>
+<p><span class="neutral smaller">Python throughout: statsmodels, scikit-learn, xgboost, PyTorch, prophet, pyGAM, pymc.</span></p>
+<p>Twelve lectures, four parts.</p>
+<p><strong>Part one, time series models.</strong> Today’s lecture, then ARIMA and VAR in Lecture 2, then generalized additive models in Lecture 3. This is the classical econometric toolkit.</p>
+<p><strong>Part two, tree-based models.</strong> Decision trees, then tree ensembles — random forests and boosted trees together — then regularization and model selection. This is where we cross into machine learning, and where feature engineering starts to matter more than the model.</p>
+<p><strong>Part three, deep learning.</strong> Neural networks in PyTorch, CNN architectures, then RNNs, LSTMs and Transformers. We build these from the components up, not just by calling a library.</p>
+<p><strong>Part four, Bayesian methods.</strong> Foundations, then time series and hierarchical models, then Bayesian linear regression. This is where we stop producing a single number and start producing a full distribution — which is often what the decision actually needed. Python throughout. Statsmodels, scikit-learn, xgboost, PyTorch, prophet, pyGAM, and pymc.</p>
+<p>One note on sequencing: the parts get harder, but not uniformly. If you come from econometrics, part one will feel comfortable and part four will be a genuine shift in thinking. If you come from data science, the reverse. Whichever you are, don’t coast through the familiar half — the methods build on each other, and falling behind in one week makes the next one harder.</p>
+</section>
+<section id="tools-and-what-you-will-be-able-to-do" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="tools-and-what-you-will-be-able-to-do"><span class="header-section-number">1.5.2</span> Tools and What You Will Be Able to Do</h3>
+<p><strong>The Python stack:</strong> <code>statsmodels</code> (ETS, ARIMA, VAR) · <code>scikit-learn</code> (models, pipelines, cross-validation) · <code>xgboost</code> (gradient boosting) · <code>torch</code> (neural networks) · <code>prophet</code> and <code>pygam</code> (GAMs) · <code>pymc</code> (Bayesian models).</p>
+<p><strong>By the end of the semester you will be able to:</strong></p>
+<ul>
+<li>Choose the right method for a given business problem</li>
+<li>Implement and tune it in Python</li>
+<li>Evaluate it rigorously out-of-sample</li>
+<li>Interpret the result for a non-technical stakeholder</li>
+<li>Use AI tools effectively to accelerate the analysis</li>
+<li>Avoid the most common forecasting mistakes</li>
+</ul>
+<p>Quickly, the stack. Statsmodels for the classical time series models. Scikit-learn for machine learning models, pipelines, and cross-validation. XGBoost for gradient boosting. PyTorch for neural networks. Prophet and pyGAM for additive models. And pymc for Bayesian work.</p>
+<p>Get these installed before the next class. There’s a test script in the course repository — run it, and if something fails, email me now rather than the night before Assignment 1.</p>
+<p>And here’s what I’m actually promising. By the end of the semester you’ll be able to choose the right method for a given business problem — which is mostly about knowing what each one assumes. Implement and tune it in Python. Evaluate it rigorously out-of-sample. Interpret the result for someone non-technical. Use AI tools effectively to speed the work up. And avoid the most common mistakes, several of which we’ve already named today.</p>
+<p>Notice that only one of those six is about writing code. The code is the easy part now. The judgment is what you’re here for.</p>
+</section>
+<section id="lecture-1-key-takeaways" class="level3" data-number="1.5.3">
+<h3 data-number="1.5.3" class="anchored" data-anchor-id="lecture-1-key-takeaways"><span class="header-section-number">1.5.3</span> Lecture 1: Key Takeaways</h3>
+<div class="keybox">
+<ol type="1">
+<li><p>Forecasting underpins every forward-looking business decision. The optimal point forecast (under squared loss) is the <strong>conditional expectation</strong>.</p></li>
+<li><p><strong>Always beat a benchmark first.</strong> Naïve, seasonal naïve, mean, drift.</p></li>
+<li><p>Exponential smoothing assigns <strong>geometrically declining weights</strong> to past observations. <span class="math inline">\(\alpha\)</span> controls how fast old data is forgotten.</p></li>
+<li><p>SES (level) → Holt (+ trend) → Holt-Winters (+ season). The <strong>ETS framework</strong> unifies all variants; AIC selects automatically.</p></li>
+<li><p><strong>Evaluate out-of-sample only.</strong> RMSE penalizes large errors; MASE benchmarks against seasonal naïve. Never shuffle time series data.</p></li>
+</ol>
+</div>
+<p><em>Next: ARIMA &amp; VAR — a regression-based approach to time series with richer autocorrelation structure.</em></p>
+<p>Five things to carry out of today.</p>
+<p><strong>One.</strong> Forecasting underpins every forward-looking business decision, and under squared-error loss the optimal point forecast is the conditional expectation.</p>
+<p><strong>Two.</strong> Always beat a benchmark first. Naive, seasonal naive, mean, drift. If you can’t beat them, you have nothing — and you should say so.</p>
+<p><strong>Three.</strong> Exponential smoothing assigns geometrically declining weights to past observations. Alpha controls how fast old data is forgotten.</p>
+<p><strong>Four.</strong> SES gives you level. Holt adds trend. Holt-Winters adds seasonality. The ETS framework unifies all fifteen variants, and AIC selects among them automatically.</p>
+<p><strong>Five.</strong> Evaluate out-of-sample only. RMSE punishes large errors; MASE benchmarks against seasonal naive. And never shuffle time series data.</p>
+<p>If you remember only two of those, make it number two and number five. Benchmark first, evaluate honestly. Every method in the remaining eleven lectures is judged by those two standards.</p>
+</section>
+<section id="references" class="level3" data-number="1.5.4">
+<h3 data-number="1.5.4" class="anchored" data-anchor-id="references"><span class="header-section-number">1.5.4</span> References</h3>
+
+
+<p>Readings for this week are in the syllabus. For today, that’s chapters one, two, five, and eight of <em>Forecasting: Principles and Practice</em> — either edition works for this material, the chapter numbers are identical.</p>
+<p>Next time: ARIMA and VAR. We’ll relax the idea that the past enters only through a smoothed level, and start modeling the correlation structure of the series directly. See you then.</p>
+</section>
+</section>
+<section id="timing-guide" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="timing-guide"><span class="header-section-number">1.6</span> Timing guide</h2>
+<p>Measured from the script: <strong>3,880 spoken words</strong>. At 140 wpm — a normal lecture pace — that is <strong>~28 minutes</strong>; 32 if you read deliberately, 26 if you push.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Segment</th>
+<th>Slides</th>
+<th style="text-align: right;">Words</th>
+<th style="text-align: right;">Runtime</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Opening &amp; why forecasting matters</td>
+<td>1–7</td>
+<td style="text-align: right;">1,410</td>
+<td style="text-align: right;">~10 min</td>
+</tr>
+<tr class="even">
+<td>Exponential smoothing</td>
+<td>8–13</td>
+<td style="text-align: right;">1,291</td>
+<td style="text-align: right;">~9 min</td>
+</tr>
+<tr class="odd">
+<td>Forecast evaluation</td>
+<td>14–16</td>
+<td style="text-align: right;">580</td>
+<td style="text-align: right;">~4 min</td>
+</tr>
+<tr class="even">
+<td>Roadmap &amp; close</td>
+<td>17–21</td>
+<td style="text-align: right;">599</td>
+<td style="text-align: right;">~4 min</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>3,880</strong></td>
+<td style="text-align: right;"><strong>~28 min</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Content slides run 90–155 seconds each; section dividers 4–17 seconds.</p>
+<p>If you’re running long, slides 4 and 19 compress most easily — the domain examples and the tool list both survive trimming. Do <strong>not</strong> compress slides 7, 15, or 16; those carry the standards the rest of the course depends on.</p>
+<p><strong>If you need this longer</strong>, the script is deliberately lean and there are three honest ways to extend it, in rough order of value:</p>
+<ol type="1">
+<li><strong>Work a numeric example on screen.</strong> Slides 10–12 (SES, Holt, Holt-Winters) currently state the update equations without ever turning a crank. Walking through three periods of an SES update by hand adds 4–6 minutes and is where the intuition actually lands.</li>
+<li><strong>Live-code the ETS fit.</strong> Slide 13 mentions <code>ETSModel</code> in one sentence. Fitting it to a real series on camera, and showing what automatic selection picks, adds 6–10 minutes.</li>
+<li><strong>Demonstrate the leakage failure.</strong> Slide 16 asserts that <code>KFold</code> flatters a model. Showing the inflated CV score next to the honest one makes the warning land far harder than stating it. Adds 4–5 minutes.</li>
+</ol>
+<p>All three add <em>demonstration</em>, not more talking — which is the right way to lengthen a video lecture.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../index.html" class="pagination-link" aria-label="Preface">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture02_ARIMA_VAR.html" class="pagination-link" aria-label="ARIMA, VAR &amp; Multivariate Models">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">ARIMA, VAR &amp; Multivariate Models</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
