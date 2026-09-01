@@ -7,7 +7,7 @@ Scope: `forecasting-course` (public), `forecasting-env` (public, student homewor
 `forecasting-instructor` (private, keys). Evidence gathered by inspection and by running the
 repositories' own checks.
 
-**Two false alarms of my own, recorded so they are not re-investigated.** A first pass reported
+**Four false alarms of my own — two found while writing this, two found while acting on it.** See §1.1 and §2.1, both retracted. The pattern in all four is the same: I trusted an extraction instead of reading the source.  A first pass reported
 prompt-budget mismatches across all eleven assignments and a missing due date for Homework 6
 Part 1. Both were bugs in my extraction, not in the course: the budgets agree in all three places
 and all eleven due dates match. Where this document says something is clean, it was checked.
@@ -16,7 +16,14 @@ and all eleven due dates match. Where this document says something is clean, it 
 
 ## 1. Inconsistencies
 
-### 1.1 The intake meeting is called two different lengths — **confirmed**
+### 1.1 ~~The intake meeting is called two different lengths~~ — **WRONG, retracted 2026-09-01**
+
+**This finding was mine and it was false.** The only "10-minute" text in the syllabus sat inside a
+commented-out block — the superseded Calendly paragraph, replaced by the Google Sheet sign-up that
+is actually live. I read commented-out text as live text. The live section never contradicted its
+heading; it simply stated no duration at all, which has now been fixed to say twenty minutes.
+
+Original finding, preserved:
 
 `ECON8310Syllabus2026Fall.md`
 
@@ -65,7 +72,14 @@ syllabus itself hands out. Either restore it or delete it.
 
 ## 2. Questionable to wrong
 
-### 2.1 Week 17 is graded but not scheduled — **confirmed**
+### 2.1 ~~Week 17 is graded but not scheduled~~ — **WRONG, retracted 2026-09-01**
+
+**Also mine, also false.** The week was in the schedule as **"Final Exam Week · Dec 17 — Final
+project presentations (5:30-7:30pm)"**. It was named differently from the grading table's "Week
+17", not absent. My check grepped for `^\*\*Week 17` and concluded absence from a naming
+difference. The two now agree.
+
+Original finding, preserved:
 
 The grading table has `| In-class presentation | Week 17 (Dec. 17) | 25 |`, and the final report is
 due Dec 18. The weekly schedule ends at **Week 16 · Dec 10**. Nothing in the schedule tells a
