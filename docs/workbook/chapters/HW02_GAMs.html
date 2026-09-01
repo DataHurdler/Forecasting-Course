@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>17&nbsp; Homework 2: Generalized Additive Models – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/HW03_Trees_RF.html" rel="next">
+<link href="../chapters/HW01_Part2_ARIMA_VAR.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/HW01_Part1_ETS.html">Assignments</a></li><li class="breadcrumb-item"><a href="../chapters/HW02_GAMs.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">18</span> Overview</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="header-section-number">19</span> Dataset</a></li>
+  <li><a href="#initial-prompt-for-your-ai-assistant" id="toc-initial-prompt-for-your-ai-assistant" class="nav-link" data-scroll-target="#initial-prompt-for-your-ai-assistant"><span class="header-section-number">20</span> Initial Prompt for Your AI Assistant</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">21</span> Questions</a>
+  <ul class="collapse">
+  <li><a href="#q1-prophet-fit-and-decompose" id="toc-q1-prophet-fit-and-decompose" class="nav-link" data-scroll-target="#q1-prophet-fit-and-decompose"><span class="header-section-number">21.1</span> Q1 — Prophet: Fit and Decompose</a></li>
+  <li><a href="#q2-prophet-adding-regressors" id="toc-q2-prophet-adding-regressors" class="nav-link" data-scroll-target="#q2-prophet-adding-regressors"><span class="header-section-number">21.2</span> Q2 — Prophet: Adding Regressors</a></li>
+  <li><a href="#q3-pygam" id="toc-q3-pygam" class="nav-link" data-scroll-target="#q3-pygam"><span class="header-section-number">21.3</span> Q3 — pyGAM</a></li>
+  <li><a href="#q4-model-comparison" id="toc-q4-model-comparison" class="nav-link" data-scroll-target="#q4-model-comparison"><span class="header-section-number">21.4</span> Q4 — Model Comparison</a></li>
+  <li><a href="#q5-reflection" id="toc-q5-reflection" class="nav-link" data-scroll-target="#q5-reflection"><span class="header-section-number">21.5</span> Q5 — Reflection</a></li>
+  </ul></li>
+  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">22</span> Submission Checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/HW01_Part1_ETS.html">Assignments</a></li><li class="breadcrumb-item"><a href="../chapters/HW02_GAMs.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level1" data-number="18">
+<h1 data-number="18"><span class="header-section-number">18</span> Overview</h1>
+<p>Generalized Additive Models (GAMs) extend linear regression by replacing straight-line effects with flexible smooth functions — one per predictor — that are then added together to produce a forecast. This structure preserves interpretability (you can inspect each component individually) while capturing nonlinear patterns that fixed-slope models miss. Prophet, developed at Meta, applies exactly this idea to time series by decomposing a signal into trend, seasonality, and user-defined regressor effects. This assignment applies both Prophet and pyGAM to daily Walmart sales and benchmarks them against a seasonal-naive baseline and against your ARIMA/ETS results from Homework 1.</p>
+<p><strong>Learning objectives.</strong> By the end of this assignment you will be able to:</p>
+<ul>
+<li>Decompose a time series into trend, weekly seasonality, yearly seasonality, and external regressors using Prophet</li>
+<li>Interpret Prophet component plots and connect them to concrete business decisions</li>
+<li>Fit a pyGAM with a cyclic spline for the annual cycle, a factor term for day of week, and linear terms for binary demand drivers</li>
+<li>Compare GAM-family models against ARIMA/ETS on a common holdout set using RMSE</li>
+</ul>
+<hr>
+</section>
+<section id="dataset" class="level1" data-number="19">
+<h1 data-number="19"><span class="header-section-number">19</span> Dataset</h1>
+<p>This homework switches from weekly to <strong>daily</strong> data. Prophet and pyGAM both benefit from finer time granularity: daily data expose intra-week patterns that are averaged away in weekly aggregates, and Prophet’s changepoint detection is more reliable with a denser observation grid.</p>
+<p>You will work with <strong>store CA_1, FOODS category</strong> — 1,941 daily observations from the M5/Walmart data. Note that this is the same store and category you used in Homework 1 Part 1, but at daily rather than weekly frequency, so you can compare directly against what you already fitted.</p>
+<p>The preprocessed file is <code>data/processed/m5_daily.csv</code>. If it does not exist, run <code>python scripts/prep_m5.py</code> once from the repository root.</p>
+<div id="a162a5b3" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, l, f</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings, logging</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">'cmdstanpy'</span>).setLevel(logging.ERROR)   <span class="co"># Prophet is chatty</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Find the processed data file whether you render from the repo root or from</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">    this file's own folder."""</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"processed"</span> <span class="op">/</span> name</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. "</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Run `python scripts/prep_m5.py` from the repository root first."</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> pd.read_csv(data_path(<span class="st">"m5_daily.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"date"</span>])</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"CA_1 FOODS daily: </span><span class="sc">{</span><span class="bu">len</span>(daily)<span class="sc">}</span><span class="ss"> observations from "</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span>daily[<span class="st">'date'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>daily[<span class="st">'date'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(daily[[<span class="st">"date"</span>, <span class="st">"units"</span>, <span class="st">"snap"</span>, <span class="st">"is_event"</span>, <span class="st">"avg_price"</span>]].head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>The columns you will use:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>date</code></td>
+<td>Calendar date</td>
+</tr>
+<tr class="even">
+<td><code>units</code></td>
+<td>Units sold that day — the target</td>
+</tr>
+<tr class="odd">
+<td><code>snap</code></td>
+<td>1 if SNAP benefits were disbursable in California that day (~33% of days)</td>
+</tr>
+<tr class="even">
+<td><code>is_event</code></td>
+<td>1 if a calendar event fell on that day (holiday, sporting event, religious date)</td>
+</tr>
+<tr class="odd">
+<td><code>avg_price</code></td>
+<td>Average sell price across the category that day</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Your numbers will not match mine, and that is fine
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every result in this course depends on a random seed, and often also on your library versions, your hardware, and how many CPU threads your machine uses. Two people running identical, correct code will get different numbers — sometimes noticeably different.</p>
+<p><strong>What is graded</strong> is that you used the right model and the right procedure, and that your interpretation follows from the numbers <em>you</em> actually obtained. Quote your own output.</p>
+<p><strong>What is not graded</strong> is matching any particular value. Do not tune your way toward a number you saw on a slide or heard from a classmate — that is the one way to turn this into a wrong answer.</p>
+<p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
+</div>
+</div>
+<section id="one-data-quirk-to-find-before-you-model" class="level2" data-number="19.1">
+<h2 data-number="19.1" class="anchored" data-anchor-id="one-data-quirk-to-find-before-you-model"><span class="header-section-number">19.1</span> One data quirk to find before you model</h2>
+<p>Run <code>daily[daily.units == 0]</code> before you fit anything. There are exactly five such days, and they are not missing data — they are real zeros with a real cause. Identify the cause, and decide (and state in Q1) whether you leave them in, drop them, or handle them another way. Whatever you choose, Prophet will do something with them, so choose deliberately.</p>
+</section>
+</div>
+</div>
+<hr>
+</section>
+<section id="initial-prompt-for-your-ai-assistant" class="level1" data-number="20">
+<h1 data-number="20"><span class="header-section-number">20</span> Initial Prompt for Your AI Assistant</h1>
+<p><em>Any assistant works — ChatGPT, Claude, Gemini, or Copilot, in an editor or in a browser tab. Paste the block below as your <strong>first</strong> message, before you ask anything else.</em></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Initial Prompt for Your AI Assistant
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Paste the block below as the very first message in your assistant session before sending any questions. This sets the context that all subsequent prompts build on and does <strong>not</strong> count against your prompt budget.</p>
+<pre><code>I am working on Homework 2 for ECON 8310: Business Forecasting at the University of Nebraska at Omaha.
+
+Dataset: M5/Walmart — daily data for store CA_1, FOODS category, at `data/processed/m5_daily.csv`. Columns: date, store_id, cat_id, units (target), avg_price, snap (1 if SNAP benefits disbursable that day), is_event (1 if a calendar event), wday, month, year, and lagged units (units_lag1, units_lag7, units_lag14, units_lag28, units_lag365).
+
+This homework covers Generalized Additive Models (GAMs) using Prophet and pyGAM in Python. I will ask you questions one at a time. For each:
+1. Write clean, well-commented Python code that runs end-to-end
+2. Explain what the output means so that I understand it — but do NOT draft the written
+   answers I submit. The interpretation and business-recommendation sections are mine to
+   write, in my own words.
+
+My prompt budget is 10 (this context prompt is excluded). I will label each question before asking.
+
+
+Repository rules — these apply to every prompt in this thread:
+- My submission folder is `submissions/hw02_&lt;my_name&gt;/`. Put everything there.
+- Keep a `PROMPT_LOG.md` in that folder. For every prompt I send, append a block:
+      ### Prompt &lt;n&gt; — YYYY-MM-DD HH:MM
+      &lt;my prompt, verbatim&gt;
+  Numbered from 1, in order. Never edit or delete an earlier entry. If your tool cannot write
+  files, I will paste them in myself.
+- After finishing the work for each prompt, make exactly one git commit:
+  `hw02 prompt &lt;prompt_id&gt;: &lt;short summary&gt;`
+- If a prompt would take me past my budget of 10, do not do the work. Reply exactly
+  PROMPT_LIMIT_REACHED, and still log that prompt.
+- Never modify `AGENTS.md`, anything in `assignments/`, or anything in `policy/`.
+
+Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
+<p>Submit this text as <strong><code>INITIAL_PROMPT.md</code></strong> in your submission folder.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="questions" class="level1" data-number="21">
+<h1 data-number="21"><span class="header-section-number">21</span> Questions</h1>
+<section id="q1-prophet-fit-and-decompose" class="level2" data-number="21.1">
+<h2 data-number="21.1" class="anchored" data-anchor-id="q1-prophet-fit-and-decompose"><span class="header-section-number">21.1</span> Q1 — Prophet: Fit and Decompose</h2>
+<p><em>(Suggested prompts: 2)</em></p>
+<p>Prophet requires the input dataframe to have exactly two columns: <code>ds</code> (the date) and <code>y</code> (the target variable). The starter code below performs that rename and defines the train/test split. Using that split, fit a Prophet model with the settings listed below, generate a forecast over the test period, and produce both plots described.</p>
+<p><strong>Model settings:</strong></p>
+<ul>
+<li>Yearly seasonality: enabled</li>
+<li>Weekly seasonality: enabled</li>
+<li><code>changepoint_prior_scale = 0.05</code> (allows the trend to bend, but conservatively)</li>
+</ul>
+<p><strong>Plots to produce:</strong></p>
+<ol type="1">
+<li>Forecast plot with uncertainty bands (use Prophet’s built-in <code>plot()</code> method)</li>
+<li>Component decomposition plot showing trend, weekly seasonality, and yearly seasonality (use <code>plot_components()</code>)</li>
+</ol>
+<div id="c69baa16" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prophet requires columns named 'ds' (date) and 'y' (target)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>prophet_df <span class="op">=</span> daily[[<span class="st">"date"</span>, <span class="st">"units"</span>]].rename(columns<span class="op">=</span>{<span class="st">"date"</span>: <span class="st">"ds"</span>, <span class="st">"units"</span>: <span class="st">"y"</span>})</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">365</span>                       <span class="co"># hold out the final year</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>train_prophet <span class="op">=</span> prophet_df.iloc[:<span class="op">-</span>N_TEST]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>test_prophet  <span class="op">=</span> prophet_df.iloc[<span class="op">-</span>N_TEST:]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"train </span><span class="sc">{</span><span class="bu">len</span>(train_prophet)<span class="sc">}</span><span class="ss"> days, test </span><span class="sc">{</span><span class="bu">len</span>(test_prophet)<span class="sc">}</span><span class="ss"> days "</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"(</span><span class="sc">{</span>test_prophet<span class="sc">.</span>ds<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>test_prophet<span class="sc">.</span>ds<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit Prophet, forecast over the test period, and plot results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Describe what the component plots reveal. Which day of the week is busiest? Is there a clear annual pattern, and does it have one peak or more than one? What business decisions could a store manager make from these components? State what you did about the five zero days and why.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q2-prophet-adding-regressors" class="level2" data-number="21.2">
+<h2 data-number="21.2" class="anchored" data-anchor-id="q2-prophet-adding-regressors"><span class="header-section-number">21.2</span> Q2 — Prophet: Adding Regressors</h2>
+<p><em>(Suggested prompts: 2)</em></p>
+<p>External regressors allow Prophet to attribute part of the sales signal to known business drivers rather than absorbing them into the trend or seasonality components. The starter code below prepares a dataframe that includes <code>snap</code> and <code>is_event</code> alongside the required <code>ds</code> and <code>y</code> columns.</p>
+<p><strong>(a)</strong> Add <code>snap</code> and <code>is_event</code> as additional regressors using <code>add_regressor()</code>, then re-fit on the same training set. Compute test RMSE for this model and for the baseline from Q1. Present both in a small summary table.</p>
+<p><strong>(b)</strong> Extract the regressor coefficients using <code>prophet.utilities.regressor_coefficients()</code>. Report the estimated lift (in units) attributable to a SNAP day, and the effect of an event day. Interpret both magnitudes relative to average daily sales — is each large or small?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why SNAP is the interesting one
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>SNAP (the Supplemental Nutrition Assistance Program) benefits are disbursed on fixed calendar days that vary by state. California’s schedule puts them on roughly the first ten days of each month. This is a <strong>known, published, future-dated schedule</strong> — you always know next year’s SNAP days in advance. That is what makes it usable as a forecasting regressor, and it is the property you should look for when someone proposes a predictor.</p>
+</div>
+</div>
+<div id="8be9e835" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add regressor columns to the dataframe before fitting</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>prophet_reg_df <span class="op">=</span> daily[[<span class="st">"date"</span>, <span class="st">"units"</span>, <span class="st">"snap"</span>, <span class="st">"is_event"</span>]].rename(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">"date"</span>: <span class="st">"ds"</span>, <span class="st">"units"</span>: <span class="st">"y"</span>}</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit Prophet with snap and is_event as additional regressors</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare RMSE with and without regressors</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and report regressor coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Is the SNAP effect large enough to be actionable? Name one concrete operational decision — staffing, ordering, or promotion timing — that this number would change, and say what you would need to check before acting on it.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q3-pygam" class="level2" data-number="21.3">
+<h2 data-number="21.3" class="anchored" data-anchor-id="q3-pygam"><span class="header-section-number">21.3</span> Q3 — pyGAM</h2>
+<p><em>(Suggested prompts: 2)</em></p>
+<p>pyGAM fits an additive model directly on a feature matrix rather than on a time index, which makes it easy to include calendar-derived features and binary indicators side by side. The starter code below derives <code>day_of_year</code> and <code>day_of_week</code> from the <code>date</code> column and constructs training and test arrays.</p>
+<p>Fit a <code>LinearGAM</code> with the following four terms:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 34%">
+<col style="width: 18%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>Predictor</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>s(0, basis="cp")</code></td>
+<td><code>day_of_year</code> (1–366)</td>
+<td>Cyclic spline</td>
+<td>Annual cycle, with Dec 31 joined to Jan 1</td>
+</tr>
+<tr class="even">
+<td><code>f(1)</code></td>
+<td><code>day_of_week</code> (0–6)</td>
+<td>Factor</td>
+<td>Within-week pattern</td>
+</tr>
+<tr class="odd">
+<td><code>l(2)</code></td>
+<td><code>snap</code></td>
+<td>Linear</td>
+<td>SNAP benefit-day lift</td>
+</tr>
+<tr class="even">
+<td><code>l(3)</code></td>
+<td><code>is_event</code></td>
+<td>Linear</td>
+<td>Calendar event effect</td>
+</tr>
+</tbody>
+</table>
+<p>Two of those choices are deliberate and you should be able to defend them. <strong><code>basis="cp"</code></strong> makes the spline <em>cyclic</em>, so the fitted curve meets itself at the year boundary instead of being free to jump between December 31 and January 1. And <strong><code>f(1)</code> rather than <code>s(1)</code></strong>: day of week takes seven discrete values with no meaningful “between,” so a factor term is the honest choice — a smooth spline would interpolate a fractional Wednesday-and-a-half.</p>
+<p>After fitting, compute test RMSE. Then plot the partial dependence curves for <code>day_of_year</code> and <code>day_of_week</code> using the model’s <code>plot_partial_dependence()</code> method or by calling <code>partial_dependence()</code> manually.</p>
+<div id="c69fff44" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, l, f</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">"day_of_year"</span>] <span class="op">=</span> daily[<span class="st">"date"</span>].dt.dayofyear</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">"day_of_week"</span>] <span class="op">=</span> daily[<span class="st">"date"</span>].dt.dayofweek</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> [<span class="st">"day_of_year"</span>, <span class="st">"day_of_week"</span>, <span class="st">"snap"</span>, <span class="st">"is_event"</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> daily.iloc[:<span class="op">-</span>N_TEST][features].values</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> daily.iloc[:<span class="op">-</span>N_TEST][<span class="st">"units"</span>].values</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>X_test  <span class="op">=</span> daily.iloc[<span class="op">-</span>N_TEST:][features].values</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>y_test  <span class="op">=</span> daily.iloc[<span class="op">-</span>N_TEST:][<span class="st">"units"</span>].values</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit LinearGAM, compute test RMSE, plot partial dependence for day_of_year and day_of_week</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Look at the partial dependence plot for <code>day_of_week</code>. Which day has the highest predicted sales, all else equal? Does that match the Prophet weekly component from Q1? Then look at the confidence band on the <code>day_of_year</code> curve and say where it is widest — and explain why it is widest there.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q4-model-comparison" class="level2" data-number="21.4">
+<h2 data-number="21.4" class="anchored" data-anchor-id="q4-model-comparison"><span class="header-section-number">21.4</span> Q4 — Model Comparison</h2>
+<p><em>(Suggested prompts: 2)</em></p>
+<p>Collect the test-set RMSE values from Q1, Q2, and Q3 into the summary table below. Fill in the best RMSE you recorded from Homework 1 in the final row.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 44%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Test RMSE</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Seasonal naive (364 days back)</td>
+<td></td>
+<td>the benchmark every model must beat</td>
+</tr>
+<tr class="even">
+<td>Prophet (no regressors)</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Prophet (with regressors)</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>pyGAM</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Best HW1 model (ARIMA or ETS)</td>
+<td><em>from HW1</em></td>
+<td>note that HW1 was <strong>weekly</strong>, not daily</td>
+</tr>
+</tbody>
+</table>
+<p>Compute the seasonal-naive benchmark yourself: predict each test day using the value 364 days earlier (364 rather than 365 keeps the day of week aligned). A model that cannot beat this is not earning its complexity.</p>
+<p>Then produce a single figure showing actual versus predicted for the three fitted models over the test period, with distinct colors and a legend.</p>
+<div id="67ff3524" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the seasonal-naive benchmark, then collect RMSE values from Q1, Q2, Q3</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot actual vs predicted for the test period for Prophet (both variants) and pyGAM</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a single figure with distinct colors and a legend</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Comparing against Homework 1 honestly
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Your HW1 models were fitted on <strong>weekly</strong> data and this homework is <strong>daily</strong>. RMSE on weekly units and RMSE on daily units are not the same quantity and must not be put side by side as if they were. If you want a genuine comparison, say explicitly what you would have to do to make it one — you do not have to carry it out.</p>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Which model gives the best holdout RMSE, and by how much over the benchmark? Which is most interpretable to a non-technical manager? Would you recommend different models for different uses — next-week staffing versus an annual budget — and why?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q5-reflection" class="level2" data-number="21.5">
+<h2 data-number="21.5" class="anchored" data-anchor-id="q5-reflection"><span class="header-section-number">21.5</span> Q5 — Reflection</h2>
+<p><em>(Suggested prompts: 0 — write yourself)</em></p>
+<p>No code required for this question. Write 150–200 words in response to the following scenario.</p>
+<p>You are presenting to a Walmart regional operations team that currently forecasts store-level demand with a simple 4-week moving average. Explain why a GAM-based approach (Prophet or pyGAM) would be an upgrade. Identify at least two specific insights from your component plots that you would put in front of this audience — one of them should be the SNAP effect, stated as a number with its operational implication. Close by disclosing at least one meaningful limitation of GAMs the team should understand before adopting the approach.</p>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong></p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="submission-checklist" class="level1" data-number="22">
+<h1 data-number="22"><span class="header-section-number">22</span> Submission Checklist</h1>
+<p>Before submitting, confirm each item below is complete.</p>
+<ul class="task-list">
+<li><label><input type="checkbox">All code cells run without errors from a clean kernel restart</label></li>
+<li><label><input type="checkbox">Written responses completed in your own words (not copied from your assistant’s output)</label></li>
+<li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in your submission folder</label></li>
+<li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with 10 or fewer entries</label></li>
+<li><label><input type="checkbox">One git commit per prompt, with message format <code>hw02 prompt &lt;id&gt;: &lt;summary&gt;</code></label></li>
+<li><label><input type="checkbox"><code>REPORT.md</code> containing a plain-English business recommendation (one paragraph)</label></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="pagination-link" aria-label="Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/HW03_Trees_RF.html" class="pagination-link" aria-label="Homework 3: Decision Trees and Random Forests">
+        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

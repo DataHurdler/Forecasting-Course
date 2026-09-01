@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>25&nbsp; Homework 7: Bayesian Linear Regression – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/HW06_Part2_Hierarchical.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/HW01_Part1_ETS.html">Assignments</a></li><li class="breadcrumb-item"><a href="../chapters/HW07_Bayesian_Regression.html"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">25.1</span> Overview</a></li>
+  <li><a href="#dataset-and-setup" id="toc-dataset-and-setup" class="nav-link" data-scroll-target="#dataset-and-setup"><span class="header-section-number">25.2</span> Dataset and Setup</a></li>
+  <li><a href="#initial-prompt-for-your-ai-assistant" id="toc-initial-prompt-for-your-ai-assistant" class="nav-link" data-scroll-target="#initial-prompt-for-your-ai-assistant"><span class="header-section-number">25.3</span> Initial Prompt for Your AI Assistant</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">25.4</span> Questions</a>
+  <ul class="collapse">
+  <li><a href="#q1-draw-a-dag-suggested-prompts-1" id="toc-q1-draw-a-dag-suggested-prompts-1" class="nav-link" data-scroll-target="#q1-draw-a-dag-suggested-prompts-1"><span class="header-section-number">25.4.1</span> Q1 — Draw a DAG <em>(Suggested prompts: 1)</em></a></li>
+  <li><a href="#q2-ols-benchmark-two-ways-suggested-prompts-2" id="toc-q2-ols-benchmark-two-ways-suggested-prompts-2" class="nav-link" data-scroll-target="#q2-ols-benchmark-two-ways-suggested-prompts-2"><span class="header-section-number">25.4.2</span> Q2 — OLS Benchmark, Two Ways <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q3-bayesian-linear-regression-suggested-prompts-3" id="toc-q3-bayesian-linear-regression-suggested-prompts-3" class="nav-link" data-scroll-target="#q3-bayesian-linear-regression-suggested-prompts-3"><span class="header-section-number">25.4.3</span> Q3 — Bayesian Linear Regression <em>(Suggested prompts: 3)</em></a></li>
+  <li><a href="#q4-posterior-visualization-suggested-prompts-2" id="toc-q4-posterior-visualization-suggested-prompts-2" class="nav-link" data-scroll-target="#q4-posterior-visualization-suggested-prompts-2"><span class="header-section-number">25.4.4</span> Q4 — Posterior Visualization <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q5-rope-analysis-suggested-prompts-2" id="toc-q5-rope-analysis-suggested-prompts-2" class="nav-link" data-scroll-target="#q5-rope-analysis-suggested-prompts-2"><span class="header-section-number">25.4.5</span> Q5 — ROPE Analysis <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q6-conditional-scenario-simulation-suggested-prompts-3" id="toc-q6-conditional-scenario-simulation-suggested-prompts-3" class="nav-link" data-scroll-target="#q6-conditional-scenario-simulation-suggested-prompts-3"><span class="header-section-number">25.4.6</span> Q6 — Conditional Scenario Simulation <em>(Suggested prompts: 3)</em></a></li>
+  <li><a href="#q7-course-capstone-reflection-suggested-prompts-0-write-yourself" id="toc-q7-course-capstone-reflection-suggested-prompts-0-write-yourself" class="nav-link" data-scroll-target="#q7-course-capstone-reflection-suggested-prompts-0-write-yourself"><span class="header-section-number">25.4.7</span> Q7 — Course Capstone Reflection <em>(Suggested prompts: 0 — write yourself)</em></a></li>
+  </ul></li>
+  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">25.5</span> Submission Checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/HW01_Part1_ETS.html">Assignments</a></li><li class="breadcrumb-item"><a href="../chapters/HW07_Bayesian_Regression.html"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Your numbers will not match mine, and that is fine
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every result in this course depends on a random seed, and often also on your library versions, your hardware, and how many CPU threads your machine uses. Two people running identical, correct code will get different numbers — sometimes noticeably different.</p>
+<p><strong>What is graded</strong> is that you used the right model and the right procedure, and that your interpretation follows from the numbers <em>you</em> actually obtained. Quote your own output.</p>
+<p><strong>What is not graded</strong> is matching any particular value. Do not tune your way toward a number you saw on a slide or heard from a classmate — that is the one way to turn this into a wrong answer.</p>
+<p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
+</div>
+</div>
+<section id="overview" class="level2" data-number="25.1">
+<h2 data-number="25.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">25.1</span> Overview</h2>
+<p>Bayesian linear regression replaces OLS point estimates with full posterior distributions over every coefficient. Instead of asking “Is beta significant at p &lt; 0.05?”, you ask “What is the probability that this effect is positive?” and “Is the effect large enough to matter for business decisions?”</p>
+<p>This final homework fits a Bayesian regression model for store sales as a function of promotions, competition, and store characteristics. It also introduces Directed Acyclic Graphs (DAGs) as a tool for deciding which variables to include and how to interpret the coefficients causally.</p>
+<p><strong>Learning objectives:</strong></p>
+<ul>
+<li>Draw and interpret a DAG for a business forecasting model</li>
+<li>Specify weakly informative priors for regression coefficients</li>
+<li>Read posterior coefficient distributions (HDI, probability of direction)</li>
+<li>Apply ROPE analysis to distinguish statistical from practical significance</li>
+<li>Use posterior samples to simulate conditional scenarios</li>
+</ul>
+<hr>
+</section>
+<section id="dataset-and-setup" class="level2" data-number="25.2">
+<h2 data-number="25.2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">25.2</span> Dataset and Setup</h2>
+<p>The question for this assignment is a causal one: <strong>how much does demand respond to price?</strong> That is an elasticity, and it is the number a category manager would actually act on.</p>
+<div id="8c0a512d" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings, logging</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">'pymc'</span>).setLevel(logging.ERROR)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"processed"</span> <span class="op">/</span> name</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. "</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Run `python scripts/prep_m5.py` from the repository root first."</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> (pd.read_csv(data_path(<span class="st">"m5_weekly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"week_start"</span>])</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            .sort_values([<span class="st">"store_id"</span>, <span class="st">"cat_id"</span>, <span class="st">"week_start"</span>]))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">"series"</span>] <span class="op">=</span> weekly.store_id <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> weekly.cat_id</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> weekly.dropna(subset<span class="op">=</span>[<span class="st">"units"</span>, <span class="st">"avg_price"</span>]).copy()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"ly"</span>] <span class="op">=</span> np.log(df.units.clip(lower<span class="op">=</span><span class="dv">1</span>))          <span class="co"># log units</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"lp"</span>] <span class="op">=</span> np.log(df.avg_price)                     <span class="co"># log price</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"t"</span>]  <span class="op">=</span> (df.week_start <span class="op">-</span> df.week_start.<span class="bu">min</span>()).dt.days <span class="op">/</span> <span class="fl">365.25</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"snap"</span>]  <span class="op">=</span> (df.snap_days <span class="op">&gt;=</span> <span class="dv">5</span>).astype(<span class="bu">float</span>)     <span class="co"># high-SNAP week</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"event"</span>] <span class="op">=</span> (df.event_days <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">float</span>)     <span class="co"># any event that week</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>codes, uniq <span class="op">=</span> pd.factorize(df.series)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"idx"</span>] <span class="op">=</span> codes</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="bu">len</span>(uniq)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Centre log price within series. NOT standardized -- see the note below.</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"lpc"</span>] <span class="op">=</span> df.lp <span class="op">-</span> df.groupby(<span class="st">"series"</span>).lp.transform(<span class="st">"mean"</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">:,}</span><span class="ss"> rows | </span><span class="sc">{</span>J<span class="sc">}</span><span class="ss"> series | "</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"price range </span><span class="sc">{</span>df<span class="sc">.</span>avg_price<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">-</span><span class="sc">{</span>df<span class="sc">.</span>avg_price<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Why logs on both sides.</strong> With <code>ly</code> and <code>lp</code> both logged, the price coefficient is an <strong>elasticity</strong>: the percentage change in units for a one percent change in price. That is directly interpretable, and it is what makes the scenario analysis in Q6 possible.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Do not standardize log price
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is a common reflex, and here it is a trap. Dividing <code>lp</code> by its standard deviation rescales the coefficient into “per standard deviation of log price” — which is <strong>no longer an elasticity</strong>, and every percentage claim you build on it in Q6 will be wrong by the factor you divided by. Leave <code>lp</code> in log units. Every predictor in this assignment is already on a scale a manager reads directly: log price in percent, <code>snap</code> and <code>event</code> as 0/1, <code>t</code> in years.</p>
+<p>Centring within series (<code>lpc</code>) is different and is fine — it shifts the variable without rescaling it, leaves the elasticity untouched, and greatly improves sampling, because price levels differ across series and otherwise correlate with the intercepts.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="initial-prompt-for-your-ai-assistant" class="level2" data-number="25.3">
+<h2 data-number="25.3" class="anchored" data-anchor-id="initial-prompt-for-your-ai-assistant"><span class="header-section-number">25.3</span> Initial Prompt for Your AI Assistant</h2>
+<p><em>Any assistant works — ChatGPT, Claude, Gemini, or Copilot, in an editor or in a browser tab. Paste the block below as your <strong>first</strong> message, before you ask anything else.</em></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Initial Prompt for Your AI Assistant
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Paste the following as your first message to your assistant. Save it as <code>INITIAL_PROMPT.md</code> in your submission folder.</p>
+<pre><code>I am working on Homework 7 for ECON 8310: Business Forecasting at the
+University of Nebraska at Omaha.
+
+Dataset: M5/Walmart — weekly aggregated, 30 store-category series, at
+`data/processed/m5_weekly.csv`. Columns: store_id, cat_id, state_id,
+week_start, units, avg_price, snap_days, event_days. I work with log units
+(ly) on log price (lp), plus a trend and series identifiers.
+
+This homework covers Bayesian linear regression using PyMC (v4+),
+including DAGs, posterior coefficient interpretation, ROPE analysis,
+and conditional scenario simulation. I will ask you questions one at
+a time. For each:
+1. Write clean, well-commented PyMC code that runs end-to-end
+2. Explain what the output means so that I understand it — but do NOT draft the written
+   answers I submit. The interpretation and business-recommendation sections are mine to
+   write, in my own words.
+
+My prompt budget is 16 (this context prompt is excluded). I will label
+each question before asking.
+
+
+Repository rules — these apply to every prompt in this thread:
+- My submission folder is `submissions/hw07_&lt;my_name&gt;/`. Put everything there.
+- Keep a `PROMPT_LOG.md` in that folder. For every prompt I send, append a block:
+      ### Prompt &lt;n&gt; — YYYY-MM-DD HH:MM
+      &lt;my prompt, verbatim&gt;
+  Numbered from 1, in order. Never edit or delete an earlier entry. If your tool cannot write
+  files, I will paste them in myself.
+- After finishing the work for each prompt, make exactly one git commit:
+  `hw07 prompt &lt;prompt_id&gt;: &lt;short summary&gt;`
+- If a prompt would take me past my budget of 16, do not do the work. Reply exactly
+  PROMPT_LIMIT_REACHED, and still log that prompt.
+- Never modify `AGENTS.md`, anything in `assignments/`, or anything in `policy/`.
+
+Confirm by responding with: HW07_CONTEXT_ACK</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="questions" class="level2" data-number="25.4">
+<h2 data-number="25.4" class="anchored" data-anchor-id="questions"><span class="header-section-number">25.4</span> Questions</h2>
+<section id="q1-draw-a-dag-suggested-prompts-1" class="level3" data-number="25.4.1">
+<h3 data-number="25.4.1" class="anchored" data-anchor-id="q1-draw-a-dag-suggested-prompts-1"><span class="header-section-number">25.4.1</span> Q1 — Draw a DAG <em>(Suggested prompts: 1)</em></h3>
+<p>Before fitting anything, think about the causal structure. <strong>This question determines what the rest of the assignment means</strong>, so do it first and do it honestly.</p>
+<p>Draw a DAG for weekly demand including at least: <code>units</code>, <code>avg_price</code>, <code>series</code> (which store-category this is), <code>time</code> (trend), <code>snap_days</code>, and <code>event_days</code>.</p>
+<p>No code needed — a Markdown table or ASCII diagram is fine. Justify every arrow in one sentence.</p>
+<pre><code>series  → avg_price   (categories differ systematically in price level)
+series  → units       (categories differ systematically in volume)
+time    → avg_price   (prices drift over five years)
+time    → units       (demand grows over the sample)
+avg_price → units     (the effect we want to estimate)
+...</code></pre>
+<p><strong>Then answer the question this exists to answer:</strong> is there a confounder between <code>avg_price</code> and <code>units</code>? Name it, explain the mechanism in business terms, and state what you must do about it in the regression.</p>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong></p>
+</blockquote>
+<hr>
+</section>
+<section id="q2-ols-benchmark-two-ways-suggested-prompts-2" class="level3" data-number="25.4.2">
+<h3 data-number="25.4.2" class="anchored" data-anchor-id="q2-ols-benchmark-two-ways-suggested-prompts-2"><span class="header-section-number">25.4.2</span> Q2 — OLS Benchmark, Two Ways <em>(Suggested prompts: 2)</em></h3>
+<p>Fit <strong>two</strong> OLS regressions with <code>statsmodels</code>, and note that the difference between them is the whole point of Q1.</p>
+<p><strong>(a) Naive</strong> — regress <code>ly</code> on <code>lp</code>, <code>snap</code>, <code>event</code>.</p>
+<p><strong>(b) Controlled</strong> — regress <code>ly</code> on <code>lpc</code>, <code>snap</code>, <code>event</code>, plus a trend (<code>t</code>) and series fixed effects (<code>pd.get_dummies(df.series)</code>).</p>
+<p>Report the coefficient table for each, and put the two price elasticities side by side.</p>
+<div id="e09fb8b1" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) naive OLS</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) OLS with trend and series fixed effects</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the two price coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Report both elasticities. They will differ substantially. Using your DAG from Q1, explain <strong>which one estimates the quantity you actually want</strong>, and why the other is biased in the direction it is.</p>
+<p>Then look at the standard errors: the naive estimate is not merely different, it is at least as <em>precise</em>. Explain why precision is no defence here.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q3-bayesian-linear-regression-suggested-prompts-3" class="level3" data-number="25.4.3">
+<h3 data-number="25.4.3" class="anchored" data-anchor-id="q3-bayesian-linear-regression-suggested-prompts-3"><span class="header-section-number">25.4.3</span> Q3 — Bayesian Linear Regression <em>(Suggested prompts: 3)</em></h3>
+<p>Fit the <strong>controlled</strong> specification from Q2(b) as a Bayesian model — price, SNAP, events, trend, and a per-series intercept. Use weakly informative priors:</p>
+<ul>
+<li><code>beta_j ~ Normal(0, 1)</code> for each predictor (weakly informative on these scales)</li>
+<li><code>alpha ~ Normal(0, 1)</code> for the intercept</li>
+<li><code>sigma ~ HalfNormal(1)</code> for observation noise</li>
+</ul>
+<p>Give the per-series intercepts a hierarchical prior, written <strong>non-centred</strong>, as in Homework 6.</p>
+<p>Sample with <code>pm.sample(1000, tune=1500, chains=4, target_accept=0.9)</code> and report the posterior mean, sd and 94% HDI for each coefficient — plus <span class="math inline">\(\hat{R}\)</span>, ESS and divergences.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Ask ArviZ for the HDI explicitly
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>az.summary(idata)</code> reports an <strong>89% equal-tailed interval</strong> by default, not the HDI. For the highest-density interval this course uses, call <code>az.summary(idata, ci_kind="hdi", ci_prob=0.94)</code>, or <code>az.hdi(samples, prob=0.94)</code> on raw draws.</p>
+<p>An equal-tailed interval cuts 5.5% off each tail; an HDI is the <em>shortest</em> interval holding 94% of the mass. They coincide for a symmetric posterior and diverge for a skewed one.</p>
+</div>
+</div>
+<div id="e5fea884" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build and sample Bayesian linear regression</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Compare the posterior means to the controlled OLS coefficients from Q2(b). With this much data they should agree closely — say whether they do, and explain why agreement is the <em>expected</em> result rather than a disappointing one.</p>
+<p>Then: what does a wide HDI tell you that a narrow one does not, and which coefficient here has the widest relative to its mean?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q4-posterior-visualization-suggested-prompts-2" class="level3" data-number="25.4.4">
+<h3 data-number="25.4.4" class="anchored" data-anchor-id="q4-posterior-visualization-suggested-prompts-2"><span class="header-section-number">25.4.4</span> Q4 — Posterior Visualization <em>(Suggested prompts: 2)</em></h3>
+<p>Plot the posterior distributions for the three coefficients that matter most for a business decision — justify the choice from your DAG.</p>
+<p>For each, report: - Posterior mean - 94% HDI - <code>P(beta &gt; 0)</code> — probability the effect is positive - Whether the HDI excludes zero (the Bayesian analog of significance)</p>
+<div id="df9cabc2" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot posterior distributions and compute P(beta &gt; 0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> For the <strong>price</strong> coefficient, report <span class="math inline">\(P(\beta_{\text{price}} &lt; 0)\)</span> — the probability that raising price reduces demand. Contrast that statement with what the OLS p-value in Q2 actually claims, and say which one you could put in front of a manager without having to correct it afterwards.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q5-rope-analysis-suggested-prompts-2" class="level3" data-number="25.4.5">
+<h3 data-number="25.4.5" class="anchored" data-anchor-id="q5-rope-analysis-suggested-prompts-2"><span class="header-section-number">25.4.5</span> Q5 — ROPE Analysis <em>(Suggested prompts: 2)</em></h3>
+<p>“Credible” and “big enough to act on” are different questions. A <strong>ROPE</strong> — region of practical equivalence — makes the second one explicit.</p>
+<p>For each predictor, compute the fraction of posterior mass inside <code>|beta| &lt; 0.05</code>. Because nothing here is standardized, that threshold reads directly: for price, an elasticity between <span class="math inline">\(-0.05\)</span> and <span class="math inline">\(0.05\)</span> means a 1% price change moves units by less than 0.05% — no one would act on it. For <code>snap</code> and <code>event</code> it means a weekly lift under 5%.</p>
+<p>Present results in a table:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 20%">
+<col style="width: 12%">
+<col style="width: 15%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Predictor</th>
+<th>Posterior Mean</th>
+<th>94% HDI</th>
+<th>% in ROPE</th>
+<th>Practically significant?</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<p>A predictor is “practically significant” if less than 5% of its posterior falls in the ROPE.</p>
+<div id="eadd0637" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute % of posterior in ROPE for each predictor</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Name any predictor that is <strong>credible but negligible</strong> — HDI excluding zero while most of its posterior sits inside the ROPE. That combination is common in large samples and is exactly what a p-value cannot express.</p>
+<p>What should a manager do with such a finding, and what would have to change for it to become worth acting on?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q6-conditional-scenario-simulation-suggested-prompts-3" class="level3" data-number="25.4.6">
+<h3 data-number="25.4.6" class="anchored" data-anchor-id="q6-conditional-scenario-simulation-suggested-prompts-3"><span class="header-section-number">25.4.6</span> Q6 — Conditional Scenario Simulation <em>(Suggested prompts: 3)</em></h3>
+<p>A category manager is considering a <strong>5% price increase</strong> across the board and wants to know what happens to volume — and how confident anyone can be about it.</p>
+<p>Push the scenario through your posterior rather than through a point estimate.</p>
+<div id="bf811944" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># b = idata.posterior["b_price"].values.ravel()</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pct_change = 100 * (np.exp(b * np.log(1.05)) - 1)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># report the mean and the 94% interval of pct_change</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>(a)</strong> Report the mean percentage change in units and its 94% interval.</p>
+<p><strong>(b)</strong> Revenue rises if the percentage volume loss is smaller than the 5% price gain. Compute the <strong>probability that revenue increases</strong>, directly from the posterior samples.</p>
+<p><strong>(c)</strong> Repeat using the <em>naive</em> elasticity from Q2(a). Report how the recommendation changes.</p>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Give the manager a two-sentence recommendation with a probability attached. Then state the caveat honestly: this is a causal claim about intervening on price, and it is only as good as the DAG in Q1. Name one arrow that, if wrong, would invalidate the answer.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q7-course-capstone-reflection-suggested-prompts-0-write-yourself" class="level3" data-number="25.4.7">
+<h3 data-number="25.4.7" class="anchored" data-anchor-id="q7-course-capstone-reflection-suggested-prompts-0-write-yourself"><span class="header-section-number">25.4.7</span> Q7 — Course Capstone Reflection <em>(Suggested prompts: 0 — write yourself)</em></h3>
+<p>No code required. In 200–250 words: Look back at the full arc of this course — from exponential smoothing in Homework 1 to Bayesian regression in this homework.</p>
+<p>Answer the following:</p>
+<ol type="1">
+<li><p><strong>Which method from the course would you use first</strong> when you encounter a new business forecasting problem, and why? (Consider ease of implementation, interpretability, and typical performance.)</p></li>
+<li><p><strong>Where does Bayesian inference add the most value</strong> compared to the classical and machine learning methods you used earlier? Give a specific example from your homework results.</p></li>
+<li><p><strong>What is one limitation</strong> of every method in this course — something none of them handle well — and what would you do in practice to address it?</p></li>
+</ol>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong></p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="submission-checklist" class="level2" data-number="25.5">
+<h2 data-number="25.5" class="anchored" data-anchor-id="submission-checklist"><span class="header-section-number">25.5</span> Submission Checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">All code cells run without errors from top to bottom</label></li>
+<li><label><input type="checkbox">Written responses completed in your own words</label></li>
+<li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in <code>submissions/hw07_&lt;your_name&gt;/</code></label></li>
+<li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with <strong>16 or fewer</strong> entries</label></li>
+<li><label><input type="checkbox">One git commit per prompt (<code>hw07 prompt &lt;id&gt;: &lt;short summary&gt;</code>)</label></li>
+<li><label><input type="checkbox"><code>REPORT.md</code> with a clear business recommendation</label></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/HW06_Part2_Hierarchical.html" class="pagination-link" aria-label="Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -113,7 +113,10 @@ Labs/*.html
 # narration, never the chapter. Committing them would create the fourth copy of
 # every number that the generator exists to prevent.
 book/chapters/
+workbook/chapters/
 book/.quarto/
+workbook/.quarto/
+workbook/.gitignore
 # Quarto writes this on every render of the book project.
 book/.gitignore
 book/_book/

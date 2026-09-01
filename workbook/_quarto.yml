@@ -1,0 +1,53 @@
+project:
+  type: book
+  output-dir: ../docs/workbook
+
+book:
+  title: "Business Forecasting — Workbook"
+  subtitle: "ECON 8310 · Labs and Assignments"
+  date: last-modified
+  search: true
+  chapters:
+    - index.qmd
+    - part: "Labs"
+      chapters:
+        - chapters/Lecture01_lab.qmd
+        - chapters/Lecture02_lab.qmd
+        - chapters/Lecture03_lab.qmd
+        - chapters/Lecture04_lab.qmd
+        - chapters/Lecture05_lab.qmd
+        - chapters/Lecture06_lab.qmd
+        - chapters/Lecture07_lab.qmd
+        - chapters/Lecture08_lab.qmd
+        - chapters/Lecture09_Part1_lab.qmd
+        - chapters/Lecture09_Part2_lab.qmd
+        - chapters/Lecture10_lab.qmd
+        - chapters/Lecture11_Part1_lab.qmd
+        - chapters/Lecture11_Part2_lab.qmd
+        - chapters/Lecture12_lab.qmd
+    - part: "Assignments"
+      chapters:
+        - chapters/HW01_Part1_ETS.qmd
+        - chapters/HW01_Part2_ARIMA_VAR.qmd
+        - chapters/HW02_GAMs.qmd
+        - chapters/HW03_Trees_RF.qmd
+        - chapters/HW04_XGBoost_Regularization.qmd
+        - chapters/HW05_Part1_FFN_CNN.qmd
+        - chapters/HW05_Part2_Sequence.qmd
+        - chapters/HW05_Part3_Comparison.qmd
+        - chapters/HW06_Part1_Foundations_TS.qmd
+        - chapters/HW06_Part2_Hierarchical.qmd
+        - chapters/HW07_Bayesian_Regression.qmd
+
+format:
+  html:
+    theme: [cosmo, ../book/book.scss]
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-copy: true
+
+execute:
+  eval: false
+  echo: true
+  freeze: false

@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>19&nbsp; Homework 4: Boosted Trees and Regularization – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/HW05_Part1_FFN_CNN.html" rel="next">
+<link href="../chapters/HW03_Trees_RF.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/HW01_Part1_ETS.html">Assignments</a></li><li class="breadcrumb-item"><a href="../chapters/HW04_XGBoost_Regularization.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">19.1</span> Overview</a></li>
+  <li><a href="#dataset-and-setup" id="toc-dataset-and-setup" class="nav-link" data-scroll-target="#dataset-and-setup"><span class="header-section-number">19.2</span> Dataset and Setup</a></li>
+  <li><a href="#initial-prompt-for-your-ai-assistant" id="toc-initial-prompt-for-your-ai-assistant" class="nav-link" data-scroll-target="#initial-prompt-for-your-ai-assistant"><span class="header-section-number">19.3</span> Initial Prompt for Your AI Assistant</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">19.4</span> Questions</a>
+  <ul class="collapse">
+  <li><a href="#q1-xgboost-baseline-suggested-prompts-2" id="toc-q1-xgboost-baseline-suggested-prompts-2" class="nav-link" data-scroll-target="#q1-xgboost-baseline-suggested-prompts-2"><span class="header-section-number">19.4.1</span> Q1 — XGBoost Baseline <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q2-hyperparameter-tuning-suggested-prompts-2" id="toc-q2-hyperparameter-tuning-suggested-prompts-2" class="nav-link" data-scroll-target="#q2-hyperparameter-tuning-suggested-prompts-2"><span class="header-section-number">19.4.2</span> Q2 — Hyperparameter Tuning <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q3-lasso-regularization-path-suggested-prompts-2" id="toc-q3-lasso-regularization-path-suggested-prompts-2" class="nav-link" data-scroll-target="#q3-lasso-regularization-path-suggested-prompts-2"><span class="header-section-number">19.4.3</span> Q3 — LASSO Regularization Path <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q4-elastic-net-vs-lasso-vs-ridge-suggested-prompts-2" id="toc-q4-elastic-net-vs-lasso-vs-ridge-suggested-prompts-2" class="nav-link" data-scroll-target="#q4-elastic-net-vs-lasso-vs-ridge-suggested-prompts-2"><span class="header-section-number">19.4.4</span> Q4 — Elastic Net vs LASSO vs Ridge <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q5-walk-forward-cv-comparison-suggested-prompts-2" id="toc-q5-walk-forward-cv-comparison-suggested-prompts-2" class="nav-link" data-scroll-target="#q5-walk-forward-cv-comparison-suggested-prompts-2"><span class="header-section-number">19.4.5</span> Q5 — Walk-Forward CV Comparison <em>(Suggested prompts: 2)</em></a></li>
+  <li><a href="#q6-recommendation-memo-suggested-prompts-0-write-yourself" id="toc-q6-recommendation-memo-suggested-prompts-0-write-yourself" class="nav-link" data-scroll-target="#q6-recommendation-memo-suggested-prompts-0-write-yourself"><span class="header-section-number">19.4.6</span> Q6 — Recommendation Memo <em>(Suggested prompts: 0 — write yourself)</em></a></li>
+  </ul></li>
+  <li><a href="#submission-checklist" id="toc-submission-checklist" class="nav-link" data-scroll-target="#submission-checklist"><span class="header-section-number">19.5</span> Submission Checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/HW01_Part1_ETS.html">Assignments</a></li><li class="breadcrumb-item"><a href="../chapters/HW04_XGBoost_Regularization.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Your numbers will not match mine, and that is fine
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every result in this course depends on a random seed, and often also on your library versions, your hardware, and how many CPU threads your machine uses. Two people running identical, correct code will get different numbers — sometimes noticeably different.</p>
+<p><strong>What is graded</strong> is that you used the right model and the right procedure, and that your interpretation follows from the numbers <em>you</em> actually obtained. Quote your own output.</p>
+<p><strong>What is not graded</strong> is matching any particular value. Do not tune your way toward a number you saw on a slide or heard from a classmate — that is the one way to turn this into a wrong answer.</p>
+<p>One caveat worth knowing. The broad <em>ordering</em> of models usually survives this variation. If yours comes out backwards from what the lecture found, say so in a sentence and offer a reason: either you have found something real about your run, or there is a bug worth hunting. Both are worth more marks than quietly reporting a number you do not believe.</p>
+</div>
+</div>
+<section id="overview" class="level2" data-number="19.1">
+<h2 data-number="19.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">19.1</span> Overview</h2>
+<p>Boosting builds trees sequentially — each new tree corrects the errors left by the previous ones. XGBoost is the dominant gradient boosting implementation for tabular data, and it often outperforms Random Forests given proper tuning. Regularized linear models (LASSO, Ridge, Elastic Net) take a different approach: they shrink coefficients toward zero, performing automatic feature selection while keeping the model interpretable.</p>
+<p>This homework applies both families to the same M5/Walmart data as Homework 3 — but with a <strong>deliberately richer feature set</strong> — and ends with a head-to-head comparison across every method tried in the course so far.</p>
+<p><strong>Learning objectives:</strong></p>
+<ul>
+<li>Fit XGBoost and interpret gain-based feature importance</li>
+<li>Tune <code>learning_rate</code>, <code>max_depth</code>, and <code>reg_lambda</code> using time-series cross-validation</li>
+<li>Read a LASSO regularization path to identify robust vs fragile features</li>
+<li>Compare LASSO, Ridge, and Elastic Net on test RMSE and sparsity</li>
+<li>Synthesize walk-forward CV results across all models</li>
+</ul>
+<hr>
+</section>
+<section id="dataset-and-setup" class="level2" data-number="19.2">
+<h2 data-number="19.2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">19.2</span> Dataset and Setup</h2>
+<p>We use the same weekly M5 data and the same temporal split as Homework 3 — but we engineer many more features first, and the reason matters.</p>
+<p>In Homework 3 you had 27 features and 5,160 training rows. With <span class="math inline">\(k\)</span> that much smaller than <span class="math inline">\(n\)</span>, there is very little for a shrinkage penalty to do: ordinary least squares is already stable, and Ridge or LASSO will select almost no penalty. Regularization earns its keep when <span class="math inline">\(k\)</span> is <em>large relative to</em> <span class="math inline">\(n\)</span>, which is exactly the situation Lecture 6 opened with.</p>
+<p>So we build the feature set a working analyst would actually build — ten lags, rolling means and standard deviations at four windows, Fourier terms for the annual cycle, calendar variables, and one-hot identity columns — and let the penalty decide which survive.</p>
+<div id="9a731352" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xgboost <span class="im">as</span> xgb</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Lasso, Ridge, ElasticNet, ElasticNetCV, RidgeCV</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> TimeSeriesSplit, GridSearchCV</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"processed"</span> <span class="op">/</span> name</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. "</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Run `python scripts/prep_m5.py` from the repository root first."</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> (pd.read_csv(data_path(<span class="st">"m5_weekly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"week_start"</span>])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>            .sort_values([<span class="st">"store_id"</span>, <span class="st">"cat_id"</span>, <span class="st">"week_start"</span>]))</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># --- feature engineering, per store-category series ---------------------------</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> weekly.groupby([<span class="st">"store_id"</span>, <span class="st">"cat_id"</span>])[<span class="st">"units"</span>]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> L <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):        <span class="co"># ten lags</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    weekly[<span class="ss">f"lag</span><span class="sc">{</span>L<span class="sc">}</span><span class="ss">"</span>] <span class="op">=</span> g.shift(L)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W <span class="kw">in</span> (<span class="dv">4</span>, <span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):                           <span class="co"># rolling stats, shifted to avoid leakage</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    weekly[<span class="ss">f"roll</span><span class="sc">{</span>W<span class="sc">}</span><span class="ss">_mean"</span>] <span class="op">=</span> g.shift(<span class="dv">1</span>).rolling(W).mean().values</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    weekly[<span class="ss">f"roll</span><span class="sc">{</span>W<span class="sc">}</span><span class="ss">_std"</span>]  <span class="op">=</span> g.shift(<span class="dv">1</span>).rolling(W).std().values</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">"month"</span>] <span class="op">=</span> weekly[<span class="st">"week_start"</span>].dt.month</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">"week_of_year"</span>] <span class="op">=</span> weekly[<span class="st">"week_start"</span>].dt.isocalendar().week.astype(<span class="bu">int</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">"year"</span>] <span class="op">=</span> weekly[<span class="st">"week_start"</span>].dt.year</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>):                                 <span class="co"># Fourier terms for the annual cycle</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    weekly[<span class="ss">f"sin</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">"</span>] <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> k <span class="op">*</span> weekly.week_of_year <span class="op">/</span> <span class="dv">52</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    weekly[<span class="ss">f"cos</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">"</span>] <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> k <span class="op">*</span> weekly.week_of_year <span class="op">/</span> <span class="dv">52</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>df_enc <span class="op">=</span> pd.get_dummies(weekly, columns<span class="op">=</span>[<span class="st">"store_id"</span>, <span class="st">"cat_id"</span>, <span class="st">"state_id"</span>],</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>                        prefix<span class="op">=</span>[<span class="st">"store"</span>, <span class="st">"cat"</span>, <span class="st">"state"</span>])</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>FEATURES <span class="op">=</span> ([c <span class="cf">for</span> c <span class="kw">in</span> df_enc.columns</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>             <span class="cf">if</span> c.startswith((<span class="st">"lag"</span>, <span class="st">"roll"</span>, <span class="st">"sin"</span>, <span class="st">"cos"</span>, <span class="st">"store_"</span>, <span class="st">"cat_"</span>, <span class="st">"state_"</span>))]</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> [<span class="st">"avg_price"</span>, <span class="st">"snap_days"</span>, <span class="st">"event_days"</span>, <span class="st">"month"</span>, <span class="st">"week_of_year"</span>, <span class="st">"year"</span>])</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>TARGET <span class="op">=</span> <span class="st">"units"</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>LAGGED <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> FEATURES <span class="cf">if</span> c.startswith((<span class="st">"lag"</span>, <span class="st">"roll"</span>))]</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df_enc.dropna(subset<span class="op">=</span>LAGGED).copy()</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>cutoff <span class="op">=</span> pd.Timestamp(<span class="st">"2015-05-17"</span>)          <span class="co"># same split as Homework 3</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> df[df[<span class="st">"week_start"</span>] <span class="op">&lt;</span> cutoff]</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>test  <span class="op">=</span> df[df[<span class="st">"week_start"</span>] <span class="op">&gt;=</span> cutoff]</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>X_train, y_train <span class="op">=</span> train[FEATURES].values.astype(<span class="bu">float</span>), train[TARGET].values</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>X_test,  y_test  <span class="op">=</span> test[FEATURES].values.astype(<span class="bu">float</span>),  test[TARGET].values</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"k = </span><span class="sc">{</span><span class="bu">len</span>(FEATURES)<span class="sc">}</span><span class="ss"> features | train </span><span class="sc">{</span><span class="bu">len</span>(X_train)<span class="sc">:,}</span><span class="ss"> rows | test </span><span class="sc">{</span><span class="bu">len</span>(X_test)<span class="sc">:,}</span><span class="ss"> rows"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note the <code>.shift(1)</code> on the rolling features
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>g.shift(1).rolling(W)</code> computes each rolling statistic from data strictly <strong>before</strong> the current week. Drop the <code>.shift(1)</code> and the window includes the current week’s own units — the target leaking into its own predictor. Your CV error would improve and your forecast would fail. This is the same leakage failure as random k-fold, wearing different clothes.</p>
+</div>
+</div>
+<p>Compute the <strong>seasonal-naive benchmark</strong> (predict <code>units</code> with <code>lag52</code>) on the test set before going further. Every model below is measured against it.</p>
+<hr>
+</section>
+<section id="initial-prompt-for-your-ai-assistant" class="level2" data-number="19.3">
+<h2 data-number="19.3" class="anchored" data-anchor-id="initial-prompt-for-your-ai-assistant"><span class="header-section-number">19.3</span> Initial Prompt for Your AI Assistant</h2>
+<p><em>Any assistant works — ChatGPT, Claude, Gemini, or Copilot, in an editor or in a browser tab. Paste the block below as your <strong>first</strong> message, before you ask anything else.</em></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Initial Prompt for Your AI Assistant
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Paste the following as your first message to your assistant. Save it as <code>INITIAL_PROMPT.md</code> in your submission folder.</p>
+<pre><code>I am working on Homework 4 for ECON 8310: Business Forecasting at the
+University of Nebraska at Omaha.
+
+Dataset: M5/Walmart — weekly aggregated, 30 store-category series, at
+`data/processed/m5_weekly.csv`. Same temporal split as Homework 3
+(train &lt; 2015-05-17, test &gt;= 2015-05-17), but with an engineered feature
+set of ~46 columns: ten lags (lag1..lag52), rolling mean and std at
+windows 4/13/26/52, Fourier terms sin1..sin3 and cos1..cos3, calendar
+features (month, week_of_year, year), avg_price, snap_days, event_days,
+and one-hot store/cat/state identifiers.
+
+This homework covers XGBoost and regularized linear regression (LASSO,
+Ridge, Elastic Net) for sales forecasting using Python. I will ask you
+questions one at a time. For each:
+1. Write clean, well-commented Python code that runs end-to-end
+2. Explain what the output means so that I understand it — but do NOT draft the written
+   answers I submit. The interpretation and business-recommendation sections are mine to
+   write, in my own words.
+
+My prompt budget is 12 (this context prompt is excluded). I will label
+each question before asking.
+
+
+Repository rules — these apply to every prompt in this thread:
+- My submission folder is `submissions/hw04_&lt;my_name&gt;/`. Put everything there.
+- Keep a `PROMPT_LOG.md` in that folder. For every prompt I send, append a block:
+      ### Prompt &lt;n&gt; — YYYY-MM-DD HH:MM
+      &lt;my prompt, verbatim&gt;
+  Numbered from 1, in order. Never edit or delete an earlier entry. If your tool cannot write
+  files, I will paste them in myself.
+- After finishing the work for each prompt, make exactly one git commit:
+  `hw04 prompt &lt;prompt_id&gt;: &lt;short summary&gt;`
+- If a prompt would take me past my budget of 12, do not do the work. Reply exactly
+  PROMPT_LIMIT_REACHED, and still log that prompt.
+- Never modify `AGENTS.md`, anything in `assignments/`, or anything in `policy/`.
+
+Confirm by responding with: HW04_CONTEXT_ACK</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="questions" class="level2" data-number="19.4">
+<h2 data-number="19.4" class="anchored" data-anchor-id="questions"><span class="header-section-number">19.4</span> Questions</h2>
+<section id="q1-xgboost-baseline-suggested-prompts-2" class="level3" data-number="19.4.1">
+<h3 data-number="19.4.1" class="anchored" data-anchor-id="q1-xgboost-baseline-suggested-prompts-2"><span class="header-section-number">19.4.1</span> Q1 — XGBoost Baseline <em>(Suggested prompts: 2)</em></h3>
+<p>Fit an <code>xgb.XGBRegressor</code> with the following hyperparameters:</p>
+<ul>
+<li><code>n_estimators=200</code></li>
+<li><code>learning_rate=0.1</code></li>
+<li><code>max_depth=5</code></li>
+<li><code>subsample=0.8</code></li>
+<li><code>colsample_bytree=0.8</code></li>
+<li><code>random_state=42</code></li>
+</ul>
+<p>Report the test RMSE. Compare it to the Random Forest RMSE you recorded in Homework 3 (enter that value in a comment) and to the seasonal-naive benchmark. Then plot the top-15 XGBoost feature importances using <code>importance_type="gain"</code> as a horizontal bar chart sorted descending.</p>
+<div id="dde60849" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit XGBoost baseline and plot feature importances</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Does XGBoost outperform Random Forest on test RMSE? Based on the gain-based importance plot, which features matter most — and did any of the engineered rolling or Fourier features earn a place near the top?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q2-hyperparameter-tuning-suggested-prompts-2" class="level3" data-number="19.4.2">
+<h3 data-number="19.4.2" class="anchored" data-anchor-id="q2-hyperparameter-tuning-suggested-prompts-2"><span class="header-section-number">19.4.2</span> Q2 — Hyperparameter Tuning <em>(Suggested prompts: 2)</em></h3>
+<p><strong>(a)</strong> Conduct a grid search over:</p>
+<ul>
+<li><code>learning_rate</code>: [0.01, 0.05, 0.1]</li>
+<li><code>max_depth</code>: [3, 5, 7]</li>
+</ul>
+<p>Hold <code>n_estimators=300</code> fixed. Use <code>TimeSeriesSplit(n_splits=3)</code> as the CV strategy and negative RMSE as the scoring metric. Report the best combination, its CV RMSE, and its test RMSE.</p>
+<p><strong>(b)</strong> Now a second, smaller search over <strong><code>reg_lambda</code></strong> in <code>[0.1, 1.0, 10.0, 100.0]</code>, holding the rest at the best values from (a). Report the best <code>reg_lambda</code> and the resulting test RMSE.</p>
+<div id="79305dba" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> TimeSeriesSplit, GridSearchCV</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>param_grid <span class="op">=</span> {</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"learning_rate"</span>: [<span class="fl">0.01</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>],</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max_depth"</span>: [<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>],</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Complete the grid search here</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Then sweep reg_lambda holding the winners from (a) fixed</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>reg_lambda</code> is not a new idea
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Lecture 6 showed that XGBoost’s <code>reg_lambda</code> is <strong>literally an <span class="math inline">\(\ell_2\)</span> penalty on the leaf weights</strong> — the same Ridge penalty you are about to apply to regression coefficients in Q4, applied to a different set of numbers. Keep your <code>reg_lambda</code> result in view when you get there: you are running the same idea twice, on two different model families, in one assignment.</p>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Why must you use <code>TimeSeriesSplit</code> rather than standard k-fold CV for this problem? What would go wrong if you used standard k-fold? And separately: how much did tuning actually buy you over the Q1 defaults — is the gain worth the compute?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q3-lasso-regularization-path-suggested-prompts-2" class="level3" data-number="19.4.3">
+<h3 data-number="19.4.3" class="anchored" data-anchor-id="q3-lasso-regularization-path-suggested-prompts-2"><span class="header-section-number">19.4.3</span> Q3 — LASSO Regularization Path <em>(Suggested prompts: 2)</em></h3>
+<p>Standardize the features using <code>StandardScaler</code> (LASSO is sensitive to feature scale). Fit LASSO at 30 values of <code>alpha</code> spaced logarithmically from 1 to 10,000. Plot the regularization path: coefficient values on the y-axis, log₁₀(alpha) on the x-axis, one line per feature labeled by name.</p>
+<p>Identify: which features shrink to zero first (at the smallest alpha)? Which are the last to shrink (most robust to regularization)?</p>
+<div id="f818e867" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>X_train_scaled <span class="op">=</span> scaler.fit_transform(X_train)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>X_test_scaled  <span class="op">=</span> scaler.transform(X_test)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> np.logspace(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">30</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit LASSO at each alpha and collect coefficients</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Also record the number of non-zero coefficients at each alpha</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Alongside the coefficient path, plot <strong>non-zero count against log₁₀(alpha)</strong>. That second plot is often the more useful one in practice: it tells you how much model you are buying at each level of penalty.</p>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Which features are the last three standing as alpha increases? Report the <em>ordering</em> in which features drop out, not just the final survivors — Lecture 6 argued that this ordering is a more stable finding than any single coefficient table, and this is where you check whether that holds. Does the ordering match what XGBoost’s gain importance told you in Q1?</p>
+</blockquote>
+<hr>
+</section>
+<section id="q4-elastic-net-vs-lasso-vs-ridge-suggested-prompts-2" class="level3" data-number="19.4.4">
+<h3 data-number="19.4.4" class="anchored" data-anchor-id="q4-elastic-net-vs-lasso-vs-ridge-suggested-prompts-2"><span class="header-section-number">19.4.4</span> Q4 — Elastic Net vs LASSO vs Ridge <em>(Suggested prompts: 2)</em></h3>
+<p>Lecture 6 gave two knobs: <span class="math inline">\(\lambda\)</span> sets the <strong>total</strong> penalty, <span class="math inline">\(\alpha\)</span> (sklearn’s <code>l1_ratio</code>) sets the <strong>mix</strong>. This question separates them properly.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Do not fix alpha across all five models
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is tempting to fit <code>Lasso(alpha=100)</code>, <code>ElasticNet(alpha=100, ...)</code>, and <code>Ridge(alpha=100)</code> and call that a fair comparison. <strong>It is not</strong>, for two separate reasons.</p>
+<p>First, <code>sklearn</code> scales the two objectives differently. <code>Lasso</code> and <code>ElasticNet</code> minimize <span class="math inline">\(\frac{1}{2n}\|y - Xw\|^2 + \ldots\)</span>, while <code>Ridge</code> minimizes <span class="math inline">\(\|y - Xw\|^2 + \alpha\|w\|^2\)</span> with <strong>no</strong> <span class="math inline">\(1/2n\)</span> factor. With <span class="math inline">\(n \approx 5{,}000\)</span> training rows, the same numeric <code>alpha</code> means penalties that differ by roughly four orders of magnitude.</p>
+<p>Second, even within one family, the right total penalty depends on the mix — an <span class="math inline">\(\ell_2\)</span>-heavy model needs a different <span class="math inline">\(\lambda\)</span> than an <span class="math inline">\(\ell_1\)</span>-heavy one to be equally regularized.</p>
+<p>So <strong>tune <span class="math inline">\(\lambda\)</span> separately for every mix</strong>, exactly as Lecture 6’s code slide does.</p>
+</div>
+</div>
+<p>For each <code>l1_ratio</code> in <code>[1.0, 0.9, 0.5, 0.1]</code>, use <code>ElasticNetCV</code> with <code>alphas=np.logspace(-2, 4, 50)</code> and <code>cv=TimeSeriesSplit(n_splits=5)</code> to select the best alpha. Then fit a <code>RidgeCV</code> with <code>alphas=np.logspace(-2, 7, 80)</code> and the same CV.</p>
+<p>Wrap each in <code>make_pipeline(StandardScaler(), ...)</code> so scaling is refit <strong>inside each fold</strong>.</p>
+<p>Report, in one table: the model, its selected alpha, its test RMSE, and its number of non-zero coefficients out of the total.</p>
+<div id="d7feceb6" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tscv <span class="op">=</span> TimeSeriesSplit(n_splits<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># For each l1_ratio, fit ElasticNetCV inside a pipeline with StandardScaler</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Then fit RidgeCV the same way</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Collect: selected alpha, test RMSE, non-zero coefficient count</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Which mix gives the best test RMSE, and how much separates best from worst — is the difference large enough to matter operationally? Which mix gives the <em>sparsest</em> model that is still competitive, and why might you ship that one instead of the outright winner?</p>
+<p>Then explain, in one sentence each, why the scaling warning above matters and why <code>make_pipeline</code> is doing real work here rather than being tidy.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q5-walk-forward-cv-comparison-suggested-prompts-2" class="level3" data-number="19.4.5">
+<h3 data-number="19.4.5" class="anchored" data-anchor-id="q5-walk-forward-cv-comparison-suggested-prompts-2"><span class="header-section-number">19.4.5</span> Q5 — Walk-Forward CV Comparison <em>(Suggested prompts: 2)</em></h3>
+<p>Re-use the expanding-window walk-forward CV framework from Homework 3 (13-week steps, same cutoffs). Compare four models:</p>
+<ul>
+<li>Best XGBoost (tuned hyperparameters from Q2, including <code>reg_lambda</code>)</li>
+<li><code>RandomForestRegressor(n_estimators=200, random_state=42)</code></li>
+<li>The best Elastic Net configuration from Q4, at its selected alpha</li>
+<li>Ridge at its <code>RidgeCV</code>-selected alpha</li>
+</ul>
+<p>Report mean CV RMSE for each in a summary table, with the seasonal-naive benchmark as a reference row.</p>
+<div id="e164887c" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cutoffs <span class="op">=</span> pd.date_range(<span class="st">"2014-01-05"</span>, <span class="st">"2015-05-17"</span>, freq<span class="op">=</span><span class="st">"13W"</span>)   <span class="co"># 6 rounds, as in HW3</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(cutoffs)<span class="sc">}</span><span class="ss"> CV rounds:"</span>, [<span class="bu">str</span>(c.date()) <span class="cf">for</span> c <span class="kw">in</span> cutoffs])</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Walk-forward CV loop</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Re-fit each model at each cutoff; keep the hyperparameters fixed at their tuned values</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+One honest caveat about this comparison
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You tuned the XGBoost and Elastic Net hyperparameters on data that overlaps these CV windows. So these CV numbers are mildly optimistic for the tuned models and not for the untuned ones. Note it in your answer — you are not expected to fix it, only to notice it. Doing it strictly would mean re-tuning inside every fold, which is the nested cross-validation you would use if this were going into production.</p>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong> Does walk-forward CV change the ranking compared to the single test-set evaluation? What does that tell you about the stability of each model over time? Name the model whose rank moved most, and offer an explanation for why.</p>
+</blockquote>
+<hr>
+</section>
+<section id="q6-recommendation-memo-suggested-prompts-0-write-yourself" class="level3" data-number="19.4.6">
+<h3 data-number="19.4.6" class="anchored" data-anchor-id="q6-recommendation-memo-suggested-prompts-0-write-yourself"><span class="header-section-number">19.4.6</span> Q6 — Recommendation Memo <em>(Suggested prompts: 0 — write yourself)</em></h3>
+<p>No code required. In 150–200 words, write a recommendation memo addressed to Walmart regional analytics leadership. You must choose <strong>one</strong> model to deploy in production for weekly store-category demand forecasting. Your options:</p>
+<ul>
+<li>Best ETS or ARIMA (Homework 1)</li>
+<li>Best GAM / Prophet (Homework 2)</li>
+<li>Random Forest (Homework 3)</li>
+<li>XGBoost (this homework)</li>
+<li>Regularized linear model — LASSO, Elastic Net, or Ridge (this homework)</li>
+</ul>
+<p>Cover: (1) your choice and the evidence supporting it — CV RMSE, interpretability, and cost to maintain; (2) one risk you would monitor after deployment; and (3) whether you would keep any other model as a benchmark or fallback.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Do not assume the most complex model won
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compare your Q4 and Q5 numbers before you write. If a regularized linear model matched or beat the boosted trees here, say so plainly and follow the implication through — a model that is smaller, faster to refit, and whose coefficients you can read aloud carries real operational advantages that an RMSE table does not show. If boosting genuinely won, say by how much, and whether that margin justifies the extra machinery.</p>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Your response:</strong></p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="submission-checklist" class="level2" data-number="19.5">
+<h2 data-number="19.5" class="anchored" data-anchor-id="submission-checklist"><span class="header-section-number">19.5</span> Submission Checklist</h2>
+<p>Before submitting, confirm:</p>
+<ul class="task-list">
+<li><label><input type="checkbox">All code cells run without errors from top to bottom</label></li>
+<li><label><input type="checkbox">Written responses completed in your own words (not AI-generated prose)</label></li>
+<li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in <code>submissions/hw04_&lt;your_name&gt;/</code></label></li>
+<li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with ≤ 12 entries</label></li>
+<li><label><input type="checkbox">One git commit per prompt (<code>hw04 prompt &lt;id&gt;: &lt;short summary&gt;</code>)</label></li>
+<li><label><input type="checkbox"><code>REPORT.md</code> with a clear business recommendation</label></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/HW03_Trees_RF.html" class="pagination-link" aria-label="Homework 3: Decision Trees and Random Forests">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/HW05_Part1_FFN_CNN.html" class="pagination-link" aria-label="Homework 5: Deep Learning for Time Series">
+        <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

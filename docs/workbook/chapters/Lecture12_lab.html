@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>14&nbsp; Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/HW01_Part1_ETS.html" rel="next">
+<link href="../chapters/Lecture11_Part2_lab.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture12_lab.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">14.1</span> What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">14.2</span> Setup</a></li>
+  <li><a href="#step-1-the-naive-elasticity" id="toc-step-1-the-naive-elasticity" class="nav-link" data-scroll-target="#step-1-the-naive-elasticity"><span class="header-section-number">14.3</span> Step 1 — The naive elasticity</a></li>
+  <li><a href="#step-2-control-for-the-confounder" id="toc-step-2-control-for-the-confounder" class="nav-link" data-scroll-target="#step-2-control-for-the-confounder"><span class="header-section-number">14.4</span> Step 2 — Control for the confounder</a></li>
+  <li><a href="#step-3-the-preprocessing-step-that-silently-destroys-the-answer" id="toc-step-3-the-preprocessing-step-that-silently-destroys-the-answer" class="nav-link" data-scroll-target="#step-3-the-preprocessing-step-that-silently-destroys-the-answer"><span class="header-section-number">14.5</span> Step 3 — The preprocessing step that silently destroys the answer</a></li>
+  <li><a href="#step-4-ask-the-posterior-a-business-question" id="toc-step-4-ask-the-posterior-a-business-question" class="nav-link" data-scroll-target="#step-4-ask-the-posterior-a-business-question"><span class="header-section-number">14.6</span> Step 4 — Ask the posterior a business question</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">14.7</span> Before you leave</a></li>
+  <li><a href="#what-your-run-should-produce" id="toc-what-your-run-should-produce" class="nav-link" data-scroll-target="#what-your-run-should-produce"><span class="header-section-number">14.8</span> What your run should produce</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture12_lab.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Run this one live: <a href="../../labs/Lecture12_lab.html">the executable lab</a>.</em></p>
+<section id="what-we-are-doing" class="level2" data-number="14.1">
+<h2 data-number="14.1" class="anchored" data-anchor-id="what-we-are-doing"><span class="header-section-number">14.1</span> What we are doing</h2>
+<p>A Bayesian regression coefficient is a distribution, and a price elasticity is the one number a category manager will actually act on. Today you will estimate one, and then find three separate ways it can be wrong while every diagnostic still says the model is fine.</p>
+<p>Two of the three are not statistical failures at all. One is a routine preprocessing step you have used in every lab since Lecture 6.</p>
+<p><strong>Time:</strong> ~45 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pymc</code>, <code>arviz</code>, and <code>data/processed/m5_weekly.csv</code>. Four model fits, most under 30 seconds.</p>
+<hr>
+</section>
+<section id="setup" class="level2" data-number="14.2">
+<h2 data-number="14.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">14.2</span> Setup</h2>
+<div id="05f1f0a2" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> pd.read_csv(<span class="st">"../data/processed/m5_weekly.csv"</span>, parse_dates<span class="op">=</span>[<span class="st">"week_start"</span>])</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>weekly[<span class="st">"series"</span>] <span class="op">=</span> weekly.store_id <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> weekly.cat_id</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> weekly.dropna(subset<span class="op">=</span>[<span class="st">"units"</span>, <span class="st">"avg_price"</span>]).copy()</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df.avg_price <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"ly"</span>]    <span class="op">=</span> np.log(df.units.clip(lower<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"lp"</span>]    <span class="op">=</span> np.log(df.avg_price)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"snap"</span>]  <span class="op">=</span> (df.snap_days <span class="op">&gt;=</span> <span class="dv">5</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"event"</span>] <span class="op">=</span> (df.event_days <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"yr"</span>]    <span class="op">=</span> (df.week_start <span class="op">-</span> df.week_start.<span class="bu">min</span>()).dt.days <span class="op">/</span> <span class="fl">365.25</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>codes, uniq <span class="op">=</span> pd.factorize(df.series)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"idx"</span>] <span class="op">=</span> codes</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="bu">len</span>(uniq)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df.ly.values</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">:,}</span><span class="ss"> rows | </span><span class="sc">{</span>J<span class="sc">}</span><span class="ss"> series | sd(log price) = </span><span class="sc">{</span>df<span class="sc">.</span>lp<span class="sc">.</span>std()<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With units and price both in logs, the price coefficient is an <strong>elasticity</strong>: the percent change in demand per percent change in price. Hold on to that sentence — Step 3 is about the moment it stops being true.</p>
+<p>One model function, with switches for the three things we want to vary.</p>
+<div id="b897b87e" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fit(price_col, controlled<span class="op">=</span><span class="va">True</span>, standardize_price<span class="op">=</span><span class="va">False</span>, seed<span class="op">=</span>RANDOM_STATE):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> df[price_col].values.astype(<span class="bu">float</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> standardize_price:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> (x <span class="op">-</span> x.mean()) <span class="op">/</span> x.std()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> pm.Model():</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        s  <span class="op">=</span> pm.Exponential(<span class="st">"sigma"</span>, <span class="fl">1.0</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        bp <span class="op">=</span> pm.Normal(<span class="st">"b_price"</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        bs <span class="op">=</span> pm.Normal(<span class="st">"b_snap"</span>,  <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        be <span class="op">=</span> pm.Normal(<span class="st">"b_event"</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> controlled:</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            a  <span class="op">=</span> pm.Normal(<span class="st">"a"</span>, y.mean(), <span class="dv">1</span>, shape<span class="op">=</span>J)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            bt <span class="op">=</span> pm.Normal(<span class="st">"b_trend"</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>            mu <span class="op">=</span> (a[df.idx.values] <span class="op">+</span> bp <span class="op">*</span> x <span class="op">+</span> bs <span class="op">*</span> df.snap.values</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                  <span class="op">+</span> be <span class="op">*</span> df.event.values <span class="op">+</span> bt <span class="op">*</span> df.yr.values)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            a  <span class="op">=</span> pm.Normal(<span class="st">"a"</span>, y.mean(), <span class="dv">1</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            mu <span class="op">=</span> a <span class="op">+</span> bp <span class="op">*</span> x <span class="op">+</span> bs <span class="op">*</span> df.snap.values <span class="op">+</span> be <span class="op">*</span> df.event.values</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        pm.Normal(<span class="st">"obs"</span>, mu<span class="op">=</span>mu, sigma<span class="op">=</span>s, observed<span class="op">=</span>y)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pm.sample(<span class="dv">1000</span>, tune<span class="op">=</span><span class="dv">1500</span>, chains<span class="op">=</span><span class="dv">4</span>, progressbar<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                         random_seed<span class="op">=</span>seed, target_accept<span class="op">=</span><span class="fl">0.9</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show(idata, controlled<span class="op">=</span><span class="va">True</span>, label<span class="op">=</span><span class="st">""</span>):</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    vs <span class="op">=</span> [<span class="st">"b_price"</span>, <span class="st">"b_snap"</span>, <span class="st">"b_event"</span>] <span class="op">+</span> ([<span class="st">"b_trend"</span>] <span class="cf">if</span> controlled <span class="cf">else</span> [])</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    su <span class="op">=</span> az.summary(idata, var_names<span class="op">=</span>vs, ci_kind<span class="op">=</span><span class="st">"hdi"</span>, ci_prob<span class="op">=</span><span class="fl">0.94</span>, round_to<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(label)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(su[[<span class="st">"mean"</span>, <span class="st">"hdi94_lb"</span>, <span class="st">"hdi94_ub"</span>, <span class="st">"r_hat"</span>, <span class="st">"ess_bulk"</span>]].to_string())</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> su</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>8,310 rows | 30 series | sd(log price) = 0.2444</code></pre>
+<p>Both units and price are in logs, and that is what makes the price coefficient an elasticity — percent per percent. Say that sentence carefully now, because Step 3 is entirely about the moment it stops being true.</p>
+<p>And note <strong>0.2444</strong>, the standard deviation of log price across the whole panel. Keep it in view. In Step 3 a different, much smaller number takes its place, and the gap between them is where the damage comes from.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-1-the-naive-elasticity" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="step-1-the-naive-elasticity"><span class="header-section-number">14.3</span> Step 1 — The naive elasticity</h2>
+<p>Regress log units on log price, SNAP and events. Nothing else.</p>
+<div id="5c8217ee" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>idata_naive <span class="op">=</span> fit(<span class="st">"lp"</span>, controlled<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> show(idata_naive, controlled<span class="op">=</span><span class="va">False</span>, label<span class="op">=</span><span class="st">"Naive"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>An elasticity near <span class="math inline">\(-2.8\)</span>: a 1% price rise costs almost 3% of volume. Diagnostics are clean, <span class="math inline">\(\hat{R}\)</span> is 1.00, ESS is in the thousands, and the interval is tight.</p>
+<p>It is also badly wrong, and Lecture 12’s DAG says why before any model is fitted. Our thirty series are different categories in different stores. Categories differ systematically in <strong>both</strong> typical price and typical volume — HOBBIES items cost more per unit and sell fewer of them. So series identity is an arrow into price <em>and</em> into units: a textbook confounder.</p>
+<p>Comparing a hobby item to a food item is not measuring a price response. It is measuring the difference between two product categories.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Log units on log price, SNAP, and events. Nothing else.</p>
+<pre><code>Naive
+           mean  hdi94_lb  hdi94_ub   r_hat   ess_bulk
+b_price -2.8046   -2.8531   -2.7522  1.0010  2296.4356</code></pre>
+<p>An elasticity of <strong>minus 2.8</strong>. A one percent price rise costs almost three percent of volume. That is a dramatic, highly elastic result — and it would change how a category is priced.</p>
+<p>Look at the diagnostics. R-hat 1.001. ESS 2,296. The interval runs from −2.85 to −2.75 — a width of one tenth. This model is <em>certain</em>. It is also badly wrong, and the useful part is that we knew that before fitting it.</p>
+<p>Lecture 12’s DAG says why. Our thirty series are different <strong>categories</strong> in different stores, and categories differ systematically in both typical price and typical volume — hobby items cost more per unit and sell fewer of them. So series identity is an arrow into price <strong>and</strong> an arrow into units. That is the textbook shape of a confounder.</p>
+<p>Comparing a hobby item to a food item is not measuring a price response. It is measuring the difference between two product categories, and calling it elasticity.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2-control-for-the-confounder" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="step-2-control-for-the-confounder"><span class="header-section-number">14.4</span> Step 2 — Control for the confounder</h2>
+<p>Add per-series intercepts and a trend. Centre log price within each series, so the model uses only price variation <em>inside</em> a series over time — which is the variation a manager could actually create.</p>
+<div id="3089edfd" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"lpc"</span>] <span class="op">=</span> df.lp <span class="op">-</span> df.groupby(<span class="st">"series"</span>).lp.transform(<span class="st">"mean"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>idata_ctrl <span class="op">=</span> fit(<span class="st">"lpc"</span>, controlled<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>su_ctrl <span class="op">=</span> show(idata_ctrl, label<span class="op">=</span><span class="st">"Controlled"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="ef34584e" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>b_naive <span class="op">=</span> idata_naive.posterior[<span class="st">"b_price"</span>].values.ravel()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>b_ctrl  <span class="op">=</span> idata_ctrl.posterior[<span class="st">"b_price"</span>].values.ravel()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  naive       </span><span class="sc">{</span>b_naive<span class="sc">.</span>mean()<span class="sc">:+.3f}</span><span class="ss">   width of 94% HDI "</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>diff(az.hdi(b_naive, prob<span class="op">=</span><span class="fl">0.94</span>))[<span class="dv">0</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  controlled  </span><span class="sc">{</span>b_ctrl<span class="sc">.</span>mean()<span class="sc">:+.3f}</span><span class="ss">   width of 94% HDI "</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>diff(az.hdi(b_ctrl, prob<span class="op">=</span><span class="fl">0.94</span>))[<span class="dv">0</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  the naive estimate is </span><span class="sc">{</span>b_naive<span class="sc">.</span>mean()<span class="op">/</span>b_ctrl<span class="sc">.</span>mean()<span class="sc">:.1f}</span><span class="ss">x too large"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Precision is not accuracy
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The naive estimate is nearly six times too large <strong>and its interval is half the width</strong>. It is not noisy. It is confidently, precisely wrong.</p>
+<p>A tight credible interval says the model is sure. It says nothing about whether the model is answering your question — and no diagnostic in ArviZ will ever tell you that it isn’t. Only the DAG does.</p>
+</div>
+</div>
+<div id="1b7c20f4" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>Add per<span class="op">-</span>series intercepts <span class="kw">and</span> a trend, <span class="kw">and</span> centre log price <span class="op">*</span>within<span class="op">*</span> each series — so the model</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>uses only price variation inside a series over time, which <span class="kw">is</span> the only variation a manager could</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>actually create.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Controlled mean hdi94_lb hdi94_ub b_price -0.4921 -0.5949 -0.3872</p>
+<pre><code></code></pre>
+<p>naive -2.805 width of 94% HDI 0.100 controlled -0.492 width of 94% HDI 0.207 the naive estimate is 5.7x too large</p>
+<pre><code>
+Minus 0.49 rather than minus 2.8. The naive estimate was **5.7 times too large**.
+
+Now the line that matters, and it is the second column. The naive interval is **0.100** wide. The
+correct one is **0.207** — twice as wide.
+
+So the wrong model was not noisy. It was **more precise than the right one**, by a factor of two,
+while being nearly six times off. It was confidently, tightly, precisely wrong.
+
+That is worth dwelling on, because it inverts an instinct almost everybody has. A narrow credible
+interval feels like a good sign. All it says is that the model is sure about the answer to the
+question it was actually asked — and the naive model was asked "how do hobby items differ from
+food items?", which the data answers very precisely indeed.
+
+No diagnostic in ArviZ will ever tell you the question was wrong. Only the DAG does, and the DAG
+is drawn before any code is written.
+
+::: {.callout-tip}
+## Try it
+:::
+
+Answer the question in the cell: the naive estimate is too *negative*. Which arrow in the DAG
+makes the bias run that way rather than the other?
+
+:::
+
+## ---- your turn: uncomment and answer in the string ----
+
+## direction = "..."   # &lt;- the naive estimate is too NEGATIVE. Which arrow in the DAG
+
+## #    makes the bias run that way rather than the other?
+
+## print(direction)
+</code></pre>
+<hr>
+</section>
+<section id="step-3-the-preprocessing-step-that-silently-destroys-the-answer" class="level2" data-number="14.5">
+<h2 data-number="14.5" class="anchored" data-anchor-id="step-3-the-preprocessing-step-that-silently-destroys-the-answer"><span class="header-section-number">14.5</span> Step 3 — The preprocessing step that silently destroys the answer</h2>
+<p>You have standardized predictors in nearly every lab since Lecture 6. It makes <code>Normal(0, 1)</code> priors mean the same thing across variables, and it helps samplers. It is a good habit.</p>
+<p>Do it to log price here and watch what happens.</p>
+<div id="29eb43c2" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>idata_std <span class="op">=</span> fit(<span class="st">"lpc"</span>, controlled<span class="op">=</span><span class="va">True</span>, standardize_price<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>b_std <span class="op">=</span> idata_std.posterior[<span class="st">"b_price"</span>].values.ravel()</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  unstandardized  b_price = </span><span class="sc">{</span>b_ctrl<span class="sc">.</span>mean()<span class="sc">:+.4f}</span><span class="ss">"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  standardized    b_price = </span><span class="sc">{</span>b_std<span class="sc">.</span>mean()<span class="sc">:+.4f}</span><span class="ss">"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  sd(centred log price)   = </span><span class="sc">{</span>df<span class="sc">.</span>lpc<span class="sc">.</span>std()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  ratio                   = </span><span class="sc">{</span>b_ctrl<span class="sc">.</span>mean()<span class="op">/</span>b_std<span class="sc">.</span>mean()<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The two fits agree perfectly — they are the same model. But the <em>coefficient</em> is no longer the same quantity. Standardizing divided log price by its standard deviation, so the coefficient is now the change in log units per <strong>standard deviation</strong> of log price, not per percent.</p>
+<p>Both diagnostics are clean. Both intervals exclude zero. Nothing anywhere reports a problem. The only thing that changed is what the number means, and the model has no way to tell you.</p>
+<p>Now watch it become a business error.</p>
+<div id="e9551e36" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scenario(b, pct<span class="op">=</span><span class="fl">5.0</span>):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Percent change in units, and in revenue, from a `pct` price rise."""</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    units <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> (np.exp(b <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">+</span> pct<span class="op">/</span><span class="dv">100</span>)) <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    rev   <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> ((<span class="dv">1</span> <span class="op">+</span> pct<span class="op">/</span><span class="dv">100</span>) <span class="op">*</span> np.exp(b <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">+</span> pct<span class="op">/</span><span class="dv">100</span>)) <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> units, rev</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, b <span class="kw">in</span> [(<span class="st">"correct (elasticity)"</span>, b_ctrl), (<span class="st">"standardized"</span>, b_std)]:</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    u, r <span class="op">=</span> scenario(b)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>label<span class="sc">:&lt;22s}</span><span class="ss"> 5% price rise -&gt; units </span><span class="sc">{</span>u<span class="sc">.</span>mean()<span class="sc">:+.2f}</span><span class="ss">%  "</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"revenue </span><span class="sc">{</span>r<span class="sc">.</span>mean()<span class="sc">:+.2f}</span><span class="ss">%"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+This is the lab’s point
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Read the two lines. Using the standardized coefficient, a manager is told a 5% price rise costs about a tenth of a percent of volume. The truth is <strong>more than twenty times that</strong> — because the coefficient was divided by the standard deviation of centred log price, which is only 0.0455. The revenue projection is inflated too, from <span class="math inline">\(+2.5\%\)</span> to <span class="math inline">\(+4.9\%\)</span>.</p>
+<p>The smaller the standard deviation you divide by, the larger the distortion. Here the within-series price variation is genuinely small, which makes the error enormous — and entirely invisible.</p>
+<p>The model was right. The sampler was right. The diagnostics were right. The error entered through a preprocessing convenience three cells earlier, and it survived all the way to a stocking decision because <strong>nothing downstream carries units</strong>.</p>
+<p>The habit that prevents it: write down what one unit of each variable <em>is</em> before you rescale it, and check that the coefficient still answers the question you asked.</p>
+</div>
+</div>
+<div id="f89e8387" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>You have standardized predictors <span class="kw">in</span> nearly every lab since Lecture <span class="fl">6.</span> It makes `Normal(<span class="dv">0</span>,<span class="dv">1</span>)`</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>priors mean the same thing across variables, it helps samplers, <span class="kw">and</span> it <span class="kw">is</span> a genuinely good habit</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>that I am <span class="kw">not</span> about to tell you to abandon. Do it to log price here.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>unstandardized b_price = -0.4921 standardized b_price = -0.0224 sd(centred log price) = 0.0455 ratio = 21.9384</p>
+<pre><code>
+The two fits agree perfectly — they are the same model, and both have clean diagnostics and
+intervals excluding zero. But the coefficient went from −0.49 to **−0.022**, a factor of nearly
+twenty-two.
+
+Nothing is broken. Standardizing divided log price by its standard deviation, so the coefficient
+is now the change in log units per **standard deviation of log price** rather than per percent.
+Same model, same fit, different unit — and the number no longer means "elasticity." Now look at what it was divided by. **0.0455.**
+
+Remember the setup printed 0.2444 for log price across the whole panel? This is not that number.
+This is the standard deviation of log price **within** a series, after centring — and it is five
+times smaller, because prices move very little inside a single store-category over time.
+
+And here is the irony worth naming. That within-series variation is small **because of the good
+decision we made in Step 2.** Centring within series is what removed the confounding. It is also
+what makes the standard deviation tiny, and the smaller the number you divide by, the larger the
+distortion. **The correct modelling choice amplified the preprocessing error.**
+</code></pre>
+<p>correct (elasticity) 5% price rise -&gt; units -2.37% revenue +2.51% standardized 5% price rise -&gt; units -0.11% revenue +4.89%</p>
+<pre><code>
+Read those two lines as advice given to a person.
+
+Using the standardized coefficient, a manager is told that a 5% price rise costs about **a tenth
+of a percent** of volume — essentially free. The truth is **−2.37%**, more than twenty times
+larger. And the revenue projection nearly doubles, from +2.5% to +4.9%. That is a real decision, made from a real model, that passed every check.
+
+The model was right. The sampler was right. The diagnostics were right. The error entered through
+a **preprocessing convenience three cells earlier**, and it survived all the way to a stocking
+decision because nothing downstream carries units. A float is a float. `-0.0224` looks exactly as
+authoritative as `-0.4921`.
+
+::: {.callout-tip}
+## Try it
+:::
+
+Fill in the blank: to recover the elasticity from the standardized fit, what do you multiply by?
+
+And the habit that prevents this, which is the one line to take from the lab: **write down what
+one unit of each variable is before you rescale it, and check that the coefficient still answers
+the question you asked.** Keep standardizing. Just know what you are holding afterwards.
+
+:::
+
+## ---- your turn: uncomment and fill in ----
+
+## print("To recover the elasticity from the standardized fit, multiply it by ___")
+</code></pre>
+<hr>
+</section>
+<section id="step-4-ask-the-posterior-a-business-question" class="level2" data-number="14.6">
+<h2 data-number="14.6" class="anchored" data-anchor-id="step-4-ask-the-posterior-a-business-question"><span class="header-section-number">14.6</span> Step 4 — Ask the posterior a business question</h2>
+<p>The posterior is samples, so any question is answered by counting. Use the correct fit.</p>
+<div id="7556aec5" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  P(elasticity &lt; 0)     = </span><span class="sc">{</span>(b_ctrl <span class="op">&lt;</span> <span class="dv">0</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  P(elasticity &lt; -0.5)  = </span><span class="sc">{</span>(b_ctrl <span class="op">&lt;</span> <span class="op">-</span><span class="fl">0.5</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  P(-0.5 &lt; e &lt; 0)       = </span><span class="sc">{</span>((b_ctrl <span class="op">&gt;</span> <span class="op">-</span><span class="fl">0.5</span>) <span class="op">&amp;</span> (b_ctrl <span class="op">&lt;</span> <span class="dv">0</span>))<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The first number settles the direction: every posterior sample is negative, so demand falls when price rises. There is no doubt at all.</p>
+<p>The second is the interesting one. Elasticity <span class="math inline">\(-0.5\)</span> is a meaningful business threshold, and the posterior puts us within a few points of a coin flip. <strong>The data cannot settle whether demand is elastic or inelastic</strong>, and that is the honest report. A significance test would have announced the direction and said nothing about the question the manager actually asked.</p>
+<div id="be94387f" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ax.hist(b_ctrl, bins<span class="op">=</span><span class="dv">60</span>, color<span class="op">=</span><span class="st">"steelblue"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="op">-</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"crimson"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">"elastic / inelastic boundary"</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"gray"</span>, ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"price elasticity"</span>)<span class="op">;</span> ax.set_yticks([])</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span> plt.tight_layout()<span class="op">;</span> plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now the decision the manager actually faces.</p>
+<div id="59a2a908" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>u5, r5 <span class="op">=</span> scenario(b_ctrl, <span class="fl">5.0</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  5% price rise:  units </span><span class="sc">{</span>u5<span class="sc">.</span>mean()<span class="sc">:+.2f}</span><span class="ss">%  "</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"[</span><span class="sc">{</span>np<span class="sc">.</span>percentile(u5,<span class="dv">3</span>)<span class="sc">:+.2f}</span><span class="ss">, </span><span class="sc">{</span>np<span class="sc">.</span>percentile(u5,<span class="dv">97</span>)<span class="sc">:+.2f}</span><span class="ss">]"</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"                  revenue </span><span class="sc">{</span>r5<span class="sc">.</span>mean()<span class="sc">:+.2f}</span><span class="ss">%  "</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"[</span><span class="sc">{</span>np<span class="sc">.</span>percentile(r5,<span class="dv">3</span>)<span class="sc">:+.2f}</span><span class="ss">, </span><span class="sc">{</span>np<span class="sc">.</span>percentile(r5,<span class="dv">97</span>)<span class="sc">:+.2f}</span><span class="ss">]"</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  P(revenue rises) = </span><span class="sc">{</span>(r5 <span class="op">&gt;</span> <span class="dv">0</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Revenue rises with probability 1.00 across every posterior sample — <em>even though</em> the elasticity might well be past <span class="math inline">\(-0.5\)</span>. Both facts are true at once, and only the posterior lets you say so.</p>
+<div id="96984336" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>Back to the correct fit. The posterior <span class="kw">is</span> samples, so <span class="bu">any</span> question <span class="kw">is</span> answered by counting.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>P(elasticity &lt; 0) = 1.000 P(elasticity &lt; -0.5) = 0.446 P(-0.5 &lt; e &lt; 0) = 0.554</p>
+<pre><code>
+The first line settles the direction completely. Every posterior sample is negative — demand falls
+when price rises, with no doubt whatsoever.
+
+The second line is the interesting one, and it is the reason to have fitted a Bayesian model at
+all. Minus one half is a meaningful business boundary: past it, demand is elastic and a price rise
+loses revenue. The posterior puts us at **0.446** — within a few points of a coin flip.
+
+So the honest report is: **the data cannot settle whether demand is elastic or inelastic.** Not
+"it is inelastic." Not "the effect is significant." A significance test here would have announced
+the direction — which was never in question — and said nothing at all about the boundary the
+manager actually cares about.
+</code></pre>
+<p>5% price rise: units -2.37% [-2.86, -1.87] revenue +2.51% [+2.00, +3.04] P(revenue rises) = 1.000</p>
+<pre><code>
+And now the resolution, which is the most useful thing in the lab.
+
+**Revenue rises with probability 1.000** — across every posterior sample — *even though* the
+elasticity may well be past −0.5. Both of those are true at once. The threshold question is
+genuinely unresolved; the decision question is not.
+
+Only a posterior lets you say both. A point estimate forces you to pick one number and then argue
+about which side of the line it falls on. The distribution lets you answer the question that was
+actually asked — *should we raise the price?* — with a probability attached, while being honest
+that a different question remains open.
+
+::: {.callout-tip}
+## Try it
+:::
+
+Write the two strings: your two-sentence recommendation to the manager with a probability
+attached, and one DAG arrow that, if wrong, invalidates it.
+
+:::
+
+## ---- your turn: uncomment and answer in the strings ----
+
+## recommend = "..."   # &lt;- two sentences to the manager, with a probability attached
+
+## caveat    = "..."   # &lt;- name one DAG arrow that, if wrong, invalidates this
+
+## print(recommend); print(caveat)
+</code></pre>
+<hr>
+</section>
+<section id="before-you-leave" class="level2" data-number="14.7">
+<h2 data-number="14.7" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">14.7</span> Before you leave</h2>
+<blockquote class="blockquote">
+<p><strong>Discuss (the three failures):</strong> This lab produced a wrong elasticity three ways — an omitted confounder, a rescaled coefficient, and a threshold question the data cannot answer. Which of the three would any ArviZ diagnostic have caught? What does your answer imply about what diagnostics are for?</p>
+<p><strong>Discuss (the habit):</strong> Standardizing is genuinely good practice and you should keep doing it. State the rule that lets you keep the habit without repeating Step 3’s error.</p>
+<p><strong>Discuss (the decision):</strong> You must advise on the 5% rise using only Step 4’s output. Write the recommendation. Then say what you would want measured before a 20% rise, and why extrapolating this elasticity that far is a different kind of claim.</p>
+<p><strong>Discuss (the course):</strong> You have now estimated the same kind of quantity with OLS, XGBoost, and a Bayesian regression. Only one of them naturally answers “how likely is it that revenue rises?” Explain what about the Bayesian output makes that question cheap, and name one forecasting task from this course where you would still not reach for it.</p>
+</blockquote>
+<hr>
+<p><em>Solutions posted to Canvas after class.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Four questions, and the last one closes the course.</p>
+<p><strong>The three failures.</strong> You produced a wrong elasticity three ways — an omitted confounder, a rescaled coefficient, and a threshold the data cannot resolve. Which would any ArviZ diagnostic have caught?</p>
+<p>that the computation did what the code said. Everything about whether the code said the right thing is yours.*</p>
+<p><strong>The habit.</strong> Standardizing is good practice and you should keep doing it. State the rule that lets you keep the habit without repeating Step 3.</p>
+<p><strong>The decision.</strong> Advise on the 5% rise using only Step 4’s output. Then say what you would want measured before a <strong>20%</strong> rise — and why extrapolating this elasticity that far is a different kind of claim.</p>
+<p>that actually occurred within series, and the standard deviation of that is 0.0455 — a few percent. A 20% move is far outside the range the data has ever seen. That is extrapolation, not estimation, and it is the same limit you met in Lab 4 when a tree could not predict beyond its training range.*</p>
+<p><strong>The course.</strong> You have now estimated this kind of quantity with OLS, with XGBoost, and with a Bayesian regression. Only one of them naturally answers “how likely is it that revenue rises?” Explain what about the Bayesian output makes that question cheap — and name one forecasting task from this course where you would still not reach for it.</p>
+<p>And that is the last lab. Fifteen weeks, one dataset, a dozen model families, and a scoreboard that ends with a 46-coefficient linear model at the top.</p>
+<p>The through-line was never which method wins. It was that every one of these models will return a confident number whether or not it deserves one — a tree that cannot extrapolate, a network whose result moves 230 RMSE with the seed, a forecast interval that is honest and useless, a hierarchy pooling series that never belonged together, and today a coefficient that stopped being an elasticity three cells before anybody read it.</p>
+<p>None of those announced themselves. Every one of them was caught by holding something out and checking. That habit is the course. Solutions go up on Canvas after the deadline. See you in Week 16 for the synthesis.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="what-your-run-should-produce" class="level2" data-number="14.8">
+<h2 data-number="14.8" class="anchored" data-anchor-id="what-your-run-should-produce"><span class="header-section-number">14.8</span> What your run should produce</h2>
+<p>Your numbers will differ where a model is stochastic; these are the values this lab produces on the pinned environment.</p>
+<p><code>random_seed=42</code>; four fits, whole lab ≈ 2 minutes.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Panel</td>
+<td>8,310 rows · 30 series · <strong>sd(log price) = 0.2444</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Naive</strong> <code>b_price</code></td>
+<td><strong>−2.8046</strong> · HDI [−2.8531, −2.7522] · R-hat 1.001 · ESS 2,296</td>
+</tr>
+<tr class="odd">
+<td><strong>Controlled</strong> <code>b_price</code></td>
+<td><strong>−0.4921</strong> · HDI [−0.5949, −0.3872] · R-hat 1.002 · ESS 2,736</td>
+</tr>
+<tr class="even">
+<td>Bias</td>
+<td>naive is <strong>5.7× too large</strong></td>
+</tr>
+<tr class="odd">
+<td>Interval widths</td>
+<td>naive <strong>0.100</strong> vs controlled <strong>0.207</strong> — the wrong model is <em>twice as precise</em></td>
+</tr>
+<tr class="even">
+<td>Standardized <code>b_price</code></td>
+<td><strong>−0.0224</strong></td>
+</tr>
+<tr class="odd">
+<td>sd(<strong>centred</strong> log price)</td>
+<td><strong>0.0455</strong> — five times smaller than the panel-wide 0.2444</td>
+</tr>
+<tr class="even">
+<td>Rescaling ratio</td>
+<td><strong>21.94</strong> ( = 1 / 0.0455 )</td>
+</tr>
+<tr class="odd">
+<td>5% rise, correct</td>
+<td>units <strong>−2.37%</strong> [−2.86, −1.87] · revenue <strong>+2.51%</strong> [+2.00, +3.04]</td>
+</tr>
+<tr class="even">
+<td>5% rise, standardized</td>
+<td>units <strong>−0.11%</strong> · revenue +4.89% — <strong>21× understated</strong></td>
+</tr>
+<tr class="odd">
+<td>P(elasticity &lt; 0)</td>
+<td><strong>1.000</strong></td>
+</tr>
+<tr class="even">
+<td>P(elasticity &lt; −0.5)</td>
+<td><strong>0.446</strong> — near a coin flip</td>
+</tr>
+<tr class="odd">
+<td>P(revenue rises at +5%)</td>
+<td><strong>1.000</strong></td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture11_Part2_lab.html" class="pagination-link" aria-label="Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/HW01_Part1_ETS.html" class="pagination-link" aria-label="Homework 1, Part 1: Exponential Smoothing">
+        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

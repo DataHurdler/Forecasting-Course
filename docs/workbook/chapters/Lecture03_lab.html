@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Lab 3: GAMs, Prophet, and Several Seasons at Once – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture04_lab.html" rel="next">
+<link href="../chapters/Lecture02_lab.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture03_lab.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">3.1</span> What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">3.2</span> Setup</a></li>
+  <li><a href="#step-1-three-cycles-one-series" id="toc-step-1-three-cycles-one-series" class="nav-link" data-scroll-target="#step-1-three-cycles-one-series"><span class="header-section-number">3.3</span> Step 1 — Three cycles, one series</a></li>
+  <li><a href="#step-2-the-annual-cycle-has-two-peaks" id="toc-step-2-the-annual-cycle-has-two-peaks" class="nav-link" data-scroll-target="#step-2-the-annual-cycle-has-two-peaks"><span class="header-section-number">3.4</span> Step 2 — The annual cycle has <em>two</em> peaks</a></li>
+  <li><a href="#step-3-prophet-and-an-honest-benchmark" id="toc-step-3-prophet-and-an-honest-benchmark" class="nav-link" data-scroll-target="#step-3-prophet-and-an-honest-benchmark"><span class="header-section-number">3.5</span> Step 3 — Prophet, and an honest benchmark</a></li>
+  <li><a href="#step-4-the-components-plot" id="toc-step-4-the-components-plot" class="nav-link" data-scroll-target="#step-4-the-components-plot"><span class="header-section-number">3.6</span> Step 4 — The components plot</a></li>
+  <li><a href="#step-5-how-much-did-the-extra-harmonics-buy" id="toc-step-5-how-much-did-the-extra-harmonics-buy" class="nav-link" data-scroll-target="#step-5-how-much-did-the-extra-harmonics-buy"><span class="header-section-number">3.7</span> Step 5 — How much did the extra harmonics buy?</a></li>
+  <li><a href="#step-6-pygam-and-reading-the-smooth-directly" id="toc-step-6-pygam-and-reading-the-smooth-directly" class="nav-link" data-scroll-target="#step-6-pygam-and-reading-the-smooth-directly"><span class="header-section-number">3.8</span> Step 6 — pyGAM, and reading the smooth directly</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">3.9</span> Before you leave</a></li>
+  <li><a href="#what-your-run-should-produce" id="toc-what-your-run-should-produce" class="nav-link" data-scroll-target="#what-your-run-should-produce"><span class="header-section-number">3.10</span> What your run should produce</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture03_lab.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Run this one live: <a href="../../labs/Lecture03_lab.html">the executable lab</a>.</em></p>
+<section id="what-we-are-doing" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="what-we-are-doing"><span class="header-section-number">3.1</span> What we are doing</h2>
+<p>Lecture 3 made a claim: a GAM earns its keep when a series has <strong>several cycles running at once</strong>, because each one gets its own smooth term and you can still read the model.</p>
+<p>Retail sales cannot show you that — they have essentially one season. So today we leave M5 and use electricity demand, which has three large cycles simultaneously, and an annual shape that will break the first model we try.</p>
+<p>The business question: you are forecasting daily demand for a grid operator. Being wrong is expensive in both directions — under-forecast and you buy power at spot prices, over-forecast and you have paid to keep generation spinning for nothing.</p>
+<p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>prophet</code>, <code>pygam</code>, and <code>data/processed/electricity_daily.csv</code> + <code>electricity_hourly.csv</code> (run <code>python scripts/prep_electricity.py</code> once).</p>
+<hr>
+</section>
+<section id="setup" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">3.2</span> Setup</h2>
+<div id="8ffcfd4c" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings, logging</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">'cmdstanpy'</span>).setLevel(logging.ERROR)   <span class="co"># Prophet is chatty; silence it</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Find the processed data file whether you render from the repo root or from</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">    this file's own folder."""</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"processed"</span> <span class="op">/</span> name</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. "</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Run `python scripts/prep_electricity.py` from the repository root first."</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> pd.read_csv(data_path(<span class="st">"electricity_daily.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"date"</span>])</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>hourly <span class="op">=</span> pd.read_csv(data_path(<span class="st">"electricity_hourly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"datetime"</span>])</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>2041 days — train 1673, test 368 test window: 2017-08-01 to 2018-08-03</p>
+<pre><code>
+Two notes. We trim to 2013 onward — five and a half years, which is plenty of annual cycles and
+keeps every fit under a second, because you're going to fit several. And we hold out just over a
+year, August 2017 through August 2018, so the test window contains a full summer *and* a full
+winter. That's deliberate. Holding out only six months of an annual cycle tells you almost
+nothing.
+
+The `logging` line silences Prophet, which is otherwise extremely chatty on every fit.
+
+:::
+
+## Five and a half years is plenty of yearly cycles and keeps every fit under a second.
+
+daily = daily[daily.date &gt;= "2013-01-01"].reset_index(drop=True)
+
+SPLIT = "2017-08-01"
+train, test = daily[daily.date &lt; SPLIT], daily[daily.date &gt;= SPLIT]
+
+rmse = lambda a, b: float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+mae  = lambda a, b: float(np.mean(np.abs(np.asarray(a) - np.asarray(b))))
+results = {}
+
+print(f"{len(daily)} days — train {len(train)}, test {len(test)}")
+print(f"test window: {test.date.min():%Y-%m-%d} to {test.date.max():%Y-%m-%d}")</code></pre>
+<hr>
+</section>
+<section id="step-1-three-cycles-one-series" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="step-1-three-cycles-one-series"><span class="header-section-number">3.3</span> Step 1 — Three cycles, one series</h2>
+<p>Before any model, look at the three periodicities separately.</p>
+<div id="a282b3ac" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">3.2</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>hourly.groupby(<span class="st">"hour"</span>).mw.mean().plot(ax<span class="op">=</span>axes[<span class="dv">0</span>], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"hour of day"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].set_xlabel(<span class="st">"hour"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>daily.groupby(<span class="st">"dow"</span>).mw_mean.mean().plot(ax<span class="op">=</span>axes[<span class="dv">1</span>], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"day of week (0=Mon)"</span>)<span class="op">;</span> axes[<span class="dv">1</span>].set_xlabel(<span class="st">""</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>daily.groupby(<span class="st">"doy"</span>).mw_mean.mean().rolling(<span class="dv">7</span>, center<span class="op">=</span><span class="va">True</span>).mean().plot(ax<span class="op">=</span>axes[<span class="dv">2</span>])</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_title(<span class="st">"day of year (7d smoothed)"</span>)<span class="op">;</span> axes[<span class="dv">2</span>].set_xlabel(<span class="st">""</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> axes: a.set_ylabel(<span class="st">"MW"</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d6d53530" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, g <span class="kw">in</span> [(<span class="st">"hour of day"</span>, hourly.groupby(<span class="st">"hour"</span>).mw.mean()),</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                 (<span class="st">"day of week"</span>, daily.groupby(<span class="st">"dow"</span>).mw_mean.mean()),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                 (<span class="st">"day of year"</span>, daily.groupby(<span class="st">"doy"</span>).mw_mean.mean())]:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    swing <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> (g.<span class="bu">max</span>() <span class="op">-</span> g.<span class="bu">min</span>()) <span class="op">/</span> g.mean()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>label<span class="sc">:&lt;14}</span><span class="ss"> swing </span><span class="sc">{</span>swing<span class="sc">:5.1f}</span><span class="ss">%   min </span><span class="sc">{</span>g<span class="sc">.</span>idxmin()<span class="sc">:&gt;3}</span><span class="ss">   max </span><span class="sc">{</span>g<span class="sc">.</span>idxmax()<span class="sc">:&gt;3}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Notice:</strong> all three cycles are large — none is a rounding error you could ignore. This is the situation Lecture 3 said GAMs are for.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Before any model, look at the three periodicities separately.</p>
+<p>Hour of day: demand bottoms out around four in the morning and peaks in the early evening, around hour nineteen. People wake up, go to work, come home, turn things on. Day of week: Monday highest, Sunday lowest. Commercial and industrial load.</p>
+<p>Day of year: and this one is a strange shape, which is the whole point of Step 2.</p>
+<pre><code>hour of day    swing  33.3%   min   4   max  19
+day of week    swing  11.6%   min   6   max   1
+day of year    swing  44.7%   min 116   max 200</code></pre>
+<p>All three are large. The annual swing is forty-five percent of mean demand, the daily swing is thirty-three percent, and even the weakest — day of week — is nearly twelve percent. None of these is a rounding error you could ignore and still have a usable forecast.</p>
+<p>That is the situation Lecture 3 said GAMs are for. Not one dominant season with noise around it. Three real cycles, all worth modelling, all on different time scales.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2-the-annual-cycle-has-two-peaks" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="step-2-the-annual-cycle-has-two-peaks"><span class="header-section-number">3.4</span> Step 2 — The annual cycle has <em>two</em> peaks</h2>
+<p>Look again at the third panel. It does not look like a wave.</p>
+<div id="c06527f0" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>doy <span class="op">=</span> daily.groupby(<span class="st">"doy"</span>).mw_mean.mean()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"January  (days 1-31)    </span><span class="sc">{</span>doy<span class="sc">.</span>loc[<span class="dv">1</span>:<span class="dv">31</span>]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> MW   &lt;- heating"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"April    (days 95-115)  </span><span class="sc">{</span>doy<span class="sc">.</span>loc[<span class="dv">95</span>:<span class="dv">115</span>]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> MW   &lt;- mild, nothing running"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"July     (days 180-200) </span><span class="sc">{</span>doy<span class="sc">.</span>loc[<span class="dv">180</span>:<span class="dv">200</span>]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> MW   &lt;- air conditioning"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Two peaks and two troughs per year, because heating and cooling are <em>both</em> electricity demand and they happen at opposite ends of the calendar.</p>
+<p>Now the consequence. Fit the annual shape with a single sine wave, then with two.</p>
+<div id="143a7801" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.arange(<span class="bu">len</span>(doy))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>one <span class="op">=</span> np.c_[np.ones_like(t), np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>), np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>)]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>two <span class="op">=</span> np.c_[one,             np.sin(<span class="dv">4</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>), np.cos(<span class="dv">4</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>)]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, X <span class="kw">in</span> [(<span class="st">"one harmonic"</span>, one), (<span class="st">"two harmonics"</span>, two)]:</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    beta, <span class="op">*</span>_ <span class="op">=</span> np.linalg.lstsq(X, doy.values, rcond<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>label<span class="sc">:&lt;15}</span><span class="ss"> in-sample RMSE </span><span class="sc">{</span>rmse(doy.values, X <span class="op">@</span> beta)<span class="sc">:,.0f}</span><span class="ss"> MW"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>This is the whole argument for a flexible term.</strong> One harmonic can put its peak in summer or in winter — not both. Adding the second harmonic (a cycle that repeats <em>twice</em> a year) cuts the error by about a factor of two and a half.</p>
+<p>Prophet’s <code>yearly_seasonality</code> is exactly this idea with more terms: a Fourier series of order 10 by default, so 10 sine/cosine pairs. A <code>pyGAM</code> spline gets there differently — by bending freely — but solves the same problem.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Look at that annual panel again. It does not look like a wave. It looks like a letter M.</p>
+<pre><code>January  (days 1-31)     34,403 MW   &lt;- heating
+April    (days 95-115)   26,945 MW   &lt;- mild, nothing running
+July     (days 180-200)  37,043 MW   &lt;- air conditioning</code></pre>
+<p>There it is. High in January, low in April, high again in July. Two peaks and two troughs per year — because heating and cooling are <strong>both</strong> electricity demand, and they happen at opposite ends of the calendar. April is the month when nobody needs either.</p>
+<p>Now the consequence, and this is the argument for the whole lecture. Fit that annual shape with a single sine wave. Then with two.</p>
+<pre><code>one harmonic     in-sample RMSE 3,428 MW
+two harmonics    in-sample RMSE 1,348 MW</code></pre>
+<p>A single sine wave has one peak per cycle. <strong>It can put that peak in summer or in winter — it cannot do both.</strong> Whichever it picks, it is badly wrong for half the year. Three thousand four hundred megawatts of error on a series averaging around thirty thousand.</p>
+<p>Add a second harmonic — a cycle that repeats <em>twice</em> a year — and the error drops to thirteen forty-eight. Two and a half times better, from one extra pair of terms, because that second harmonic is exactly the shape the physics needs.</p>
+<p>That’s the mechanism. Prophet’s <code>yearly_seasonality</code> is this idea with more terms — a Fourier series of order ten by default, so ten sine-cosine pairs. A pyGAM spline gets there differently, by bending freely rather than by summing waves, but it’s solving the same problem: the annual shape is not a wave, so don’t fit it with one.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-3-prophet-and-an-honest-benchmark" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="step-3-prophet-and-an-honest-benchmark"><span class="header-section-number">3.5</span> Step 3 — Prophet, and an honest benchmark</h2>
+<p>Prophet wants two columns named <code>ds</code> and <code>y</code>. That is most of the API.</p>
+<div id="32395d40" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>Prophet wants two columns named `ds` <span class="kw">and</span> `y`. That <span class="kw">is</span> genuinely most of the API.</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>But benchmark first — always. Same day last year, <span class="kw">and</span> note it<span class="st">'s **364** days rather than 365,</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="er">which keeps the weekday aligned. Comparing a Tuesday to a Wednesday would hand the benchmark an</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>error that isn<span class="st">'t really about seasonality.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Seasonal naive (364d) RMSE 4,608 MAE 3,333 Prophet RMSE 3,935 MAE 3,001</p>
+<pre><code>
+Prophet beats the benchmark — about fifteen percent better on RMSE.
+
+One deliberate choice: `daily_seasonality=False`. The data is one row per day, so there is no
+within-day variation left to model. Leave it on and Prophet will happily fit a daily cycle to
+noise, and report it to you with a straight face.
+
+:::
+
+## Benchmark first, always: same day last year (364 days keeps the weekday aligned).
+
+lookup = daily.set_index("date").mw_mean
+sn = [lookup.get(t - pd.Timedelta(days=364), np.nan) for t in test.date]
+results["Seasonal naive (364d)"] = (rmse(test.mw_mean, sn), mae(test.mw_mean, sn))
+
+m = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False)
+m.fit(train.rename(columns={"date": "ds", "mw_mean": "y"})[["ds", "y"]])
+
+fc = m.predict(test.rename(columns={"date": "ds"})[["ds"]])
+results["Prophet"] = (rmse(test.mw_mean, fc.yhat), mae(test.mw_mean, fc.yhat))
+
+for k, (r, a) in results.items():
+    print(f"{k:&lt;24} RMSE {r:7,.0f}   MAE {a:7,.0f}")</code></pre>
+<p>We turned <code>daily_seasonality</code> off deliberately — the data is one row per day, so there is no within-day variation left to model. Leave it on and Prophet will happily fit noise.</p>
+<hr>
+</section>
+<section id="step-4-the-components-plot" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="step-4-the-components-plot"><span class="header-section-number">3.6</span> Step 4 — The components plot</h2>
+<p>This is the payoff, and the reason Prophet gets used by people who will be questioned about their forecast.</p>
+<div id="1ce7914f" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>m.plot_components(fc)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Three panels, one per additive term, each on the scale of the original series. The trend, the weekly cycle, the yearly cycle — separately readable.</p>
+<p><strong>Notice</strong> the yearly panel reproduces the double peak from Step 2. Nobody told Prophet about heating and cooling; the Fourier series had enough terms to find the shape.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>(Screen: run <code>m.plot_components(fc)</code>.)</em></p>
+<p>This is the payoff, and it’s why Prophet gets used by people who have to defend a forecast in a meeting.</p>
+<p>Three panels, one per additive term, each on the scale of the original series. The trend. The weekly cycle. The yearly cycle. Separately readable, and each one is a sentence you can say to a non-technical person: <em>“demand is drifting down slightly, Mondays run about a thousand megawatts above Sundays, and there are two annual peaks.”</em></p>
+<p>And look at the yearly panel — it reproduces the double peak from Step 2. Nobody told Prophet about heating and cooling. Nobody coded a January term and a July term. The Fourier series simply had enough flexibility to find the shape that was in the data.</p>
+<p>That combination — flexible enough to find it, structured enough to show you what it found — is the entire case for additive models.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-5-how-much-did-the-extra-harmonics-buy" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="step-5-how-much-did-the-extra-harmonics-buy"><span class="header-section-number">3.7</span> Step 5 — How much did the extra harmonics buy?</h2>
+<p>Step 2 argued this in-sample. Test it properly, on the holdout.</p>
+<p><code>yearly_seasonality</code> accepts an integer — the Fourier order — instead of <code>True</code>.</p>
+<p><strong>Your turn:</strong> fit a Prophet with the yearly order forced to <strong>1</strong> (a single harmonic) and add it to the results table.</p>
+<div id="f4adec0e" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>Step <span class="dv">2</span> made this argument <span class="kw">in</span><span class="op">-</span>sample, on the averaged annual profile. That<span class="st">'s suggestive, not</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="er">evidence. Test it properly, on the holdout. `yearly_seasonality` takes an integer — the Fourier order — instead of `True`.</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>tip}</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">## Try it</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>Pause here. Fit a Prophet <span class="cf">with</span> the yearly order forced to <span class="op">**</span><span class="dv">1</span><span class="op">**</span> — a single harmonic — <span class="kw">and</span> add it</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>to the results table. Everything <span class="cf">else</span> stays the same.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>single harmonic RMSE 4,269</p>
+<pre><code>
+Four thousand two hundred and sixty-nine, against three thousand nine hundred and thirty-five for
+the full-order model. The holdout agrees with Step 2 — crippling the annual term costs you real
+accuracy out of sample, not just in-sample fit.
+
+But look where it lands relative to the benchmark. Seasonal naive was 4,608. The single-harmonic
+Prophet is 4,269 — it beats the benchmark by about seven percent, and that is *all* it beats it
+by.
+
+And here's the part worth stopping on. **On MAE, it loses to the benchmark outright** — 3,358
+against 3,333. Same two models, same holdout, opposite verdict depending on which error measure
+you quote.
+
+That is not a trick and it is not a bug. RMSE squares errors, so it punishes the occasional large
+miss; MAE treats all errors proportionally. A model can be better on one and worse on the other,
+and when a ranking flips between them the honest move is to say so rather than to quote the
+metric that flatters you.
+
+:::
+
+## ---- your turn: uncomment and fill in the order ----
+
+## m1 = Prophet(yearly_seasonality=___, weekly_seasonality=True, daily_seasonality=False)
+
+## m1.fit(train.rename(columns={"date": "ds", "mw_mean": "y"})[["ds", "y"]])
+
+#
+
+## fc1 = m1.predict(test.rename(columns={"date": "ds"})[["ds"]])
+
+## results["Prophet (yearly order=1)"] = (rmse(test.mw_mean, fc1.yhat),
+
+## mae(test.mw_mean, fc1.yhat))
+
+#
+
+## print(f"single harmonic RMSE {rmse(test.mw_mean, fc1.yhat):,.0f}")
+</code></pre>
+<p>Report both numbers. Does the holdout agree with what Step 2 predicted in-sample?</p>
+<hr>
+</section>
+<section id="step-6-pygam-and-reading-the-smooth-directly" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="step-6-pygam-and-reading-the-smooth-directly"><span class="header-section-number">3.8</span> Step 6 — pyGAM, and reading the smooth directly</h2>
+<p>Prophet is a GAM with the time-series decisions made for you. <code>pyGAM</code> makes you state the terms, which is more work and more control.</p>
+<div id="53ab3cf8" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, f</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>Prophet <span class="kw">is</span> a GAM <span class="cf">with</span> the time<span class="op">-</span>series decisions already made <span class="cf">for</span> you. pyGAM makes you state the</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>terms yourself — more work, more control.</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>Two terms only. A cyclic spline on day<span class="op">-</span>of<span class="op">-</span>year — `basis<span class="op">=</span><span class="st">"cp"</span>` <span class="kw">is</span> what makes December <span class="dv">31</span><span class="er">st</span> join</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>back up <span class="cf">with</span> January <span class="dv">1</span><span class="er">st</span>, so the smooth doesn<span class="st">'t have a discontinuity at the year boundary — and</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="er">day-of-week as a categorical factor. That's it. No trend term. No hourly anything.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>effective degrees of freedom: 22.5</p>
+<pre><code>                      RMSE    MAE</code></pre>
+<p>pyGAM (doy + dow) 3444 2550 Prophet 3935 3001 Prophet (yearly order=1) 4269 3358 Seasonal naive (364d) 4608 3333</p>
+<pre><code>
+Every model beat the benchmark. The single-harmonic Prophet is the worst of the three, as Step 2
+predicted.
+
+And **pyGAM wins.** Thirty-four forty-four against Prophet's thirty-nine thirty-five — about
+twelve percent better, on both RMSE and MAE, using two terms against Prophet's three, with no
+trend component at all. That should bother you slightly, and we'll come back to it in the closing question. Now the partial dependence — the GAM equivalent of the components plot.
+
+**Say what the left panel means in words**, the way you'd say it to a grid operator: demand is
+high in January, falls through spring to a minimum around mid-April, climbs to an annual peak in
+mid-July, and falls again into autumn. The model learned the M shape directly from the data by
+bending, without being given a single Fourier term.
+
+And say the other thing too: **the confidence band widens where the data is thin.** Look at the
+edges. That widening is the model telling you where it is guessing, and a forecast that comes
+with an honest statement of its own uncertainty is worth more than a point estimate that doesn't.
+
+:::
+
+## s(0) = cyclic spline on day-of-year (basis="cp" makes Dec 31 join Jan 1)
+
+## f(1) = day-of-week as a categorical factor
+
+X_tr, X_te = train[["doy", "dow"]].values, test[["doy", "dow"]].values
+
+gam = LinearGAM(s(0, n_splines=20, basis="cp") + f(1)).fit(X_tr, train.mw_mean.values)
+results["pyGAM (doy + dow)"] = (rmse(test.mw_mean, gam.predict(X_te)),
+                                mae(test.mw_mean, gam.predict(X_te)))
+
+print(f"effective degrees of freedom: {gam.statistics_['edof']:.1f}")
+print(pd.DataFrame(results, index=["RMSE", "MAE"]).T
+        .sort_values("RMSE").round(0).astype(int).to_string())</code></pre>
+<p>Now the partial dependence — the GAM equivalent of the components plot.</p>
+<div id="e0d9ce98" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.2</span>))</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (ax, name) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(axes, [<span class="st">"day of year"</span>, <span class="st">"day of week"</span>])):</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    XX <span class="op">=</span> gam.generate_X_grid(term<span class="op">=</span>i)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    pdep, ci <span class="op">=</span> gam.partial_dependence(term<span class="op">=</span>i, X<span class="op">=</span>XX, width<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    ax.plot(XX[:, i], pdep)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    ax.plot(XX[:, i], ci, c<span class="op">=</span><span class="st">"grey"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    ax.set_title(name)<span class="op">;</span> ax.set_ylabel(<span class="st">"effect on MW"</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Read the left panel and say what it means in words</strong>, the way you would to a grid operator. The confidence band widens where the data is thin — say that too.</p>
+<hr>
+</section>
+<section id="before-you-leave" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">3.9</span> Before you leave</h2>
+<p>You should have found that every method beat the seasonal-naive benchmark <strong>on RMSE</strong>, and that the single harmonic was the worst of the three models.</p>
+<p>Look at the MAE column before you move on. The single-harmonic Prophet has a <em>worse</em> MAE than the benchmark it beat on RMSE. Same two models, same holdout, opposite verdict depending on which error measure you quote — because RMSE squares errors and so punishes the occasional large miss, while MAE treats every error proportionally.</p>
+<blockquote class="blockquote">
+<p><strong>Discuss:</strong> <code>pyGAM</code> was given only day-of-year and day-of-week — no trend term at all. Prophet was given a trend, a weekly cycle, <em>and</em> a yearly cycle with ten harmonics. Yet on this holdout the simpler model won, by roughly 12% on both RMSE and MAE.</p>
+<p>Give one reason a more flexible model can lose on a held-out year, and name the thing you would check before concluding that pyGAM is genuinely the better choice here.</p>
+<p>And the operational question: your forecast is for a grid operator who must buy generation in advance. Under-forecasting and over-forecasting cost different amounts. Which of these models would you actually ship, and what would you need to know first?</p>
+</blockquote>
+<hr>
+<p><em>Solutions posted to Canvas after class.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Post these in the Week 3 thread before Lecture 4.</p>
+<p><strong>First, the awkward result.</strong> pyGAM was given two things: day of year and day of week. Prophet was given a trend, a weekly cycle, <em>and</em> a yearly cycle with ten harmonics. Prophet has strictly more machinery — and it lost by twelve percent.</p>
+<p>Give me one reason a more flexible model can lose on a held-out year. And name the thing you would check before concluding that pyGAM is genuinely the better choice here, rather than luckier on this particular holdout.</p>
+<p><strong>Second, the operational question.</strong> Your forecast is for a grid operator who must buy generation in advance, and the two directions of error cost different amounts. Under-forecast and you buy at spot during a peak. Over-forecast and you’ve paid for spinning reserve you didn’t need.</p>
+<p>Which of these models would you actually ship — and what would you need to know before you could answer that at all?</p>
+<p>Notice that nothing in the table we just built answers the second question. RMSE and MAE are both symmetric — they charge you the same for being a thousand megawatts high as a thousand low. If the costs aren’t symmetric, neither metric is measuring the thing you care about.</p>
+<p>That’s not a flaw in this lab. It’s the gap between forecast accuracy and forecast <em>value</em>, and it’s worth carrying into the rest of the course.</p>
+<p>Solutions for the coded parts go up on Canvas after the deadline. See you in Lecture 4, where we start on trees.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="what-your-run-should-produce" class="level2" data-number="3.10">
+<h2 data-number="3.10" class="anchored" data-anchor-id="what-your-run-should-produce"><span class="header-section-number">3.10</span> What your run should produce</h2>
+<p>Your numbers will differ where a model is stochastic; these are the values this lab produces on the pinned environment.</p>
+<p>Reproducible; verified bit-identical across repeated runs. Prophet uses MAP estimation, not MCMC.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Data</td>
+<td>2,041 days (train 1,673, test 368), 2017-08-01 → 2018-08-03</td>
+</tr>
+<tr class="even">
+<td>Swing — hour of day</td>
+<td>33.3% (min hour 4, max hour 19)</td>
+</tr>
+<tr class="odd">
+<td>Swing — day of week</td>
+<td>11.6% (min Sunday, max Monday)</td>
+</tr>
+<tr class="even">
+<td>Swing — day of year</td>
+<td>44.7% (min day 116, max day 200)</td>
+</tr>
+<tr class="odd">
+<td>January / April / July</td>
+<td>34,403 / 26,945 / 37,043 MW</td>
+</tr>
+<tr class="even">
+<td>One harmonic, in-sample</td>
+<td>3,428 MW</td>
+</tr>
+<tr class="odd">
+<td>Two harmonics, in-sample</td>
+<td>1,348 MW (<strong>factor of 2.5</strong>, not 3)</td>
+</tr>
+<tr class="even">
+<td>pyGAM (doy + dow)</td>
+<td>RMSE 3,444 · MAE 2,550</td>
+</tr>
+<tr class="odd">
+<td>Prophet</td>
+<td>RMSE 3,935 · MAE 3,001</td>
+</tr>
+<tr class="even">
+<td>Prophet (yearly order = 1)</td>
+<td>RMSE 4,269 · MAE 3,358</td>
+</tr>
+<tr class="odd">
+<td>Seasonal naive (364d)</td>
+<td>RMSE 4,608 · MAE 3,333</td>
+</tr>
+<tr class="even">
+<td>pyGAM effective d.o.f.</td>
+<td>22.5</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture02_lab.html" class="pagination-link" aria-label="Lab 2: Stationarity, ARIMA, and Granger Causality">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture04_lab.html" class="pagination-link" aria-label="Lab 4: Decision Trees — Reading One, and Finding Where It Breaks">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,29 @@
+# Preface {.unnumbered}
+
+The companion to the [course book](../book/index.html): the fourteen in-class labs and the eleven
+assignments, in one place you can search.
+
+## How to use it
+
+**The labs here are for reading, not running.** Code is shown but not executed, so the workbook
+opens instantly. Each lab links to its executable version, which is the one to open beside your
+editor when you actually do the work.
+
+Each step carries a collapsible **Walkthrough** — what was said about that step in class, including
+the numbers it produces. Open it when you are stuck or want to check your reading of a result;
+ignore it while you are still working the step out.
+
+Every lab also ends with **what your run should produce**. Where a model is stochastic your numbers
+will differ, and several labs are entirely about how much they differ and what that means.
+
+## The assignments
+
+Reproduced as you receive them, with their prompt budgets and initial prompts. Solutions are not
+here and never will be — they are released separately, after each deadline.
+
+## A word on the numbers
+
+Everything in this workbook is generated from the labs, the assignments and the class narration
+themselves, so a value quoted here cannot disagree with the lab that produced it. Where a number
+looks surprising, that is usually the point: a good deal of this course is about results that
+contradict what the method's reputation would suggest.

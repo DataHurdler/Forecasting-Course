@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Lab 4: Decision Trees — Reading One, and Finding Where It Breaks – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture05_lab.html" rel="next">
+<link href="../chapters/Lecture03_lab.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture04_lab.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">4.1</span> What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">4.2</span> Setup</a></li>
+  <li><a href="#step-1-fit-a-tree-and-read-it-out-loud" id="toc-step-1-fit-a-tree-and-read-it-out-loud" class="nav-link" data-scroll-target="#step-1-fit-a-tree-and-read-it-out-loud"><span class="header-section-number">4.3</span> Step 1 — Fit a tree and read it out loud</a></li>
+  <li><a href="#step-2-watch-the-biasvariance-tradeoff-happen" id="toc-step-2-watch-the-biasvariance-tradeoff-happen" class="nav-link" data-scroll-target="#step-2-watch-the-biasvariance-tradeoff-happen"><span class="header-section-number">4.4</span> Step 2 — Watch the bias–variance tradeoff happen</a></li>
+  <li><a href="#step-3-why-one-tree-is-not-enough" id="toc-step-3-why-one-tree-is-not-enough" class="nav-link" data-scroll-target="#step-3-why-one-tree-is-not-enough"><span class="header-section-number">4.5</span> Step 3 — Why one tree is not enough</a></li>
+  <li><a href="#step-4-where-trees-reliably-fail" id="toc-step-4-where-trees-reliably-fail" class="nav-link" data-scroll-target="#step-4-where-trees-reliably-fail"><span class="header-section-number">4.6</span> Step 4 — Where trees reliably fail</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">4.7</span> Before you leave</a></li>
+  <li><a href="#what-your-run-should-produce" id="toc-what-your-run-should-produce" class="nav-link" data-scroll-target="#what-your-run-should-produce"><span class="header-section-number">4.8</span> What your run should produce</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture04_lab.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Run this one live: <a href="../../labs/Lecture04_lab.html">the executable lab</a>.</em></p>
+<section id="what-we-are-doing" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="what-we-are-doing"><span class="header-section-number">4.1</span> What we are doing</h2>
+<p>Today the course changes character. Everything so far specified a structure and estimated it. A tree is handed a pile of features and finds the structure itself.</p>
+<p>We use <strong>the same series you just forecast in Homework 2</strong> — daily units for CA_1 FOODS. Same store, same aisle, same target. Last week you fitted a GAM to it. Today you fit a tree, and the comparison is the point: you will be able to say what each method bought you on identical data.</p>
+<p>By the end you will have done four things: read a fitted tree out loud, watched the bias–variance tradeoff happen in a table, discovered why a single tree is unstable, and found the one place trees reliably fail.</p>
+<p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>scikit-learn</code>, and <code>data/processed/m5_daily.csv</code> (run <code>python scripts/prep_m5.py</code> if it is missing).</p>
+<hr>
+</section>
+<section id="setup" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">4.2</span> Setup</h2>
+<div id="8bb15ae9" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeRegressor, export_text, plot_tree</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Find the processed data file whether you render from the repo root or from</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">    this file's own folder."""</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"processed"</span> <span class="op">/</span> name</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. "</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Run `python scripts/prep_m5.py` from the repository root first."</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>RANDOM_STATE <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> pd.read_csv(data_path(<span class="st">"m5_daily.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"date"</span>])</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">"dow"</span>] <span class="op">=</span> daily[<span class="st">"date"</span>].dt.dayofweek        <span class="co"># 0 = Monday</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">"doy"</span>] <span class="op">=</span> daily[<span class="st">"date"</span>].dt.dayofyear</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>FEATURES <span class="op">=</span> [<span class="st">"units_lag1"</span>, <span class="st">"units_lag7"</span>, <span class="st">"units_lag14"</span>, <span class="st">"units_lag28"</span>, <span class="st">"units_lag365"</span>,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"snap"</span>, <span class="st">"is_event"</span>, <span class="st">"dow"</span>, <span class="st">"doy"</span>, <span class="st">"avg_price"</span>]</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> daily.dropna(subset<span class="op">=</span>FEATURES).copy()</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">365</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> df.iloc[:<span class="op">-</span>N_TEST], df.iloc[<span class="op">-</span>N_TEST:]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>X_train, y_train <span class="op">=</span> train[FEATURES].values, train[<span class="st">"units"</span>].values</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>X_test,  y_test  <span class="op">=</span> test[FEATURES].values,  test[<span class="st">"units"</span>].values</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> <span class="kw">lambda</span> a, b: <span class="bu">float</span>(np.sqrt(np.mean((np.asarray(a) <span class="op">-</span> np.asarray(b)) <span class="op">**</span> <span class="dv">2</span>)))</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> usable days — train </span><span class="sc">{</span><span class="bu">len</span>(train)<span class="sc">}</span><span class="ss">, test </span><span class="sc">{</span><span class="bu">len</span>(test)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"benchmark (same day last year): RMSE </span><span class="sc">{</span>rmse(y_test, test.units_lag365.values)<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Notice what just happened to the data.</strong> There is no date index in <code>X_train</code>. Every row is an independent example, and everything the model knows about time is sitting in the lag columns. That reframing — a time series becomes a flat table — is what lets every method from here to Lecture 9 be applied to forecasting at all.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>1576 usable days — train 1211, test 365
+benchmark (same day last year): RMSE 625</code></pre>
+<p>Just over four years of daily data, holding out the final year — May 2015 through May 2016.</p>
+<p>The benchmark is the same one you have used since Lecture 1: predict today with the same day last year. <strong>625 units.</strong> Write it down. Every number today gets measured against it. Now look at what we handed the model, because this is the important part of the setup.</p>
+<p>Ten columns: five lags, a SNAP flag, an event flag, day of week, day of year, and price. And <strong>no date index.</strong> There is no time in <code>X_train</code> at all. Every row is an independent example, and everything the model knows about <em>when</em> it is, is sitting in those columns because we put it there.</p>
+<p>That reframing — a time series flattened into an ordinary table — is what lets everything from here to Lecture 9 be applied to forecasting at all. Trees, forests, boosting, neural networks: none of them know what a time series is. They all consume this table.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-1-fit-a-tree-and-read-it-out-loud" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="step-1-fit-a-tree-and-read-it-out-loud"><span class="header-section-number">4.3</span> Step 1 — Fit a tree and read it out loud</h2>
+<p>Start deliberately shallow, because a depth-3 tree is small enough to read.</p>
+<div id="1f9d0709" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tree3 <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">3</span>, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(export_text(tree3, feature_names<span class="op">=</span>FEATURES, decimals<span class="op">=</span><span class="dv">0</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">test RMSE: </span><span class="sc">{</span>rmse(y_test, tree3.predict(X_test))<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="3743fda2" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plot_tree(tree3, feature_names<span class="op">=</span>FEATURES, filled<span class="op">=</span><span class="va">True</span>, rounded<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">7</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Read the root split aloud to the person next to you</strong>, in business language — not <code>dow &lt;= 4.50</code> but what that <em>means</em> about this store.</p>
+<p>Then look at the importances:</p>
+<div id="453b367d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>imp <span class="op">=</span> pd.Series(tree3.feature_importances_, index<span class="op">=</span>FEATURES).sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imp[imp <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">round</span>(<span class="dv">3</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Compare this with the lecture slide
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Lecture 4’s importance table was computed on <strong>weekly</strong> CA_1 FOODS, and there the four-week lag dominated. Here, on <strong>daily</strong> data for the same store and aisle, something else wins outright.</p>
+<p>Same store. Same product. Different frequency, different answer. Say why before moving on.</p>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Depth 3, deliberately. Eight leaves is small enough to read in full, and you should read it in full, because being able to do that is most of what a tree is for.</p>
+<pre><code>|--- dow &lt;= 4
+|   |--- units_lag28 &lt;= 2596
+...
+|--- dow &gt;  4
+|   |--- units_lag1 &lt;= 3351
+...
+
+test RMSE: 337</code></pre>
+<p>The root split is <code>dow &lt;= 4</code>. That is Monday-through-Friday on one side, Saturday and Sunday on the other — and the tree found it without being told that a week has a weekend in it.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Pause here and say the whole path out loud, in business language rather than in inequalities. Not “<code>dow</code> less than or equal to 4.5, then <code>units_lag28</code> above 2596.” Something closer to: <em>it’s a weekday, and four weeks ago was already busy, and last week was busy too, so predict about 2,950.</em></p>
+<p>If you can do that for one leaf, you can do it for a store manager, and that is a thing no model in Lectures 1 through 3 could offer you.</p>
+<p>One branch worth reading before we move on. On the weekend side, on days when yesterday was already very busy, the tree splits on <code>is_event</code> — and it predicts <strong>4,041</strong> when there is no event and <strong>3,583</strong> when there is. The event lowers the forecast by about 450 units. Events in M5 include days like Christmas, when the store is shut or nearly so. The tree has no idea what Christmas is. It found the hole in the data anyway.</p>
+<p>And the accuracy: <strong>337 against a benchmark of 625.</strong> Roughly a 46% improvement, from eight leaves you can print on a slide.</p>
+<pre><code>dow            0.789
+units_lag28    0.106
+units_lag1     0.064
+units_lag7     0.030
+is_event       0.011</code></pre>
+<p>Day of week takes seventy-nine percent of the importance. On its own, day-of-week means explain about <strong>66%</strong> of the variance in training units — weekday average 2,632, weekend average 3,773, a gap of 43%. There is no mystery about why the tree grabbed it first.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Lecture 4’s importance table, on the <strong>weekly</strong> version of this same store and aisle, had <code>units_lag4</code> at 0.62 and day-of-week nowhere — it isn’t in the table at all. Here, on <strong>daily</strong> data, <code>dow</code> wins outright with 0.79 and the four-week lag drops to 0.11. Same store. Same product. Opposite answer. Pause and work out why before I say it.</p>
+<p>Because weekly data has no day-of-week variation left in it. Aggregating to a week averages the weekend and the weekdays together and destroys the largest single signal in the series. It was never that the four-week lag mattered more; it was that the thing that mattered most had already been summed away.</p>
+<p>That is worth more than it looks. <strong>Feature importance is a statement about the table you built, not about the business.</strong> Change the frequency and the ranking inverts.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2-watch-the-biasvariance-tradeoff-happen" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="step-2-watch-the-biasvariance-tradeoff-happen"><span class="header-section-number">4.4</span> Step 2 — Watch the bias–variance tradeoff happen</h2>
+<p>Lecture 4 drew this as a curve. Now produce it.</p>
+<div id="4276443a" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> depth <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="va">None</span>]:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span>depth, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    rows.append({<span class="st">"depth"</span>: <span class="bu">str</span>(depth),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"leaves"</span>: t.get_n_leaves(),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"train_RMSE"</span>: <span class="bu">round</span>(rmse(y_train, t.predict(X_train))),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"test_RMSE"</span>:  <span class="bu">round</span>(rmse(y_test,  t.predict(X_test)))})</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>sweep <span class="op">=</span> pd.DataFrame(rows)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sweep.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="31e05ea1" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.train_RMSE, marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"train"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.test_RMSE,  marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"test"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(sweep)))<span class="op">;</span> ax.set_xticklabels(sweep.depth)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"max_depth"</span>)<span class="op">;</span> ax.set_ylabel(<span class="st">"RMSE"</span>)<span class="op">;</span> ax.legend()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Two things to say out loud.</strong> What does the training error do as depth increases, and what number does it reach at the end? And where does the <em>test</em> error bottom out?</p>
+<p>The gap between those two curves is overfitting, drawn to scale.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Lecture 4 drew this as a curve on a slide. Here it is as an actual table on your own data.</p>
+<pre><code>depth  leaves  train_RMSE  test_RMSE
+    1       2         443        413
+    2       4         388        369
+    3       8         354        337
+    5      32         284        303
+    8     179         184        313
+   12     698          84        385
+ None    1200           0        406</code></pre>
+<p>Read the two columns separately.</p>
+<p><strong>Training error</strong> falls the whole way down and ends at <strong>zero</strong>. Not near zero — zero. Look at the leaf count on that row: <strong>1,200 leaves for 1,211 training days.</strong> The tree has given almost every single day its own leaf and memorized the answer. A model that has memorized the training set has a training error of zero by construction, and that number tells you nothing whatsoever.</p>
+<p><strong>Test error</strong> does something else. It falls to <strong>303 at depth 5</strong>, and then turns around and climbs back to <strong>406</strong> — worse than the depth-2 tree with four leaves.</p>
+<p>The gap between the two columns is overfitting, drawn to scale. At depth 5 it’s 284 against 303, almost nothing. At full depth it’s 0 against 406. Two things to carry out of this table.</p>
+<p>First, the model that fits the training data best is the <em>worst</em> model in the table on data it has not seen. That is not a subtlety, that is the whole lesson, and it will repeat in every lecture for the rest of the course.</p>
+<p>Second — and this is the practical one — the depth-5 tree beats the fully grown tree, and the only thing separating them is one keyword argument. Nothing about the data changed. <code>max_depth</code> is the entire difference between 303 and 406.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-3-why-one-tree-is-not-enough" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="step-3-why-one-tree-is-not-enough"><span class="header-section-number">4.5</span> Step 3 — Why one tree is not enough</h2>
+<p>Lecture 4 claimed a tree is unstable: change the data slightly and the structure changes. Test it properly, using bootstrap resamples — draw a sample of the same size <em>with replacement</em>, refit, and repeat.</p>
+<div id="5f2e773f" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>roots, preds <span class="op">=</span> {}, []</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> b <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> rng.choice(<span class="bu">len</span>(X_train), <span class="bu">len</span>(X_train), replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">5</span>, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train[idx], y_train[idx])</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    root <span class="op">=</span> [l.strip() <span class="cf">for</span> l <span class="kw">in</span> export_text(t, feature_names<span class="op">=</span>FEATURES).split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> l.startswith(<span class="st">"|---"</span>)][<span class="dv">0</span>]</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    roots[root] <span class="op">=</span> roots.get(root, <span class="dv">0</span>) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    preds.append(t.predict(X_test))</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.array(preds)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"root splits across 20 bootstrap trees:"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, v <span class="kw">in</span> <span class="bu">sorted</span>(roots.items(), key<span class="op">=</span><span class="kw">lambda</span> kv: <span class="op">-</span>kv[<span class="dv">1</span>]):</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>v<span class="sc">:2d}</span><span class="ss"> x  </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">per-day spread of predictions across the 20 trees:"</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  average sd </span><span class="sc">{</span>P<span class="sc">.</span>std(<span class="dv">0</span>)<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> units   worst day </span><span class="sc">{</span>P<span class="sc">.</span>std(<span class="dv">0</span>)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss"> units"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The root may well be stable — one feature can be dominant enough that every resample finds it first. <strong>That is not the same as the tree being stable.</strong> Look at the spread of predictions: on a typical day the twenty trees disagree by a meaningful margin, and on the worst day they disagree enormously. All that disagreement lives <em>below</em> the root.</p>
+<p>Now the payoff, and it is one line:</p>
+<div id="f94ad9e3" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> np.mean([rmse(y_test, p) <span class="cf">for</span> p <span class="kw">in</span> P])</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>averaged <span class="op">=</span> rmse(y_test, P.mean(<span class="dv">0</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"average RMSE of a single bootstrap tree : </span><span class="sc">{</span>single<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"RMSE of the 20 trees averaged together  : </span><span class="sc">{</span>averaged<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"improvement: </span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>(single<span class="op">-</span>averaged)<span class="op">/</span>single<span class="sc">:.0f}</span><span class="ss">%"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>You just built a <strong>bagged ensemble</strong> by hand — bootstrap aggregating, in three lines. Nothing was tuned and no new information was added; the gain came entirely from averaging away the disagreement you measured above. It is not yet a Random Forest: a forest adds one more idea, which is to stop every tree from looking at <code>dow</code> first. Twenty trees that agree perfectly on their root are twenty trees making correlated mistakes. That is next week.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Lecture 4 claimed a tree is unstable — nudge the data and the structure changes. Let’s test that properly rather than take it on faith.</p>
+<p>Twenty bootstrap resamples: draw 1,211 rows <em>with replacement</em>, refit a depth-5 tree, record what it split on first, and keep its test predictions.</p>
+<pre><code>root splits across 20 bootstrap trees:
+  20 x  |--- dow &lt;= 4.50
+
+per-day spread of predictions across the 20 trees:
+  average sd 160 units   worst day 1,137 units</code></pre>
+<p>Now, that first result looks like it refutes the lecture. Twenty out of twenty found the same root. The root is perfectly stable.</p>
+<p>It is stable because day-of-week is <em>overwhelming</em> — a 43% gap survives any resample you can draw. <strong>A stable root is not a stable tree.</strong> Look at the second number: on a typical test day the twenty trees disagree by 160 units, and on the worst day they are spread over <strong>1,137 units</strong> — about a third of an average day’s sales. Every bit of that disagreement lives below the root, in the splits you cannot see from this printout.</p>
+<p>That is the instability the lecture was talking about, and you can only see it by looking at predictions, not at structure.</p>
+<pre><code>average RMSE of a single bootstrap tree : 324
+RMSE of the 20 trees averaged together  : 266
+improvement: 18%</code></pre>
+<p>Eighteen percent. No tuning, no new features, no extra data — the twenty trees saw <em>less</em> data than the original fit, since a bootstrap sample leaves out about a third of the rows each time.</p>
+<p>And note where 266 sits against Step 2’s table: the best single tree you found by sweeping depth was <strong>303</strong>. Averaging twenty individually <em>worse</em> trees — 324 on average — produced something better than the best one of them and better than the best tree in the whole sweep.</p>
+<p>That is the result the next lecture is built on, and it is worth being precise about the mechanism. Nothing here reduced any individual tree’s bias. What fell was the <em>variance</em> you measured two cells ago: the disagreement averages out, the signal does not.</p>
+<p>What you have built is called <strong>bagging</strong> — bootstrap aggregating. It is not yet a random forest. A forest adds one more idea, which is to stop the trees from all looking at day-of-week first, and you can already see why that might matter: twenty trees that agree perfectly on their root are twenty trees making correlated mistakes. That is Lecture 5, and it is one keyword argument.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4-where-trees-reliably-fail" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="step-4-where-trees-reliably-fail"><span class="header-section-number">4.6</span> Step 4 — Where trees reliably fail</h2>
+<p>A tree predicts the <strong>mean of the training rows in a leaf</strong>. So every prediction it can ever make is an average of values it has already seen.</p>
+<div id="a1860862" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>full <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> full.predict(X_test)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"training target range : [</span><span class="sc">{</span>y_train<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:,.0f}</span><span class="ss">, </span><span class="sc">{</span>y_train<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">]"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"prediction range      : [</span><span class="sc">{</span>p<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:,.0f}</span><span class="ss">, </span><span class="sc">{</span>p<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">]"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The predictions cannot leave the training range — not “usually do not,” <em>cannot</em>. Now watch what that does at the extremes.</p>
+<div id="c394f9a2" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>hi <span class="op">=</span> y_test <span class="op">&gt;</span> np.percentile(y_test, <span class="dv">90</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>lo <span class="op">=</span> y_test <span class="op">&lt;</span> np.percentile(y_test, <span class="dv">10</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"busiest 10% of test days  (n=</span><span class="sc">{</span>hi<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">): actual </span><span class="sc">{</span>y_test[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   predicted </span><span class="sc">{</span>p[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">   under by </span><span class="sc">{</span>y_test[hi]<span class="sc">.</span>mean()<span class="op">-</span>p[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"quietest 10% of test days (n=</span><span class="sc">{</span>lo<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">): actual </span><span class="sc">{</span>y_test[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   predicted </span><span class="sc">{</span>p[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">   over by  </span><span class="sc">{</span>p[lo]<span class="sc">.</span>mean()<span class="op">-</span>y_test[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Your turn:</strong> the two errors above point in opposite directions. Plot predicted against actual for the test set, add the 45-degree line, and see the shape this produces.</p>
+<div id="a62a5d03" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>Every lecture <span class="kw">in</span> this course should end by telling you where the method breaks. Here <span class="kw">is</span> where a</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>tree breaks, <span class="kw">and</span> it follows <span class="im">from</span> one sentence: <span class="op">**</span>a tree predicts the mean of the training rows <span class="kw">in</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>a leaf.<span class="op">**</span> Every prediction it will ever make <span class="kw">is</span> an average of values it has already seen.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>training target range : [0, 5,016] prediction range : [0, 4,527]</p>
+<pre><code>
+The prediction range sits inside the training range, and it *has* to — not "usually does," cannot.
+A tree can never forecast a value above the largest one in its training data, because there is no
+arithmetic in it that could produce one. No trend term, no extrapolation, nothing. If this store
+grows 20% next year, the tree will predict last year's ceiling forever.
+</code></pre>
+<p>busiest 10% of test days (n=37): actual 4,115 predicted 3,929 under by 186 quietest 10% of test days (n=37): actual 2,030 predicted 2,237 over by 207</p>
+<pre><code>
+Both ends are wrong, and — this is the point — **they are wrong in opposite directions**.
+The busy days are under-forecast by 186 units. The quiet days are over-forecast by 207. The model
+is pulling everything toward the middle.
+
+Be precise about what this is and is not. The hard ceiling did not bite this year: the busiest
+test day was 4,717 units and the training set had a 5,016-unit day, so nothing was clipped.
+What you are seeing is the softer, more common version — leaf averaging shrinks the extremes
+inward. It is not a large effect in absolute terms next to a full tree's RMSE of 406. It is a
+*systematic* one, which is worse, because it will not average out over the year and it is exactly
+the days you care most about.
+
+::: {.callout-tip}
+## Try it
+:::
+
+Uncomment the scatter block and fill in the two blanks — actual on x, predicted on y, with the
+45-degree line. Pause the video, run it, and come back when you can describe the shape.
+
+You should be looking at a cloud that is flatter than the 45-degree line. Below the line on the
+right, above it on the left, hinged in the middle. Once you have seen that shape you will
+recognize it everywhere, in every method that predicts by averaging.
+
+:::
+
+## ---- your turn: uncomment and fill in the two blanks ----
+
+## fig, ax = plt.subplots(figsize=(4.5, 4.5))
+
+## ax.scatter(___, ___, s=6, alpha=0.4)          # &lt;- actual on x, predicted on y
+
+## lims = [y_test.min(), y_test.max()]
+
+## ax.plot(lims, lims, "k--", lw=1)
+
+## ax.set_xlabel("actual units"); ax.set_ylabel("predicted units")
+
+## plt.tight_layout()
+</code></pre>
+<hr>
+</section>
+<section id="before-you-leave" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">4.7</span> Before you leave</h2>
+<p>You should have found that the tree systematically under-predicts the busiest days and over-predicts the quietest ones, and that averaging twenty unstable trees beat any one of them.</p>
+<blockquote class="blockquote">
+<p><strong>Discuss (the failure):</strong> A tree pulls its predictions toward the middle at both ends. Give the mechanical reason — think about what a leaf prediction actually is.</p>
+<p>Then the operational version: this store is planning inventory. Which of those two errors costs more, and does your answer change if the product is milk rather than canned goods?</p>
+<p><strong>Discuss (the comparison):</strong> You forecast this exact series with a GAM last week. Which method would you rather hand to a store manager, and what specifically would each one let you say that the other would not?</p>
+</blockquote>
+<hr>
+<p><em>Solutions posted to Canvas after class.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Two questions on the discussion board before the next session.</p>
+<p><strong>First, the failure.</strong> You have just seen a tree pull its predictions toward the middle at both ends. Give me the <em>mechanical</em> reason — and I mean mechanical, in terms of what a leaf prediction literally is, not “the model is conservative.”</p>
+<p>Then the operational half. This store is planning inventory. One of those two errors costs more than the other: under-forecasting a busy day means an empty shelf and a lost sale; over-forecasting a quiet day means stock sitting in the back. Which is worse — and does your answer change if the product is milk rather than canned goods?</p>
+<p><strong>Second, the comparison.</strong> You fitted a GAM to this exact series in Homework 2, and a tree to it today. Which one would you actually hand to a store manager, and what specifically would each let you say that the other would not?</p>
+<p>Be concrete. The GAM gives you a smooth curve per feature and a partial-dependence plot you can show someone. The tree gives you a path — <em>weekday, four weeks ago was busy, yesterday was busy, predict 2,950</em> — that a manager can follow and argue with. Those are genuinely different kinds of explanation, and one of them will suit an audience better than the other.</p>
+<p>One last thing before you close the file. Look back at Step 2’s table and notice what is <em>not</em> in this lab: we chose depth 5 by looking at the test set. Every number in that column was computed on the year we held out, and then we picked the winner from it. Lecture 1 told you what that is worth. Fixing it properly needs walk-forward validation on the training data alone, and that is Homework 3’s job.</p>
+<p>Solutions for the coded parts go up on Canvas after the deadline. Next week: what happens when you stop the twenty trees from all looking at day-of-week first.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="what-your-run-should-produce" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="what-your-run-should-produce"><span class="header-section-number">4.8</span> What your run should produce</h2>
+<p>Your numbers will differ where a model is stochastic; these are the values this lab produces on the pinned environment.</p>
+<p>Deterministic; verified across repeated runs. <code>random_state=42</code> on every fit; the bootstrap uses a seeded <code>RandomState</code>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Data</td>
+<td>1,576 usable days (train 1,211, test 365), 2015-05-24 → 2016-05-22</td>
+</tr>
+<tr class="even">
+<td>Benchmark — same day last year</td>
+<td>RMSE <strong>625</strong></td>
+</tr>
+<tr class="odd">
+<td>Depth-3 tree</td>
+<td>test RMSE <strong>337</strong> · root split <code>dow &lt;= 4</code></td>
+</tr>
+<tr class="even">
+<td>Depth-3 importances</td>
+<td><code>dow</code> 0.789 · <code>units_lag28</code> 0.106 · <code>units_lag1</code> 0.064 · <code>units_lag7</code> 0.030 · <code>is_event</code> 0.011</td>
+</tr>
+<tr class="odd">
+<td>Lecture 4 slide (weekly, same series)</td>
+<td><code>units_lag4</code> 0.62 dominant; <code>dow</code> absent</td>
+</tr>
+<tr class="even">
+<td>Weekday vs weekend mean (train)</td>
+<td>2,632 vs 3,773 — a 43% gap; <code>dow</code> alone explains 66% of training variance</td>
+</tr>
+<tr class="odd">
+<td>Depth sweep — train / test RMSE</td>
+<td>1: 443/413 · 2: 388/369 · 3: 354/337 · <strong>5: 284/303</strong> · 8: 184/313 · 12: 84/385 · None: <strong>0/406</strong></td>
+</tr>
+<tr class="even">
+<td>Leaves at full depth</td>
+<td>1,200 (for 1,211 training rows)</td>
+</tr>
+<tr class="odd">
+<td>Bootstrap root splits</td>
+<td>20 / 20 identical (<code>dow &lt;= 4.50</code>)</td>
+</tr>
+<tr class="even">
+<td>Prediction spread across 20 trees</td>
+<td>average sd 160 units · worst day 1,137</td>
+</tr>
+<tr class="odd">
+<td>Single bootstrap tree (mean)</td>
+<td>RMSE <strong>324</strong></td>
+</tr>
+<tr class="even">
+<td>Twenty trees averaged</td>
+<td>RMSE <strong>266</strong> — an 18% improvement</td>
+</tr>
+<tr class="odd">
+<td>Full tree — training target range</td>
+<td>[0, 5,016]</td>
+</tr>
+<tr class="even">
+<td>Full tree — prediction range</td>
+<td>[0, 4,527]</td>
+</tr>
+<tr class="odd">
+<td>Busiest 10% (n=37)</td>
+<td>actual 4,115 · predicted 3,929 · <strong>under by 186</strong></td>
+</tr>
+<tr class="even">
+<td>Quietest 10% (n=37)</td>
+<td>actual 2,030 · predicted 2,237 · <strong>over by 207</strong></td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture03_lab.html" class="pagination-link" aria-label="Lab 3: GAMs, Prophet, and Several Seasons at Once">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture05_lab.html" class="pagination-link" aria-label="Lab 5: Tree Ensembles — Averaging, Then Boosting">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

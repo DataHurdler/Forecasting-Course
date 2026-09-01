@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Lab 2: Stationarity, ARIMA, and Granger Causality – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture03_lab.html" rel="next">
+<link href="../chapters/Lecture01_lab.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture02_lab.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">2.1</span> What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">2.2</span> Setup</a></li>
+  <li><a href="#step-1-look-then-test" id="toc-step-1-look-then-test" class="nav-link" data-scroll-target="#step-1-look-then-test"><span class="header-section-number">2.3</span> Step 1 — Look, then test</a></li>
+  <li><a href="#step-2-now-you-are-allowed-to-read-the-acf" id="toc-step-2-now-you-are-allowed-to-read-the-acf" class="nav-link" data-scroll-target="#step-2-now-you-are-allowed-to-read-the-acf"><span class="header-section-number">2.4</span> Step 2 — Now you are allowed to read the ACF</a></li>
+  <li><a href="#step-3-fit-it" id="toc-step-3-fit-it" class="nav-link" data-scroll-target="#step-3-fit-it"><span class="header-section-number">2.5</span> Step 3 — Fit it</a></li>
+  <li><a href="#step-4-break-it-the-horizon-trap" id="toc-step-4-break-it-the-horizon-trap" class="nav-link" data-scroll-target="#step-4-break-it-the-horizon-trap"><span class="header-section-number">2.6</span> Step 4 — Break it: the horizon trap</a></li>
+  <li><a href="#step-5-granger-causality-and-the-trap-in-it" id="toc-step-5-granger-causality-and-the-trap-in-it" class="nav-link" data-scroll-target="#step-5-granger-causality-and-the-trap-in-it"><span class="header-section-number">2.7</span> Step 5 — Granger causality, and the trap in it</a></li>
+  <li><a href="#step-6-the-same-test-on-macro-data-and-why-the-sample-matters" id="toc-step-6-the-same-test-on-macro-data-and-why-the-sample-matters" class="nav-link" data-scroll-target="#step-6-the-same-test-on-macro-data-and-why-the-sample-matters"><span class="header-section-number">2.8</span> Step 6 — The same test on macro data, and why the sample matters</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">2.9</span> Before you leave</a></li>
+  <li><a href="#what-your-run-should-produce" id="toc-what-your-run-should-produce" class="nav-link" data-scroll-target="#what-your-run-should-produce"><span class="header-section-number">2.10</span> What your run should produce</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture02_lab.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Run this one live: <a href="../../labs/Lecture02_lab.html">the executable lab</a>.</em></p>
+<section id="what-we-are-doing" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="what-we-are-doing"><span class="header-section-number">2.1</span> What we are doing</h2>
+<p>Lecture 2 gave you a rule — <strong>test for stationarity before you read an ACF</strong> — and a caveat: <strong>Granger causality is not structural causality.</strong> In the next 35 minutes you will do both, on data where each one actually bites.</p>
+<p>The business question: you are forecasting weekly HOUSEHOLD demand at store CA_1, and you want to know whether watching the food aisle helps you predict it. Then, in Step 6, you run the same test on the macro question from the lecture slide — does unemployment predict retail sales? — and find that the answer depends on which years you include.</p>
+<p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>statsmodels</code>, and two prepared files: <code>data/processed/m5_weekly.csv</code> (<code>prep_m5.py</code>) and <code>data/processed/fred_monthly.csv</code> (<code>prep_fred.py</code>).</p>
+<hr>
+</section>
+<section id="setup" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">2.2</span> Setup</h2>
+<div id="e6129efb" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.stattools <span class="im">import</span> adfuller, grangercausalitytests</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf, plot_pacf</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.arima.model <span class="im">import</span> ARIMA</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> contextlib <span class="im">import</span> redirect_stdout</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Find the processed data file whether you render from the repo root or from</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">    this file's own folder."""</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"processed"</span> <span class="op">/</span> name</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. "</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Run the matching prep script from the repository root first: "</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`prep_m5.py` for m5_*.csv, `prep_fred.py` for fred_monthly.csv."</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> pd.read_csv(data_path(<span class="st">"m5_weekly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"week_start"</span>])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_series(store, cat):</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (weekly[(weekly.store_id <span class="op">==</span> store) <span class="op">&amp;</span> (weekly.cat_id <span class="op">==</span> cat)]</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>            .set_index(<span class="st">"week_start"</span>)[<span class="st">"units"</span>].sort_index().astype(<span class="bu">float</span>))</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> get_series(<span class="st">"CA_1"</span>, <span class="st">"HOUSEHOLD"</span>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> y.iloc[:<span class="op">-</span>N_TEST], y.iloc[<span class="op">-</span>N_TEST:]</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(y)<span class="sc">}</span><span class="ss"> weeks — train </span><span class="sc">{</span><span class="bu">len</span>(train)<span class="sc">}</span><span class="ss">, test </span><span class="sc">{</span><span class="bu">len</span>(test)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Same pattern as Lab 1 — imports, a path helper, a series accessor, a split.</p>
+<pre><code>277 weeks — train 225, test 52</code></pre>
+<p>Same store dataset, different store and same category as Lab 1: CA_1 household. Fifty-two weeks held out.</p>
+<p>The one new import worth noticing is <code>redirect_stdout</code> from <code>contextlib</code>, and <code>io</code>. That’s not statistics — that’s damage control, and I’ll show you why in Step 5.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-1-look-then-test" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="step-1-look-then-test"><span class="header-section-number">2.3</span> Step 1 — Look, then test</h2>
+<div id="118cf533" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.2</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax.plot(y.index, y.values, lw<span class="op">=</span><span class="fl">1.3</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"CA_1 HOUSEHOLD — weekly units"</span>)<span class="op">;</span> plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Notice:</strong> the level wanders. Your eye says non-stationary. Now make the test agree.</p>
+<div id="b226b209" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> report_adf(series, label):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    stat, p, lags, nobs, crit, _ <span class="op">=</span> adfuller(series.dropna(), autolag<span class="op">=</span><span class="st">"AIC"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>label<span class="sc">:&lt;28}</span><span class="ss"> ADF </span><span class="sc">{</span>stat<span class="sc">:&gt;7.2f}</span><span class="ss">   p </span><span class="sc">{</span>p<span class="sc">:&gt;6.3f}</span><span class="ss">   lags </span><span class="sc">{</span>lags<span class="sc">:&gt;2}</span><span class="ss">   "</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"</span><span class="sc">{</span><span class="st">'stationary'</span> <span class="cf">if</span> p <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">'UNIT ROOT'</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>report_adf(y, <span class="st">"levels"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now difference it and re-test.</p>
+<div id="ddc7de27" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dy <span class="op">=</span> y.diff().dropna()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>report_adf(dy, <span class="st">"first difference"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>You should see the statistic move decisively. Write down both numbers — you will be asked to justify a choice of <span class="math inline">\(d\)</span> in the homework, and this is what a <em>clean</em> case looks like.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Look first. Always look first.</p>
+<p>The level wanders. It drifts up, it drifts back, there’s no fixed value it returns to. Your eye says non-stationary. Now make the test agree — because your eye is not evidence you can put in a report.</p>
+<pre><code>levels                       ADF   -1.33   p  0.614   lags 12   UNIT ROOT
+first difference             ADF   -5.00   p  0.000   lags 11   stationary</code></pre>
+<p>Read those two lines carefully, because this is what a <em>clean</em> case looks like and you want it in your memory for comparison later.</p>
+<p>In levels: ADF statistic minus one point three three, p-value point six one. Nowhere near significance. We fail to reject the null of a unit root — the series is non-stationary, exactly as your eye said. First difference: minus five point zero zero, p-value effectively zero. Decisive. One difference was enough.</p>
+<p>That tells you <em>d</em> equals one, and you now have an evidence trail for that choice rather than a hunch. You’ll be asked to justify a <em>d</em> in the homework. This is what the justification looks like.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2-now-you-are-allowed-to-read-the-acf" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="step-2-now-you-are-allowed-to-read-the-acf"><span class="header-section-number">2.4</span> Step 2 — Now you are allowed to read the ACF</h2>
+<p>Lecture 2’s rule: the ACF of a non-stationary series decays slowly no matter what the underlying process is. Run both and see it.</p>
+<div id="50e646a8" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">5</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plot_acf(y, lags<span class="op">=</span><span class="dv">30</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>,<span class="dv">0</span>])<span class="op">;</span>  axes[<span class="dv">0</span>,<span class="dv">0</span>].set_title(<span class="st">"ACF — levels (uninformative)"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plot_pacf(y, lags<span class="op">=</span><span class="dv">30</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>,<span class="dv">1</span>])<span class="op">;</span> axes[<span class="dv">0</span>,<span class="dv">1</span>].set_title(<span class="st">"PACF — levels"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plot_acf(dy, lags<span class="op">=</span><span class="dv">30</span>, ax<span class="op">=</span>axes[<span class="dv">1</span>,<span class="dv">0</span>])<span class="op">;</span>  axes[<span class="dv">1</span>,<span class="dv">0</span>].set_title(<span class="st">"ACF — differenced"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plot_pacf(dy, lags<span class="op">=</span><span class="dv">30</span>, ax<span class="op">=</span>axes[<span class="dv">1</span>,<span class="dv">1</span>])<span class="op">;</span> axes[<span class="dv">1</span>,<span class="dv">1</span>].set_title(<span class="st">"PACF — differenced"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Compare the top row against the bottom.</strong> The top ACF crawls down — that is the signature of an undifferenced series, and it tells you nothing about <span class="math inline">\(p\)</span> or <span class="math inline">\(q\)</span>. The bottom row is interpretable.</p>
+<p><strong>Your turn:</strong> using the bottom row and the four reference patterns from Lecture 2, propose a <span class="math inline">\((p, d, q)\)</span>. Say it out loud to the person next to you before you fit anything.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Four panels. Top row is the raw series, bottom row is differenced.</p>
+<p>Look at the top ACF. It crawls down — a long slow decay, bar after bar, staying well above the significance band for twenty-plus lags.</p>
+<p>Here’s the trap. That pattern looks like enormously strong autocorrelation, and a reasonable person reads it as “there’s a lot of structure here to model.” <strong>It isn’t.</strong> That slow decay is the signature of an <em>undifferenced</em> series, and it appears no matter what the underlying process is. A random walk produces it. An AR(1) with a unit root produces it. White noise plus a trend produces it. It tells you nothing about <em>p</em> or <em>q</em>. It tells you only that you skipped a step.</p>
+<p>Now the bottom row, after differencing. That is interpretable. The bars drop into the band quickly and you can actually read structure off it.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Pause the video. Using the bottom row and the four reference patterns from Lecture 2, propose a .</p>
+<p>Write it down before you continue, and write down <em>why</em> — which panel, which lags. Then post it in the Week 2 thread. I want to see the range of proposals, because there genuinely is one, and that’s part of the lesson.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-3-fit-it" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="step-3-fit-it"><span class="header-section-number">2.5</span> Step 3 — Fit it</h2>
+<div id="df4401fe" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>order <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)                           <span class="co"># &lt;- REPLACE with your proposal from Step 2</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ARIMA(train, order<span class="op">=</span>order).fit()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model.summary().tables[<span class="dv">0</span>])</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>fc <span class="op">=</span> model.forecast(N_TEST)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> <span class="bu">float</span>(np.sqrt(np.mean((test.values <span class="op">-</span> np.asarray(fc)) <span class="op">**</span> <span class="dv">2</span>)))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">52-week RMSE: </span><span class="sc">{</span>rmse<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Line one of this cell is <code>order = (1, 1, 1)</code>. <strong>Replace it with your proposal.</strong> The lab ships with (1,1,1) as a placeholder so the file renders for everyone — it is not the answer.</p>
+<p><em>(Note for the narrator: with the shipped (1,1,1) the 52-week RMSE is <strong>569</strong>. Say your own number aloud, then say the following.)</em></p>
+<p>Your number will differ from mine if you chose a different order, and that is fine — that is the exercise. What you should be able to do is say why you chose what you chose.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4-break-it-the-horizon-trap" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="step-4-break-it-the-horizon-trap"><span class="header-section-number">2.6</span> Step 4 — Break it: the horizon trap</h2>
+<p>Now the same model, evaluated a different way.</p>
+<div id="c18d811e" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>errs <span class="op">=</span> []</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>vals <span class="op">=</span> y.values</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">104</span>, <span class="bu">len</span>(vals) <span class="op">-</span> <span class="dv">1</span>):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> ARIMA(vals[:i<span class="op">+</span><span class="dv">1</span>], order<span class="op">=</span>order).fit()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    errs.append(vals[i<span class="op">+</span><span class="dv">1</span>] <span class="op">-</span> <span class="bu">float</span>(m.forecast(<span class="dv">1</span>)[<span class="dv">0</span>]))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>wf <span class="op">=</span> <span class="bu">float</span>(np.sqrt(np.mean(np.array(errs) <span class="op">**</span> <span class="dv">2</span>)))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"walk-forward 1-step RMSE : </span><span class="sc">{</span>wf<span class="sc">:,.0f}</span><span class="ss">   (</span><span class="sc">{</span><span class="bu">len</span>(errs)<span class="sc">}</span><span class="ss"> origins)"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"single-split 52-step RMSE: </span><span class="sc">{</span>rmse<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Notice</strong> how much smaller the walk-forward number is. It is tempting to quote it — it makes your model look better.</p>
+<p><strong>Do not.</strong> They answer different questions. One-step-ahead, knowing everything up to last week, is a fundamentally easier problem than forecasting a year out from a fixed origin. If a planner is ordering inventory twelve months ahead, the 52-step number is the honest one.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Same model. Different evaluation. Watch what happens to the number.</p>
+<pre><code>walk-forward 1-step RMSE : 352   (172 origins)
+single-split 52-step RMSE: 569</code></pre>
+<p>Three fifty-two against five sixty-nine. The walk-forward number is nearly forty percent smaller, and it is computed from a hundred and seventy-two separate forecasts instead of one — so it even <em>looks</em> more rigorous. More origins, more evaluation, smaller error. It is enormously tempting to quote it. Do not.</p>
+<p>They are not two estimates of the same thing. They answer different questions. One-step-ahead — knowing everything up to last week, forecasting next week — is a fundamentally easier problem than standing at a fixed origin and forecasting fifty-two weeks out. Of course the error is smaller. It would be alarming if it weren’t.</p>
+<p>The question is which one matches the decision. If a planner is ordering inventory twelve months ahead, <strong>the 52-step number is the honest one</strong>, and quoting 352 to that person is not optimistic — it’s wrong.</p>
+<p>This is the most common way I see forecast accuracy overstated in practice, and almost nobody does it dishonestly. They compute the number that’s easy to compute, and it happens to be the flattering one.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-5-granger-causality-and-the-trap-in-it" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="step-5-granger-causality-and-the-trap-in-it"><span class="header-section-number">2.7</span> Step 5 — Granger causality, and the trap in it</h2>
+<p>Does the food aisle help predict the household aisle?</p>
+<p><code>grangercausalitytests</code> prints four test variants for every lag up to <code>maxlag</code> — a wall of output you did not ask for. The helper below silences it and pulls out the single F-test.</p>
+<div id="fb0b7db5" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>food <span class="op">=</span> get_series(<span class="st">"CA_1"</span>, <span class="st">"FOODS"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>pair <span class="op">=</span> pd.concat([y.rename(<span class="st">"household"</span>), food.rename(<span class="st">"food"</span>)], axis<span class="op">=</span><span class="dv">1</span>).diff().dropna()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> granger(effect, cause, lag<span class="op">=</span><span class="dv">4</span>):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""F-test for: do lags of `cause` help predict `effect`?"""</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> redirect_stdout(io.StringIO()):        <span class="co"># statsmodels prints 4 variants per lag</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> grangercausalitytests(pair[[effect, cause]], maxlag<span class="op">=</span>lag)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    F, p <span class="op">=</span> res[lag][<span class="dv">0</span>][<span class="st">"ssr_ftest"</span>][<span class="dv">0</span>], res[lag][<span class="dv">0</span>][<span class="st">"ssr_ftest"</span>][<span class="dv">1</span>]</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    verdict <span class="op">=</span> <span class="st">"significant"</span> <span class="cf">if</span> p <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">"not significant"</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>cause<span class="sc">:&gt;10}</span><span class="ss"> -&gt; </span><span class="sc">{</span>effect<span class="sc">:&lt;10}</span><span class="ss">  F = </span><span class="sc">{</span>F<span class="sc">:5.2f}</span><span class="ss">   p = </span><span class="sc">{</span>p<span class="sc">:.4f}</span><span class="ss">   </span><span class="sc">{</span>verdict<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>granger(<span class="st">"household"</span>, <span class="st">"food"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note the argument order: the <strong>second</strong> argument is the candidate cause. Getting this backwards is the single most common mistake with this function.</p>
+<p><strong>Your turn:</strong> run the other direction and report both F-statistics.</p>
+<div id="b16a0024" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>Does the food aisle <span class="bu">help</span> predict the household aisle?</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>First, the practical note. `grangercausalitytests` prints four test variants <span class="cf">for</span> every lag up to</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>`maxlag` — <span class="cf">for</span> lag <span class="dv">4</span>, that<span class="st">'s a screen and a half of output nobody asked for. The helper</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="er">swallows it with `redirect_stdout` and pulls out the single F-test we want. That's what those</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>imports were <span class="cf">for</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<pre><code>  food -&gt; household  F =  3.83   p = 0.0048   significant</code></pre>
+<pre><code>
+Now the argument order, and please write this down: **the second argument is the candidate
+cause.** `granger("household", "food")` asks whether food helps predict household. Getting this
+backwards is the single most common mistake with this function, and it is silent — you get a
+perfectly reasonable-looking result to the wrong question.
+
+::: {.callout-tip}
+## Try it
+:::
+
+Your turn. Run the other direction and report both F-statistics. It's one line — uncomment and
+swap the arguments.
+</code></pre>
+<p>household -&gt; food F = 2.80 p = 0.0263 significant</p>
+<pre><code>
+Both directions are significant. Food predicts household, and household predicts food.
+
+Sit with how strange that is. Household goods do not cause groceries. Groceries do not cause
+household goods. Nobody buys paper towels *because* they bought bananas. And yet the test says
+each helps predict the other, at conventional significance, in both directions. We'll come back to what's generating that. Hold the question.
+
+:::
+
+## ---- your turn: uncomment, then swap the two arguments ----
+
+## granger(___, ___)
+</code></pre>
+<hr>
+</section>
+<section id="step-6-the-same-test-on-macro-data-and-why-the-sample-matters" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="step-6-the-same-test-on-macro-data-and-why-the-sample-matters"><span class="header-section-number">2.8</span> Step 6 — The same test on macro data, and why the sample matters</h2>
+<p>Step 5 used two aisles of one store. Now the question from the lecture slide: <strong>does unemployment Granger-cause retail sales?</strong></p>
+<p>Run <code>python scripts/prep_fred.py</code> once before class — it caches three FRED series to <code>data/processed/fred_monthly.csv</code>, so this step needs no network and no API key.</p>
+<div id="7ca2a88d" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fred <span class="op">=</span> pd.read_csv(data_path(<span class="st">"fred_monthly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"date"</span>]).set_index(<span class="st">"date"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>Now the question <span class="im">from</span> the lecture slide, on real macro data. Does unemployment Granger<span class="op">-</span>cause</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>retail sales?</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>Both series arrive already stationary — retail growth <span class="kw">is</span> log<span class="op">-</span>differenced monthly percent change,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>unemployment <span class="kw">is</span> the monthly change <span class="kw">in</span> the rate. So we can test directly.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Full sample: 1992-02 to 2026-06 (412 months) unrate_diff -&gt; retail_growth F = 18.22 p = 0.0000 significant retail_growth -&gt; unrate_diff F = 12.80 p = 0.0000 significant</p>
+<pre><code>
+Both directions significant, and unemployment is the stronger of the two — F of eighteen against
+thirteen. That matches the story everybody expects. People lose jobs, people stop spending. You
+could write that paragraph without running anything, which is exactly why you should be
+suspicious of how satisfying it is. **Now drop the COVID window.**
+</code></pre>
+<p>Excluding Feb 2020 - Jun 2021 (395 months) unrate_diff -&gt; retail_growth F = 2.91 p = 0.0214 significant retail_growth -&gt; unrate_diff F = 6.74 p = 0.0000 significant</p>
+<pre><code>
+Seventeen months removed out of four hundred and twelve — four percent of the sample. The
+unemployment-to-retail F-statistic falls from **18.22 to 2.91.** It's still significant, barely,
+but it has lost about six-sevenths of its strength. The reverse direction went from 12.80 to 6.74. Weaker, but still overwhelming.
+
+::: {.callout-tip}
+## Try it
+:::
+
+Your turn. Restrict to everything *before* February 2020 — no COVID period at all, no recovery
+either — and run both directions.
+</code></pre>
+<p>Pre-COVID, before Feb 2020 (336 months) unrate_diff -&gt; retail_growth F = 1.85 p = 0.1196 NOT significant retail_growth -&gt; unrate_diff F = 9.67 p = 0.0000 significant</p>
+<pre><code>
+Eighteen point two two. Two point nine one. One point eight five.
+
+On twenty-eight years of pre-pandemic data, unemployment does **not** Granger-cause retail sales.
+The intuitive direction — the one everybody expects, the one that has a mechanism, the one you'd
+put in a slide without checking — is gone.
+
+And the direction nobody leads with, retail predicting unemployment, survives every single cut:
+12.80, then 6.74, then 9.67. Never above a p-value of point zero zero zero one.
+
+:::
+
+## Both series are already stationary transforms:
+
+## retail_growth = monthly % change in retail sales (log-differenced)
+
+## unrate_diff   = monthly change in the unemployment rate
+
+macro = fred[["retail_growth", "unrate_diff"]].dropna()
+
+def granger_macro(effect, cause, data, lag=4):
+    with redirect_stdout(io.StringIO()):
+        res = grangercausalitytests(data[[effect, cause]], maxlag=lag)
+    F, p = res[lag][0]["ssr_ftest"][0], res[lag][0]["ssr_ftest"][1]
+    print(f"  {cause:&gt;12} -&gt; {effect:&lt;14} F = {F:6.2f}   p = {p:.4f}"
+          f"   {'significant' if p &lt; 0.05 else 'NOT significant'}")
+
+print(f"Full sample: {macro.index.min():%Y-%m} to {macro.index.max():%Y-%m} ({len(macro)} months)")
+granger_macro("retail_growth", "unrate_diff", macro)
+granger_macro("unrate_diff", "retail_growth", macro)</code></pre>
+<p>Both directions are significant, and unemployment looks like the stronger driver. That matches the story everyone expects: people lose jobs, people stop spending.</p>
+<p><strong>Now drop the COVID window and run it again.</strong></p>
+<div id="e960efd4" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ex_covid <span class="op">=</span> macro[(macro.index <span class="op">&lt;</span> <span class="st">"2020-02-01"</span>) <span class="op">|</span> (macro.index <span class="op">&gt;</span> <span class="st">"2021-06-01"</span>)]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Excluding Feb 2020 - Jun 2021 (</span><span class="sc">{</span><span class="bu">len</span>(ex_covid)<span class="sc">}</span><span class="ss"> months)"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>granger_macro(<span class="st">"retail_growth"</span>, <span class="st">"unrate_diff"</span>, ex_covid)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>granger_macro(<span class="st">"unrate_diff"</span>, <span class="st">"retail_growth"</span>, ex_covid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Your turn:</strong> restrict the sample to everything <em>before</em> February 2020 and run both directions once more.</p>
+<div id="83871f4e" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">## ---- your turn: uncomment and fill in the filter ----</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">## pre_covid = macro[___]                     # &lt;- rows with index &lt; "2020-02-01"</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">## granger_macro("retail_growth", "unrate_diff", pre_covid)</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">## granger_macro("unrate_diff", "retail_growth", pre_covid)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+</section>
+<section id="before-you-leave" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">2.9</span> Before you leave</h2>
+<p>You should have found, in Step 5, that the relationship runs <strong>both ways</strong>, at least in part.</p>
+<blockquote class="blockquote">
+<p><strong>Discuss (Step 5):</strong> Household goods do not cause groceries, and groceries do not cause household goods. So what is generating a two-way predictive relationship between two aisles of the same store?</p>
+<p>And the question that matters commercially: given what you found, is there anything a planner is entitled to <em>do</em> with it? Name one legitimate use and one thing they must not conclude.</p>
+</blockquote>
+<p>In Step 6 the intuitive direction — unemployment driving retail — is strong on the full sample, weak once COVID is removed, and gone entirely before 2020. The reverse direction survives every cut.</p>
+<blockquote class="blockquote">
+<p><strong>Discuss (Step 6):</strong> One analyst runs the full sample and reports that unemployment predicts retail sales. Another runs 1992–2019 and reports it does not. Neither has made an error.</p>
+<p>What actually happened here — and what does it tell you about a Granger result computed on a sample containing one enormous shared shock?</p>
+<p>Retail sales are a <em>coincident-to-leading</em> indicator and unemployment is a <em>lagging</em> one. Does that help explain which direction survived?</p>
+</blockquote>
+<hr>
+<p><em>Solutions posted to Canvas after class.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Two questions, and I want both in the Week 2 thread before Lecture 3.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p><strong>First, the aisles.</strong> You found a two-way relationship between household goods and groceries. Neither causes the other. So what is generating it?</p>
+<p>And the commercial half, which is the one that matters: given what you found, is there anything a planner is <em>entitled</em> to do with it? Name one legitimate use and one thing they must not conclude.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p><strong>Second, the macro result.</strong> One analyst runs the full sample and reports that unemployment predicts retail sales. Another runs 1992 to 2019 and reports that it does not.</p>
+<p><strong>Neither of them has made an error.</strong> Both ran the correct test, correctly, on a defensible sample. That’s what makes this worth twenty minutes of your attention rather than being a cautionary tale about sloppy work.</p>
+<p>What actually happened — and what does it tell you about a Granger result computed on a sample containing one enormous shared shock?</p>
+<p>One hint worth using: retail sales are a coincident-to-leading indicator, and unemployment is a <em>lagging</em> one. Firms cut hours and stop hiring after demand falls, not before. Does that help explain which direction survived every cut?</p>
+<p>Solutions for the coded parts go up on Canvas after the deadline. Lecture 3 next, where we leave retail data entirely — because it can’t show you what we need to see.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="what-your-run-should-produce" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="what-your-run-should-produce"><span class="header-section-number">2.10</span> What your run should produce</h2>
+<p>Your numbers will differ where a model is stochastic; these are the values this lab produces on the pinned environment.</p>
+<p>Reproducible; verified across repeated runs. <strong>Step 3 excepted</strong> — that number depends on the order the student chooses.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Series</td>
+<td>CA_1 HOUSEHOLD, 277 weeks (train 225, test 52)</td>
+</tr>
+<tr class="even">
+<td>ADF levels</td>
+<td>−1.33, p = 0.614, 12 lags → unit root</td>
+</tr>
+<tr class="odd">
+<td>ADF first difference</td>
+<td>−5.00, p &lt; 0.001, 11 lags → stationary</td>
+</tr>
+<tr class="even">
+<td>ARIMA(1,1,1) 52-step RMSE</td>
+<td>569 <em>(shipped placeholder order only)</em></td>
+</tr>
+<tr class="odd">
+<td>Walk-forward 1-step RMSE</td>
+<td>352, over 172 origins</td>
+</tr>
+<tr class="even">
+<td>food → household</td>
+<td>F = 3.83, p = 0.0048</td>
+</tr>
+<tr class="odd">
+<td>household → food</td>
+<td>F = 2.80, p = 0.0263</td>
+</tr>
+<tr class="even">
+<td><strong>Macro, full sample (412 mo)</strong></td>
+<td>unrate→retail F = 18.22 · retail→unrate F = 12.80</td>
+</tr>
+<tr class="odd">
+<td><strong>Ex-COVID (395 mo)</strong></td>
+<td>unrate→retail F = 2.91 (p = 0.0214) · retail→unrate F = 6.74</td>
+</tr>
+<tr class="even">
+<td><strong>Pre-COVID (336 mo)</strong></td>
+<td>unrate→retail F = 1.85 (<strong>p = 0.1196, not significant</strong>) · retail→unrate F = 9.67</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note for the instructor.</strong> The FRED full sample ends 2026-06, so it moves as <code>prep_fred.py</code> is re-run. The three F-statistics will drift slightly between terms; the <em>pattern</em> — collapse in one direction, survival in the other — is what’s stable, and it’s what the discussion questions rest on. Re-run this appendix before recording if the cache is more than a term old.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture01_lab.html" class="pagination-link" aria-label="Lab 1: Benchmarks and Exponential Smoothing">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture03_lab.html" class="pagination-link" aria-label="Lab 3: GAMs, Prophet, and Several Seasons at Once">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

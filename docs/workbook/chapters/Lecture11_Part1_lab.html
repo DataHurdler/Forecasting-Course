@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>12&nbsp; Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture11_Part2_lab.html" rel="next">
+<link href="../chapters/Lecture10_lab.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture11_Part1_lab.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">12.1</span> What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">12.2</span> Setup</a></li>
+  <li><a href="#step-1-fit-it-the-obvious-way" id="toc-step-1-fit-it-the-obvious-way" class="nav-link" data-scroll-target="#step-1-fit-it-the-obvious-way"><span class="header-section-number">12.3</span> Step 1 — Fit it the obvious way</a></li>
+  <li><a href="#step-2-reparameterize" id="toc-step-2-reparameterize" class="nav-link" data-scroll-target="#step-2-reparameterize"><span class="header-section-number">12.4</span> Step 2 — Reparameterize</a></li>
+  <li><a href="#step-3-forecast-two-ways" id="toc-step-3-forecast-two-ways" class="nav-link" data-scroll-target="#step-3-forecast-two-ways"><span class="header-section-number">12.5</span> Step 3 — Forecast, two ways</a></li>
+  <li><a href="#step-4-calibrated-is-not-the-same-as-useful" id="toc-step-4-calibrated-is-not-the-same-as-useful" class="nav-link" data-scroll-target="#step-4-calibrated-is-not-the-same-as-useful"><span class="header-section-number">12.6</span> Step 4 — Calibrated is not the same as useful</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">12.7</span> Before you leave</a></li>
+  <li><a href="#what-your-run-should-produce" id="toc-what-your-run-should-produce" class="nav-link" data-scroll-target="#what-your-run-should-produce"><span class="header-section-number">12.8</span> What your run should produce</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture11_Part1_lab.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Run this one live: <a href="../../labs/Lecture11_Part1_lab.html">the executable lab</a>.</em></p>
+<section id="what-we-are-doing" class="level2" data-number="12.1">
+<h2 data-number="12.1" class="anchored" data-anchor-id="what-we-are-doing"><span class="header-section-number">12.1</span> What we are doing</h2>
+<p>A structural model writes a series as parts you can name — a level that drifts, a seasonal shape, and noise — and puts a prior on each. The output is not a forecast line but a distribution for every future week.</p>
+<p>Today you will build one, hit a failure the diagnostics catch, fix it — and then find that the <em>correct</em> way to forecast produces a worse-calibrated interval than the shortcut.</p>
+<p>That last result is not a mistake in the lab. It is the model telling you something, and working out what takes the rest of the session.</p>
+<p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pymc</code>, <code>arviz</code>, and <code>data/processed/m5_weekly.csv</code>. Sampling takes about 20 seconds per fit.</p>
+<hr>
+</section>
+<section id="setup" class="level2" data-number="12.2">
+<h2 data-number="12.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">12.2</span> Setup</h2>
+<div id="5e01052b" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings, logging</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">'pymc'</span>).setLevel(logging.ERROR)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"processed"</span> <span class="op">/</span> name</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. "</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Run `python scripts/prep_m5.py` from the repository root first."</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> pd.read_csv(data_path(<span class="st">"m5_weekly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"week_start"</span>])</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ca1 <span class="op">=</span> (weekly[(weekly.store_id <span class="op">==</span> <span class="st">"CA_1"</span>) <span class="op">&amp;</span> (weekly.cat_id <span class="op">==</span> <span class="st">"FOODS"</span>)]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>         .sort_values(<span class="st">"week_start"</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> train.units.values.astype(<span class="bu">float</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(train)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>y_mu, y_sd <span class="op">=</span> y.mean(), y.std()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>y_z <span class="op">=</span> (y <span class="op">-</span> y_mu) <span class="op">/</span> y_sd          <span class="co"># standardize: the priors below assume unit scale</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>K, P <span class="op">=</span> <span class="dv">3</span>, <span class="dv">52</span>                     <span class="co"># 3 Fourier pairs, annual period on weekly data</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fourier(t):</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.column_stack([f(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>k<span class="op">*</span>t<span class="op">/</span>P) <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, K<span class="op">+</span><span class="dv">1</span>) <span class="cf">for</span> f <span class="kw">in</span> (np.sin, np.cos)])</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>t_all <span class="op">=</span> np.arange(<span class="bu">len</span>(ca1))</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>X_tr, X_te <span class="op">=</span> fourier(t_all[:n]), fourier(t_all[n:])</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"train </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss"> weeks, test </span><span class="sc">{</span>N_TEST<span class="sc">}</span><span class="ss"> weeks | </span><span class="sc">{</span><span class="dv">2</span><span class="op">*</span>K<span class="sc">}</span><span class="ss"> Fourier coefficients standing in for 52"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>train 225 weeks, test 52 weeks | 6 Fourier coefficients standing in for 52</code></pre>
+<p>CA_1 FOODS again — the series you have been forecasting since Homework 2 — held out for a full final year.</p>
+<p>One line deserves attention. <strong>Six coefficients standing in for fifty-two.</strong> Three sine-cosine pairs describe the annual shape, rather than fifty-two weekly dummies. That is a modelling choice with a cost and a benefit: you cannot represent a one-week spike, but you have six parameters to estimate instead of fifty-two, on 225 observations. Remember it — it comes back in Step 3 as a suspect.</p>
+<p>Also note the standardization. <code>y_z</code> is the series in standard units, because the priors below — <code>Exponential(10)</code>, <code>Normal(0, 0.5)</code> — assume unit scale. Priors are not scale-free, and this is the line that makes them defensible.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-1-fit-it-the-obvious-way" class="level2" data-number="12.3">
+<h2 data-number="12.3" class="anchored" data-anchor-id="step-1-fit-it-the-obvious-way"><span class="header-section-number">12.3</span> Step 1 — Fit it the obvious way</h2>
+<p>The model is a drifting level plus seasonality. PyMC has a distribution for a random walk, so the natural thing is to use it.</p>
+<div id="97f772f3" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> centred:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">"sigma_level"</span>, <span class="fl">10.0</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    level <span class="op">=</span> pm.GaussianRandomWalk(<span class="st">"level"</span>, sigma<span class="op">=</span>sigma_level, shape<span class="op">=</span>n)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    beta  <span class="op">=</span> pm.Normal(<span class="st">"beta"</span>, <span class="dv">0</span>, <span class="fl">0.5</span>, shape<span class="op">=</span><span class="dv">2</span><span class="op">*</span>K)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> pm.Exponential(<span class="st">"sigma"</span>, <span class="fl">1.0</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    pm.Normal(<span class="st">"obs"</span>, mu<span class="op">=</span>level <span class="op">+</span> pm.math.dot(X_tr, beta), sigma<span class="op">=</span>sigma, observed<span class="op">=</span>y_z)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    idata_c <span class="op">=</span> pm.sample(<span class="dv">1500</span>, tune<span class="op">=</span><span class="dv">2000</span>, chains<span class="op">=</span><span class="dv">4</span>, progressbar<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                        random_seed<span class="op">=</span><span class="dv">42</span>, target_accept<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>s_c <span class="op">=</span> az.summary(idata_c, var_names<span class="op">=</span>[<span class="st">"sigma_level"</span>, <span class="st">"sigma"</span>, <span class="st">"beta"</span>],</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                 ci_kind<span class="op">=</span><span class="st">"hdi"</span>, ci_prob<span class="op">=</span><span class="fl">0.94</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"R-hat        </span><span class="sc">{</span>s_c<span class="sc">.</span>r_hat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.3f}</span><span class="ss">   (want &lt; 1.01)"</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"ESS (bulk)   </span><span class="sc">{</span>s_c<span class="sc">.</span>ess_bulk<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">     (want &gt; 400)"</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"divergences  </span><span class="sc">{</span><span class="bu">int</span>(idata_c.sample_stats.diverging.<span class="bu">sum</span>())<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>It did not converge.</strong> No exception, a forecast is available, and the diagnostics are the only thing telling you not to use it. Note that <code>target_accept</code> is already at 0.95 — this is not fixed by asking the sampler to try harder.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The model is a drifting level plus seasonality. PyMC has a distribution for a random walk, so the obvious thing is to reach for it: <code>pm.GaussianRandomWalk</code>. It reads exactly like the maths.</p>
+<pre><code>R-hat        1.022   (want &lt; 1.01)
+ESS (bulk)   274     (want &gt; 400)
+divergences  0</code></pre>
+<p><strong>It did not converge</strong>, and I want you to look carefully at <em>how</em> you know.</p>
+<p>R-hat is 1.022, above the 1.01 threshold — the four chains do not agree with each other. Effective sample size is 274, below 400 — the draws are so autocorrelated that six thousand samples carry less information than a few hundred independent ones. And <strong>divergences are zero.</strong></p>
+<p>That last line matters, because divergences are the diagnostic everyone learns first, and here they are silent. The sampler never had to give up on a step; it just wandered badly. <strong>Different pathologies trip different instruments</strong> — which is precisely why you check all three, every time, rather than the one you remember.</p>
+<p>Next week you will see the mirror image: a model where R-hat and ESS both pass and forty-three divergences are the only thing objecting.</p>
+<p>And note this is <strong>not</strong> fixed by asking the sampler to try harder. <code>target_accept</code> is already at 0.95. The problem is not effort.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2-reparameterize" class="level2" data-number="12.4">
+<h2 data-number="12.4" class="anchored" data-anchor-id="step-2-reparameterize"><span class="header-section-number">12.4</span> Step 2 — Reparameterize</h2>
+<p>The problem is the <em>shape</em> of the posterior, not the model. Write the walk as a cumulative sum of standard Normal draws scaled by <code>sigma_level</code>, and the sampler gets a geometry it can navigate.</p>
+<div id="2eb97778" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">"sigma_level"</span>, <span class="fl">10.0</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> pm.Normal(<span class="st">"z"</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>n)                              <span class="co"># standard normal</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    level <span class="op">=</span> pm.Deterministic(<span class="st">"level"</span>, pm.math.cumsum(z <span class="op">*</span> sigma_level))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    beta  <span class="op">=</span> pm.Normal(<span class="st">"beta"</span>, <span class="dv">0</span>, <span class="fl">0.5</span>, shape<span class="op">=</span><span class="dv">2</span><span class="op">*</span>K)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> pm.Exponential(<span class="st">"sigma"</span>, <span class="fl">1.0</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    pm.Normal(<span class="st">"obs"</span>, mu<span class="op">=</span>level <span class="op">+</span> pm.math.dot(X_tr, beta), sigma<span class="op">=</span>sigma, observed<span class="op">=</span>y_z)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">1500</span>, tune<span class="op">=</span><span class="dv">2000</span>, chains<span class="op">=</span><span class="dv">4</span>, progressbar<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                      random_seed<span class="op">=</span><span class="dv">42</span>, target_accept<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> az.summary(idata, var_names<span class="op">=</span>[<span class="st">"sigma_level"</span>, <span class="st">"sigma"</span>, <span class="st">"beta"</span>], ci_kind<span class="op">=</span><span class="st">"hdi"</span>, ci_prob<span class="op">=</span><span class="fl">0.94</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"R-hat        </span><span class="sc">{</span>s<span class="sc">.</span>r_hat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.3f}</span><span class="ss">   (want &lt; 1.01)"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"ESS (bulk)   </span><span class="sc">{</span>s<span class="sc">.</span>ess_bulk<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">    (want &gt; 400)"</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"divergences  </span><span class="sc">{</span><span class="bu">int</span>(idata.sample_stats.diverging.<span class="bu">sum</span>())<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Same model, same data, same priors.</strong> <code>cumsum(z * sigma)</code> and <code>GaussianRandomWalk(sigma=sigma)</code> describe the identical distribution — only the coordinates the sampler explores have changed.</p>
+<p>Look at the components it recovered:</p>
+<div id="58f6df36" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lev <span class="op">=</span> idata.posterior[<span class="st">"level"</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, n).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sea <span class="op">=</span> (idata.posterior[<span class="st">"beta"</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span><span class="op">*</span>K) <span class="op">@</span> X_tr.T).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">4.5</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(train.week_start, train.units, lw<span class="op">=</span><span class="fl">.8</span>, alpha<span class="op">=</span><span class="fl">.5</span>, label<span class="op">=</span><span class="st">"observed"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(train.week_start, lev, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"level"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].legend()<span class="op">;</span> ax[<span class="dv">0</span>].set_ylabel(<span class="st">"units"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(train.week_start, sea, lw<span class="op">=</span><span class="fl">1.5</span>, color<span class="op">=</span><span class="st">"darkgreen"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylabel(<span class="st">"seasonal"</span>)<span class="op">;</span> ax[<span class="dv">1</span>].axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"k"</span>, lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The problem is the <strong>shape of the posterior</strong>, not the model.</p>
+<p>A centred random walk couples the level to <code>sigma_level</code>: when the scale is small, the steps must be small, so the posterior narrows into a funnel that the sampler cannot traverse at a single step size. The fix is to write the walk as a cumulative sum of <strong>standard</strong> Normal draws, scaled afterwards. Now <code>z</code> and <code>sigma_level</code> are independent in the posterior geometry.</p>
+<pre><code>R-hat        1.002   (want &lt; 1.01)
+ESS (bulk)   2376    (want &gt; 400)
+divergences  0</code></pre>
+<p>R-hat 1.022 to 1.002. Effective sample size 274 to <strong>2,376</strong> — nearly nine times more information out of the same number of draws.</p>
+<p>And here is the sentence to say slowly: <strong>same model, same data, same priors.</strong> <code>cumsum(z * sigma)</code> and <code>GaussianRandomWalk(sigma=sigma)</code> describe the <em>identical</em> distribution. Nothing about what we believe has changed. Only the coordinate system the sampler explores.</p>
+<p>That is worth internalising, because it is unlike everything else in this course. This is not a modelling improvement or a bias-variance trade. It is a <strong>computational</strong> fix to a <strong>computational</strong> problem, and the give-away is that the posterior it targets is unchanged.</p>
+<p>And now the payoff of a structural model — you can look at the parts. Top panel, the level: a slow drift under the noise. Bottom panel, the seasonal shape the six Fourier coefficients recovered. Neither of those is available from XGBoost at any price.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-3-forecast-two-ways" class="level2" data-number="12.5">
+<h2 data-number="12.5" class="anchored" data-anchor-id="step-3-forecast-two-ways"><span class="header-section-number">12.5</span> Step 3 — Forecast, two ways</h2>
+<p>To forecast you need the level at each future week. There are two candidates, and one of them is theoretically right.</p>
+<p><strong>Held constant:</strong> carry the last estimated level forward unchanged. Simple, and it asserts the level stops drifting the moment your data ends — which is not what the model says.</p>
+<p><strong>Propagated:</strong> let the level keep random-walking forward, exactly as it did in-sample. This is what the fitted model actually implies.</p>
+<div id="d0e9cf80" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>post <span class="op">=</span> idata.posterior</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>lev_last <span class="op">=</span> post[<span class="st">"level"</span>].values[:, :, <span class="op">-</span><span class="dv">1</span>].ravel()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>sl       <span class="op">=</span> post[<span class="st">"sigma_level"</span>].values.ravel()</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>b        <span class="op">=</span> post[<span class="st">"beta"</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span><span class="op">*</span>K)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>sg       <span class="op">=</span> post[<span class="st">"sigma"</span>].values.ravel()</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> <span class="bu">len</span>(lev_last)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> test.units.values</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>To forecast you need the level at each future week, <span class="kw">and</span> there are two candidates.</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="op">**</span>Held constant.<span class="op">**</span> Carry the last estimated level forward unchanged. Simple — <span class="kw">and</span> it asserts that</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>the level stops drifting the moment your data ends, which <span class="kw">is</span> <span class="kw">not</span> what the model says.</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="op">**</span>Propagated.<span class="op">**</span> Let the level keep random<span class="op">-</span>walking forward exactly <span class="im">as</span> it did <span class="kw">in</span><span class="op">-</span>sample. This <span class="kw">is</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>what the fitted model actually implies. It <span class="kw">is</span> the defensible choice.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<pre><code>         method  RMSE  coverage_%  mean_width</code></pre>
+<p>level held constant 1589 96 6340 level propagated 1589 100 11667</p>
+<pre><code>
+The point forecasts are **identical** — 1,589 on both rows, and not by coincidence. Propagating
+the level adds steps whose mean is zero, so the expected level is unchanged and RMSE simply cannot
+tell these two apart. Everything separating them is in the **interval**, which differs by a factor
+of nearly two, and not in the direction you would predict.
+
+The theoretically correct method **over-covers**: 100% of weeks fell inside a 94% interval. The
+shortcut lands at 96%, close to nominal. **The defensible choice calibrated worse.**
+
+::: {.callout-tip}
+## Try it
+:::
+
+Pause and work out why before I tell you. Then do the first "your turn" — print the two scale
+parameters and the drift accumulated over 52 weeks.
+
+Over 52 weeks a random walk accumulates about $\sqrt{52}$ — call it seven — times `sigma_level` of
+drift. So if `sigma_level` is even somewhat too large, the interval inflates fast, and it inflates
+with the *square root of the horizon*.
+
+**And there is good reason to think it is too large**, which brings back the Fourier choice from
+the setup. The random walk is the most flexible component in this model. Anything the six
+coefficients cannot represent — a promotion, a holiday that moves, a single bad week — has nowhere
+else to go, so it gets absorbed into the level. That inflates `sigma_level` beyond genuine drift,
+and the forecast then propagates that inflated drift for a year.
+
+So — and this is the sentence that matters — the frozen version is **not right**. It is wrong in a
+way that happens to **cancel** an overestimated drift, on this series, at this horizon. Rely on
+that and it will fail somewhere else, silently, and you will not know which of the two errors
+moved.
+</code></pre>
+<p>coverage / mean width, by horizon (nominal 94%) method wk 1-13 wk 14-39 wk 40-52 level held constant 100% / 6,255 92% / 6,537 100% / 6,027 level propagated 100% / 8,081 100% / 11,974 100% / 14,637</p>
+<pre><code>
+Read the **widths** across each row, not the coverage.
+
+The frozen version: 6,255 at weeks 1–13, and 6,027 at weeks 40–52. It is *narrower* a year out
+than a month out. It has no mechanism to widen, because nothing in it knows that time has passed. The propagated version: 8,081, then 11,974, then 14,637. It nearly doubles.
+
+**One of these models knows that forecasting further ahead is harder, and the other does not.**
+That is a structural difference, not a scoring difference, and it is why the aggregate table on
+its own would have misled you. On this series, at this horizon, the ignorance happened to cost
+nothing. On a series with a genuinely drifting level it would cost a great deal.
+
+And notice the only sub-nominal cell in the table: the frozen version drops to **92%** in weeks
+14–39. Its respectable 96% average is hiding a stretch where it is overconfident. Aggregates hide
+things; that is the third time this course has said so.
+
+:::
+
+## The POINT forecast is identical for both methods, and not approximately so:
+
+## propagating the level adds zero-mean steps, so E[level] is unchanged. Only the
+
+## spread differs. Compute the point forecast once, from the deterministic part.
+
+point = (lev_last[:, None] + b @ X_te.T).mean(0) * y_sd + y_mu
+rmse_point = float(np.sqrt(np.mean((actual - point) ** 2)))
+
+def score(draws, label):
+    lo, hi = np.percentile(draws, [3, 97], axis=0) * y_sd + y_mu
+    return {"method": label,
+            "RMSE": round(rmse_point),
+            "coverage_%": round(100*float(np.mean((actual &gt;= lo) &amp; (actual &lt;= hi)))),
+            "mean_width": round(float(np.mean(hi - lo)))}
+
+## (a) level held constant at its last value  -- the tempting shortcut
+
+mu_a = lev_last[:, None] + b @ X_te.T
+draws_a = mu_a + rng.normal(0, 1, size=mu_a.shape) * sg[:, None]
+
+## (b) level keeps random-walking into the future -- what the model actually says
+
+steps = rng.normal(0, 1, size=(D, N_TEST)) * sl[:, None]
+mu_b = lev_last[:, None] + np.cumsum(steps, axis=1) + b @ X_te.T
+draws_b = mu_b + rng.normal(0, 1, size=mu_b.shape) * sg[:, None]
+
+print(pd.DataFrame([score(draws_a, "level held constant"),
+                    score(draws_b, "level propagated")]).to_string(index=False))</code></pre>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The theoretically correct choice calibrated worse. Work out why.
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The two methods have the <strong>same point forecast</strong> — not nearly the same, exactly the same, because propagating the level adds steps with mean zero. So RMSE cannot distinguish them, and everything that separates them lives in the <strong>interval</strong> — which differs enormously, and not in the direction you would predict.</p>
+<p>Propagating the walk is the defensible choice: the level genuinely does keep drifting, and freezing it asserts a certainty the model does not have. Yet the propagated interval <strong>over-covers</strong>, while the frozen one lands close to its nominal 94%.</p>
+<p>Over-covering means too wide. Over 52 weeks the propagated level accumulates roughly <span class="math inline">\(\sqrt{52}\,\sigma_{\text{level}}\)</span> of drift, so if <span class="math inline">\(\sigma_{\text{level}}\)</span> is too large the interval inflates fast.</p>
+<p><strong>And there is good reason to think it is too large.</strong> The random walk is the most flexible part of this model. Anything the Fourier terms fail to capture — a promotion, a holiday shift, an outlier — gets absorbed into the level, inflating <span class="math inline">\(\sigma_{\text{level}}\)</span> beyond genuine drift.</p>
+<p>So the frozen version is not right. It is <strong>wrong in a way that happens to cancel</strong> an overestimated drift on this series and this horizon. Rely on that and it will fail elsewhere.</p>
+</div>
+</div>
+<p><strong>Your turn:</strong> check the size of the estimated drift against the noise it is competing with.</p>
+<div id="075df2ea" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">## ---- your turn: uncomment and fill in ----</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">## print(az.summary(idata, var_names=[___, ___],        # &lt;- the two scale parameters</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">## ci_kind="hdi", ci_prob=0.94).round(4).to_string())</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">## print("\ndrift accumulated over 52 weeks, in standardized units:")</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">## print(f"  {np.sqrt(52) * float(post['sigma_level'].values.mean()):.2f}")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><strong>Now split coverage by horizon</strong>, which is where the difference actually shows.</p>
+<div id="85670c09" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> by_horizon(draws, label):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(draws, [<span class="dv">3</span>, <span class="dv">97</span>], axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    inside <span class="op">=</span> (actual <span class="op">&gt;=</span> lo) <span class="op">&amp;</span> (actual <span class="op">&lt;=</span> hi)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    segs <span class="op">=</span> {<span class="st">"wk 1-13"</span>: <span class="bu">slice</span>(<span class="dv">0</span>,<span class="dv">13</span>), <span class="st">"wk 14-39"</span>: <span class="bu">slice</span>(<span class="dv">13</span>,<span class="dv">39</span>), <span class="st">"wk 40-52"</span>: <span class="bu">slice</span>(<span class="dv">39</span>,<span class="dv">52</span>)}</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> {<span class="st">"method"</span>: label}</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, sl_ <span class="kw">in</span> segs.items():</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        row[name] <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>inside[sl_]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">% / </span><span class="sc">{</span><span class="bu">int</span>((hi<span class="op">-</span>lo)[sl_].mean())<span class="sc">:,}</span><span class="ss">"</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> row</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"coverage / mean width, by horizon (nominal 94%)"</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame([by_horizon(draws_a, <span class="st">"level held constant"</span>),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                    by_horizon(draws_b, <span class="st">"level propagated"</span>)]).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Read the widths across each row.</strong> The frozen version’s interval is essentially the same width at week 50 as at week 1 — it has no mechanism to widen. The propagated version’s roughly doubles.</p>
+<p>That is the real distinction, and it is structural rather than a matter of which scored better here: <strong>one of these models knows that forecasting further ahead is harder, and the other does not.</strong> On this series, at this horizon, that ignorance happened not to cost anything. On a series with a genuinely drifting level it would.</p>
+<hr>
+</section>
+<section id="step-4-calibrated-is-not-the-same-as-useful" class="level2" data-number="12.6">
+<h2 data-number="12.6" class="anchored" data-anchor-id="step-4-calibrated-is-not-the-same-as-useful"><span class="header-section-number">12.6</span> Step 4 — Calibrated is not the same as useful</h2>
+<p>Take the propagated version — the one the model implies — and ask two separate questions of it.</p>
+<div id="d12ce8b5" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> score(draws_b, <span class="st">"level propagated"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coverage      </span><span class="sc">{</span>res[<span class="st">'coverage_%'</span>]<span class="sc">}</span><span class="ss">%   against a nominal 94%"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"mean width    </span><span class="sc">{</span>res[<span class="st">'mean_width'</span>]<span class="sc">:,}</span><span class="ss"> units"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"              = </span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>res[<span class="st">'mean_width'</span>]<span class="op">/</span>ca1<span class="sc">.</span>units<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">% of average weekly units"</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"RMSE          </span><span class="sc">{</span>res[<span class="st">'RMSE'</span>]<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"seasonal naive</span><span class="sc">{</span>np<span class="sc">.</span>sqrt(np.mean((actual <span class="op">-</span> train.units.values[<span class="op">-</span><span class="dv">52</span>:])<span class="op">**</span><span class="dv">2</span>))<span class="sc">:&gt;7,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Question one: is it calibrated?</strong> Compare coverage against 94%.</p>
+<p><strong>Question two: is it useful?</strong> Compare the width against the size of the thing you are forecasting, and ask whether you would place an inventory order against it.</p>
+<p><strong>Your turn:</strong> state, in one sentence each, your answer to both — and whether passing the first excuses failing the second.</p>
+<div id="941504e4" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>Take the propagated version — the one the model implies — <span class="kw">and</span> ask it two <span class="op">**</span>separate<span class="op">**</span> questions.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>coverage 100% against a nominal 94% mean width 11,667 units = 59% of average weekly units RMSE 1,589 seasonal naive 1,660</p>
+<pre><code>
+**Question one: is it calibrated?** Yes, and then some. 100% against a nominal 94% — not
+overconfident. Conservative. **Question two: is it useful?**
+
+The interval is **11,667 units wide on a series averaging about 19,700** — call it plus or minus
+thirty percent. Now say that out loud as a business sentence: *"I am 94% confident that next
+week's demand is somewhere between roughly thirty percent below and thirty percent above
+average."*
+
+Nobody places an inventory order against that. It is honest and it is useless, and those are not
+the same axis.
+
+::: {.callout-tip}
+## Try it
+:::
+
+Write your one-sentence answer to each question, and then the third question the lab actually
+asks: does passing the first excuse failing the second?
+
+And the point forecast: 1,589 against seasonal naive's 1,660. **About 4% better**, for a model
+that took twenty seconds to sample, a reparameterization to converge, and a page of code.
+
+If accuracy were the argument for this model, that number would be an embarrassment. Accuracy is
+not the argument. What you bought is a level and a seasonal component you can plot and defend, a
+full distribution for every future week, and — the thing the whole lab has been about — an
+interval that **admits when it does not know**. Whether that trade is worth 5% is a business
+question, and it depends entirely on whether anyone downstream will use the uncertainty you went
+to the trouble of producing.
+
+:::
+
+## ---- your turn: uncomment and answer in the strings ----
+
+## calibrated = "..."
+
+## useful     = "..."
+
+## print(calibrated); print(useful)
+</code></pre>
+<hr>
+</section>
+<section id="before-you-leave" class="level2" data-number="12.7">
+<h2 data-number="12.7" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">12.7</span> Before you leave</h2>
+<blockquote class="blockquote">
+<p><strong>Discuss (the two problems):</strong> The convergence failure was caught by a diagnostic. The over-wide interval was not — it needed a held-out set and a coverage calculation. What is the structural difference between the two, and what habit catches the second kind?</p>
+<p><strong>Discuss (the payoff):</strong> The point forecast beat seasonal naive by only a few percent. Given that, what did fitting this model actually buy — and name a business question it can answer that XGBoost from Homework 4 cannot.</p>
+<p><strong>Discuss (the fix):</strong> The interval is honest and too wide to act on. Propose one change to the <em>model</em> — not the forecasting code — that would narrow it, and say what you would be assuming in exchange.</p>
+</blockquote>
+<hr>
+<p><em>Solutions posted to Canvas after class.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Three questions for the board.</p>
+<p><strong>The two problems.</strong> The convergence failure was caught by a <strong>diagnostic</strong> — R-hat and ESS, computed from the fit alone, before you looked at any data you were predicting. The over-wide interval was caught by nothing of the sort: it needed a <strong>held-out year and a coverage calculation</strong>. What is the structural difference between those two kinds of error, and what habit catches the second kind?</p>
+<p>held-out check asks “is the model any good?” — and no amount of the first substitutes for the second. A perfectly converged sampler will happily give you a useless interval.*</p>
+<p><strong>The payoff.</strong> The point forecast beat seasonal naive by about four percent. Given that, what did fitting this model actually buy? Name one business question it answers that XGBoost from Homework 4 cannot.</p>
+<p><strong>The fix.</strong> The interval is honest and too wide to act on. Propose one change to the <strong>model</strong> — not the forecasting code — that would narrow it, and say what you are assuming in exchange.</p>
+<p>assumes the level really does drift slowly; or more seasonal flexibility so the Fourier terms stop dumping their residual into the level. The second is the more interesting answer because it addresses the cause rather than the symptom.*</p>
+<p>Solutions for the coded parts go up on Canvas after the deadline. Next week: ten series instead of one, and what happens when some of them barely have any data.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="what-your-run-should-produce" class="level2" data-number="12.8">
+<h2 data-number="12.8" class="anchored" data-anchor-id="what-your-run-should-produce"><span class="header-section-number">12.8</span> What your run should produce</h2>
+<p>Your numbers will differ where a model is stochastic; these are the values this lab produces on the pinned environment.</p>
+<p><code>random_seed=42</code> on both fits, <code>default_rng(42)</code> on the forecast draws. Two fits, ~20 s each.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Split</td>
+<td>train <strong>225</strong> weeks, test <strong>52</strong> · 6 Fourier coefficients (3 pairs) for a 52-week period</td>
+</tr>
+<tr class="even">
+<td><strong>Centred</strong> model</td>
+<td>R-hat <strong>1.022</strong> · ESS <strong>274</strong> · divergences <strong>0</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Non-centred</strong> model</td>
+<td>R-hat <strong>1.002</strong> · ESS <strong>2,376</strong> · divergences 0</td>
+</tr>
+<tr class="even">
+<td>ESS improvement</td>
+<td>274 → 2,376, about <strong>8.7×</strong>, from a reparameterization that changes no belief</td>
+</tr>
+<tr class="odd">
+<td>Level held constant</td>
+<td>RMSE <strong>1,589</strong> · coverage <strong>96%</strong> · mean width 6,340</td>
+</tr>
+<tr class="even">
+<td>Level propagated</td>
+<td>RMSE <strong>1,589</strong> (identical by construction) · coverage <strong>100%</strong> · mean width <strong>11,667</strong></td>
+</tr>
+<tr class="odd">
+<td>By horizon — frozen</td>
+<td>100% / 6,255 · <strong>92%</strong> / 6,537 · 100% / 6,027 (<em>narrower</em> a year out)</td>
+</tr>
+<tr class="even">
+<td>By horizon — propagated</td>
+<td>100% / 8,081 · 100% / 11,974 · 100% / 14,637 (<strong>1.8× widening</strong>)</td>
+</tr>
+<tr class="odd">
+<td>Interval width in context</td>
+<td>11,667 on a mean of ~19,700 → about <strong>±30%</strong></td>
+</tr>
+<tr class="even">
+<td>Seasonal naive</td>
+<td><strong>1,660</strong> → the model is about <strong>4%</strong> better (4.28%)</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture10_lab.html" class="pagination-link" aria-label="Lab 10: Priors, Posteriors, and Checking the Sampler">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture11_Part2_lab.html" class="pagination-link" aria-label="Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It">
+        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

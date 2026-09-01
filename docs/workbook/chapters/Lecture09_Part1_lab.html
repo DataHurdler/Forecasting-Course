@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>9&nbsp; Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It – Business Forecasting — Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/Lecture09_Part2_lab.html" rel="next">
+<link href="../chapters/Lecture08_lab.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c1b08d31956f1824f457e0b6984faaea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture09_Part1_lab.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Business Forecasting — Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Labs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture01_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lab 1: Benchmarks and Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture02_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lab 2: Stationarity, ARIMA, and Granger Causality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture03_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 3: GAMs, Prophet, and Several Seasons at Once</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture04_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 4: Decision Trees — Reading One, and Finding Where It Breaks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture05_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lab 5: Tree Ensembles — Averaging, Then Boosting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture06_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture07_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 7: Your First Network — and Why One Run Proves Nothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture08_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part1_lab.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture09_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture10_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 10: Priors, Posteriors, and Checking the Sampler</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part1_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lab 11 Part 1: Structural Time Series — and Two Ways to Get the Interval Wrong</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture11_Part2_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 11 Part 2: Partial Pooling — and the Question That Comes Before It</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/Lecture12_lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lab 12: Elasticity — What the Coefficient Means, and What It Costs to Get Wrong</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Assignments</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part1_ETS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Homework 1, Part 1: Exponential Smoothing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW01_Part2_ARIMA_VAR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Homework 1, Part 2: ARIMA, VAR &amp; Method Comparison</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW02_GAMs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Homework 2: Generalized Additive Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW03_Trees_RF.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Homework 3: Decision Trees and Random Forests</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW04_XGBoost_Regularization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Homework 4: Boosted Trees and Regularization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part1_FFN_CNN.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part2_Sequence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW05_Part3_Comparison.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Homework 5: Deep Learning for Time Series</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part1_Foundations_TS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW06_Part2_Hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Homework 6: Bayesian Foundations, Time Series, and Hierarchical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/HW07_Bayesian_Regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Homework 7: Bayesian Linear Regression</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-we-are-doing" id="toc-what-we-are-doing" class="nav-link active" data-scroll-target="#what-we-are-doing"><span class="header-section-number">9.1</span> What we are doing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">9.2</span> Setup</a></li>
+  <li><a href="#step-1-a-plain-rnn" id="toc-step-1-a-plain-rnn" class="nav-link" data-scroll-target="#step-1-a-plain-rnn"><span class="header-section-number">9.3</span> Step 1 — A plain RNN</a></li>
+  <li><a href="#step-2-an-lstm" id="toc-step-2-an-lstm" class="nav-link" data-scroll-target="#step-2-an-lstm"><span class="header-section-number">9.4</span> Step 2 — An LSTM</a></li>
+  <li><a href="#step-3-which-wins-and-does-it-hold" id="toc-step-3-which-wins-and-does-it-hold" class="nav-link" data-scroll-target="#step-3-which-wins-and-does-it-hold"><span class="header-section-number">9.5</span> Step 3 — Which wins, and does it hold?</a></li>
+  <li><a href="#step-4-was-that-a-fair-fight" id="toc-step-4-was-that-a-fair-fight" class="nav-link" data-scroll-target="#step-4-was-that-a-fair-fight"><span class="header-section-number">9.6</span> Step 4 — Was that a fair fight?</a></li>
+  <li><a href="#step-5-why-the-gates-buy-nothing-here" id="toc-step-5-why-the-gates-buy-nothing-here" class="nav-link" data-scroll-target="#step-5-why-the-gates-buy-nothing-here"><span class="header-section-number">9.7</span> Step 5 — Why the gates buy nothing here</a></li>
+  <li><a href="#before-you-leave" id="toc-before-you-leave" class="nav-link" data-scroll-target="#before-you-leave"><span class="header-section-number">9.8</span> Before you leave</a></li>
+  <li><a href="#what-your-run-should-produce" id="toc-what-your-run-should-produce" class="nav-link" data-scroll-target="#what-your-run-should-produce"><span class="header-section-number">9.9</span> What your run should produce</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Lecture01_lab.html">Labs</a></li><li class="breadcrumb-item"><a href="../chapters/Lecture09_Part1_lab.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><em>Run this one live: <a href="../../labs/Lecture09_Part1_lab.html">the executable lab</a>.</em></p>
+<section id="what-we-are-doing" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="what-we-are-doing"><span class="header-section-number">9.1</span> What we are doing</h2>
+<p>Labs 7 and 8 gave you two models that could not properly use a window. The feedforward network flattened it and lost the ordering; the CNN kept ordering but could only see seven weeks at a time.</p>
+<p>A recurrent network has neither limit. It reads the sequence in order and carries a hidden state, so in principle nothing stops it using the whole window.</p>
+<p>Today you build two of them — a plain RNN and an LSTM — and find that at the training budget anyone would have used, the more sophisticated one loses badly. Then you vary the budget and the result changes. Working out which claim the evidence actually supports, and why, is the point of the lab, and it is the most transferable thing in it.</p>
+<p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>torch</code>, and <code>data/processed/m5_weekly.csv</code>. Most fits are quick — about six seconds each. The exception is <strong>Step 4</strong>, which trains four models to 100 epochs and takes two to three minutes; start it and read the text underneath while it runs.</p>
+<hr>
+</section>
+<section id="setup" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">9.2</span> Setup</h2>
+<div id="e7a8f96a" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_path(name):</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> base <span class="kw">in</span> (Path.cwd(), <span class="op">*</span>Path.cwd().parents):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> base <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"processed"</span> <span class="op">/</span> name</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p.exists():</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> p</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Could not find data/processed/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">. "</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Run `python scripts/prep_m5.py` from the repository root first."</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>weekly <span class="op">=</span> (pd.read_csv(data_path(<span class="st">"m5_weekly.csv"</span>), parse_dates<span class="op">=</span>[<span class="st">"week_start"</span>])</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>            .sort_values([<span class="st">"store_id"</span>, <span class="st">"cat_id"</span>, <span class="st">"week_start"</span>]))</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>CHANNELS <span class="op">=</span> [<span class="st">"units"</span>, <span class="st">"snap_days"</span>, <span class="st">"event_days"</span>, <span class="st">"avg_price"</span>]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>CUTOFF   <span class="op">=</span> np.datetime64(<span class="st">"2015-05-17"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> <span class="kw">lambda</span> a, b: <span class="bu">float</span>(np.sqrt(np.mean((np.asarray(a) <span class="op">-</span> np.asarray(b)) <span class="op">**</span> <span class="dv">2</span>)))</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build(W):</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    X, Y, D <span class="op">=</span> [], [], []</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, g <span class="kw">in</span> weekly.groupby([<span class="st">"store_id"</span>, <span class="st">"cat_id"</span>]):</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        arr, dates <span class="op">=</span> g[CHANNELS].values.astype(<span class="st">"float32"</span>), g.week_start.values</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(g) <span class="op">-</span> W):</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>            X.append(arr[i:i<span class="op">+</span>W])<span class="op">;</span> Y.append(arr[i<span class="op">+</span>W, <span class="dv">0</span>])<span class="op">;</span> D.append(dates[i<span class="op">+</span>W])</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> np.stack(X)<span class="op">;</span> Y <span class="op">=</span> np.array(Y, dtype<span class="op">=</span><span class="st">"float32"</span>)<span class="op">;</span> D <span class="op">=</span> np.array(D)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    tr, te <span class="op">=</span> D <span class="op">&lt;</span> CUTOFF, D <span class="op">&gt;=</span> CUTOFF</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    mu, sd <span class="op">=</span> X[tr].mean((<span class="dv">0</span>,<span class="dv">1</span>), keepdims<span class="op">=</span><span class="va">True</span>), X[tr].std((<span class="dv">0</span>,<span class="dv">1</span>), keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-8</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    ym, ys <span class="op">=</span> Y[tr].mean(), Y[tr].std()</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    Xn, Yn <span class="op">=</span> (X <span class="op">-</span> mu)<span class="op">/</span>sd, (Y <span class="op">-</span> ym)<span class="op">/</span>ys</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># recurrent layers want (batch, time, channels) -- NOT the Conv1d layout</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (torch.tensor(Xn[tr]), torch.tensor(Yn[tr]), torch.tensor(Xn[te]), Y[te], ym, ys)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>DATA <span class="op">=</span> {W: build(W) <span class="cf">for</span> W <span class="kw">in</span> (<span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>)}</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape at W=26:"</span>, DATA[<span class="dv">26</span>][<span class="dv">0</span>].shape, <span class="st">"(batch, time, channels)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The layout flips back
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>Conv1d</code> wanted <code>(batch, channels, time)</code>. <code>nn.RNN</code> and <code>nn.LSTM</code> with <code>batch_first=True</code> want <code>(batch, time, channels)</code> — the transpose you added in Lab 8 must come <strong>out</strong> again here.</p>
+<p>Neither library will complain. Both will train on nonsense.</p>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Same <code>build()</code> function as Lab 8, same panel, same cutoff, same standardization from training rows only. Three window lengths again — 13, 26, 52. One line is different from last week, and it is the one the callout is about.</p>
+<p><strong>The layout flips back.</strong> <code>Conv1d</code> wanted (batch, channels, time). <code>nn.RNN</code> and <code>nn.LSTM</code> with <code>batch_first=True</code> want (batch, <strong>time</strong>, channels) — so the transpose you carefully added last week has to come out again this week.</p>
+<p>And as always: neither library complains. Feed an RNN the Conv1d layout and it will read your four channels as a four-step sequence, treat the 26 weeks as features, train to convergence, and hand you a number.</p>
+<p>That is now the fourth instance of the same failure mode in this course — <code>shuffle=True</code>, missing <code>zero_grad()</code>, transposed axes for the convolution, and now transposed back for the recurrence. None of them raise. I keep pointing at it because it is the single biggest practical difference between this material and the regression you did in Lecture 6, where a shape error is an error.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-1-a-plain-rnn" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="step-1-a-plain-rnn"><span class="header-section-number">9.3</span> Step 1 — A plain RNN</h2>
+<p>One recurrent layer, then a linear layer on the <strong>final</strong> hidden state — the summary after reading the whole window.</p>
+<div id="51864f42" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Recurrent(nn.Module):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, kind, n_channels<span class="op">=</span><span class="dv">4</span>, hidden<span class="op">=</span><span class="dv">64</span>):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        layer <span class="op">=</span> nn.RNN <span class="cf">if</span> kind <span class="op">==</span> <span class="st">"rnn"</span> <span class="cf">else</span> nn.LSTM</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rnn <span class="op">=</span> layer(n_channels, hidden, batch_first<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc  <span class="op">=</span> nn.Linear(hidden, <span class="dv">1</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        out, _ <span class="op">=</span> <span class="va">self</span>.rnn(x)          <span class="co"># nn.LSTM returns out, (h, c) -- the _ absorbs both</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.fc(out[:, <span class="op">-</span><span class="dv">1</span>, :]).squeeze(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train(kind, W, seed, epochs<span class="op">=</span><span class="dv">30</span>):</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    Xtr, Ytr, Xte, Yte, ym, ys <span class="op">=</span> DATA[W]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    torch.manual_seed(seed)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> Recurrent(kind)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    opt <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>, weight_decay<span class="op">=</span><span class="fl">1e-4</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    lossfn <span class="op">=</span> nn.MSELoss()</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    loader <span class="op">=</span> torch.utils.data.DataLoader(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        torch.utils.data.TensorDataset(Xtr, Ytr), batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(epochs):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        model.train()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> xb, yb <span class="kw">in</span> loader:</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            opt.zero_grad()</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            lossfn(model(xb), yb).backward()</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            torch.nn.utils.clip_grad_norm_(model.parameters(), <span class="fl">1.0</span>)   <span class="co"># see below</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            opt.step()</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        score <span class="op">=</span> rmse(Yte, model(Xte).numpy() <span class="op">*</span> ys <span class="op">+</span> ym)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> score, <span class="bu">sum</span>(p.numel() <span class="cf">for</span> p <span class="kw">in</span> model.parameters())</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>score, n_par <span class="op">=</span> train(<span class="st">"rnn"</span>, <span class="dv">26</span>, seed<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"vanilla RNN — </span><span class="sc">{</span>n_par<span class="sc">:,}</span><span class="ss"> parameters, test RMSE </span><span class="sc">{</span>score<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><code>clip_grad_norm_</code> is not decoration.</strong> Backpropagating through 26 steps multiplies gradients repeatedly, and the product can explode. Clipping caps the update size. It is one line, it costs nothing, and recurrent models are the place you need it.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>One recurrent layer, then a linear layer on the <strong>final</strong> hidden state — the summary after the model has read the whole window.</p>
+<pre><code>vanilla RNN — 4,545 parameters, test RMSE 860</code></pre>
+<p><strong>Four and a half thousand parameters.</strong> Hold that against Lab 7’s feedforward network, which had 21,761, and Lab 8’s CNN at 8,161. This is the smallest model in the entire neural section, and on this seed it is already the best.</p>
+<p>One line deserves a word. <strong><code>clip_grad_norm_</code> is not decoration.</strong> Backpropagating through 26 steps multiplies gradients together 26 times, and that product can explode as easily as it can vanish. Clipping caps the size of the update. It costs nothing, and recurrent models are exactly where you need it.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2-an-lstm" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="step-2-an-lstm"><span class="header-section-number">9.4</span> Step 2 — An LSTM</h2>
+<p>Identical code, one word changed.</p>
+<div id="8147d369" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>score_lstm, n_par_lstm <span class="op">=</span> train(<span class="st">"lstm"</span>, <span class="dv">26</span>, seed<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"LSTM        — </span><span class="sc">{</span>n_par_lstm<span class="sc">:,}</span><span class="ss"> parameters, test RMSE </span><span class="sc">{</span>score_lstm<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">parameter ratio: </span><span class="sc">{</span>n_par_lstm <span class="op">/</span> n_par<span class="sc">:.1f}</span><span class="ss">x the RNN"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Account for that ratio before reading the RMSE.</strong> An LSTM has a forget gate, an input gate, an output gate and a candidate — four sets of weights where the RNN has one. Same hidden size, four times the parameters.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Identical code. One word changed — <code>nn.RNN</code> becomes <code>nn.LSTM</code>.</p>
+<pre><code>LSTM        — 17,985 parameters, test RMSE 1,004
+
+parameter ratio: 4.0x the RNN</code></pre>
+<p>Account for the ratio before you look at the RMSE, because it is the whole economics of the comparison. An LSTM has a forget gate, an input gate, an output gate, and a candidate — four sets of weights where the plain RNN has one. Same hidden size, four times the parameters. <strong>Exactly</strong> four, as the printout shows. And on this seed it scores 1,004 against the RNN’s 860.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="step-3-which-wins-and-does-it-hold" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="step-3-which-wins-and-does-it-hold"><span class="header-section-number">9.5</span> Step 3 — Which wins, and does it hold?</h2>
+<p>One comparison at one window is not evidence. Vary the window and use two seeds.</p>
+<div id="1733569f" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W <span class="kw">in</span> (<span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> [train(<span class="st">"rnn"</span>,  W, s)[<span class="dv">0</span>] <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>)]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    l <span class="op">=</span> [train(<span class="st">"lstm"</span>, W, s)[<span class="dv">0</span>] <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>)]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    rows.append({<span class="st">"window"</span>: W,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"RNN"</span>: <span class="bu">round</span>(np.mean(r)),  <span class="st">"RNN_sd"</span>: <span class="bu">round</span>(np.std(r)),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"LSTM"</span>: <span class="bu">round</span>(np.mean(l)), <span class="st">"LSTM_sd"</span>: <span class="bu">round</span>(np.std(l)),</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"winner"</span>: <span class="st">"RNN"</span> <span class="cf">if</span> np.mean(r) <span class="op">&lt;</span> np.mean(l) <span class="cf">else</span> <span class="st">"LSTM"</span>})</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame(rows).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Read the columns in this order
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>The winner column first.</strong> At this training budget, on this panel, the plain RNN wins at every window length. That part is not a seed artifact — the run-to-run spreads (3 to 33) are tiny next to the gaps (112 to 193).</p>
+<p><strong>Then the parameter count.</strong> The model that lost has four times as many parameters as the model that won.</p>
+<p><strong>Then be suspicious.</strong> Both models trained for exactly 30 epochs, because that is what <code>train()</code> defaults to. Nothing above establishes that 30 epochs is enough for <em>both</em> of them — and a model with four times the parameters is not obviously finished learning at the same point as the smaller one. Step 4 checks, and the answer is not the one this table implies.</p>
+</div>
+</div>
+<p><strong>Your turn:</strong> compute the gap at each window and say whether it is closing or widening.</p>
+<div id="4b47d569" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>One comparison at one window <span class="kw">is</span> <span class="kw">not</span> evidence. Three windows, two seeds each.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>window RNN RNN_sd LSTM LSTM_sd winner 13 878 33 990 21 RNN 26 842 19 987 17 RNN 52 805 5 998 3 RNN</p>
+<pre><code>
+The RNN wins at all three. And unlike Lab 8's window experiment, the seed question is settled
+cleanly here: the spreads are 3 to 33 against gaps of 112 to 193. Three to sixty times the noise.
+This is not a seed artifact. Now read the callout carefully, because it does something the earlier version of this lab did not.
+
+**First**, it bounds the claim: *at this training budget, on this panel.* Three windows rules out
+a fluke of one window. It does not rule out much else — all three rows are the same thirty series,
+the same split, the same recency structure. **One finding measured three ways, not three
+independent tests.**
+
+**Second**, the parameter count: the model that lost has four times as many as the model that won.
+
+**Third — and this is the new part — be suspicious.** Both models trained for exactly 30 epochs,
+because that is what `train()` defaults to. Nothing in this table establishes that 30 epochs is
+enough for *both* of them, and one of them has four times the parameters to fit.
+
+::: {.callout-tip}
+## Try it
+:::
+
+Before you go on: compute the gap at each window and say whether it is closing or widening. Then
+predict what Step 4 will find.
+
+:::
+
+## ---- your turn: uncomment and fill in ----
+
+## df = pd.DataFrame(rows)
+
+## df["gap"] = ___ - ___          # &lt;- which two columns?
+
+## print(df[["window", "gap"]].to_string(index=False))
+</code></pre>
+<hr>
+</section>
+<section id="step-4-was-that-a-fair-fight" class="level2" data-number="9.6">
+<h2 data-number="9.6" class="anchored" data-anchor-id="step-4-was-that-a-fair-fight"><span class="header-section-number">9.6</span> Step 4 — Was that a fair fight?</h2>
+<p>Step 3 compared two models at <strong>one</strong> training budget. Lab 7 taught you not to trust a comparison run at one seed; this is the same objection one level up. An LSTM has four times the parameters, and bigger models generally take longer to converge.</p>
+<p>So train both to 100 epochs, and record the test RMSE along the way instead of only at the end.</p>
+<div id="f8de1378" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>CKPT <span class="op">=</span> [<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">45</span>, <span class="dv">60</span>, <span class="dv">80</span>, <span class="dv">100</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> curve(kind, W, seed):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Train once to 100 epochs, scoring the test set at each checkpoint."""</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    Xtr, Ytr, Xte, Yte, ym, ys <span class="op">=</span> DATA[W]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    torch.manual_seed(seed)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> Recurrent(kind)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    opt <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>, weight_decay<span class="op">=</span><span class="fl">1e-4</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    lossfn <span class="op">=</span> nn.MSELoss()</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    loader <span class="op">=</span> torch.utils.data.DataLoader(</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        torch.utils.data.TensorDataset(Xtr, Ytr), batch_size<span class="op">=</span><span class="dv">128</span>, shuffle<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> {}</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ep <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">max</span>(CKPT) <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        model.train()</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> xb, yb <span class="kw">in</span> loader:</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>            opt.zero_grad()<span class="op">;</span> lossfn(model(xb), yb).backward()</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>            torch.nn.utils.clip_grad_norm_(model.parameters(), <span class="fl">1.0</span>)<span class="op">;</span> opt.step()</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ep <span class="kw">in</span> CKPT:</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>            model.<span class="bu">eval</span>()</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                out[ep] <span class="op">=</span> rmse(Yte, model(Xte).numpy() <span class="op">*</span> ys <span class="op">+</span> ym)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>paths <span class="op">=</span> {}</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> kind <span class="kw">in</span> (<span class="st">"rnn"</span>, <span class="st">"lstm"</span>):</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    runs <span class="op">=</span> [curve(kind, <span class="dv">26</span>, s) <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>)]        <span class="co"># fit each seed ONCE</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    paths[kind] <span class="op">=</span> [np.mean([r[e] <span class="cf">for</span> r <span class="kw">in</span> runs]) <span class="cf">for</span> e <span class="kw">in</span> CKPT]</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> pd.DataFrame({<span class="st">"epochs"</span>: CKPT,</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"RNN"</span>:  [<span class="bu">round</span>(v) <span class="cf">for</span> v <span class="kw">in</span> paths[<span class="st">"rnn"</span>]],</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"LSTM"</span>: [<span class="bu">round</span>(v) <span class="cf">for</span> v <span class="kw">in</span> paths[<span class="st">"lstm"</span>]]})</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>table[<span class="st">"gap"</span>] <span class="op">=</span> table.LSTM <span class="op">-</span> table.RNN</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(table.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="459d90be" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">6.5</span>, <span class="fl">3.4</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ax.plot(CKPT, paths[<span class="st">"rnn"</span>],  marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"vanilla RNN"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ax.plot(CKPT, paths[<span class="st">"lstm"</span>], marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"LSTM"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">30</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="dv">1</span>, color<span class="op">=</span><span class="st">"grey"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"epochs"</span>)<span class="op">;</span> ax.set_ylabel(<span class="st">"test RMSE"</span>)<span class="op">;</span> ax.legend()</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Step 3 measured at the dashed line"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The gap is largest at exactly the budget we used
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Read the <code>gap</code> column downwards. It is <strong>negative at 10 epochs</strong> — the LSTM is ahead early — then peaks at <strong>30</strong>, the setting Step 3 used, and shrinks at every checkpoint after until the two models are level.</p>
+<p>Look at the shapes, not just the endpoint. The RNN is finished by about epoch 45 and flat thereafter. The LSTM is <strong>still improving at 100 epochs</strong>; its curve has not turned over. We ran out of patience, not the model.</p>
+<p>So the honest verdict is <strong>not</strong> “the LSTM loses.” It is:</p>
+<ul>
+<li>at a fixed 30-epoch budget the RNN is far ahead — and 30 epochs is the point of its <em>maximum</em> advantage anywhere in this range;</li>
+<li>given enough epochs the two are <strong>tied</strong>;</li>
+<li>the RNN reaches its best score about three times faster, on a quarter of the parameters.</li>
+</ul>
+<p>That last line is a real advantage and worth having. It is simply a different claim from the one the Step 3 table appears to make — and you could not have told the two apart without varying the budget.</p>
+</div>
+</div>
+<p><strong>Your turn:</strong> the run-to-run spread in Step 3 was roughly 20 RMSE. From which checkpoint on is the gap smaller than that?</p>
+<div id="045b3cb9" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>::: {.callout<span class="op">-</span>note collapse<span class="op">=</span><span class="st">"true"</span>}</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Walkthrough</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>This <span class="kw">is</span> the step the lab <span class="kw">is</span> really about, <span class="kw">and</span> I want to be honest that it was added after the</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>fact. The first version of this lab stopped at Step <span class="fl">3.</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>Lab <span class="dv">7</span> taught you <span class="kw">not</span> to trust a comparison run at one seed. This <span class="kw">is</span> the same objection one level</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>up: <span class="op">**</span><span class="kw">not</span> one seed, one budget.<span class="op">**</span> So train both models to <span class="dv">100</span> epochs <span class="kw">and</span> record the test RMSE at</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>seven checkpoints along the way, instead of only at the end.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>epochs RNN LSTM gap 10 1099 1002 -97 20 922 1033 111 30 842 987 145 45 834 953 119 60 828 926 98 80 833 885 52 100 830 821 -9</p>
+<pre><code>
+Read the gap column down. At ten epochs it is **negative** — the LSTM is ahead. At thirty it is
+**plus one forty-five**. Then 119, 98, 52, and at a hundred epochs it is **minus nine**.
+
+**The gap is largest at exactly the budget we used in Step 3.** Not near the largest — the largest
+anywhere in the range.
+
+And look at the shapes, because they are different. The RNN goes 834, 828, 833, 830 from epoch 45
+onward. Flat. Finished. The LSTM goes 953, 926, 885, 821 — still falling at epoch 100, and its
+curve has not turned over. **We ran out of patience, not the model.**
+
+So the honest verdict is not "the LSTM loses." It is three separate statements, and you need all
+three.
+
+At a fixed 30-epoch budget, the RNN wins by a wide margin — that is true and it is what Step 3
+measured. Given enough epochs, the two **tie**. And the RNN reaches its best score roughly three
+times faster on a quarter of the parameters.
+
+That third one is a real advantage and worth having. Convergence speed matters when you are
+tuning, when you are retraining nightly, when compute is billed. But it is an **optimization**
+advantage, not a verdict on gating — and those are different claims that the Step 3 table cannot
+tell apart.
+
+::: {.callout-tip}
+## Try it
+:::
+
+The run-to-run spread in Step 3 was about 20. From which checkpoint on is the gap smaller than
+that? Fill the blank in and find out.
+
+One more thing before we move on, and it is the transferable part. Nobody thinks of the epoch
+count as part of an experiment. It is boilerplate — you set it once, you copy it between
+projects, you stop seeing it. That is precisely what made it dangerous here: a number that felt
+like configuration turned out to be the thing determining the answer. Seeds in Lab 7. Windows in Lab 8. Budget here. Same mistake, three costumes.
+
+:::
+
+## ---- your turn: uncomment and fill in ----
+
+## noise = ___                       # &lt;- the seed spread from Step 3
+
+## print(table[table.gap.abs() &lt; noise].epochs.tolist())
+</code></pre>
+<hr>
+</section>
+<section id="step-5-why-the-gates-buy-nothing-here" class="level2" data-number="9.7">
+<h2 data-number="9.7" class="anchored" data-anchor-id="step-5-why-the-gates-buy-nothing-here"><span class="header-section-number">9.7</span> Step 5 — Why the gates buy nothing here</h2>
+<p>The LSTM’s gates exist to solve one problem: in a plain RNN, gradients shrink as they propagate backward, so signal from far in the past never reaches the weights. Put a number on it.</p>
+<div id="8e38d277" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> factor <span class="kw">in</span> (<span class="fl">0.7</span>, <span class="fl">0.9</span>):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"gradient shrink factor </span><span class="sc">{</span>factor<span class="sc">}</span><span class="ss"> per step:"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> steps <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"   </span><span class="sc">{</span>steps<span class="sc">:&gt;3}</span><span class="ss"> steps back -&gt; </span><span class="sc">{</span>factor<span class="op">**</span>steps<span class="sc">:,.6f}</span><span class="ss">"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>At 0.7 per step the signal is essentially gone by 26 steps. <strong>That is the problem gating fixes.</strong></p>
+<p>Two things about that table before we go on. At a shrink factor of 0.7 the signal is gone by 26 steps. At <strong>0.9</strong> it is still 0.065 at 26 steps and 0.004 at 52 — small, but not zero. Vanishing gradients are a matter of degree and of <em>sequence length</em>, and 26 weeks is short.</p>
+<p>Now stop asserting and go measure whether this dataset has the problem gating solves. Three questions, three numbers.</p>
+<div id="c6d2e292" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> weekly.assign(series<span class="op">=</span>weekly.store_id <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> weekly.cat_id)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>w[<span class="st">"level"</span>] <span class="op">=</span> w.groupby(<span class="st">"series"</span>).units.transform(<span class="st">"mean"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>w[<span class="st">"dev"</span>]   <span class="op">=</span> w.units <span class="op">-</span> w.level</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>grand <span class="op">=</span> w.units.mean()</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>btw <span class="op">=</span> ((w.level <span class="op">-</span> grand) <span class="op">**</span> <span class="dv">2</span>).<span class="bu">sum</span>() <span class="op">/</span> ((w.units <span class="op">-</span> grand) <span class="op">**</span> <span class="dv">2</span>).<span class="bu">sum</span>()</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"1. between-series share of total variance : </span><span class="sc">{</span>btw<span class="sc">:.1%}</span><span class="ss">"</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">2. within-series autocorrelation of units"</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lag <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> w.groupby(<span class="st">"series"</span>).dev.<span class="bu">apply</span>(<span class="kw">lambda</span> x: x.autocorr(lag)).mean()</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"      lag </span><span class="sc">{</span>lag<span class="sc">:&gt;2}</span><span class="ss">: </span><span class="sc">{</span>a<span class="sc">:+.3f}</span><span class="ss">"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">3. does a flag at t predict units at t+k?"</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ch <span class="kw">in</span> (<span class="st">"snap_days"</span>, <span class="st">"event_days"</span>):</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    cells <span class="op">=</span> []</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> (<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>):</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        c <span class="op">=</span> w.groupby(<span class="st">"series"</span>).<span class="bu">apply</span>(<span class="kw">lambda</span> g: g[ch].corr(g.dev.shift(<span class="op">-</span>k))).mean()</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        cells.append(<span class="ss">f"t+</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>c<span class="sc">:+.3f}</span><span class="ss">"</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"      </span><span class="sc">{</span>ch<span class="sc">:&lt;11}</span><span class="ss"> "</span> <span class="op">+</span> <span class="st">"   "</span>.join(cells))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Three reasons the gates have nothing to do
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>1. Most of the variance is not sequential at all.</strong> About <strong>91%</strong> of the variation in weekly units is <em>between</em> series — which store, which category — and only 9% is within a series over time. The single biggest thing a model must get right is the level of the series in front of it, and that is readable from the most recent few weeks. No memory mechanism is needed for it.</p>
+<p><strong>2. The series are smooth, which is the opposite of needing memory.</strong> Within-series autocorrelation is <strong>0.83 at lag 1</strong> and still <strong>0.43 at lag 52</strong>. That looks like long memory and is in fact the reason long memory is unnecessary: because neighbouring weeks are nearly the same number, <em>the recent past is a sufficient statistic for the distant past.</em> Nothing has to be carried across the gap, because the gap has been filled in continuously along the way. Gating pays off when a value must survive many steps that would otherwise <strong>overwrite</strong> it — and here nothing overwrites anything.</p>
+<p><strong>3. Nothing in the inputs arrives early.</strong> <code>snap_days</code> correlates <strong>+0.14</strong> with units in the same week and essentially zero at every lead; <code>event_days</code> is flat at every horizon including zero. There is no <em>announcement</em> structure in this data — nothing shows up at time <span class="math inline">\(t\)</span> that must be stored until <span class="math inline">\(t+k\)</span>. That is the canonical use for a forget gate and an input gate, and this panel does not contain one instance of it.</p>
+<p><strong>So the gates solve something real, on data that does not have it.</strong> They charge four times the parameters and — as Step 4 showed — roughly three times the epochs for the service, and at convergence they return a tie.</p>
+</div>
+</div>
+<p><strong>The transferable part</strong> is the three questions, not the answer. Before reaching for a gated or attention-based model on your own series, ask: how much of my variance is cross-sectional rather than sequential? Is my series smooth enough that recent values already summarise old ones? Does anything in my inputs <em>lead</em> the target? If the answers look like this panel’s, the extra machinery has nothing to do.</p>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Step 4 told us the RNN’s <em>margin</em> was mostly a budget artifact. It did not tell us why the LSTM never pulls <strong>ahead</strong> — and for that you have to look at the data.</p>
+<p>Start with the problem gating exists to solve. In a plain RNN, gradients shrink as they propagate backward, so signal from far in the past never reaches the weights.</p>
+<pre><code>gradient shrink factor 0.7 per step:      26 steps back -&gt; 0.000094
+gradient shrink factor 0.9 per step:      26 steps back -&gt; 0.064611
+                                          52 steps back -&gt; 0.004175</code></pre>
+<p>Notice this is a matter of degree and of <strong>length</strong>. At a shrink factor of 0.7 the signal is gone by 26 steps — that is the catastrophe the textbooks draw. At 0.9 it is 0.065 at 26 steps. Small, but not zero. And 26 weeks is a short sequence. Vanishing gradients are a real phenomenon that bites hard at hundreds of steps and only bites softly here. Now stop asserting and measure whether this dataset has the problem at all. Three questions.</p>
+<pre><code>1. between-series share of total variance : 91.0%
+
+2. within-series autocorrelation of units
+      lag  1: +0.828      lag 13: +0.695
+      lag  4: +0.824      lag 26: +0.575
+                          lag 52: +0.432
+
+3. does a flag at t predict units at t+k?
+      snap_days   t+0: +0.143   t+1: +0.030   t+2: -0.128   t+4: +0.116
+      event_days  t+0: +0.004   t+1: +0.023   t+2: -0.009   t+4: -0.009</code></pre>
+<p><strong>One. Ninety-one percent of the variance is not sequential at all.</strong> It is <em>between</em> series — which store, which category. Only nine percent is within a series over time. So the single biggest thing any model here must get right is the <strong>level</strong> of the series in front of it, and that is readable off the most recent few weeks. No memory mechanism is involved in it.</p>
+<p><strong>Two, and this one is counter-intuitive, so slow down.</strong> The autocorrelation is 0.83 at lag 1 and still 0.43 at lag 52. That <em>looks</em> like long memory — like exactly the case for an LSTM.</p>
+<p>It is the opposite. Because neighbouring weeks are nearly the same number, <strong>the recent past is a sufficient statistic for the distant past.</strong> Week 51 already tells you most of what week 40 knew. Gating earns its keep when a value must survive many steps that would otherwise <strong>overwrite</strong> it — and here nothing overwrites anything, because the series was filled in continuously the whole way along.</p>
+<p><strong>Three. Nothing in the inputs arrives early.</strong> SNAP correlates 0.14 with units in the same week and essentially zero at every lead. Events are flat everywhere, including at zero. There is no <strong>announcement</strong> in this data — nothing shows up at time <em>t</em> that must be held until <em>t + k</em>.</p>
+<p>That is the textbook use for a forget gate and an input gate, and this panel does not contain a single instance of it.</p>
+<p>And now the part to carry out of the lab, which is not the answer — it is the three questions. Before you reach for a gated model, or an attention model, on a series of your own: how much of my variance is cross-sectional rather than sequential? Is my series smooth enough that recent values already summarize the old ones? Does anything in my inputs <strong>lead</strong> the target?</p>
+<p>If the answers look like this panel’s, the extra machinery has nothing to do. If they don’t, it might be exactly what you need — and you will know which, before you spend a week finding out.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="before-you-leave" class="level2" data-number="9.8">
+<h2 data-number="9.8" class="anchored" data-anchor-id="before-you-leave"><span class="header-section-number">9.8</span> Before you leave</h2>
+<blockquote class="blockquote">
+<p><strong>Discuss (the result):</strong> Using the three diagnostics from Step 5, describe a forecasting problem where you would expect the LSTM to beat the RNN outright. Be specific: what would the between-series share look like, what would the autocorrelation look like, and what would have to be true of the exogenous inputs?</p>
+<p><strong>Discuss (the budget):</strong> Step 3 and Step 4 support different claims from the same two models on the same data. State the strongest claim you would be willing to publish, in one sentence — and say what a reader would need to be told alongside it for the sentence to be honest.</p>
+<p><strong>Discuss (the practice):</strong> You have now been caught twice: once by seeds in Lab 7, once by the training budget here. Both times a comparison looked settled and was not. What is the general form of that mistake, and what would you check the next time you see two models compared in a table?</p>
+<p><strong>Discuss (for Homework 5):</strong> Part 2 asks you to fit an RNN, an LSTM and a Transformer, and to explain where the extra LSTM parameters go and whether they bought anything. You now have the RNN and LSTM half. What is your prediction for the Transformer, and what would make you wrong?</p>
+</blockquote>
+<hr>
+<p><em>Solutions posted to Canvas after class.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Walkthrough
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+<p>Three questions for the board.</p>
+<p><strong>The result.</strong> Your table says the simpler model wins. Describe a forecasting problem where you would expect the LSTM to win instead, and be specific about the property of the data that changes the answer — not “more data,” but what <em>kind</em> of dependence.</p>
+<p>forward through many irrelevant steps. A promotion announced twelve weeks before it takes effect. A contract signed in January that governs deliveries in November. That is what gating is for.*</p>
+<p><strong>The practice.</strong> Suppose you had run only <code>W=26</code>, one seed, and the LSTM had come out ahead. Given Lab 7, what would you have needed to do before reporting that an LSTM beats an RNN on this data?</p>
+<p><strong>For Homework 5.</strong> Part 2 asks you to fit an RNN, an LSTM, and a Transformer, and to explain where the extra LSTM parameters go and whether they bought anything. You now have two thirds of that answer. What is your prediction for the Transformer — and, more usefully, what result would make you wrong?</p>
+<p>Next session you build the Transformer and find out. I will not spoil it, except to say that the argument you just made about the LSTM is the argument you should try on attention as well, and that you should check whether it survives.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="what-your-run-should-produce" class="level2" data-number="9.9">
+<h2 data-number="9.9" class="anchored" data-anchor-id="what-your-run-should-produce"><span class="header-section-number">9.9</span> What your run should produce</h2>
+<p>Your numbers will differ where a model is stochastic; these are the values this lab produces on the pinned environment.</p>
+<p>Deterministic; <code>torch.manual_seed</code> per fit, <code>shuffle=False</code>. Most fits are ~6 s; <strong>Step 4 trains four models to 100 epochs and takes 2–3 minutes.</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tensor shape at W=26</td>
+<td>(5940, <strong>26</strong>, 4) — batch, time, channels (<em>not</em> the Conv1d layout)</td>
+</tr>
+<tr class="even">
+<td>Vanilla RNN</td>
+<td><strong>4,545</strong> parameters · seed 1 → 860</td>
+</tr>
+<tr class="odd">
+<td>LSTM</td>
+<td><strong>17,985</strong> parameters · seed 1 → 1,004 · ratio exactly <strong>4.0×</strong></td>
+</tr>
+<tr class="even">
+<td>Window table — RNN</td>
+<td>13w: <strong>878</strong> (sd 33) · 26w: <strong>842</strong> (sd 19) · 52w: <strong>805</strong> (sd 5)</td>
+</tr>
+<tr class="odd">
+<td>Window table — LSTM</td>
+<td>13w: 990 (sd 21) · 26w: 987 (sd 17) · 52w: 998 (sd 3)</td>
+</tr>
+<tr class="even">
+<td>Gaps vs spreads</td>
+<td>112 / 145 / 193 against sds of 3–33 — <strong>not</strong> a seed artifact</td>
+</tr>
+<tr class="odd">
+<td>Convergence, RNN</td>
+<td>1099 · 922 · <strong>842</strong> · 834 · 828 · 833 · 830 (epochs 10→100)</td>
+</tr>
+<tr class="even">
+<td>Convergence, LSTM</td>
+<td>1002 · 1033 · 987 · 953 · 926 · 885 · <strong>821</strong></td>
+</tr>
+<tr class="odd">
+<td>Gap by epoch</td>
+<td>−97 · +111 · <strong>+145</strong> · +119 · +98 · +52 · <strong>−9</strong></td>
+</tr>
+<tr class="even">
+<td>Where the gap peaks</td>
+<td><strong>epoch 30</strong> — the budget Step 3 used</td>
+</tr>
+<tr class="odd">
+<td>Gradient shrink</td>
+<td>0.7²⁶ = 0.000094 · 0.9²⁶ = 0.0646 · 0.9⁵² = 0.0042</td>
+</tr>
+<tr class="even">
+<td>Between-series variance</td>
+<td><strong>91.0%</strong></td>
+</tr>
+<tr class="odd">
+<td>Within-series autocorrelation</td>
+<td>0.828 (lag 1) · 0.824 (4) · 0.695 (13) · 0.575 (26) · 0.432 (52)</td>
+</tr>
+<tr class="even">
+<td><code>snap_days</code> lead correlation</td>
+<td>+0.143 at t+0, then +0.030 / −0.128 / +0.116 — no lead</td>
+</tr>
+<tr class="odd">
+<td><code>event_days</code> lead correlation</td>
+<td>+0.004 at t+0 — flat at every horizon</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/Lecture08_lab.html" class="pagination-link" aria-label="Lab 8: Convolutions — What the Filter Can Actually See">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lab 8: Convolutions — What the Filter Can Actually See</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/Lecture09_Part2_lab.html" class="pagination-link" aria-label="Lab 9 Part 2: Attention — and the Line You Cannot Forget">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lab 9 Part 2: Attention — and the Line You Cannot Forget</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
