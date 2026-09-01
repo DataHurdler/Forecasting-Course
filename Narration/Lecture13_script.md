@@ -164,7 +164,18 @@ advantages *at scale*, and five thousand nine hundred forty windows is not scale
 
 **CNNs lost to LASSO**, because a seven-week receptive field cannot see an annual lag.
 
-And **tuning made XGBoost worse** — nine fits, and the defaults were three RMSE better.
+And **tuning bought nothing measurable** — nine fits, and a three-unit change.
+
+*(Be precise here, because three units is not a result.)* Both numbers came from a stochastic fit:
+the assignment specifies `subsample=0.8, colsample_bytree=0.8`. Fixing `random_state=42` makes each
+number reproducible, but it does **not** make their difference meaningful — two different
+hyperparameter settings at the same seed draw entirely different subsamples. Vary only the seed at
+one fixed config on this panel and the spread is **twenty to ninety RMSE**. A three-unit gap is
+inside that many times over.
+
+So the lesson is not that tuning hurt. It is that nine fits bought nothing you could measure —
+XGBoost's defaults are well chosen for tabular data, and a grid search that improves
+cross-validation need not improve test.
 
 **[pause]**
 

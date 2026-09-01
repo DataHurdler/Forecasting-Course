@@ -101,8 +101,10 @@
 % --- Slide: benchmarks ----------------------------------------------------------
 \begin{frame}{Lesson 1: The Benchmark Is a Real Competitor}
   In Homework 1 the seasonal-naive benchmark \textbf{beat every exponential smoothing and ARIMA
-  model} you fitted. That was not a trick question --- it is what the data supports at that
-  horizon.
+  model} you fitted --- and the reason is countable. Holt-Winters must estimate \textbf{52
+  seasonal indices from 4.3 annual cycles} of training data: about four observations per
+  parameter. Seasonal naive estimates \textbf{nothing}, and the level it carries moves
+  $+3.7\%$, $+1.3\%$, $-4.4\%$, $+2.9\%$ year over year --- stable inside $\pm 5\%$.
 
   \vspace{0.15cm}
   Across the whole course the benchmark was beaten, but rarely by the margin the effort implied.
@@ -122,8 +124,8 @@
 
 % --- Slide: sophistication -----------------------------------------------------
 \begin{frame}{Lesson 2: More Sophisticated Did Not Mean Better}
-  Four times this course, the more advanced method lost --- and each time for a reason we could
-  name.
+  Four times this course, the more advanced method failed to win --- and each time for a reason we
+  could name.
   \begin{center}
     {\small
     \begin{tabular}{p{3.6cm}p{8.7cm}}
@@ -131,10 +133,11 @@
       \textbf{LSTM lost to a plain RNN} & At three window lengths, \emph{at a fixed 30-epoch
       budget} --- they tie by 100. Gating fixes long-range forgetting; 91\% of this panel's
       variance is between-series, so there is little to forget. \\[3pt]
-      \textbf{Transformer lost to an RNN} & With 15$\times$ the parameters. Its advantages are
-      advantages \emph{at scale}, and 5{,}940 windows is not scale. \\[3pt]
+      \textbf{Transformer lost to an RNN} & 67{,}329 parameters against roughly \textbf{230
+      effectively independent} 26-week blocks --- ours overlap 96\%. \\[3pt]
       \textbf{CNNs lost to LASSO} & A seven-week receptive field cannot see an annual lag. \\[3pt]
-      \textbf{Tuning made XGBoost worse} & Nine fits, and the defaults were three RMSE better. \\
+      \textbf{Tuning bought nothing measurable} & Nine fits and a 3-unit change, against a
+      \textbf{seed spread of 20--90} at one fixed config. CV improved; test did not. \\
       \bottomrule
     \end{tabular}
     }

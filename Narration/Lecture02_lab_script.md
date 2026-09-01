@@ -364,3 +364,19 @@ order the student chooses.
 re-run. The three F-statistics will drift slightly between terms; the *pattern* — collapse in one
 direction, survival in the other — is what's stable, and it's what the discussion questions rest
 on. Re-run this appendix before recording if the cache is more than a term old.
+
+**Three things to know before recording.**
+
+*Step 6 is the only place in the course where a Granger verdict flips with the sample window.*
+`UNRATE` to `RSXFS` is significant on 1992-2026 and gone before 2020, because COVID supplies one
+enormous shared shock. That is the point of leaving M5 for one step — no retail series in this
+course has an episode that can teach it — so protect its screen time.
+
+*The clean ADF verdict here is deliberate, and worth naming.* CA_1 HOUSEHOLD gives the same answer
+at every lag order. Homework 1 uses the messier series where the verdict flips, so students meet
+the unambiguous case first and have something to compare against when it stops being
+unambiguous.
+
+*Granger causality is not causality, and the lab's own title says "the trap in it".* Say the
+disclaimer in the same breath as the result, not after it — a student who writes "unemployment
+causes retail sales" in Homework 1 has taken the wrong sentence away.

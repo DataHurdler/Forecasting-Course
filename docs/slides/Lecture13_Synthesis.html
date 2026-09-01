@@ -1139,7 +1139,7 @@ Department of Economics
 </section>
 <section id="lesson-1-the-benchmark-is-a-real-competitor" class="slide level2">
 <h2>Lesson 1: The Benchmark Is a Real Competitor</h2>
-<p>In Homework 1 the seasonal-naive benchmark <strong>beat every exponential smoothing and ARIMA model</strong> you fitted. That was not a trick question — it is what the data supports at that horizon.</p>
+<p>In Homework 1 the seasonal-naive benchmark <strong>beat every exponential smoothing and ARIMA model</strong> you fitted — and the reason is countable. Holt-Winters must estimate <strong>52 seasonal indices from 4.3 annual cycles</strong> of training data: about four observations per parameter. Seasonal naive estimates <strong>nothing</strong>, and the level it carries moves +3.7%, +1.3%, −4.4%, +2.9% year over year — stable inside ±5%.</p>
 <p>Across the whole course the benchmark was beaten, but rarely by the margin the effort implied. The Bayesian structural model beat it by <strong>4%</strong>. The GAMs in Homework 2 beat it by <strong>12%</strong>. The best model on the weekly panel beat it by 65% — after 46 engineered features and a cross-validated penalty.</p>
 <div class="keybox">
 <p><strong>Compute the benchmark first, every time.</strong> It costs one line, it is often close, and it is the only number that tells you whether the rest of the work was worth doing.</p>
@@ -1148,7 +1148,7 @@ Department of Economics
 </section>
 <section id="lesson-2-more-sophisticated-did-not-mean-better" class="slide level2">
 <h2>Lesson 2: More Sophisticated Did Not Mean Better</h2>
-<p>Four times this course, the more advanced method lost — and each time for a reason we could name.</p>
+<p>Four times this course, the more advanced method failed to win — and each time for a reason we could name.</p>
 <table class="caption-top">
 <colgroup>
 <col style="width: 50%">
@@ -1161,15 +1161,15 @@ Department of Economics
 </tr>
 <tr class="even">
 <td><strong>Transformer lost to an RNN</strong></td>
-<td>With 15<span class="math inline">\(\times\)</span> the parameters. Its advantages are advantages <em>at scale</em>, and 5,940 windows is not scale.</td>
+<td>67,329 parameters against roughly <strong>230 effectively independent</strong> 26-week blocks — ours overlap 96%. Attention’s long-range paths had nothing here to reach.</td>
 </tr>
 <tr class="odd">
 <td><strong>CNNs lost to LASSO</strong></td>
 <td>A seven-week receptive field cannot see an annual lag.</td>
 </tr>
 <tr class="even">
-<td><strong>Tuning made XGBoost worse</strong></td>
-<td>Nine fits, and the defaults were three RMSE better.</td>
+<td><strong>Tuning bought nothing measurable</strong></td>
+<td>Nine fits and a 3-unit change, against a <strong>seed spread of 20–90</strong> at one fixed config. CV improved; test did not.</td>
 </tr>
 </tbody>
 </table>

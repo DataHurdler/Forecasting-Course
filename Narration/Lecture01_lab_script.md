@@ -370,3 +370,19 @@ optimizer does not fully converge while estimating 52 seasonal indices. The lab 
 warnings globally in Setup, so students will not see it. It does not change the conclusion
 (Holt-Winters loses to SES either way), but it is a second, quieter piece of evidence for the
 same point: that model is being asked to estimate more than this sample supports.
+
+**Three things to know before recording.**
+
+*The contrast with Homework 1 is the whole lab, and it is easy to under-sell.* Lab 1 runs on
+TX_1 HOUSEHOLD, which shifts about 15% in the test year, so seasonal naive carries a stale level
+and loses. Homework 1 runs on CA_1 FOODS, stable inside 5%, where the benchmark wins. Same code,
+opposite conclusion — say explicitly that the difference is the series, not the method, or
+students will generalize whichever one they saw first.
+
+*Do not let the benchmark's loss here undo Lecture 1's lesson.* A student who watches seasonal
+naive lose in the lab and win in the homework should conclude "compute it every time", not
+"benchmarks are weak". Land that in the closing.
+
+*The blanks are commented and must stay commented.* Every `___` in this lab sits inside a comment
+block, including the dependent lines, because the lab has to render with its blanks unfilled. If
+you edit the exercise on camera, keep the comment markers.
