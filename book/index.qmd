@@ -16,11 +16,16 @@ Quarto mirror of the Beamer deck, and the recording script written for that lect
 figure in this book cannot disagree with the deck it came from, because it is never copied. It is
 read from the deck on every build.
 
-That property is not decoration. Over one week in August 2026 the course found three reported
-figures that no committed code reproduced, a diagnostics table whose headline claim the
-reproducible numbers contradicted, and a tuning result that was noise. Each had been correct when
-written and had quietly stopped being so. A book assembled by hand would have inherited all of
-them.
+That property is not decoration, and assembling this book is what proved it. Three lectures turned
+out to have quietly lost whole sections from their web versions — one of them down from five
+sections to two — which the parity check of the day could not see because it compared slide counts
+rather than structure. An audit running at the same time found reported figures that no committed
+code reproduced, a diagnostics table whose headline claim the reproducible numbers contradicted,
+and a result presented as a finding that was smaller than the noise around it.
+
+Some of those had been true when they were written and had stopped being true. Others were never
+quite true. A book assembled by hand would have inherited every one of them, and as a fourth copy
+of every number it would have started drifting on its own the day it was finished.
 
 ## What the course is about
 
