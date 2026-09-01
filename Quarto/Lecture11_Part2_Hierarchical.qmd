@@ -1,5 +1,5 @@
 ---
-title: "Hierarchical Models and Partial Pooling"
+title: "Bayesian Statistics II --- Hierarchical Models"
 subtitle: "ECON 8310: Business Forecasting --- Lecture 11, Part 2"
 author: "Department of Economics"
 institute: "University of Nebraska at Omaha"

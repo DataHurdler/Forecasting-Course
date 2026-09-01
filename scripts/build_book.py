@@ -160,6 +160,17 @@ def deck_title(path: pathlib.Path) -> str:
     m = re.search(r'^title:\s*"(.+?)"', path.read_text(encoding="utf-8"), re.M)
     return m.group(1) if m else path.stem
 
+def deck_lecture(path: pathlib.Path) -> str:
+    """"Lecture 11, Part 1" — from the deck's own subtitle.
+
+    The book has fifteen chapters for thirteen lectures, because Lectures 9 and 11
+    are each taught as two decks in two weeks. With chapters numbered 1-15 the
+    chapter number stops matching the lecture number from chapter 10 onward, so
+    every chapter states which lecture it is. The string is the deck's, not ours.
+    """
+    m = re.search(r'^subtitle:\s*"[^"]*?---\s*(Lecture[^"]*)"', path.read_text(encoding="utf-8"), re.M)
+    return m.group(1).strip() if m else ""
+
 # --- assembly -----------------------------------------------------------------
 def build(stem: str, narration_name: str) -> pathlib.Path:
     mirror = ROOT / "Quarto" / f"{stem}.qmd"
@@ -167,7 +178,10 @@ def build(stem: str, narration_name: str) -> pathlib.Path:
     parts  = parse_mirror(mirror)
     prose  = parse_narration(narr)
 
+    lecture = deck_lecture(mirror)
     lines = [f"# {deck_title(mirror)}", ""]
+    if lecture:
+        lines += [f"*{lecture} of ECON 8310.*", ""]
     used = 0
     fuzzy, missing = [], []
     seen_section = False

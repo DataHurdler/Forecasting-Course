@@ -1,6 +1,6 @@
 # Lecture 11 Part 2 — Recording Script
 
-**ECON 8310: Business Forecasting · Hierarchical Models and Partial Pooling**
+**ECON 8310: Business Forecasting · Bayesian Statistics II — Hierarchical Models**
 
 Deck: `Slides/Lecture11_Part2_Hierarchical.pdf` (19 pages) · Measured runtime: see the timing guide
 
@@ -19,7 +19,7 @@ Deck: `Slides/Lecture11_Part2_Hierarchical.pdf` (19 pages) · Measured runtime: 
 
 # ▶ SLIDE 1 — Title page
 
-Lecture 11, Part 2: Hierarchical Models and Partial Pooling.
+Lecture 11, Part 2: Bayesian Statistics II — Hierarchical Models.
 
 Last week we fitted one series and got a full predictive distribution out of it. Today we have
 thirty series, and they are not equally informative — some have years of history, and in the real
