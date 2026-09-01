@@ -21,6 +21,7 @@ Verdicts: **PASS** (detects its named class at the stated threshold) · **FAIL**
 
 | 2026-08-21 | `scripts/backtest.sh` — **full stress test, all 7 gates** | `README.md`, `CLAUDE.md`, `docs/index.html`, `scripts/`, a skill | count drift (compound) · count drift (template verb) · superseded model · broken link · broken anchor · superlative · stale auto-mode claim · root scratch file · draft copy · undeclared tool | 10 | **10/10** | **0/1** on the clean-repo control | n/a (composite) | **PASS** |
 | 2026-08-21 | `check-surface-sync.py` coverage of `docs/index.html` | landing page | count drift on the published page | 1 | 1/1 | 0/0 | n/a | **PASS** (see note) |
+| 2026-09-01 | `check-site-index.py` | `docs/index.html`, `scripts/site.yml`, published tree | orphaned published page (a deck in `docs/` nothing links to) · hand-edited generated page · manifest href to an unpublished file · stale `unlinked:` entry · source edited without rebuild | 5 | **5/5** | **0/3** on controls (clean tree; a declared-`unlinked:` file; a `*_files/` asset directory) | `check-links.py` detects only class 3 — it verifies that what we link exists, and is structurally blind to what exists but is unlinked | **PASS** |
 
 ## Harness qualification (2026-08-21)
 

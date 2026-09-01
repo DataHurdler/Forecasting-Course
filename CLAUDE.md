@@ -61,6 +61,12 @@ python scripts/set_course_url.py https://new.host/path/ # rewrite all of them, t
 ./scripts/sync_to_docs.sh slides     # RevealJS mirrors only (PDFs are not published)
 ./scripts/sync_to_docs.sh Lecture07  # one lecture
 
+# The landing page is GENERATED, never hand-edited. Add a lecture, lab, assignment or
+# document to scripts/site.yml; sync_to_docs.sh rebuilds docs/index.html from it and then
+# refuses to finish if anything published under docs/ is not linked from the page.
+python scripts/build_index.py                          # rebuild it now
+python scripts/check-site-index.py                     # current? links resolve? nothing orphaned?
+
 # Student-visible external links (skips commented-out blocks)
 python scripts/check_links.py
 

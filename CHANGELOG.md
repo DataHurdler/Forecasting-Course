@@ -6,6 +6,43 @@ If you have forked this template, see the **Upgrading** section at the bottom fo
 
 ---
 
+## v2.5.1+econ8310 — 2026-09-01
+
+**The course repository's own changes**, on top of the inherited template at v2.5.1. This entry
+exists because a template inventory line is a claim about *this* repository's disk, and the disk
+diverged: `check-derived-counts` reads the topmost release entry, so the course's own count is
+the one that gets checked, and v2.5.1's line below stays a correct record of what the template
+shipped.
+
+### Added
+
+- **Gate 5 — `scripts/check-site-index.py`, and the landing page it guards.** `docs/index.html`
+  was the last hand-maintained student surface in the repository. Every other published page is
+  rendered from a source file and so cannot silently disagree with the material; the landing page
+  was typed by hand, and on 2026-09-01 it drifted twice in one day — a book link, then a workbook
+  link — with no gate noticing either time. The page is now **generated** from
+  `scripts/site.yml` (schedule, the three tables, the links) plus
+  `scripts/templates/index.html.in` (CSS and prose) by `scripts/build_index.py`, which
+  `scripts/sync_to_docs.sh` runs at the end of every publish.
+
+  The gate asks three questions, and the third is the one nothing else asked. `check-links.py`
+  verifies that **what we link exists**; it is structurally blind to **what exists but is
+  linked from nowhere** — a rendered lab, a new deck, an entire book can sit in `docs/`, be
+  served by GitHub Pages, and be invisible to every student. So the gate also walks the
+  published tree and fails on any page the landing page does not reach. An artifact that
+  genuinely should not be linked goes in `site.yml`'s `unlinked:` list **with a reason**, which
+  turns an omission into a decision on the record.
+
+  Qualified the same day against five seeded defects — orphaned published page, hand-edited
+  generated page, manifest href to an unpublished file, stale `unlinked:` entry, source edited
+  without a rebuild — 5/5 caught, 0/3 false alarms on the controls (clean tree, a declared
+  `unlinked:` file, a `*_files/` asset directory). Ledger row filed.
+
+**Inventory at release: 60 skills, 18 agents, 37 rules, 8 hooks, 11 gates**
+(was 60 / 18 / 37 / 8 / 10 at template v2.5.1).
+
+---
+
 ## v2.5.1 — 2026-08-24
 
 An **enforcement release.** Disciplines that had been working conventions in the owner's

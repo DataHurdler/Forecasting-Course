@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<!-- GENERATED FILE — DO NOT EDIT docs/index.html.
+     Source: scripts/templates/index.html.in (prose, CSS) + scripts/site.yml (schedule,
+     tables, links). Rebuild with:  python3 scripts/build_index.py
+     scripts/check-site-index.py fails the backtest if the published page is stale, if a
+     link is dead, or if a published artifact is missing from the page. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECON 8310: Business Forecasting (with AI)</title>
+<style>
+  :root {
+    --crimson: #D71920;
+    --black: #1A1A1A;
+    --gray: #525252;
+    --tint: #FDECEA;
+    --light: #F4F4F5;
+    --amber: #B45309;
+    --amber-tint: #FEF3E2;
+    --border: #E4E4E7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.12rem;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 3em 1.5em 5em;
+    color: var(--black);
+    line-height: 1.7;
+    background: #fff;
+  }
+  h1 { font-size: 2.1em; font-weight: normal; color: var(--black); margin: 0 0 .15em; line-height: 1.2; }
+  .byline { color: var(--gray); font-size: .95em; margin-bottom: .4em; }
+  .term { display: inline-block; background: var(--crimson); color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          font-size: .72em; letter-spacing: .08em; text-transform: uppercase; padding: .25em .7em; border-radius: 3px; }
+  h2 { font-size: 1.15em; font-weight: bold; color: var(--black); margin: 2.6em 0 .8em;
+       padding-bottom: .35em; border-bottom: 2px solid var(--crimson); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+       letter-spacing: .02em; }
+  a { color: var(--crimson); text-decoration: none; border-bottom: 1px solid rgba(215,25,32,.3); }
+  a:hover { border-bottom-color: var(--crimson); }
+  p { margin: .8em 0; }
+  code { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: .85em;
+         background: var(--light); padding: .12em .38em; border-radius: 3px; }
+  pre { background: var(--light); border-left: 3px solid var(--gray); padding: 1em 1.2em;
+        overflow-x: auto; font-size: .82em; line-height: 1.6; border-radius: 0 4px 4px 0; }
+  pre code { background: none; padding: 0; }
+
+  .callout { border-left: 4px solid var(--crimson); background: var(--tint);
+             padding: 1.1em 1.3em; margin: 1.6em 0; border-radius: 0 4px 4px 0; }
+  .callout.amber { border-left-color: var(--amber); background: var(--amber-tint); }
+  .callout .t { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600;
+                font-size: .9em; display: block; margin-bottom: .35em; }
+  .callout p { margin: .4em 0; font-size: .95em; }
+
+  .week { border: 1px solid var(--border); border-radius: 5px; margin: 0 0 1em;
+          padding: 1.1em 1.3em; }
+  .week.pending { background: var(--light); border-style: dashed; }
+  .whead { display: flex; align-items: baseline; gap: .8em; flex-wrap: wrap; margin-bottom: .3em; }
+  .wnum { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: .74em;
+          font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--crimson); }
+  .wdate { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: .78em; color: var(--gray); }
+  .wtitle { font-weight: bold; font-size: 1.02em; display: block; margin-bottom: .35em; }
+  .wread { font-size: .9em; color: var(--gray); margin-bottom: .55em; }
+  .wread strong { color: var(--black); font-weight: normal; }
+  .wlinks { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: .85em; }
+  .wlinks a { margin-right: .2em; }
+  .sep { color: var(--border); margin: 0 .5em; }
+  .due { display: inline-block; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+         font-size: .72em; font-weight: 600; background: var(--crimson); color: #fff;
+         padding: .12em .55em; border-radius: 3px; letter-spacing: .03em; }
+  .note { display: inline-block; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+          font-size: .72em; font-weight: 600; background: var(--gray); color: #fff;
+          padding: .12em .55em; border-radius: 3px; }
+  .due a { color: #fff; border-bottom: none; }
+  .due a:hover { border-bottom: 1px solid rgba(255,255,255,.7); }
+  .wassign { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: .85em;
+             margin: .35em 0 0; }
+  .wassign .dueon { color: var(--gray); }
+
+  table { border-collapse: collapse; width: 100%; margin: 1.2em 0; font-size: .93em; }
+  th { text-align: left; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+       font-size: .8em; text-transform: uppercase; letter-spacing: .05em; color: var(--gray);
+       border-bottom: 2px solid var(--border); padding: .5em .7em .5em 0; font-weight: 600; }
+  td { padding: .6em .7em .6em 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  td:first-child { white-space: nowrap; }
+
+  .placeholder { border: 2px dashed var(--border); border-radius: 5px; padding: 1.6em;
+                 text-align: center; color: var(--gray); font-size: .95em; }
+  footer { margin-top: 4em; padding-top: 1.5em; border-top: 1px solid var(--border);
+           color: var(--gray); font-size: .85em; }
+  @media (max-width: 640px) {
+    body { font-size: 1.02rem; padding: 2em 1.1em 3em; }
+    h1 { font-size: 1.6em; }
+    td:first-child { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<h1>ECON 8310: Business Forecasting (with AI)</h1>
+<div class="byline">University of Nebraska at Omaha &middot; Department of Economics</div>
+<span class="term">Fall 2026</span>
+
+<p style="margin-top:1.6em">Forecasting tools and applications for business settings. The first
+half of the course covers traditional econometric forecasting; the second half turns to
+predictive analytics and machine learning. Everything is implemented in Python.</p>
+
+<h2>Syllabus</h2>
+
+<p><a href="files/syllabus.html" target="_blank" rel="noopener"><strong>Read the full syllabus</strong></a> &mdash; grading, course
+policies, the AI-use and prompt-budget rules, final project milestones, and the complete schedule.</p>
+
+<p>The other course documents:</p>
+
+{{DOCUMENTS_TABLE}}
+
+<h2>Textbooks</h2>
+
+<p>All are free online. None needs to be purchased.</p>
+
+{{TEXTBOOKS_TABLE}}
+
+<h2>Before the first lab</h2>
+
+<p>Every lab and homework in this course reads from prepared data files that are <em>not</em> in the
+repository. Run these three commands once, from the repository root, before Week 1:</p>
+
+<pre><code>python scripts/prep_m5.py            # M5 / Walmart — the course spine
+python scripts/prep_fred.py          # FRED macro series — Lecture 2
+python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</code></pre>
+
+<p>Each downloads from a public source, needs no login or API key, and writes to
+<code>data/processed/</code>. Once they have run, nothing in this course needs the network again.</p>
+
+<div class="callout amber">
+  <span class="t">macOS users: one extra step before Week 5</span>
+  <p>XGBoost will not import on macOS without the OpenMP runtime. Install it once with
+  <code>brew install libomp</code>, then <code>pip install xgboost</code>. Do this before Lab 5 rather
+  than during it.</p>
+</div>
+
+<div class="callout"><span class="t">New to Quarto? Start here</span>
+  <p><a href="files/setup-guide.html" target="_blank" rel="noopener"><strong>Setup and Quarto guide</strong></a> &mdash; installing
+  Python, Quarto and an editor (VS Code or Positron), what a <code>.qmd</code> file is, and the four
+  errors you will hit. <strong>Google Colab will not work</strong> &mdash; it cannot open
+  <code>.qmd</code> files.</p>
+  <p>When something breaks later &mdash; a package that will not install, a render that fails, a
+  lab that errors halfway &mdash; go to <a href="files/troubleshooting.html" target="_blank" rel="noopener"><strong>Troubleshooting</strong></a>
+  first. It covers the failures this course actually produces.</p>
+</div>
+
+<p>You will also need: <code>jupyter</code>, <code>pandas</code>, <code>numpy</code>,
+<code>matplotlib</code>, <code>statsmodels</code>, <code>scikit-learn</code>, <code>prophet</code>,
+<code>pygam</code>, <code>xgboost</code>, <code>torch</code>, <code>pymc</code>, and <code>arviz</code>.
+<code>jupyter</code> is not optional &mdash; Quarto runs your Python through a Jupyter kernel. Assignment submission, the AI workflow, and the prompt log live in the
+<a href="https://github.com/DataHurdler/Forecasting-Env" target="_blank" rel="noopener">course environment repository</a>.</p>
+
+<h2>Weekly schedule</h2>
+
+{{SCHEDULE}}
+
+<h2>Assignments</h2>
+
+{{ASSIGNMENTS_TABLE}}
+
+
+<div class="callout">
+  <span class="t">Each assignment has a prompt budget</span>
+  <p>Every assignment carries a prompt budget and an initial context prompt that does not count
+  against it. Any AI assistant is fine &mdash; ChatGPT, Claude, Gemini, Copilot &mdash; in an editor or a
+  browser tab. UNO's ChatGPT Edu workspace does not include Codex, so nothing here requires it. You submit a <code>PROMPT_LOG.md</code> alongside your rendered
+  work, listing every prompt you sent in order.</p>
+  <p>The budget is a target, not a limit. It exists to make you decide what is worth asking, and
+  you may go over it &mdash; log the extra prompts and say where you got stuck. What does cost you
+  is a log that does not match the work you submit.</p>
+</div>
+
+<h2>The course as a book</h2>
+
+<p>Every lecture, in one continuous document you can read, search and quote from &mdash; the slides
+and what was said about them, assembled into fifteen numbered chapters. Useful for revision, for
+reading ahead, and for finding the lecture where a method was introduced without opening five decks.</p>
+
+<p><a href="book/index.html" target="_blank" rel="noopener"><strong>Read the book &rarr;</strong></a></p>
+
+<h2>The labs and assignments as a workbook</h2>
+
+<p>The companion volume: all fourteen labs and eleven assignments in one searchable document. Code
+is shown rather than run, so it opens instantly &mdash; each lab links to its executable version for
+when you are actually working. Every step carries a collapsible walkthrough of what was said about
+it in class, and every lab ends with the output your own run should produce.</p>
+
+<p><a href="workbook/index.html" target="_blank" rel="noopener"><strong>Open the workbook &rarr;</strong></a></p>
+
+<div class="callout">
+  <span class="t">It is generated, not written separately</span>
+  <p>The book is assembled from the decks themselves, so a table, figure or number in it cannot
+  disagree with the lecture it came from. If a deck is corrected, the book carries the correction
+  the next time it is built.</p>
+</div>
+
+
+<footer>
+  <span id="updated">Last updated: {{UPDATED}}</span><br>
+  ECON 8310 &middot; University of Nebraska at Omaha &middot; Fall 2026<br>
+  Slides are published as interactive HTML, not PDF &mdash; HTML carries real headings,
+  alt text, table headers and readable math. Labs and assignments are Quarto documents.
+  For a printable copy, use your browser's Print to PDF.
+</footer>
+
+</body>
+</html>

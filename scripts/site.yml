@@ -1,0 +1,354 @@
+# site.yml — the data behind the course landing page.
+#
+# docs/index.html is GENERATED from this file plus scripts/templates/index.html.in.
+# Edit here, never there, then run:  python3 scripts/build_index.py
+#
+# scripts/check-site-index.py runs in the backtest and fails if the published page is out
+# of date with this file, if any href on it is dead, or — the reason this file exists — if
+# a page published under docs/ is not linked from the landing page at all. The landing page
+# was the last hand-maintained student surface, and it drifted twice on 2026-09-01 alone.
+#
+# Every artifact under docs/slides, docs/labs, docs/homework and docs/files must appear
+# somewhere below or in `unlinked:` with a reason. Adding a lecture means adding it here.
+
+weeks:
+- label: Week 1
+  date: Aug 27, 2026
+  title: Introduction, Exponential Smoothing &amp; Forecast Evaluation
+  reading: FPP Ch. 1, Ch. 2, §5.1&ndash;5.10, Ch. 8
+  links:
+  - href: slides/Lecture01_ETS_Eval.html
+    text: Slides
+  - href: labs/Lecture01_lab.html
+    text: Lab 1
+  assignment:
+    href: homework/HW01_Part1_ETS.html
+    text: Assignment 1 Part 1
+    dueon: due Week 2 &middot; Sep 3
+- label: Week 2
+  date: Sep 3, 2026
+  title: ARIMA, VAR &amp; Multivariate Models
+  due:
+  - href: homework/HW01_Part1_ETS.html
+    text: Assignment 1 Part 1 due
+  reading: FPP Ch. 9, §10.1&ndash;10.3, §10.6, §12.3
+  links:
+  - href: slides/Lecture02_ARIMA_VAR.html
+    text: Slides
+  - href: labs/Lecture02_lab.html
+    text: Lab 2
+  assignment:
+    href: homework/HW01_Part2_ARIMA_VAR.html
+    text: Assignment 1 Part 2
+    dueon: due Week 3 &middot; Sep 10
+  notes:
+  - <strong>6:00&ndash;7:30pm:</strong> Industry panel and Q&amp;A with two business professionals,
+    followed by time to mingle. Lecture 2 runs after the panel, and <strong>Lab 2 is self-paced this
+    week</strong> &mdash; work through it on your own time.
+- label: Week 3
+  date: Sep 10, 2026
+  title: Generalized Additive Models
+  due:
+  - href: homework/HW01_Part2_ARIMA_VAR.html
+    text: Assignment 1 Part 2 due
+  reading: FPP §7.4, §7.7, §12.1&ndash;12.2
+  links:
+  - href: slides/Lecture03_GAMs.html
+    text: Slides
+  - href: labs/Lecture03_lab.html
+    text: Lab 3
+  assignment:
+    href: homework/HW02_GAMs.html
+    text: Assignment 2
+    dueon: due Week 4 &middot; Sep 17
+- label: Week 4
+  date: Sep 17, 2026
+  title: Decision Trees
+  due:
+  - href: homework/HW02_GAMs.html
+    text: Assignment 2 due
+  - href: files/project-rubric.html
+    text: Project groups due
+  reading: ISLP §8.1
+  links:
+  - href: slides/Lecture04_DecisionTrees.html
+    text: Slides
+  - href: labs/Lecture04_lab.html
+    text: Lab 4
+- label: Week 5
+  date: Sep 24, 2026
+  title: Tree Ensembles &mdash; Random Forests &amp; Boosted Trees
+  reading: ISLP §8.2; XGBoost &ldquo;Introduction to Boosted Trees&rdquo;; FPP §12.4 (Python ed.) /
+    §12.5 (R ed.) for the bagging intuition
+  links:
+  - href: slides/Lecture05_TreeEnsembles.html
+    text: Slides
+  - href: labs/Lecture05_lab.html
+    text: Lab 5
+  assignment:
+    href: homework/HW03_Trees_RF.html
+    text: Assignment 3
+    dueon: due Week 6 &middot; Oct 1
+  notes:
+  - <strong>Online, asynchronous &mdash; no in-person meeting.</strong> The lecture is posted as a recording
+    and the lab is self-paced; office hours run as usual. Nothing is due this week, so it is the week
+    to work on Assignment 3.
+- label: Week 6
+  date: Oct 1, 2026
+  title: Regularization &amp; Model Selection
+  due:
+  - href: homework/HW03_Trees_RF.html
+    text: Assignment 3 due
+  reading: ISLP Ch. 6; FPP §7.5
+  links:
+  - href: slides/Lecture06_Regularization.html
+    text: Slides
+  - href: labs/Lecture06_lab.html
+    text: Lab 6
+  assignment:
+    href: homework/HW04_XGBoost_Regularization.html
+    text: Assignment 4
+    dueon: due Week 7 &middot; Oct 8
+  notes:
+  - Final project grading rubric distributed.
+- label: Week 7
+  date: Oct 8, 2026
+  title: Introduction to Neural Networks
+  due:
+  - href: homework/HW04_XGBoost_Regularization.html
+    text: Assignment 4 due
+  reading: FPP-Py §14.1&ndash;14.2, §14.4&ndash;14.5, §14.7 (<strong>Python edition only</strong>)
+  links:
+  - href: slides/Lecture07_NeuralNets.html
+    text: Slides
+  - href: labs/Lecture07_lab.html
+    text: Lab 7
+- label: Week 8
+  date: Oct 15, 2026
+  title: CNN Architectures
+  reading: FPP-Py §14.3
+  links:
+  - href: slides/Lecture08_CNNs.html
+    text: Slides
+  - href: labs/Lecture08_lab.html
+    text: Lab 8
+  assignment:
+    href: homework/HW05_Part1_FFN_CNN.html
+    text: Assignment 5 Part 1
+    dueon: due Week 9 &middot; Oct 22
+- label: Week 9
+  date: Oct 22, 2026
+  title: RNNs and LSTMs
+  due:
+  - href: homework/HW05_Part1_FFN_CNN.html
+    text: Assignment 5 Part 1 due
+  reading: FPP-Py §14.3, §14.6
+  links:
+  - href: slides/Lecture09_Part1_RNN_LSTM.html
+    text: Slides
+  - href: labs/Lecture09_Part1_lab.html
+    text: Lab 9 &middot; Part 1
+  notes:
+  - Final project proposal due.
+- label: Week 10
+  date: Oct 29, 2026
+  title: Transformers
+  reading: FPP-Py Ch. 15
+  links:
+  - href: slides/Lecture09_Part2_Transformers.html
+    text: Slides
+  - href: labs/Lecture09_Part2_lab.html
+    text: Lab 9 &middot; Part 2
+  assignment:
+    href: homework/HW05_Part2_Sequence.html
+    text: Assignment 5 Part 2
+    dueon: due Week 11 &middot; Nov 5
+- label: Week 11
+  date: Nov 5, 2026
+  title: Bayesian Statistics I &mdash; Foundations
+  due:
+  - href: homework/HW05_Part2_Sequence.html
+    text: Assignment 5 Part 2 due
+  reading: BMCP Ch. 1 (inference, priors, prior predictive checks) and Ch. 2 (MCMC diagnostics); FPP
+    §5.5, §5.9 for framing
+  links:
+  - href: slides/Lecture10_BayesianFoundations.html
+    text: Slides
+  - href: labs/Lecture10_lab.html
+    text: Lab 10
+  assignment:
+    href: homework/HW05_Part3_Comparison.html
+    text: Assignment 5 Part 3
+    dueon: due Week 12 &middot; Nov 12
+- label: Week 12
+  date: Nov 12, 2026
+  title: Bayesian Statistics II &mdash; Time Series
+  due:
+  - href: homework/HW05_Part3_Comparison.html
+    text: Assignment 5 Part 3 due
+  reading: BMCP §6.2, §6.4 (time series as regression; state space and Bayesian structural time series)
+  links:
+  - href: slides/Lecture11_Part1_BayesianTS.html
+    text: Slides
+  - href: labs/Lecture11_Part1_lab.html
+    text: Lab 11 &middot; Part 1
+  assignment:
+    href: homework/HW06_Part1_Foundations_TS.html
+    text: Assignment 6 Part 1
+    dueon: due Week 13 &middot; Nov 19
+- label: Week 13
+  date: Nov 19, 2026
+  title: Bayesian Statistics II &mdash; Hierarchical Models
+  due:
+  - href: homework/HW06_Part1_Foundations_TS.html
+    text: Assignment 6 Part 1 due
+  reading: BMCP §4.5&ndash;4.6 (pooling, multilevel and hierarchical models)
+  links:
+  - href: slides/Lecture11_Part2_Hierarchical.html
+    text: Slides
+  - href: labs/Lecture11_Part2_lab.html
+    text: Lab 11 &middot; Part 2
+  assignment:
+    href: homework/HW06_Part2_Hierarchical.html
+    text: Assignment 6 Part 2
+    dueon: due Week 15 &middot; Dec 3
+  notes:
+  - <em>Not this:</em> FPP Ch. 11 is also titled &ldquo;hierarchical,&rdquo; but it covers forecast
+    <strong>reconciliation</strong> &mdash; a different topic from partial pooling.
+- label: Week 14
+  date: Nov 26, 2026
+  title: Thanksgiving break &mdash; no class
+- label: Week 15
+  date: Dec 3, 2026
+  title: Bayesian Statistics III &mdash; Bayesian Linear Regression
+  due:
+  - href: homework/HW06_Part2_Hierarchical.html
+    text: Assignment 6 Part 2 due
+  reading: BMCP §3.2&ndash;3.3 (linear and multiple regression, counterfactuals); FPP Ch. 7 as the frequentist
+    benchmark
+  links:
+  - href: slides/Lecture12_BayesianRegression.html
+    text: Slides
+  - href: labs/Lecture12_lab.html
+    text: Lab 12
+  assignment:
+    href: homework/HW07_Bayesian_Regression.html
+    text: Assignment 7
+    dueon: due Week 16 &middot; Dec 10
+- label: Week 16
+  date: Dec 10, 2026
+  title: Synthesis &mdash; What the Semester Measured
+  due:
+  - href: homework/HW07_Bayesian_Regression.html
+    text: Assignment 7 due
+  reading: FPP Ch. 13
+  links:
+  - href: slides/Lecture13_Synthesis.html
+    text: Slides
+  notes:
+  - <strong>No lab this week.</strong> The session is the course synthesis followed by project work
+    time &mdash; bring your project and your questions.
+- label: Final Exam Week
+  date: Dec 17, 2026
+  title: Final project presentations &mdash; 5:30&ndash;7:30pm
+  notes:
+  - <strong>Dec 18:</strong> final project report due.
+
+documents:
+- href: files/setup-guide.html
+  text: Setup &amp; Quarto guide
+  covers: Installing Python, Quarto and an editor; how to work in a <code>.qmd</code>
+- href: files/quickstart.html
+  text: Homework quickstart
+  covers: Getting the data, doing an assignment, checking it, submitting
+- href: files/ai-policy.html
+  text: Using AI on homework
+  covers: Which tools are allowed, the prompt log, what you must write yourself
+- href: files/troubleshooting.html
+  text: Troubleshooting
+  covers: When something will not install, render or run &mdash; read this before emailing
+- href: files/datasets.html
+  text: Course datasets
+  covers: What each dataset is and why it is in the course &mdash; read before Homework 1
+- href: files/project-rubric.html
+  text: Final project rubric
+  covers: How all 100 project points are awarded
+textbooks:
+- book: '<a href="https://otexts.com/fpppy/" target="_blank" rel="noopener">FPP-Py</a> &mdash; <em>Forecasting:
+    Principles and Practice, the Pythonic Way</em>'
+  used_for: Lectures 1&ndash;3; the primary text
+- book: <a href="https://otexts.com/fpp3/" target="_blank" rel="noopener">FPP3</a> &mdash; the R edition
+  used_for: Same material, R code. Chapter 12 is numbered differently &mdash; both numbers are always
+    given
+- book: <a href="https://www.statlearning.com/" target="_blank" rel="noopener">ISLP</a> &mdash; <em>An
+    Introduction to Statistical Learning with Applications in Python</em>
+  used_for: Lectures 4&ndash;6. FPP covers no tree methods and no regularization; this fills that gap
+- book: <a href="https://bayesiancomputationbook.com/" target="_blank" rel="noopener">BMCP</a> &mdash;
+    <em>Bayesian Modeling and Computation in Python</em>
+  used_for: Lectures 10&ndash;12. PyMC and ArviZ throughout, which is what we use
+assignments:
+- href: homework/HW01_Part1_ETS.html
+  text: 1 &middot; Part 1
+  covers: Exponential smoothing, forecast evaluation
+  due: Sep 3
+  prompts: 4
+- href: homework/HW01_Part2_ARIMA_VAR.html
+  text: 1 &middot; Part 2
+  covers: ARIMA, VAR, Granger causality
+  due: Sep 10
+  prompts: 8
+- href: homework/HW02_GAMs.html
+  text: '2'
+  covers: Prophet, pyGAM, component decomposition
+  due: Sep 17
+  prompts: 10
+- href: homework/HW03_Trees_RF.html
+  text: '3'
+  covers: Decision trees, random forests, feature importance
+  due: Oct 1
+  prompts: 12
+- href: homework/HW04_XGBoost_Regularization.html
+  text: '4'
+  covers: XGBoost tuning, LASSO paths, Elastic Net
+  due: Oct 8
+  prompts: 12
+- href: homework/HW05_Part1_FFN_CNN.html
+  text: 5 &middot; Part 1
+  covers: Windowing datasets, FFN, 1D CNN
+  due: Oct 22
+  prompts: 9
+- href: homework/HW05_Part2_Sequence.html
+  text: 5 &middot; Part 2
+  covers: RNN, LSTM, Transformer, positional encoding
+  due: Nov 5
+  prompts: 10
+- href: homework/HW05_Part3_Comparison.html
+  text: 5 &middot; Part 3
+  covers: Five-architecture comparison and reflection
+  due: Nov 12
+  prompts: 3
+- href: homework/HW06_Part1_Foundations_TS.html
+  text: 6 &middot; Part 1
+  covers: Beta-Binomial, prior predictive, structural TS
+  due: Nov 19
+  prompts: 10
+- href: homework/HW06_Part2_Hierarchical.html
+  text: 6 &middot; Part 2
+  covers: Exchangeability, pooling, shrinkage, divergences
+  due: Dec 3
+  prompts: 9
+- href: homework/HW07_Bayesian_Regression.html
+  text: '7'
+  covers: DAGs, Bayesian regression, ROPE, scenarios
+  due: Dec 10
+  prompts: 16
+
+# Published under docs/ but deliberately not linked from the landing page.
+# An entry here is a decision on the record; anything not listed and not linked FAILS.
+unlinked:
+  - path: files/docstyle.css
+    why: stylesheet the pandoc-rendered documents pull in, not a page
+  - path: book/index.html
+    why: linked from the prose of the "course as a book" section, not from a data table
+  - path: workbook/index.html
+    why: linked from the prose of the workbook section, not from a data table
