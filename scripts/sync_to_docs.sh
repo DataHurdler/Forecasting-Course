@@ -106,7 +106,9 @@ sync_documents() {
      --metadata title="ECON 8310 — Course Datasets" -o "$DOCS/files/datasets.html"
   "$PANDOC" ECON8310_Project_Rubric.md -s --toc --toc-depth=2 -c docstyle.css \
      --metadata title="ECON 8310 — Final Project Rubric" -o "$DOCS/files/project-rubric.html"
-  echo "  OK   syllabus, datasets, project-rubric"
+  "$PANDOC" TROUBLESHOOTING.md -s --toc --toc-depth=2 -c docstyle.css \
+     --metadata title="ECON 8310 — Troubleshooting" -o "$DOCS/files/troubleshooting.html"
+  echo "  OK   syllabus, datasets, project-rubric, troubleshooting"
   sync_student_docs
 }
 

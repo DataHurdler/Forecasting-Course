@@ -151,7 +151,7 @@ tbl = (pd.DataFrame(results, index=["RMSE", "MAE"]).T
 print(tbl.to_string())
 ```
 
-**Discuss with the person next to you, before reading on:** did any model beat the benchmark?
+**Stop before reading on** — with a neighbour if you have one, on your own if you do not: did any model beat the benchmark?
 By how much? And was it the model you expected in Step 2?
 
 ---

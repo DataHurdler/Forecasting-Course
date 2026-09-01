@@ -37,17 +37,12 @@ I returned to the University of Nebraska at Omaha as an assistant professor of e
 You can learn more about my teaching, research, and hobbies on my personal website: [https://www.luozijun.com/](https://www.luozijun.com/).
 
 ## 20-Minute In-Person Meeting
+Every student meets with me once, for twenty minutes, in the first two weeks of the term.
 1. Go to [this link](https://docs.google.com/spreadsheets/d/1hAtn20hMbHiHCeosNgofzSXGSkyp6vmOUbZsiGwit8I/edit?usp=sharing)
 2. Pick a green slot that works for you and make it into a color other than red or green. This way, your classmates know someone has signed up for that spot
 3. Add the time to your calendar
 4. Email me after you have picked your spot and tell me what date and time you have picked
 5. In your email, include a short introduction of yourself, your goal for this semester, or anything you would like to let me know ahead of our meeting
-<!--
-Each student is required to sign up for a 10-minute meeting with me in the first two weeks (August 24 to September 7) of the term.
-Go to [this link](https://calendly.com/luozijun/fall-2026-10-minute-meeting) to select a time slot.
-It is anonymous and only I will see your name and time chosen.
-Please email me a one-paragraph biography before we meet.
--->
 
 ## Course Goals
 (Course goals were written with help from Claude.)<br>
@@ -131,7 +126,7 @@ scikit-learn, xgboost, torch, pymc, arviz
 
 **macOS users need one extra step for XGBoost:** `brew install libomp`, once, before Week 5. Without it `import xgboost` fails with an OpenMP error.
 
-**Setting up: [read the Quarto guide first](https://www.luozijun.com/forecasting-course/files/setup-guide.html).** It walks through installing Python, Quarto, and an editor — either VS Code or Positron, both fine — then explains what a `.qmd` file is and the four errors students actually hit. Budget twenty minutes.
+**Setting up: [read the Quarto guide first](https://www.luozijun.com/forecasting-course/files/setup-guide.html).** When something later refuses to install, render or run, go to [Troubleshooting](https://www.luozijun.com/forecasting-course/files/troubleshooting.html) before emailing me. It walks through installing Python, Quarto, and an editor — either VS Code or Positron, both fine — then explains what a `.qmd` file is and the four errors students actually hit. Budget twenty minutes.
 
 **Google Colab will not work for this course.** It cannot open `.qmd` files.
 
@@ -153,7 +148,7 @@ There is nothing you need to buy for this course.
 - Study all course materials
 - Come to classes
 - Complete all the assignments
-- Ask questions <!-- - Email me a link to a drone video for three extra points -->
+- Ask questions
 - *DON'T* wait until the last minute to complete homework assignments
 
 ## Academic Integrity and Behavior
@@ -200,12 +195,6 @@ No late homework is otherwise accepted.
 All homework is submitted through the course repository, and is due **before class begins** on the date shown in the weekly schedule.
 A submission pushed after that time is late and will not be accepted.
 
-<!--
-### Homework
-You must answer all homework questions.
-At least one question will be checked for credit, except for homework assignments that are graded for completion.
-If you really do not know how to proceed with a homework question, you should email me.
--->
 
 There are 7 homework assignments worth **300 points in total**. They are not equally weighted —
 points follow the scope of the assignment, and three of them are submitted in parts across
@@ -353,7 +342,6 @@ I love to read. Here are two books I have enjoyed reading:
 ## Disclaimer
 While this document is designed to be as accurate as possible, learning is a dynamic process and I reserve the right to change some details.
 For example, if the class has trouble understanding a specific topic, I might take some extra time and go into more detail about it, which may result in cutting down time from other topics.
-<!-- Send me a cat photo for four extra points. -->
 
 ## Weekly Schedule
 
@@ -421,7 +409,7 @@ Assignments are due **before class begins**. Readings are listed under each week
 **No lab this week.** The session is the course synthesis followed by project work time — bring your project and your questions.
 *Due:* Homework 7
 
-**Final Exam Week · Dec 17** — **Final project presentations** (5:30-7:30pm)
+**Week 17 · Dec 17** — Final Exam Week: **final project presentations** (5:30-7:30pm)
 
 **Dec 18** — **Final project report due**
 Please try your best to submit early.

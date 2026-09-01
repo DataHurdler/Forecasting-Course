@@ -376,7 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">3.2</span> Setup</h2>
-<div id="99a25a59" class="cell" data-execution_count="1">
+<div id="1620321f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -438,7 +438,7 @@ test window: 2017-08-01 to 2018-08-03</code></pre>
 <section id="step-1-three-cycles-one-series" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="step-1-three-cycles-one-series"><span class="header-section-number">3.3</span> Step 1 — Three cycles, one series</h2>
 <p>Before any model, look at the three periodicities separately.</p>
-<div id="4f49567d" class="cell" data-execution_count="2">
+<div id="e94797d1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">3.2</span>))</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>hourly.groupby(<span class="st">"hour"</span>).mw.mean().plot(ax<span class="op">=</span>axes[<span class="dv">0</span>], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>)</span>
@@ -453,7 +453,7 @@ test window: 2017-08-01 to 2018-08-03</code></pre>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> axes: a.set_ylabel(<span class="st">"MW"</span>)</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="04cee53c" class="cell" data-execution_count="3">
+<div id="58fed6e5" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, g <span class="kw">in</span> [(<span class="st">"hour of day"</span>, hourly.groupby(<span class="st">"hour"</span>).mw.mean()),</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                 (<span class="st">"day of week"</span>, daily.groupby(<span class="st">"dow"</span>).mw_mean.mean()),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                 (<span class="st">"day of year"</span>, daily.groupby(<span class="st">"doy"</span>).mw_mean.mean())]:</span>
@@ -489,7 +489,7 @@ day of year    swing  44.7%   min 116   max 200</code></pre>
 <section id="step-2-the-annual-cycle-has-two-peaks" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="step-2-the-annual-cycle-has-two-peaks"><span class="header-section-number">3.4</span> Step 2 — The annual cycle has <em>two</em> peaks</h2>
 <p>Look again at the third panel. It does not look like a wave.</p>
-<div id="e2e90c11" class="cell" data-execution_count="4">
+<div id="e717b1da" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>doy <span class="op">=</span> daily.groupby(<span class="st">"doy"</span>).mw_mean.mean()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"January  (days 1-31)    </span><span class="sc">{</span>doy<span class="sc">.</span>loc[<span class="dv">1</span>:<span class="dv">31</span>]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> MW   &lt;- heating"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"April    (days 95-115)  </span><span class="sc">{</span>doy<span class="sc">.</span>loc[<span class="dv">95</span>:<span class="dv">115</span>]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> MW   &lt;- mild, nothing running"</span>)</span>
@@ -497,7 +497,7 @@ day of year    swing  44.7%   min 116   max 200</code></pre>
 </div>
 <p>Two peaks and two troughs per year, because heating and cooling are <em>both</em> electricity demand and they happen at opposite ends of the calendar.</p>
 <p>Now the consequence. Fit the annual shape with a single sine wave, then with two.</p>
-<div id="9e4c5490" class="cell" data-execution_count="5">
+<div id="c6f3fca2" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.arange(<span class="bu">len</span>(doy))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>one <span class="op">=</span> np.c_[np.ones_like(t), np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>), np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>)]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>two <span class="op">=</span> np.c_[one,             np.sin(<span class="dv">4</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>), np.cos(<span class="dv">4</span><span class="op">*</span>np.pi<span class="op">*</span>t<span class="op">/</span><span class="dv">365</span>)]</span>
@@ -539,7 +539,7 @@ two harmonics    in-sample RMSE 1,348 MW</code></pre>
 <section id="step-3-prophet-and-an-honest-benchmark" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="step-3-prophet-and-an-honest-benchmark"><span class="header-section-number">3.5</span> Step 3 — Prophet, and an honest benchmark</h2>
 <p>Prophet wants two columns named <code>ds</code> and <code>y</code>. That is most of the API.</p>
-<div id="e5463b19" class="cell" data-execution_count="6">
+<div id="5f922410" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Benchmark first, always: same day last year (364 days keeps the weekday aligned).</span></span>
@@ -583,7 +583,7 @@ Prophet                  RMSE   3,935   MAE   3,001</code></pre>
 <section id="step-4-the-components-plot" class="level2" data-number="3.6">
 <h2 data-number="3.6" class="anchored" data-anchor-id="step-4-the-components-plot"><span class="header-section-number">3.6</span> Step 4 — The components plot</h2>
 <p>This is the payoff, and the reason Prophet gets used by people who will be questioned about their forecast.</p>
-<div id="627acc74" class="cell" data-execution_count="7">
+<div id="c9f977cc" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>m.plot_components(fc)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Three panels, one per additive term, each on the scale of the original series. The trend, the weekly cycle, the yearly cycle — separately readable.</p>
@@ -615,7 +615,7 @@ Walkthrough
 <p>Step 2 argued this in-sample. Test it properly, on the holdout.</p>
 <p><code>yearly_seasonality</code> accepts an integer — the Fourier order — instead of <code>True</code>.</p>
 <p><strong>Your turn:</strong> fit a Prophet with the yearly order forced to <strong>1</strong> (a single harmonic) and add it to the results table.</p>
-<div id="dd348071" class="cell" data-execution_count="8">
+<div id="7a3d3f86" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the order ----</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># m1 = Prophet(yearly_seasonality=___, weekly_seasonality=True, daily_seasonality=False)</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># m1.fit(train.rename(columns={"date": "ds", "mw_mean": "y"})[["ds", "y"]])</span></span>
@@ -667,7 +667,7 @@ Try it
 <section id="step-6-pygam-and-reading-the-smooth-directly" class="level2" data-number="3.8">
 <h2 data-number="3.8" class="anchored" data-anchor-id="step-6-pygam-and-reading-the-smooth-directly"><span class="header-section-number">3.8</span> Step 6 — pyGAM, and reading the smooth directly</h2>
 <p>Prophet is a GAM with the time-series decisions made for you. <code>pyGAM</code> makes you state the terms, which is more work and more control.</p>
-<div id="604fc183" class="cell" data-execution_count="9">
+<div id="6e71e987" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, f</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># s(0) = cyclic spline on day-of-year (basis="cp" makes Dec 31 join Jan 1)</span></span>
@@ -683,7 +683,7 @@ Try it
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        .sort_values(<span class="st">"RMSE"</span>).<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now the partial dependence — the GAM equivalent of the components plot.</p>
-<div id="52c79d6a" class="cell" data-execution_count="10">
+<div id="17338987" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.2</span>))</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (ax, name) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(axes, [<span class="st">"day of year"</span>, <span class="st">"day of week"</span>])):</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    XX <span class="op">=</span> gam.generate_X_grid(term<span class="op">=</span>i)</span>

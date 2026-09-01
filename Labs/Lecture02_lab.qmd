@@ -125,7 +125,7 @@ an undifferenced series, and it tells you nothing about $p$ or $q$. The bottom r
 interpretable.
 
 **Your turn:** using the bottom row and the four reference patterns from Lecture 2, propose a
-$(p, d, q)$. Say it out loud to the person next to you before you fit anything.
+$(p, d, q)$. Say it out loud — to a neighbour, or to yourself — before you fit anything. Committing to an order before you see the result is the point.
 
 ---
 

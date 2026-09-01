@@ -430,7 +430,7 @@ Your numbers will not match mine, and that is fine
 <section id="dataset-and-setup" class="level2" data-number="25.2">
 <h2 data-number="25.2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">25.2</span> Dataset and Setup</h2>
 <p>The question for this assignment is a causal one: <strong>how much does demand respond to price?</strong> That is an elasticity, and it is the number a category manager would actually act on.</p>
-<div id="a1cd3fe8" class="cell" data-execution_count="1">
+<div id="681cf014" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -570,7 +570,7 @@ avg_price → units     (the effect we want to estimate)
 <p><strong>(a) Naive</strong> — regress <code>ly</code> on <code>lp</code>, <code>snap</code>, <code>event</code>.</p>
 <p><strong>(b) Controlled</strong> — regress <code>ly</code> on <code>lpc</code>, <code>snap</code>, <code>event</code>, plus a trend (<code>t</code>) and series fixed effects (<code>pd.get_dummies(df.series)</code>).</p>
 <p>Report the coefficient table for each, and put the two price elasticities side by side.</p>
-<div id="a5d300c1" class="cell" data-execution_count="2">
+<div id="c8a5cdbb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) naive OLS</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) OLS with trend and series fixed effects</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the two price coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -605,7 +605,7 @@ Ask ArviZ for the HDI explicitly
 <p>An equal-tailed interval cuts 5.5% off each tail; an HDI is the <em>shortest</em> interval holding 94% of the mass. They coincide for a symmetric posterior and diverge for a skewed one.</p>
 </div>
 </div>
-<div id="69c6c2d0" class="cell" data-execution_count="3">
+<div id="ba9006ba" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build and sample Bayesian linear regression</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -618,7 +618,7 @@ Ask ArviZ for the HDI explicitly
 <h3 data-number="25.4.4" class="anchored" data-anchor-id="q4-posterior-visualization-suggested-prompts-2"><span class="header-section-number">25.4.4</span> Q4 — Posterior Visualization <em>(Suggested prompts: 2)</em></h3>
 <p>Plot the posterior distributions for the three coefficients that matter most for a business decision — justify the choice from your DAG.</p>
 <p>For each, report: - Posterior mean - 94% HDI - <code>P(beta &gt; 0)</code> — probability the effect is positive - Whether the HDI excludes zero (the Bayesian analog of significance)</p>
-<div id="faca0494" class="cell" data-execution_count="4">
+<div id="1b8e4f01" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot posterior distributions and compute P(beta &gt; 0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -652,7 +652,7 @@ Ask ArviZ for the HDI explicitly
 </tbody>
 </table>
 <p>A predictor is “practically significant” if less than 5% of its posterior falls in the ROPE.</p>
-<div id="be4b70a4" class="cell" data-execution_count="5">
+<div id="9edd286b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute % of posterior in ROPE for each predictor</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -665,7 +665,7 @@ Ask ArviZ for the HDI explicitly
 <h3 data-number="25.4.6" class="anchored" data-anchor-id="q6-conditional-scenario-simulation-suggested-prompts-3"><span class="header-section-number">25.4.6</span> Q6 — Conditional Scenario Simulation <em>(Suggested prompts: 3)</em></h3>
 <p>A category manager is considering a <strong>5% price increase</strong> across the board and wants to know what happens to volume — and how confident anyone can be about it.</p>
 <p>Push the scenario through your posterior rather than through a point estimate.</p>
-<div id="18fa362f" class="cell" data-execution_count="6">
+<div id="843a2d01" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># b = idata.posterior["b_price"].values.ravel()</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pct_change = 100 * (np.exp(b * np.log(1.05)) - 1)</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># report the mean and the 94% interval of pct_change</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

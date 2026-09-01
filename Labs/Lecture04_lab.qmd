@@ -103,7 +103,7 @@ plot_tree(tree3, feature_names=FEATURES, filled=True, rounded=True, fontsize=7, 
 plt.tight_layout()
 ```
 
-**Read the root split aloud to the person next to you**, in business language — not
+**Read the root split aloud** — to a neighbour, or just to yourself — in business language, not
 `dow <= 4.50` but what that *means* about this store.
 
 Then look at the importances:

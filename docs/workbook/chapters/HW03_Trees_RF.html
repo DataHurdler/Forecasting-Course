@@ -385,7 +385,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 data-number="20"><span class="header-section-number">20</span> Dataset and Feature Engineering</h1>
 <p>Unlike ETS and ARIMA, which model one series at a time and require careful handling of seasonality and trend, tree-based models can use <strong>all 30 series simultaneously</strong>. The M5 extract holds 10 Walmart stores across 3 states, each with 3 product categories — 30 store-category series in all. Each store-category-week is a row in a flat table; the lag features encode how <em>that particular series</em> was performing recently. The model learns general rules that hold across series rather than fitting a separate process to each.</p>
 <p>The preprocessed file is <code>data/processed/m5_weekly.csv</code>. If it does not exist, run <code>python scripts/prep_m5.py</code> once from the repository root.</p>
-<div id="2f23b6e5" class="cell" data-execution_count="1">
+<div id="6abee89b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -543,7 +543,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <h2 data-number="22.1" class="anchored" data-anchor-id="q1-traintest-split"><span class="header-section-number">22.1</span> Q1 — Train/Test Split</h2>
 <p><em>(Suggested prompts: 1)</em></p>
 <p>Time series data has a natural arrow of time: the past is used to predict the future. The starter code below defines a temporal cutoff. Using that cutoff, create <code>X_train</code>, <code>X_test</code>, <code>y_train</code>, and <code>y_test</code>. Print the number of rows in each split and the date range covered by each.</p>
-<div id="ceb5be73" class="cell" data-execution_count="2">
+<div id="a7c688ec" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cutoff <span class="op">=</span> pd.Timestamp(<span class="st">"2015-05-17"</span>)     <span class="co"># holds out the final ~53 weeks</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create train and test splits using the cutoff date</span></span>
@@ -564,7 +564,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <p><strong>(c)</strong> Report test RMSE and the top 5 features by impurity-based importance. Present the importances as a horizontal bar chart, sorted descending.</p>
 <p><strong>(d)</strong> Re-fit with <code>max_depth=10</code>. How does test RMSE change? Does the deeper tree help or hurt on the test set?</p>
 <p>The <code>FEATURES</code> and <code>TARGET</code> variables, and the train/test arrays from Q1, are already defined.</p>
-<div id="cf135803" class="cell" data-execution_count="3">
+<div id="ffb7677b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Fit DecisionTreeRegressor with max_depth=3</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Visualize the tree with plot_tree</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (c) Report test RMSE and top 5 feature importances</span></span>
@@ -583,7 +583,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <p><strong>(a)</strong> The <code>oob_score_</code> attribute returns an R² value, not RMSE. Convert it to an approximate RMSE using the training target values, and report this OOB RMSE.</p>
 <p><strong>(b)</strong> Report the test RMSE. Compare it to the depth-3 and depth-10 Decision Trees from Q2, and to the seasonal-naive benchmark from Q1.</p>
 <p><strong>(c)</strong> Plot the MDI feature importances as a horizontal bar chart, sorted descending, showing all features.</p>
-<div id="ace928fd" class="cell" data-execution_count="4">
+<div id="0d183113" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit RandomForestRegressor with n_estimators=200, max_features="sqrt", oob_score=True</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Convert oob_score_ (R²) to OOB RMSE</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Compute and report test RMSE, compare to Q2</span></span>
@@ -600,7 +600,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <p>MDI importance measures how much each feature reduces impurity across all trees in the forest. It is fast to compute because it is a by-product of training, but it has a known bias: features with many distinct numeric values tend to receive inflated importance scores simply because they offer the splitter more places to cut, not because they carry more information.</p>
 <p>Permutation importance avoids this bias by directly measuring how much accuracy degrades when a single feature’s values are randomly shuffled on the test set. A feature that matters will cause a large increase in RMSE when shuffled; a redundant or spurious one will cause almost none.</p>
 <p><strong>(a) Plant two controls.</strong> Add two columns of pure noise to the modeling table — one continuous, one binary — and refit the forest with them included:</p>
-<div id="ee0f61b7" class="cell" data-execution_count="5">
+<div id="aef51095" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"noise_continuous"</span>] <span class="op">=</span> rng.rand(<span class="bu">len</span>(df))          <span class="co"># uniform on [0, 1)</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"noise_binary"</span>] <span class="op">=</span> rng.randint(<span class="dv">0</span>, <span class="dv">2</span>, <span class="bu">len</span>(df))     <span class="co"># 0 or 1</span></span>
@@ -613,7 +613,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <p><strong>(b)</strong> Compute permutation importance on the test set with <code>n_repeats=10</code>, <code>random_state=42</code>, and <code>scoring="neg_root_mean_squared_error"</code> so the result is in units rather than R².</p>
 <p><strong>(c)</strong> Build a comparison table for the two noise columns and three real features of your choice, showing MDI and permutation importance side by side. Then report <strong>where <code>noise_continuous</code> ranks by MDI</strong> out of all features, and where <code>noise_binary</code> ranks.</p>
 <p><strong>(d)</strong> Produce the side-by-side bar charts: top-10 features by MDI, and top-10 by permutation importance, in one figure.</p>
-<div id="ac1b0c5f" class="cell" data-execution_count="6">
+<div id="37460b20" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.inspection <span class="im">import</span> permutation_importance</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) permutation importance on the test set, scored in RMSE units</span></span>
@@ -639,7 +639,7 @@ Confirm by responding with: HW03_CONTEXT_ACK</code></pre>
 <li>Compute RMSE for each model on the forecast window</li>
 </ol>
 <p>Report the mean RMSE across all CV rounds for each model, and plot the per-round RMSE for both models on a single figure. Add the seasonal-naive benchmark from Q1 as a horizontal reference line.</p>
-<div id="38f7a8b5" class="cell" data-execution_count="7">
+<div id="630368c0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cutoffs <span class="op">=</span> pd.date_range(<span class="st">"2014-01-05"</span>, <span class="st">"2015-05-17"</span>, freq<span class="op">=</span><span class="st">"13W"</span>)   <span class="co"># 6 rounds</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(cutoffs)<span class="sc">}</span><span class="ss"> CV rounds:"</span>, [<span class="bu">str</span>(c.date()) <span class="cf">for</span> c <span class="kw">in</span> cutoffs])</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
