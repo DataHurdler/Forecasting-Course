@@ -114,4 +114,6 @@ Labs/*.html
 # every number that the generator exists to prevent.
 book/chapters/
 book/.quarto/
+# Quarto writes this on every render of the book project.
+book/.gitignore
 book/_book/

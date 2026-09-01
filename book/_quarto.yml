@@ -5,7 +5,6 @@ project:
 book:
   title: "Business Forecasting"
   subtitle: "ECON 8310 · University of Nebraska at Omaha"
-  author: "Zijun Luo"
   date: last-modified
   search: true
   chapters:
