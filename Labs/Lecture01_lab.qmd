@@ -151,7 +151,12 @@ tbl = (pd.DataFrame(results, index=["RMSE", "MAE"]).T
 print(tbl.to_string())
 ```
 
-**Stop before reading on** — with a neighbour if you have one, on your own if you do not: did any model beat the benchmark?
+**Stop before reading on:** did any model beat the benchmark?
+
+*In the room:* say your answer to the person next to you, and make them say theirs.
+*On your own:* write your answer in a comment in the cell below before you scroll. Committing to it
+in writing is the part that matters — it is what makes the next result inform you rather than just
+agree with you.
 By how much? And was it the model you expected in Step 2?
 
 ---
