@@ -374,7 +374,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">4.2</span> Setup</h2>
-<div id="5cc819ec" class="cell" data-execution_count="1">
+<div id="1301b619" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -444,23 +444,27 @@ benchmark (same day last year): RMSE 625</code></pre>
 <section id="step-1-fit-a-tree-and-read-it-out-loud" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="step-1-fit-a-tree-and-read-it-out-loud"><span class="header-section-number">4.3</span> Step 1 — Fit a tree and read it out loud</h2>
 <p>Start deliberately shallow, because a depth-3 tree is small enough to read.</p>
-<div id="fc951ffc" class="cell" data-execution_count="2">
+<div id="0f391af7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tree3 <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">3</span>, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(export_text(tree3, feature_names<span class="op">=</span>FEATURES, decimals<span class="op">=</span><span class="dv">0</span>))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">test RMSE: </span><span class="sc">{</span>rmse(y_test, tree3.predict(X_test))<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="471d7700" class="cell" data-execution_count="3">
+<div id="efda3573" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plot_tree(tree3, feature_names<span class="op">=</span>FEATURES, filled<span class="op">=</span><span class="va">True</span>, rounded<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">7</span>, ax<span class="op">=</span>ax)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Put the root split into business language</strong> — not <code>dow &lt;= 4.50</code> but what that <em>means</em> about this store.</p>
-<p><em>In the room:</em> read it aloud to the person next to you. Saying it to someone is what exposes a sentence you do not actually understand. <em>On your own:</em> write it as one sentence in a comment below. If you cannot finish the sentence, you have found the thing to reread.</p>
+<p><em>In the room:</em> read it aloud to the person next to you. Saying it to someone is what exposes a sentence you do not actually understand.<br>
+<em>On your own:</em> write the sentence in a comment, then add a prediction you can check immediately:</p>
+<pre><code># the root split separates ____ from ____
+# I expect the higher-sales side to be dow &lt;= 4.50 / dow &gt; 4.50, because ____</code></pre>
+<p>Then read the two node values off the tree plot above and see whether you were right. A guess you wrote down and checked teaches you more than a split you merely read.</p>
 <p>Then look at the importances:</p>
-<div id="12c44618" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>imp <span class="op">=</span> pd.Series(tree3.feature_importances_, index<span class="op">=</span>FEATURES).sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imp[imp <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">round</span>(<span class="dv">3</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="c3bc088f" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>imp <span class="op">=</span> pd.Series(tree3.feature_importances_, index<span class="op">=</span>FEATURES).sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imp[imp <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">round</span>(<span class="dv">3</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -545,25 +549,25 @@ Try it
 <section id="step-2-watch-the-biasvariance-tradeoff-happen" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="step-2-watch-the-biasvariance-tradeoff-happen"><span class="header-section-number">4.4</span> Step 2 — Watch the bias–variance tradeoff happen</h2>
 <p>Lecture 4 drew this as a curve. Now produce it.</p>
-<div id="25257071" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> depth <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="va">None</span>]:</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span>depth, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    rows.append({<span class="st">"depth"</span>: <span class="bu">str</span>(depth),</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"leaves"</span>: t.get_n_leaves(),</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"train_RMSE"</span>: <span class="bu">round</span>(rmse(y_train, t.predict(X_train))),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"test_RMSE"</span>:  <span class="bu">round</span>(rmse(y_test,  t.predict(X_test)))})</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>sweep <span class="op">=</span> pd.DataFrame(rows)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sweep.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="07690f2d" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> depth <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="va">None</span>]:</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span>depth, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    rows.append({<span class="st">"depth"</span>: <span class="bu">str</span>(depth),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"leaves"</span>: t.get_n_leaves(),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"train_RMSE"</span>: <span class="bu">round</span>(rmse(y_train, t.predict(X_train))),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"test_RMSE"</span>:  <span class="bu">round</span>(rmse(y_test,  t.predict(X_test)))})</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>sweep <span class="op">=</span> pd.DataFrame(rows)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sweep.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="3ec7b919" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.train_RMSE, marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"train"</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.test_RMSE,  marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"test"</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(sweep)))<span class="op">;</span> ax.set_xticklabels(sweep.depth)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"max_depth"</span>)<span class="op">;</span> ax.set_ylabel(<span class="st">"RMSE"</span>)<span class="op">;</span> ax.legend()</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cfa5865c" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.train_RMSE, marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"train"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ax.plot(<span class="bu">range</span>(<span class="bu">len</span>(sweep)), sweep.test_RMSE,  marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"test"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(sweep)))<span class="op">;</span> ax.set_xticklabels(sweep.depth)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"max_depth"</span>)<span class="op">;</span> ax.set_ylabel(<span class="st">"RMSE"</span>)<span class="op">;</span> ax.legend()</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Two things to say out loud.</strong> What does the training error do as depth increases, and what number does it reach at the end? And where does the <em>test</em> error bottom out?</p>
 <p>The gap between those two curves is overfitting, drawn to scale.</p>
@@ -602,34 +606,34 @@ Walkthrough
 <section id="step-3-why-one-tree-is-not-enough" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="step-3-why-one-tree-is-not-enough"><span class="header-section-number">4.5</span> Step 3 — Why one tree is not enough</h2>
 <p>Lecture 4 claimed a tree is unstable: change the data slightly and the structure changes. Test it properly, using bootstrap resamples — draw a sample of the same size <em>with replacement</em>, refit, and repeat.</p>
-<div id="a3a50705" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>roots, preds <span class="op">=</span> {}, []</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> b <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> rng.choice(<span class="bu">len</span>(X_train), <span class="bu">len</span>(X_train), replace<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">5</span>, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train[idx], y_train[idx])</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    root <span class="op">=</span> [l.strip() <span class="cf">for</span> l <span class="kw">in</span> export_text(t, feature_names<span class="op">=</span>FEATURES).split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> l.startswith(<span class="st">"|---"</span>)][<span class="dv">0</span>]</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    roots[root] <span class="op">=</span> roots.get(root, <span class="dv">0</span>) <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    preds.append(t.predict(X_test))</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.array(preds)</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"root splits across 20 bootstrap trees:"</span>)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, v <span class="kw">in</span> <span class="bu">sorted</span>(roots.items(), key<span class="op">=</span><span class="kw">lambda</span> kv: <span class="op">-</span>kv[<span class="dv">1</span>]):</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>v<span class="sc">:2d}</span><span class="ss"> x  </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">per-day spread of predictions across the 20 trees:"</span>)</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  average sd </span><span class="sc">{</span>P<span class="sc">.</span>std(<span class="dv">0</span>)<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> units   worst day </span><span class="sc">{</span>P<span class="sc">.</span>std(<span class="dv">0</span>)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss"> units"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="912cda26" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(RANDOM_STATE)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>roots, preds <span class="op">=</span> {}, []</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> b <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> rng.choice(<span class="bu">len</span>(X_train), <span class="bu">len</span>(X_train), replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">5</span>, random_state<span class="op">=</span>RANDOM_STATE).fit(X_train[idx], y_train[idx])</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    root <span class="op">=</span> [l.strip() <span class="cf">for</span> l <span class="kw">in</span> export_text(t, feature_names<span class="op">=</span>FEATURES).split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> l.startswith(<span class="st">"|---"</span>)][<span class="dv">0</span>]</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    roots[root] <span class="op">=</span> roots.get(root, <span class="dv">0</span>) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    preds.append(t.predict(X_test))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.array(preds)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"root splits across 20 bootstrap trees:"</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, v <span class="kw">in</span> <span class="bu">sorted</span>(roots.items(), key<span class="op">=</span><span class="kw">lambda</span> kv: <span class="op">-</span>kv[<span class="dv">1</span>]):</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>v<span class="sc">:2d}</span><span class="ss"> x  </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">per-day spread of predictions across the 20 trees:"</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  average sd </span><span class="sc">{</span>P<span class="sc">.</span>std(<span class="dv">0</span>)<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> units   worst day </span><span class="sc">{</span>P<span class="sc">.</span>std(<span class="dv">0</span>)<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss"> units"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The root may well be stable — one feature can be dominant enough that every resample finds it first. <strong>That is not the same as the tree being stable.</strong> Look at the spread of predictions: on a typical day the twenty trees disagree by a meaningful margin, and on the worst day they disagree enormously. All that disagreement lives <em>below</em> the root.</p>
 <p>Now the payoff, and it is one line:</p>
-<div id="9310cc45" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> np.mean([rmse(y_test, p) <span class="cf">for</span> p <span class="kw">in</span> P])</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>averaged <span class="op">=</span> rmse(y_test, P.mean(<span class="dv">0</span>))</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"average RMSE of a single bootstrap tree : </span><span class="sc">{</span>single<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"RMSE of the 20 trees averaged together  : </span><span class="sc">{</span>averaged<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"improvement: </span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>(single<span class="op">-</span>averaged)<span class="op">/</span>single<span class="sc">:.0f}</span><span class="ss">%"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="43917594" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> np.mean([rmse(y_test, p) <span class="cf">for</span> p <span class="kw">in</span> P])</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>averaged <span class="op">=</span> rmse(y_test, P.mean(<span class="dv">0</span>))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"average RMSE of a single bootstrap tree : </span><span class="sc">{</span>single<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"RMSE of the 20 trees averaged together  : </span><span class="sc">{</span>averaged<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"improvement: </span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>(single<span class="op">-</span>averaged)<span class="op">/</span>single<span class="sc">:.0f}</span><span class="ss">%"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You just built a <strong>bagged ensemble</strong> by hand — bootstrap aggregating, in three lines. Nothing was tuned and no new information was added; the gain came entirely from averaging away the disagreement you measured above. It is not yet a Random Forest: a forest adds one more idea, which is to stop every tree from looking at <code>dow</code> first. Twenty trees that agree perfectly on their root are twenty trees making correlated mistakes. That is next week.</p>
 <hr>
@@ -669,32 +673,32 @@ improvement: 18%</code></pre>
 <section id="step-4-where-trees-reliably-fail" class="level2" data-number="4.6">
 <h2 data-number="4.6" class="anchored" data-anchor-id="step-4-where-trees-reliably-fail"><span class="header-section-number">4.6</span> Step 4 — Where trees reliably fail</h2>
 <p>A tree predicts the <strong>mean of the training rows in a leaf</strong>. So every prediction it can ever make is an average of values it has already seen.</p>
-<div id="48bb19fe" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>full <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> full.predict(X_test)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"training target range : [</span><span class="sc">{</span>y_train<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:,.0f}</span><span class="ss">, </span><span class="sc">{</span>y_train<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">]"</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"prediction range      : [</span><span class="sc">{</span>p<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:,.0f}</span><span class="ss">, </span><span class="sc">{</span>p<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">]"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8508b4ad" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>full <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> full.predict(X_test)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"training target range : [</span><span class="sc">{</span>y_train<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:,.0f}</span><span class="ss">, </span><span class="sc">{</span>y_train<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">]"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"prediction range      : [</span><span class="sc">{</span>p<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:,.0f}</span><span class="ss">, </span><span class="sc">{</span>p<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:,.0f}</span><span class="ss">]"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The predictions cannot leave the training range — not “usually do not,” <em>cannot</em>. Now watch what that does at the extremes.</p>
-<div id="79d8fd8f" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>hi <span class="op">=</span> y_test <span class="op">&gt;</span> np.percentile(y_test, <span class="dv">90</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>lo <span class="op">=</span> y_test <span class="op">&lt;</span> np.percentile(y_test, <span class="dv">10</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"busiest 10% of test days  (n=</span><span class="sc">{</span>hi<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">): actual </span><span class="sc">{</span>y_test[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   predicted </span><span class="sc">{</span>p[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">   under by </span><span class="sc">{</span>y_test[hi]<span class="sc">.</span>mean()<span class="op">-</span>p[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"quietest 10% of test days (n=</span><span class="sc">{</span>lo<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">): actual </span><span class="sc">{</span>y_test[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   predicted </span><span class="sc">{</span>p[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">   over by  </span><span class="sc">{</span>p[lo]<span class="sc">.</span>mean()<span class="op">-</span>y_test[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e1d5481e" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>hi <span class="op">=</span> y_test <span class="op">&gt;</span> np.percentile(y_test, <span class="dv">90</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>lo <span class="op">=</span> y_test <span class="op">&lt;</span> np.percentile(y_test, <span class="dv">10</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"busiest 10% of test days  (n=</span><span class="sc">{</span>hi<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">): actual </span><span class="sc">{</span>y_test[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   predicted </span><span class="sc">{</span>p[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">   under by </span><span class="sc">{</span>y_test[hi]<span class="sc">.</span>mean()<span class="op">-</span>p[hi]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"quietest 10% of test days (n=</span><span class="sc">{</span>lo<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">): actual </span><span class="sc">{</span>y_test[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   predicted </span><span class="sc">{</span>p[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">   over by  </span><span class="sc">{</span>p[lo]<span class="sc">.</span>mean()<span class="op">-</span>y_test[lo]<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Your turn:</strong> the two errors above point in opposite directions. Plot predicted against actual for the test set, add the 45-degree line, and see the shape this produces.</p>
-<div id="6cffa848" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the two blanks ----</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, ax = plt.subplots(figsize=(4.5, 4.5))</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.scatter(___, ___, s=6, alpha=0.4)          # &lt;- actual on x, predicted on y</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># lims = [y_test.min(), y_test.max()]</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.plot(lims, lims, "k--", lw=1)</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_xlabel("actual units"); ax.set_ylabel("predicted units")</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.tight_layout()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e7c21492" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the two blanks ----</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, ax = plt.subplots(figsize=(4.5, 4.5))</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.scatter(___, ___, s=6, alpha=0.4)          # &lt;- actual on x, predicted on y</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># lims = [y_test.min(), y_test.max()]</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.plot(lims, lims, "k--", lw=1)</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_xlabel("actual units"); ax.set_ylabel("predicted units")</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.tight_layout()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">

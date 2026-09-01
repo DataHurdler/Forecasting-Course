@@ -402,7 +402,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="14.2">
 <h2 data-number="14.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">14.2</span> Setup</h2>
-<div id="e3b7c2da" class="cell" data-execution_count="1">
+<div id="4337d41f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -433,7 +433,7 @@ window.Quarto = {
 </div>
 <p>With units and price both in logs, the price coefficient is an <strong>elasticity</strong>: the percent change in demand per percent change in price. Hold on to that sentence — Step 3 is about the moment it stops being true.</p>
 <p>One model function, with switches for the three things we want to vary.</p>
-<div id="66371314" class="cell" data-execution_count="2">
+<div id="f5f5d756" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fit(price_col, controlled<span class="op">=</span><span class="va">True</span>, standardize_price<span class="op">=</span><span class="va">False</span>, seed<span class="op">=</span>RANDOM_STATE):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> df[price_col].values.astype(<span class="bu">float</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> standardize_price:</span>
@@ -485,7 +485,7 @@ Walkthrough
 <section id="step-1-the-naive-elasticity" class="level2" data-number="14.3">
 <h2 data-number="14.3" class="anchored" data-anchor-id="step-1-the-naive-elasticity"><span class="header-section-number">14.3</span> Step 1 — The naive elasticity</h2>
 <p>Regress log units on log price, SNAP and events. Nothing else.</p>
-<div id="0f2d223f" class="cell" data-execution_count="3">
+<div id="02b02363" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>idata_naive <span class="op">=</span> fit(<span class="st">"lp"</span>, controlled<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> show(idata_naive, controlled<span class="op">=</span><span class="va">False</span>, label<span class="op">=</span><span class="st">"Naive"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -520,13 +520,13 @@ b_price -2.8046   -2.8531   -2.7522  1.0010  2296.4356</code></pre>
 <section id="step-2-control-for-the-confounder" class="level2" data-number="14.4">
 <h2 data-number="14.4" class="anchored" data-anchor-id="step-2-control-for-the-confounder"><span class="header-section-number">14.4</span> Step 2 — Control for the confounder</h2>
 <p>Add per-series intercepts and a trend. Centre log price within each series, so the model uses only price variation <em>inside</em> a series over time — which is the variation a manager could actually create.</p>
-<div id="83e2e796" class="cell" data-execution_count="4">
+<div id="2b50845c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"lpc"</span>] <span class="op">=</span> df.lp <span class="op">-</span> df.groupby(<span class="st">"series"</span>).lp.transform(<span class="st">"mean"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>idata_ctrl <span class="op">=</span> fit(<span class="st">"lpc"</span>, controlled<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>su_ctrl <span class="op">=</span> show(idata_ctrl, label<span class="op">=</span><span class="st">"Controlled"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="bf951417" class="cell" data-execution_count="5">
+<div id="f6804218" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>b_naive <span class="op">=</span> idata_naive.posterior[<span class="st">"b_price"</span>].values.ravel()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>b_ctrl  <span class="op">=</span> idata_ctrl.posterior[<span class="st">"b_price"</span>].values.ravel()</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -550,7 +550,7 @@ Precision is not accuracy
 <p>A tight credible interval says the model is sure. It says nothing about whether the model is answering your question — and no diagnostic in ArviZ will ever tell you that it isn’t. Only the DAG does.</p>
 </div>
 </div>
-<div id="68c204a1" class="cell" data-execution_count="6">
+<div id="d1f5b728" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and answer in the string ----</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># direction = "..."   # &lt;- the naive estimate is too NEGATIVE. Which arrow in the DAG</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                     #    makes the bias run that way rather than the other?</span></span>
@@ -603,7 +603,7 @@ Try it
 <h2 data-number="14.5" class="anchored" data-anchor-id="step-3-the-preprocessing-step-that-silently-destroys-the-answer"><span class="header-section-number">14.5</span> Step 3 — The preprocessing step that silently destroys the answer</h2>
 <p>You have standardized predictors in nearly every lab since Lecture 6. It makes <code>Normal(0, 1)</code> priors mean the same thing across variables, and it helps samplers. It is a good habit.</p>
 <p>Do it to log price here and watch what happens.</p>
-<div id="48c2c613" class="cell" data-execution_count="7">
+<div id="d58b5663" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>idata_std <span class="op">=</span> fit(<span class="st">"lpc"</span>, controlled<span class="op">=</span><span class="va">True</span>, standardize_price<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>b_std <span class="op">=</span> idata_std.posterior[<span class="st">"b_price"</span>].values.ravel()</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -615,7 +615,7 @@ Try it
 <p>The two fits agree perfectly — they are the same model. But the <em>coefficient</em> is no longer the same quantity. Standardizing divided log price by its standard deviation, so the coefficient is now the change in log units per <strong>standard deviation</strong> of log price, not per percent.</p>
 <p>Both diagnostics are clean. Both intervals exclude zero. Nothing anywhere reports a problem. The only thing that changed is what the number means, and the model has no way to tell you.</p>
 <p>Now watch it become a business error.</p>
-<div id="755145e0" class="cell" data-execution_count="8">
+<div id="165a31b2" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scenario(b, pct<span class="op">=</span><span class="fl">5.0</span>):</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Percent change in units, and in revenue, from a `pct` price rise."""</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    units <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> (np.exp(b <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">+</span> pct<span class="op">/</span><span class="dv">100</span>)) <span class="op">-</span> <span class="dv">1</span>)</span>
@@ -643,7 +643,7 @@ This is the lab’s point
 <p>The habit that prevents it: write down what one unit of each variable <em>is</em> before you rescale it, and check that the coefficient still answers the question you asked.</p>
 </div>
 </div>
-<div id="eb4adb09" class="cell" data-execution_count="9">
+<div id="e33d9142" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print("To recover the elasticity from the standardized fit, multiply it by ___")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -696,14 +696,14 @@ Try it
 <section id="step-4-ask-the-posterior-a-business-question" class="level2" data-number="14.6">
 <h2 data-number="14.6" class="anchored" data-anchor-id="step-4-ask-the-posterior-a-business-question"><span class="header-section-number">14.6</span> Step 4 — Ask the posterior a business question</h2>
 <p>The posterior is samples, so any question is answered by counting. Use the correct fit.</p>
-<div id="736eb692" class="cell" data-execution_count="10">
+<div id="331da721" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  P(elasticity &lt; 0)     = </span><span class="sc">{</span>(b_ctrl <span class="op">&lt;</span> <span class="dv">0</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  P(elasticity &lt; -0.5)  = </span><span class="sc">{</span>(b_ctrl <span class="op">&lt;</span> <span class="op">-</span><span class="fl">0.5</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  P(-0.5 &lt; e &lt; 0)       = </span><span class="sc">{</span>((b_ctrl <span class="op">&gt;</span> <span class="op">-</span><span class="fl">0.5</span>) <span class="op">&amp;</span> (b_ctrl <span class="op">&lt;</span> <span class="dv">0</span>))<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The first number settles the direction: every posterior sample is negative, so demand falls when price rises. There is no doubt at all.</p>
 <p>The second is the interesting one. Elasticity <span class="math inline">\(-0.5\)</span> is a meaningful business threshold, and the posterior puts us within a few points of a coin flip. <strong>The data cannot settle whether demand is elastic or inelastic</strong>, and that is the honest report. A significance test would have announced the direction and said nothing about the question the manager actually asked.</p>
-<div id="a96e7c62" class="cell" data-execution_count="11">
+<div id="1cbc4ac4" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>))</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ax.hist(b_ctrl, bins<span class="op">=</span><span class="dv">60</span>, color<span class="op">=</span><span class="st">"steelblue"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="op">-</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"crimson"</span>, ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">"elastic / inelastic boundary"</span>)</span>
@@ -712,7 +712,7 @@ Try it
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span> plt.tight_layout()<span class="op">;</span> plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now the decision the manager actually faces.</p>
-<div id="8078ccb3" class="cell" data-execution_count="12">
+<div id="18db8c77" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>u5, r5 <span class="op">=</span> scenario(b_ctrl, <span class="fl">5.0</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  5% price rise:  units </span><span class="sc">{</span>u5<span class="sc">.</span>mean()<span class="sc">:+.2f}</span><span class="ss">%  "</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"[</span><span class="sc">{</span>np<span class="sc">.</span>percentile(u5,<span class="dv">3</span>)<span class="sc">:+.2f}</span><span class="ss">, </span><span class="sc">{</span>np<span class="sc">.</span>percentile(u5,<span class="dv">97</span>)<span class="sc">:+.2f}</span><span class="ss">]"</span>)</span>
@@ -721,7 +721,7 @@ Try it
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  P(revenue rises) = </span><span class="sc">{</span>(r5 <span class="op">&gt;</span> <span class="dv">0</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Revenue rises with probability 1.00 across every posterior sample — <em>even though</em> the elasticity might well be past <span class="math inline">\(-0.5\)</span>. Both facts are true at once, and only the posterior lets you say so.</p>
-<div id="3241ce23" class="cell" data-execution_count="13">
+<div id="74fada65" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and answer in the strings ----</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># recommend = "..."   # &lt;- two sentences to the manager, with a probability attached</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># caveat    = "..."   # &lt;- name one DAG arrow that, if wrong, invalidates this</span></span>

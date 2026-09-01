@@ -404,7 +404,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="9.2">
 <h2 data-number="9.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">9.2</span> Setup</h2>
-<div id="36abc641" class="cell" data-execution_count="1">
+<div id="ad2e47bf" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -485,7 +485,7 @@ Walkthrough
 <section id="step-1-a-plain-rnn" class="level2" data-number="9.3">
 <h2 data-number="9.3" class="anchored" data-anchor-id="step-1-a-plain-rnn"><span class="header-section-number">9.3</span> Step 1 — A plain RNN</h2>
 <p>One recurrent layer, then a linear layer on the <strong>final</strong> hidden state — the summary after reading the whole window.</p>
-<div id="3844a1b8" class="cell" data-execution_count="2">
+<div id="7d6a216a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Recurrent(nn.Module):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, kind, n_channels<span class="op">=</span><span class="dv">4</span>, hidden<span class="op">=</span><span class="dv">64</span>):</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
@@ -544,7 +544,7 @@ Walkthrough
 <section id="step-2-an-lstm" class="level2" data-number="9.4">
 <h2 data-number="9.4" class="anchored" data-anchor-id="step-2-an-lstm"><span class="header-section-number">9.4</span> Step 2 — An LSTM</h2>
 <p>Identical code, one word changed.</p>
-<div id="8e3f1b65" class="cell" data-execution_count="3">
+<div id="b9701e80" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>score_lstm, n_par_lstm <span class="op">=</span> train(<span class="st">"lstm"</span>, <span class="dv">26</span>, seed<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"LSTM        — </span><span class="sc">{</span>n_par_lstm<span class="sc">:,}</span><span class="ss"> parameters, test RMSE </span><span class="sc">{</span>score_lstm<span class="sc">:,.0f}</span><span class="ss">"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">parameter ratio: </span><span class="sc">{</span>n_par_lstm <span class="op">/</span> n_par<span class="sc">:.1f}</span><span class="ss">x the RNN"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -575,7 +575,7 @@ parameter ratio: 4.0x the RNN</code></pre>
 <section id="step-3-which-wins-and-does-it-hold" class="level2" data-number="9.5">
 <h2 data-number="9.5" class="anchored" data-anchor-id="step-3-which-wins-and-does-it-hold"><span class="header-section-number">9.5</span> Step 3 — Which wins, and does it hold?</h2>
 <p>One comparison at one window is not evidence. Vary the window and use two seeds.</p>
-<div id="0e67dc16" class="cell" data-execution_count="4">
+<div id="f51d6679" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W <span class="kw">in</span> (<span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> [train(<span class="st">"rnn"</span>,  W, s)[<span class="dv">0</span>] <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>)]</span>
@@ -602,7 +602,7 @@ Read the columns in this order
 </div>
 </div>
 <p><strong>Your turn:</strong> compute the gap at each window and say whether it is closing or widening.</p>
-<div id="e0905027" class="cell" data-execution_count="5">
+<div id="9b80c789" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.DataFrame(rows)</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># df["gap"] = ___ - ___          # &lt;- which two columns?</span></span>
@@ -652,7 +652,7 @@ Try it
 <h2 data-number="9.6" class="anchored" data-anchor-id="step-4-was-that-a-fair-fight"><span class="header-section-number">9.6</span> Step 4 — Was that a fair fight?</h2>
 <p>Step 3 compared two models at <strong>one</strong> training budget. Lab 7 taught you not to trust a comparison run at one seed; this is the same objection one level up. An LSTM has four times the parameters, and bigger models generally take longer to converge.</p>
 <p>So train both to 100 epochs, and record the test RMSE along the way instead of only at the end.</p>
-<div id="c2ac3b48" class="cell" data-execution_count="6">
+<div id="e46e817e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>CKPT <span class="op">=</span> [<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">45</span>, <span class="dv">60</span>, <span class="dv">80</span>, <span class="dv">100</span>]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> curve(kind, W, seed):</span>
@@ -687,7 +687,7 @@ Try it
 <span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>table[<span class="st">"gap"</span>] <span class="op">=</span> table.LSTM <span class="op">-</span> table.RNN</span>
 <span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(table.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="27131a98" class="cell" data-execution_count="7">
+<div id="34486a7b" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">6.5</span>, <span class="fl">3.4</span>))</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ax.plot(CKPT, paths[<span class="st">"rnn"</span>],  marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"vanilla RNN"</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ax.plot(CKPT, paths[<span class="st">"lstm"</span>], marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span><span class="st">"LSTM"</span>)</span>
@@ -718,7 +718,7 @@ The gap is largest at exactly the budget we used
 </div>
 </div>
 <p><strong>Your turn:</strong> the run-to-run spread in Step 3 was roughly 20 RMSE. From which checkpoint on is the gap smaller than that?</p>
-<div id="88e44f3f" class="cell" data-execution_count="8">
+<div id="b28a1ceb" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># noise = ___                       # &lt;- the seed spread from Step 3</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(table[table.gap.abs() &lt; noise].epochs.tolist())</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -774,7 +774,7 @@ Try it
 <section id="step-5-why-the-gates-buy-nothing-here" class="level2" data-number="9.7">
 <h2 data-number="9.7" class="anchored" data-anchor-id="step-5-why-the-gates-buy-nothing-here"><span class="header-section-number">9.7</span> Step 5 — Why the gates buy nothing here</h2>
 <p>The LSTM’s gates exist to solve one problem: in a plain RNN, gradients shrink as they propagate backward, so signal from far in the past never reaches the weights. Put a number on it.</p>
-<div id="42a3b6d0" class="cell" data-execution_count="9">
+<div id="82cb39b8" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> factor <span class="kw">in</span> (<span class="fl">0.7</span>, <span class="fl">0.9</span>):</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"gradient shrink factor </span><span class="sc">{</span>factor<span class="sc">}</span><span class="ss"> per step:"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> steps <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
@@ -784,7 +784,7 @@ Try it
 <p>At 0.7 per step the signal is essentially gone by 26 steps. <strong>That is the problem gating fixes.</strong></p>
 <p>Two things about that table before we go on. At a shrink factor of 0.7 the signal is gone by 26 steps. At <strong>0.9</strong> it is still 0.065 at 26 steps and 0.004 at 52 — small, but not zero. Vanishing gradients are a matter of degree and of <em>sequence length</em>, and 26 weeks is short.</p>
 <p>Now stop asserting and go measure whether this dataset has the problem gating solves. Three questions, three numbers.</p>
-<div id="7ebd6b73" class="cell" data-execution_count="10">
+<div id="6d5a36f9" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> weekly.assign(series<span class="op">=</span>weekly.store_id <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> weekly.cat_id)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>w[<span class="st">"level"</span>] <span class="op">=</span> w.groupby(<span class="st">"series"</span>).units.transform(<span class="st">"mean"</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>w[<span class="st">"dev"</span>]   <span class="op">=</span> w.units <span class="op">-</span> w.level</span>

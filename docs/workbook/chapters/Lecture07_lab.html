@@ -375,7 +375,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">7.2</span> Setup</h2>
-<div id="d956cdda" class="cell" data-execution_count="1">
+<div id="46267290" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -412,7 +412,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="7.3" class="anchored" data-anchor-id="step-1-from-a-panel-to-windows"><span class="header-section-number">7.3</span> Step 1 — From a panel to windows</h2>
 <p>A network cannot read a dataframe. It needs a stack of fixed-size examples.</p>
 <p>For each series, slide a 26-week window along the history: the window is the input, the units in the following week is the target.</p>
-<div id="998e5395" class="cell" data-execution_count="2">
+<div id="b81e99a3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X, Y, D <span class="op">=</span> [], [], []</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _, g <span class="kw">in</span> weekly.groupby([<span class="st">"store_id"</span>, <span class="st">"cat_id"</span>]):</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> g[CHANNELS].values.astype(<span class="st">"float32"</span>)</span>
@@ -430,7 +430,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><strong>Notice the window count is far larger than the row count.</strong> Every week is the end of one window and the interior of twenty-five others, so 8,310 rows become ~7,500 overlapping examples. That overlap is why the effective sample size is much smaller than it looks.</p>
 <p>Now standardize — <strong>using training statistics only</strong>.</p>
-<div id="039c2d5c" class="cell" data-execution_count="3">
+<div id="f8b84aae" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mu <span class="op">=</span> X[train_mask].mean(axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), keepdims<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sd <span class="op">=</span> X[train_mask].std(axis<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-8</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>y_mu, y_sd <span class="op">=</span> Y[train_mask].mean(), Y[train_mask].std()</span>
@@ -476,7 +476,7 @@ train 5,940   test 1,590</code></pre>
 </section>
 <section id="step-2-train-a-network" class="level2" data-number="7.4">
 <h2 data-number="7.4" class="anchored" data-anchor-id="step-2-train-a-network"><span class="header-section-number">7.4</span> Step 2 — Train a network</h2>
-<div id="aaabbb98" class="cell" data-execution_count="4">
+<div id="e286e884" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_model(n_features, seed):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    torch.manual_seed(seed)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
@@ -532,7 +532,7 @@ test RMSE:  1,109</code></pre>
 <section id="step-3-run-it-again" class="level2" data-number="7.5">
 <h2 data-number="7.5" class="anchored" data-anchor-id="step-3-run-it-again"><span class="header-section-number">7.5</span> Step 3 — Run it again</h2>
 <p>Same code, same data, same settings. Only the random seed changes.</p>
-<div id="92a9541b" class="cell" data-execution_count="5">
+<div id="05a26859" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> seed <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"seed </span><span class="sc">{</span>seed<span class="sc">}</span><span class="ss">:  test RMSE </span><span class="sc">{</span>train(make_model(X_tr.shape[<span class="dv">1</span>], seed))<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -577,14 +577,14 @@ Try it
 <section id="step-4-so-how-would-you-compare-two-settings" class="level2" data-number="7.6">
 <h2 data-number="7.6" class="anchored" data-anchor-id="step-4-so-how-would-you-compare-two-settings"><span class="header-section-number">7.6</span> Step 4 — So how would you compare two settings?</h2>
 <p>Here is the trap. Suppose you want to know whether weight decay helps. You try three values, train once each, and pick the winner.</p>
-<div id="876ea71c" class="cell" data-execution_count="6">
+<div id="ae2530c9" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> {wd: train(make_model(X_tr.shape[<span class="dv">1</span>], seed<span class="op">=</span><span class="dv">1</span>), weight_decay<span class="op">=</span>wd)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>          <span class="cf">for</span> wd <span class="kw">in</span> (<span class="fl">0.0</span>, <span class="fl">1e-4</span>, <span class="fl">1e-2</span>)}</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> wd, r <span class="kw">in</span> single.items():</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"weight_decay=</span><span class="sc">{</span>wd<span class="sc">:&lt;7}</span><span class="ss"> test RMSE </span><span class="sc">{</span>r<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now do it honestly — <strong>five seeds per setting</strong>, and look at the spread as well as the mean.</p>
-<div id="b51e38ba" class="cell" data-execution_count="7">
+<div id="d050a4f5" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> wd <span class="kw">in</span> (<span class="fl">0.0</span>, <span class="fl">1e-4</span>, <span class="fl">1e-2</span>):</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    runs <span class="op">=</span> [train(make_model(X_tr.shape[<span class="dv">1</span>], s), weight_decay<span class="op">=</span>wd) <span class="cf">for</span> s <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)]</span>
@@ -608,7 +608,7 @@ Compare the two tables before you go on
 </div>
 </div>
 <p><strong>Your turn:</strong> using your own two tables, state the smallest RMSE difference you would be willing to call real.</p>
-<div id="e6d5cb79" class="cell" data-execution_count="8">
+<div id="e282e467" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># spread = ___                      # &lt;- a number from your five-seed table</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"differences smaller than about {spread:,.0f} RMSE are not evidence")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -662,7 +662,7 @@ Try it
 <section id="step-5-break-it-on-purpose" class="level2" data-number="7.7">
 <h2 data-number="7.7" class="anchored" data-anchor-id="step-5-break-it-on-purpose"><span class="header-section-number">7.7</span> Step 5 — Break it on purpose</h2>
 <p>One line, no error message.</p>
-<div id="2ad935b5" class="cell" data-execution_count="9">
+<div id="694ef7a0" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_broken(model, epochs<span class="op">=</span><span class="dv">60</span>, lr<span class="op">=</span><span class="fl">5e-4</span>):</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    opt <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span>lr)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    lossfn <span class="op">=</span> nn.MSELoss()</span>

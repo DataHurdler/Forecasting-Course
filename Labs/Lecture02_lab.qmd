@@ -127,8 +127,15 @@ interpretable.
 **Your turn:** using the bottom row and the four reference patterns from Lecture 2, propose a
 $(p, d, q)$.
 
-*In the room:* say your proposed order out loud to a classmate and defend it in one sentence.
-*On your own:* type it into a comment before you fit anything, with your one-sentence reason.
+*In the room:* say your proposed order out loud to a classmate and defend it in one sentence.\
+*On your own:* type it into a comment before you fit anything, in this form:
+
+```
+# (p, d, q) = (_, _, _) — PACF cuts off after lag ____, ACF cuts off after lag ____
+```
+
+Naming the lag that decided each term is what turns a guess into a reading you can be wrong
+about — and being wrong about a specific lag is something you can learn from.
 
 Either way the point is committing to an order **before** you see how it scores.
 

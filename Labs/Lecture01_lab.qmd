@@ -151,13 +151,20 @@ tbl = (pd.DataFrame(results, index=["RMSE", "MAE"]).T
 print(tbl.to_string())
 ```
 
-**Stop before reading on:** did any model beat the benchmark?
+**Stop before reading on:** did any model beat the benchmark? By how much? And was it the model
+you expected in Step 2?
 
-*In the room:* say your answer to the person next to you, and make them say theirs.
-*On your own:* write your answer in a comment in the cell below before you scroll. Committing to it
-in writing is the part that matters — it is what makes the next result inform you rather than just
-agree with you.
-By how much? And was it the model you expected in Step 2?
+*In the room:* say your answer to the person next to you, and make them say theirs.\
+*On your own:* score yourself against what you already wrote down. Scroll back to the RMSE number
+from Step 2 and the ordering from Step 3, and write two lines in a comment:
+
+```
+# guess ____, actual ____, off by ____
+# ordering: right / wrong — first model I misplaced was ____
+```
+
+Grading your own prediction in writing is the part that matters. It is what makes the next result
+inform you rather than just agree with you.
 
 ---
 
