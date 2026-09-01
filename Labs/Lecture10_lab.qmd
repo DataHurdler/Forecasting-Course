@@ -1,6 +1,6 @@
 ---
 title: "Lab 10: Priors, Posteriors, and Checking the Sampler"
-subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha · Fall 2026"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
 format:
   html:
     theme: cosmo

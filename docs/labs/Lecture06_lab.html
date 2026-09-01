@@ -2333,7 +2333,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Lab 6: Regularization — Breaking OLS, Then Rescuing It</h1>
-<p class="subtitle lead">ECON 8310: Business Forecasting — University of Nebraska at Omaha · Fall 2026</p>
+<p class="subtitle lead">ECON 8310: Business Forecasting — University of Nebraska at Omaha</p>
 </div>
 
 
@@ -2360,7 +2360,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level1">
 <h1>Setup</h1>
-<div id="57e54227" class="cell" data-execution_count="1">
+<div id="c3542010" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2423,7 +2423,7 @@ window.Quarto = {
 <section id="step-1-break-it" class="level1">
 <h1>Step 1 — Break it</h1>
 <p>With 1,210 training rows and 62 features, OLS is fine. Now shrink the training window and watch.</p>
-<div id="0edd4a16" class="cell" data-execution_count="2">
+<div id="ff8cc01b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> (<span class="dv">1210</span>, <span class="dv">400</span>, <span class="dv">200</span>, <span class="dv">120</span>, <span class="dv">80</span>):</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    sub <span class="op">=</span> train.iloc[<span class="op">-</span>n:]</span>
@@ -2458,7 +2458,7 @@ window.Quarto = {
 <section id="step-2-two-penalties-two-behaviors" class="level1">
 <h1>Step 2 — Two penalties, two behaviors</h1>
 <p>Back to the full training set. Fit Ridge and LASSO at a comparable penalty and count what survives.</p>
-<div id="eff52f99" class="cell" data-execution_count="3">
+<div id="94ea0a82" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sc <span class="op">=</span> StandardScaler().fit(X_train)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>Xs, Xts <span class="op">=</span> sc.transform(X_train), sc.transform(X_test)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2480,7 +2480,7 @@ window.Quarto = {
 <section id="step-3-the-path-and-the-order-features-die-in" class="level1">
 <h1>Step 3 — The path, and the order features die in</h1>
 <p>Lecture 6 argued that the <strong>order</strong> predictors leave is a more stable finding than any single coefficient table. Produce that ordering.</p>
-<div id="37bc02ad" class="cell" data-execution_count="4">
+<div id="ae57fd87" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">60</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>paths <span class="op">=</span> []</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> alphas:</span>
@@ -2501,7 +2501,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="d1522672" class="cell" data-execution_count="5">
+<div id="4aec0db8" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>survivors, order <span class="op">=</span> <span class="bu">set</span>(FEATURES), []</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, coefs <span class="kw">in</span> <span class="bu">zip</span>(alphas, paths):</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    nz <span class="op">=</span> <span class="bu">set</span>(np.array(FEATURES)[coefs <span class="op">!=</span> <span class="dv">0</span>])</span>
@@ -2514,8 +2514,8 @@ window.Quarto = {
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;   </span><span class="sc">{</span>f<span class="sc">}</span><span class="ss">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>the last 8 features standing, in reverse order of elimination:
-   lag28
    lag7
+   lag28
    lag35
    lag364
    lag14
@@ -2543,7 +2543,7 @@ Look at what survived
 </section>
 <section id="step-4-choosing-alpha-and-the-one-standard-error-rule" class="level1">
 <h1>Step 4 — Choosing alpha, and the one-standard-error rule</h1>
-<div id="8126a64b" class="cell" data-execution_count="6">
+<div id="2d963a43" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tscv <span class="op">=</span> TimeSeriesSplit(n_splits<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">1</span>, <span class="fl">2.5</span>, <span class="dv">30</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2568,7 +2568,7 @@ Look at what survived
 </div>
 </div>
 <p><strong>Your turn:</strong> plot the CV curve with its one-standard-error band, and mark both chosen alphas.</p>
-<div id="c22f8043" class="cell" data-execution_count="7">
+<div id="26e7d867" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the blank ----</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, ax = plt.subplots(figsize=(7, 3.4))</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.plot(np.log10(grid), means)</span></span>
@@ -2584,7 +2584,7 @@ Look at what survived
 <section id="step-5-why-your-cv-number-looks-worse-than-the-truth" class="level1">
 <h1>Step 5 — Why your CV number looks worse than the truth</h1>
 <p>The CV RMSE above is noticeably higher than the test RMSE. That is not a mistake, and the reason is sitting in Step 1.</p>
-<div id="866d13bf" class="cell" data-execution_count="8">
+<div id="76ffc329" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (tr_idx, va_idx) <span class="kw">in</span> <span class="bu">enumerate</span>(tscv.split(X_train), <span class="dv">1</span>):</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> make_pipeline(StandardScaler(), Lasso(alpha<span class="op">=</span><span class="dv">20</span>, max_iter<span class="op">=</span><span class="dv">50000</span>)).fit(X_train[tr_idx], y_train[tr_idx])</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;  fold </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: train n=</span><span class="sc">{</span><span class="bu">len</span>(tr_idx)<span class="sc">:4d}</span><span class="ss"> (n/k=</span><span class="sc">{</span><span class="bu">len</span>(tr_idx)<span class="op">/</span><span class="bu">len</span>(FEATURES)<span class="sc">:4.1f}</span><span class="ss">)   &quot;</span></span>
@@ -2604,7 +2604,7 @@ Look at what survived
 <section id="before-you-leave" class="level1">
 <h1>Before you leave</h1>
 <p>Add today’s best linear model to the scoreboard you have been building since Lab 4.</p>
-<div id="9385fed8" class="cell" data-execution_count="9">
+<div id="9d64edba" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>best <span class="op">=</span> make_pipeline(StandardScaler(), Lasso(alpha<span class="op">=</span>grid[i_min], max_iter<span class="op">=</span><span class="dv">50000</span>)).fit(X_train, y_train)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>board <span class="op">=</span> {</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Benchmark (same day last year)&quot;</span>: rmse(y_test, test.units_lag365.values),</span>

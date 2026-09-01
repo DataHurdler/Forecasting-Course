@@ -100,15 +100,19 @@ sync_documents() {
   echo "=== Syllabus, datasets, rubric ==="
   [ -n "$PANDOC" ] || { echo "  pandoc not found — skipping"; return; }
   cd "$REPO_ROOT"
-  "$PANDOC" ECON8310Syllabus2026Fall.md -s --toc --toc-depth=2 -c docstyle.css \
-     --metadata title="ECON 8310 Syllabus — Fall 2026" -o "$DOCS/files/syllabus.html"
+  # The SYLLABUS is deliberately not published. It is UNO- and term-specific — room,
+  # meeting time, grade scale, integrity policy, the academic calendar — and by the
+  # instructional designer's model it belongs on Canvas, which carries the copy every
+  # enrolled student reads. What a public visitor needs from it lives in About.
+  "$PANDOC" ECON8310_About.md -s --toc --toc-depth=2 -c docstyle.css \
+     --metadata title="ECON 8310 — About This Course" -o "$DOCS/files/about.html"
   "$PANDOC" ECON8310_Datasets.md -s --toc --toc-depth=2 -c docstyle.css \
      --metadata title="ECON 8310 — Course Datasets" -o "$DOCS/files/datasets.html"
   "$PANDOC" ECON8310_Project_Rubric.md -s --toc --toc-depth=2 -c docstyle.css \
      --metadata title="ECON 8310 — Final Project Rubric" -o "$DOCS/files/project-rubric.html"
   "$PANDOC" TROUBLESHOOTING.md -s --toc --toc-depth=2 -c docstyle.css \
      --metadata title="ECON 8310 — Troubleshooting" -o "$DOCS/files/troubleshooting.html"
-  echo "  OK   syllabus, datasets, project-rubric, troubleshooting"
+  echo "  OK   about, datasets, project-rubric, troubleshooting"
   sync_student_docs
 }
 

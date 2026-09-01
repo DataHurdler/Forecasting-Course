@@ -41,8 +41,12 @@ def a(href: str, text: str, extra: str = "") -> str:
 
 def render_week(w: dict) -> str:
     head = [f'<span class="wnum">{w["label"]}</span>']
-    if w.get("date"):
-        head.append(f'<span class="wdate">{w["date"]}</span>')
+    # The lecture name, not a calendar date. A date belongs to one term and one
+    # section; the lecture belongs to the material, so it reads the same in fall
+    # and in spring — and it lets a card identify itself even when a reader's own
+    # calendar has drifted past a break week. Canvas carries the dates.
+    if w.get("lecture"):
+        head.append(f'<span class="wdate">{w["lecture"]}</span>')
     for d in w.get("due", []):
         head.append(f'<span class="due">{a(d["href"], d["text"])}</span>')
 

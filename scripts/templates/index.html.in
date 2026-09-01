@@ -101,18 +101,27 @@
 
 <h1>ECON 8310: Business Forecasting (with AI)</h1>
 <div class="byline">University of Nebraska at Omaha &middot; Department of Economics</div>
-<span class="term">Fall 2026</span>
 
 <p style="margin-top:1.6em">Forecasting tools and applications for business settings. The first
 half of the course covers traditional econometric forecasting; the second half turns to
 predictive analytics and machine learning. Everything is implemented in Python.</p>
 
-<h2>Syllabus</h2>
+<h2>Course documents</h2>
 
-<p><a href="files/syllabus.html" target="_blank" rel="noopener"><strong>Read the full syllabus</strong></a> &mdash; grading, course
-policies, the AI-use and prompt-budget rules, final project milestones, and the complete schedule.</p>
+<p><a href="files/about.html" target="_blank" rel="noopener"><strong>About this course</strong></a> &mdash; what it teaches,
+what it assumes you already know, and the books it reads from.</p>
 
-<p>The other course documents:</p>
+<div class="callout amber">
+  <span class="t">Enrolled at UNO? Canvas has what this site does not</span>
+  <p>This site carries the <strong>course materials</strong> &mdash; every slide deck, lab, assignment,
+  the book and the workbook &mdash; and nothing specific to one university, term or section. It has no
+  calendar dates, no grading scale, no lecture recordings and no course policies.</p>
+  <p>If you are enrolled, <strong>Canvas is authoritative</strong> for all of those: your syllabus, the
+  term calendar and due dates, the lecture videos, the academic-integrity and accessibility policies,
+  and how work is submitted and graded. Where the two ever disagree, Canvas wins.</p>
+</div>
+
+<p>The rest of the course documents:</p>
 
 {{DOCUMENTS_TABLE}}
 
@@ -159,6 +168,12 @@ python scripts/prep_electricity.py   # hourly electricity demand — Lecture 3</
 
 <h2>Weekly schedule</h2>
 
+<p class="neutral" style="font-size:.95em;color:#525252">The sixteen <strong>teaching weeks</strong>, in
+order, with the lecture each one covers. There are no calendar dates here: those belong to a
+particular term and section, and a break week falls in a different place each semester. Enrolled
+students get the dated calendar &mdash; including breaks and due dates &mdash; from Canvas, where the
+week numbers match these.</p>
+
 {{SCHEDULE}}
 
 <h2>Assignments</h2>
@@ -204,7 +219,7 @@ it in class, and every lab ends with the output your own run should produce.</p>
 
 <footer>
   <span id="updated">Last updated: {{UPDATED}}</span><br>
-  ECON 8310 &middot; University of Nebraska at Omaha &middot; Fall 2026<br>
+  ECON 8310 &middot; University of Nebraska at Omaha<br>
   Slides are published as interactive HTML, not PDF &mdash; HTML carries real headings,
   alt text, table headers and readable math. Labs and assignments are Quarto documents.
   For a printable copy, use your browser's Print to PDF.

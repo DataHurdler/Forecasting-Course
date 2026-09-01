@@ -1,6 +1,6 @@
 ---
 title: "Homework 3: Decision Trees and Random Forests"
-subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha · Fall 2026"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
 author: "Your Name"
 format:
   html:

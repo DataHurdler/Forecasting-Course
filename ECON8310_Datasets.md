@@ -1,14 +1,14 @@
 ECON 8310 — The Data We Use
 ===========================
-### Fall 2026 · A guide to the four datasets in this course
+### A guide to the four datasets in this course
 
-[← Course website](https://www.luozijun.com/forecasting-course/) · [Syllabus](https://www.luozijun.com/forecasting-course/files/syllabus.html)
+[← Course website](https://www.luozijun.com/forecasting-course/) · [About this course](https://www.luozijun.com/forecasting-course/files/about.html)
 
 ---
 
 ## Why there is a spine, and why there are supplements
 
-Almost everything in this course — lecture examples, in-class demonstrations, and homework —
+Almost everything in this course — lecture examples, lab demonstrations, and homework —
 runs on **one** dataset. That is deliberate. When exponential smoothing and an LSTM disagree
 in Week 9, you should be able to say the difference came from the **method**. If we switched
 datasets every lecture, you could never make that claim: the data would be a confound.

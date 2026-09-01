@@ -13,7 +13,6 @@
 
 weeks:
 - label: Week 1
-  date: Aug 27, 2026
   title: Introduction, Exponential Smoothing &amp; Forecast Evaluation
   reading: FPP Ch. 1, Ch. 2, §5.1&ndash;5.10, Ch. 8
   links:
@@ -24,9 +23,9 @@ weeks:
   assignment:
     href: homework/HW01_Part1_ETS.html
     text: Assignment 1 Part 1
-    dueon: due Week 2 &middot; Sep 3
+    dueon: due Week 2
+  lecture: Lecture 1
 - label: Week 2
-  date: Sep 3, 2026
   title: ARIMA, VAR &amp; Multivariate Models
   due:
   - href: homework/HW01_Part1_ETS.html
@@ -40,13 +39,9 @@ weeks:
   assignment:
     href: homework/HW01_Part2_ARIMA_VAR.html
     text: Assignment 1 Part 2
-    dueon: due Week 3 &middot; Sep 10
-  notes:
-  - <strong>6:00&ndash;7:30pm:</strong> Industry panel and Q&amp;A with two business professionals,
-    followed by time to mingle. Lecture 2 runs after the panel, and <strong>Lab 2 is self-paced this
-    week</strong> &mdash; work through it on your own time.
+    dueon: due Week 3
+  lecture: Lecture 2
 - label: Week 3
-  date: Sep 10, 2026
   title: Generalized Additive Models
   due:
   - href: homework/HW01_Part2_ARIMA_VAR.html
@@ -60,9 +55,9 @@ weeks:
   assignment:
     href: homework/HW02_GAMs.html
     text: Assignment 2
-    dueon: due Week 4 &middot; Sep 17
+    dueon: due Week 4
+  lecture: Lecture 3
 - label: Week 4
-  date: Sep 17, 2026
   title: Decision Trees
   due:
   - href: homework/HW02_GAMs.html
@@ -75,8 +70,8 @@ weeks:
     text: Slides
   - href: labs/Lecture04_lab.html
     text: Lab 4
+  lecture: Lecture 4
 - label: Week 5
-  date: Sep 24, 2026
   title: Tree Ensembles &mdash; Random Forests &amp; Boosted Trees
   reading: ISLP §8.2; XGBoost &ldquo;Introduction to Boosted Trees&rdquo;; FPP §12.4 (Python ed.) /
     §12.5 (R ed.) for the bagging intuition
@@ -88,13 +83,9 @@ weeks:
   assignment:
     href: homework/HW03_Trees_RF.html
     text: Assignment 3
-    dueon: due Week 6 &middot; Oct 1
-  notes:
-  - <strong>Online, asynchronous &mdash; no in-person meeting.</strong> The lecture is posted as a recording
-    and the lab is self-paced; office hours run as usual. Nothing is due this week, so it is the week
-    to work on Assignment 3.
+    dueon: due Week 6
+  lecture: Lecture 5
 - label: Week 6
-  date: Oct 1, 2026
   title: Regularization &amp; Model Selection
   due:
   - href: homework/HW03_Trees_RF.html
@@ -108,11 +99,9 @@ weeks:
   assignment:
     href: homework/HW04_XGBoost_Regularization.html
     text: Assignment 4
-    dueon: due Week 7 &middot; Oct 8
-  notes:
-  - Final project grading rubric distributed.
+    dueon: due Week 7
+  lecture: Lecture 6
 - label: Week 7
-  date: Oct 8, 2026
   title: Introduction to Neural Networks
   due:
   - href: homework/HW04_XGBoost_Regularization.html
@@ -123,8 +112,8 @@ weeks:
     text: Slides
   - href: labs/Lecture07_lab.html
     text: Lab 7
+  lecture: Lecture 7
 - label: Week 8
-  date: Oct 15, 2026
   title: CNN Architectures
   reading: FPP-Py §14.3
   links:
@@ -135,9 +124,9 @@ weeks:
   assignment:
     href: homework/HW05_Part1_FFN_CNN.html
     text: Assignment 5 Part 1
-    dueon: due Week 9 &middot; Oct 22
+    dueon: due Week 9
+  lecture: Lecture 8
 - label: Week 9
-  date: Oct 22, 2026
   title: RNNs and LSTMs
   due:
   - href: homework/HW05_Part1_FFN_CNN.html
@@ -150,8 +139,8 @@ weeks:
     text: Lab 9 &middot; Part 1
   notes:
   - Final project proposal due.
+  lecture: Lecture 9 Part 1
 - label: Week 10
-  date: Oct 29, 2026
   title: Transformers
   reading: FPP-Py Ch. 15
   links:
@@ -162,9 +151,9 @@ weeks:
   assignment:
     href: homework/HW05_Part2_Sequence.html
     text: Assignment 5 Part 2
-    dueon: due Week 11 &middot; Nov 5
+    dueon: due Week 11
+  lecture: Lecture 9 Part 2
 - label: Week 11
-  date: Nov 5, 2026
   title: Bayesian Statistics I &mdash; Foundations
   due:
   - href: homework/HW05_Part2_Sequence.html
@@ -179,9 +168,9 @@ weeks:
   assignment:
     href: homework/HW05_Part3_Comparison.html
     text: Assignment 5 Part 3
-    dueon: due Week 12 &middot; Nov 12
+    dueon: due Week 12
+  lecture: Lecture 10
 - label: Week 12
-  date: Nov 12, 2026
   title: Bayesian Statistics II &mdash; Time Series
   due:
   - href: homework/HW05_Part3_Comparison.html
@@ -195,9 +184,9 @@ weeks:
   assignment:
     href: homework/HW06_Part1_Foundations_TS.html
     text: Assignment 6 Part 1
-    dueon: due Week 13 &middot; Nov 19
+    dueon: due Week 13
+  lecture: Lecture 11 Part 1
 - label: Week 13
-  date: Nov 19, 2026
   title: Bayesian Statistics II &mdash; Hierarchical Models
   due:
   - href: homework/HW06_Part1_Foundations_TS.html
@@ -211,15 +200,12 @@ weeks:
   assignment:
     href: homework/HW06_Part2_Hierarchical.html
     text: Assignment 6 Part 2
-    dueon: due Week 15 &middot; Dec 3
+    dueon: due Week 14
   notes:
   - <em>Not this:</em> FPP Ch. 11 is also titled &ldquo;hierarchical,&rdquo; but it covers forecast
     <strong>reconciliation</strong> &mdash; a different topic from partial pooling.
+  lecture: Lecture 11 Part 2
 - label: Week 14
-  date: Nov 26, 2026
-  title: Thanksgiving break &mdash; no class
-- label: Week 15
-  date: Dec 3, 2026
   title: Bayesian Statistics III &mdash; Bayesian Linear Regression
   due:
   - href: homework/HW06_Part2_Hierarchical.html
@@ -234,9 +220,9 @@ weeks:
   assignment:
     href: homework/HW07_Bayesian_Regression.html
     text: Assignment 7
-    dueon: due Week 16 &middot; Dec 10
-- label: Week 16
-  date: Dec 10, 2026
+    dueon: due Week 15
+  lecture: Lecture 12
+- label: Week 15
   title: Synthesis &mdash; What the Semester Measured
   due:
   - href: homework/HW07_Bayesian_Regression.html
@@ -246,13 +232,12 @@ weeks:
   - href: slides/Lecture13_Synthesis.html
     text: Slides
   notes:
-  - <strong>No lab this week.</strong> The session is the course synthesis followed by project work
-    time &mdash; bring your project and your questions.
-- label: Final Exam Week
-  date: Dec 17, 2026
-  title: Final project presentations &mdash; 5:30&ndash;7:30pm
+  - <strong>No lab this week.</strong> The session is the course synthesis and project work time.
+  lecture: Lecture 13
+- label: Week 16
+  title: Final project presentations
   notes:
-  - <strong>Dec 18:</strong> final project report due.
+  - The final project report is due after the presentations.
 
 documents:
 - href: files/setup-guide.html
@@ -290,57 +275,57 @@ assignments:
 - href: homework/HW01_Part1_ETS.html
   text: 1 &middot; Part 1
   covers: Exponential smoothing, forecast evaluation
-  due: Sep 3
+  due: Week 2
   prompts: 4
 - href: homework/HW01_Part2_ARIMA_VAR.html
   text: 1 &middot; Part 2
   covers: ARIMA, VAR, Granger causality
-  due: Sep 10
+  due: Week 3
   prompts: 8
 - href: homework/HW02_GAMs.html
   text: '2'
   covers: Prophet, pyGAM, component decomposition
-  due: Sep 17
+  due: Week 4
   prompts: 10
 - href: homework/HW03_Trees_RF.html
   text: '3'
   covers: Decision trees, random forests, feature importance
-  due: Oct 1
+  due: Week 6
   prompts: 12
 - href: homework/HW04_XGBoost_Regularization.html
   text: '4'
   covers: XGBoost tuning, LASSO paths, Elastic Net
-  due: Oct 8
+  due: Week 7
   prompts: 12
 - href: homework/HW05_Part1_FFN_CNN.html
   text: 5 &middot; Part 1
   covers: Windowing datasets, FFN, 1D CNN
-  due: Oct 22
+  due: Week 9
   prompts: 9
 - href: homework/HW05_Part2_Sequence.html
   text: 5 &middot; Part 2
   covers: RNN, LSTM, Transformer, positional encoding
-  due: Nov 5
+  due: Week 11
   prompts: 10
 - href: homework/HW05_Part3_Comparison.html
   text: 5 &middot; Part 3
   covers: Five-architecture comparison and reflection
-  due: Nov 12
+  due: Week 12
   prompts: 3
 - href: homework/HW06_Part1_Foundations_TS.html
   text: 6 &middot; Part 1
   covers: Beta-Binomial, prior predictive, structural TS
-  due: Nov 19
+  due: Week 13
   prompts: 10
 - href: homework/HW06_Part2_Hierarchical.html
   text: 6 &middot; Part 2
   covers: Exchangeability, pooling, shrinkage, divergences
-  due: Dec 3
+  due: Week 14
   prompts: 9
 - href: homework/HW07_Bayesian_Regression.html
   text: '7'
   covers: DAGs, Bayesian regression, ROPE, scenarios
-  due: Dec 10
+  due: Week 15
   prompts: 16
 
 # Published under docs/ but deliberately not linked from the landing page.

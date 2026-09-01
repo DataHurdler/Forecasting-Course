@@ -1,18 +1,20 @@
 # ECON 8310 Final Project — Grading Rubric
-### Fall 2026 · 100 points · 25% of the course grade
+### 100 points · 25% of the course grade
 
-[← Course website](https://www.luozijun.com/forecasting-course/) · [Syllabus](https://www.luozijun.com/forecasting-course/files/syllabus.html)
+[← Course website](https://www.luozijun.com/forecasting-course/) · [About this course](https://www.luozijun.com/forecasting-course/files/about.html)
 
-Groups of no more than three. Four graded deliverables, described in the syllabus and broken
-down here. Read this before the proposal, not after — the proposal is worth 20 points and most
+Groups of no more than three. Four graded deliverables, broken down here. Read this before the proposal, not after — the proposal is worth 20 points and most
 of what it is graded on is decided before you write any code.
 
 | Deliverable | Due | Points |
 |---|---|---|
-| Group formation | Week 4 · Sep 17 | 5 |
-| Project proposal | Week 9 · Oct 22 | 20 |
-| In-class presentation | Dec 17 | 25 |
-| Final report | Dec 18 | 50 |
+| Group formation | Week 4 | 5 |
+| Project proposal | Week 9 | 20 |
+| Project presentation | Week 16 | 25 |
+| Final report | after the presentations | 50 |
+
+*The week numbers above match the course schedule. Calendar dates for your term come from your
+course calendar — they are not the same in every offering.*
 
 ---
 
@@ -63,9 +65,10 @@ Re-running Homework 4 is not a project.
 
 ---
 
-## 3. In-Class Presentation — 25 points
+## 3. Project Presentation — 25 points
 
-Roughly 10–12 minutes plus questions, on December 17. Every group member presents some part.
+Roughly 10–12 minutes plus questions. Every group member presents some part. The format —
+in person, live online, or recorded — differs by section; your instructor sets it.
 
 | Criterion | Pts | What earns full marks |
 |---|---|---|
@@ -133,4 +136,5 @@ which case I will adjust individually after speaking with the group.
 
 ---
 
-*Questions about this rubric go to the Canvas discussion board so that everyone sees the answer.*
+*Enrolled students: ask about this rubric on the course discussion board, so that everyone sees
+the answer.*

@@ -32,6 +32,7 @@ TARGETS = [
     "ECON8310Syllabus2026Fall.md",
     "ECON8310_Datasets.md",
     "ECON8310_Project_Rubric.md",
+    "ECON8310_About.md",
 ]
 
 # Documents in the STUDENT repo that carry it.

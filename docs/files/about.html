@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ECON 8310 — About This Course</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="docstyle.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ECON 8310 — About This Course</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#about-this-course" id="toc-about-this-course">About This
+Course</a>
+<ul>
+<li><a href="#what-this-course-covers"
+id="toc-what-this-course-covers">What this course covers</a></li>
+<li><a href="#what-you-will-be-able-to-do"
+id="toc-what-you-will-be-able-to-do">What you will be able to
+do</a></li>
+<li><a href="#what-it-assumes-you-know"
+id="toc-what-it-assumes-you-know">What it assumes you know</a></li>
+<li><a href="#the-books" id="toc-the-books">The books</a></li>
+<li><a href="#on-difficulty-and-pacing"
+id="toc-on-difficulty-and-pacing">On difficulty and pacing</a></li>
+<li><a href="#how-the-material-is-organised"
+id="toc-how-the-material-is-organised">How the material is
+organised</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="about-this-course">About This Course</h1>
+<p><strong>ECON 8310 · Business Forecasting</strong></p>
+<p>This page holds what the course <em>is</em> — what it teaches, what
+it assumes you already know, and which books it reads from. It is
+deliberately free of anything specific to one university, one term or
+one section: no dates, no grading scale, no room, no policies. Those
+live on Canvas for enrolled students.</p>
+<p>Everything else on this site — the slides, the labs, the assignments,
+the book and the workbook — is the course material itself, and is the
+same in every offering.</p>
+<hr />
+<h2 id="what-this-course-covers">What this course covers</h2>
+<p>The course develops practical forecasting skills for graduate
+students in business, economics and data science. It works through a
+broad suite of methods — from classical time series models to machine
+learning to Bayesian inference — applied to real business forecasting
+problems. Three things are emphasised throughout: implementation in
+Python, interpretation of model output for business decisions, and
+honest comparison of methods against each other and against a
+benchmark.</p>
+<p>The first half covers traditional econometric forecasting; the second
+half turns to predictive analytics and machine learning.</p>
+<p><strong>On AI.</strong> This course is designed to fully integrate
+modern AI tools, in both teaching and learning. The instructor uses AI a
+lot, says so when he has, and asks you to do the same. The <a
+href="https://www.luozijun.com/forecasting-course/files/ai-policy.html">AI
+use policy</a> sets out what that means in practice: any assistant is
+fine, every assignment carries a prompt budget and a prompt log, and the
+written interpretation is yours.</p>
+<hr />
+<h2 id="what-you-will-be-able-to-do">What you will be able to do</h2>
+<p>By the end of the course you will be able to:</p>
+<ol type="1">
+<li>Apply exponential smoothing, ARIMA and VAR models to univariate and
+multivariate business time series, and evaluate their forecast accuracy
+using walk-forward cross-validation.</li>
+<li>Build Generalized Additive Models and use Prophet to decompose
+trend, seasonality and external regressors.</li>
+<li>Engineer features from time series data and apply decision trees,
+random forests and gradient boosting to tabular forecasting
+problems.</li>
+<li>Design, train and evaluate feedforward networks, CNNs, LSTMs and
+Transformer encoders for sequence forecasting using PyTorch.</li>
+<li>Apply Bayesian inference to specify priors, compute posteriors and
+generate calibrated probabilistic forecasts using PyMC.</li>
+<li>Communicate model results and business recommendations to both
+technical and non-technical audiences.</li>
+</ol>
+<p><em>(These outcomes were drafted with help from Claude.)</em></p>
+<hr />
+<h2 id="what-it-assumes-you-know">What it assumes you know</h2>
+<p>Familiarity with <strong>basic statistics</strong> — regression and
+hypothesis testing — and <strong>introductory programming</strong>.</p>
+<p><strong>No prior knowledge of machine learning or time series
+analysis is required.</strong> The course starts from the beginning on
+both.</p>
+<hr />
+<h2 id="the-books">The books</h2>
+<p>All are free online. Nothing needs to be purchased.</p>
+<h3 id="the-main-text-in-two-editions">The main text, in two
+editions</h3>
+<p>The primary textbook exists in both an R and a Python version. The
+Python version is newer and has two extra chapters. You are <em>highly
+encouraged</em> to use Python — many basic forecasting tasks can be done
+in R if that is what you already know, but when the course reaches the
+more advanced techniques, Python is the only way through.</p>
+<ul>
+<li><strong><em>Forecasting: Principles and Practice, the Pythonic
+Way</em></strong> (<strong>FPP-Py</strong>) — <a
+href="https://otexts.com/fpppy/">otexts.com/fpppy</a></li>
+<li><strong><em>Forecasting: Principles and Practice (3rd
+ed.)</em></strong> (<strong>FPP3</strong>, the R edition) — <a
+href="https://otexts.com/fpp3/">otexts.com/fpp3</a></li>
+</ul>
+<p><strong>How the two editions line up.</strong> Chapters 1 through 13
+carry the same numbers and titles in both, so for the first two-thirds
+of the course either edition works. Two differences matter:</p>
+<ul>
+<li><strong>Chapter 12 is numbered differently.</strong> In FPP-Py,
+§12.4 is <em>Bootstrapping and bagging</em>. In FPP3, §12.4 is
+<em>Neural network models</em> and bootstrapping/bagging is §12.5. Every
+Chapter 12 assignment in the schedule gives both numbers.</li>
+<li><strong>Chapters 14 and 15 exist only in the Python edition</strong>
+— <em>Neural networks</em> and <em>Foundation forecasting models</em>.
+These are exactly the chapters the second half of the course reads.
+There is no R equivalent.</li>
+</ul>
+<p>That is the practical reason for the Python recommendation. Through
+Lecture 6 the choice of language is yours; <strong>from Lecture 7 onward
+the readings exist only in Python</strong>, and so does all of the
+course code.</p>
+<h3 id="two-gaps-fpp-cannot-fill">Two gaps FPP cannot fill</h3>
+<p>FPP contains <strong>no tree-based methods and no
+regularization</strong>. Lectures 4 through 6 use:</p>
+<ul>
+<li><strong><em>An Introduction to Statistical Learning with
+Applications in Python</em></strong> (<strong>ISLP</strong>) — <a
+href="https://www.statlearning.com/">statlearning.com</a></li>
+</ul>
+<p>ISLP is by four of the same statisticians behind the standard
+graduate reference in this area, it is written at this level, and every
+chapter ends with a Python lab. Chapter 8 covers decision trees,
+bagging, random forests and boosting together; Chapter 6 covers
+regularization. That is Lectures 4 through 6 almost exactly.</p>
+<p>Neither book covers <strong>Bayesian methods</strong>. Lectures 10
+through 12 use:</p>
+<ul>
+<li><strong><em>Bayesian Modeling and Computation in
+Python</em></strong> (<strong>BMCP</strong>), by Martin, Kumar and Lao —
+<a
+href="https://bayesiancomputationbook.com/">bayesiancomputationbook.com</a></li>
+</ul>
+<p>BMCP is written by PyMC core developers, and every example is PyMC
+and ArviZ code — the exact libraries this course uses. It is the closest
+thing to a purpose-built text for the last three lectures: Chapter 1
+covers priors and prior predictive checks, Chapter 2 the MCMC
+diagnostics you will be asked to report, §4.5–4.6 pooling and
+hierarchical models, and §6.4.3 is <em>Bayesian Structural Time
+Series</em> by name.</p>
+<p><strong>A note on level.</strong> BMCP is mathematically heavier than
+FPP in places, and <strong>you are not responsible for the
+derivations</strong>. Read the assigned sections for the ideas and the
+code, run the examples, and treat the rest as reference. The slides
+define what you are accountable for; BMCP shows you the same ideas in
+working PyMC.</p>
+<h3 id="three-further-free-resources">Three further free resources</h3>
+<ul>
+<li><strong>XGBoost, “Introduction to Boosted Trees”</strong> — <a
+href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html">xgboost.readthedocs.io</a>.
+Derives the regularized objective and the split-gain formula covered in
+Lecture 5.</li>
+<li><strong>Molnar, <em>Interpretable Machine Learning</em></strong> —
+<a
+href="https://christophm.github.io/interpretable-ml-book/">christophm.github.io</a>.
+Ch. 9 (decision trees), Ch. 19 (partial dependence), Ch. 23 (permutation
+feature importance). Useful for Lectures 3 through 5.</li>
+<li><strong>McElreath, <em>Statistical Rethinking</em> (lecture
+series)</strong> — free on YouTube. BMCP does not cover causal graphs,
+so this is where to go further on the <strong>DAGs</strong> in Lecture
+12. It is the standard treatment.</li>
+</ul>
+<p>Per-week readings are in the <strong>weekly schedule</strong> on the
+<a href="https://www.luozijun.com/forecasting-course/">course home
+page</a>.</p>
+<hr />
+<h2 id="on-difficulty-and-pacing">On difficulty and pacing</h2>
+<p>This course covers a wide range of methods — classical statistics,
+deep learning, Bayesian inference. Some weeks will be more familiar than
+others depending on your background, and which weeks those are differs
+from person to person. Work with each other so you can complement each
+other.</p>
+<p><strong>The methods build on each other.</strong> Falling behind in
+one week makes the next harder, and the effect compounds. Use office
+hours early rather than after you are stuck.</p>
+<hr />
+<h2 id="how-the-material-is-organised">How the material is
+organised</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr>
+<td><strong>Slides</strong></td>
+<td>One deck per lecture, published as interactive HTML rather than PDF
+— HTML carries real headings, alt text, table headers and readable
+maths</td>
+</tr>
+<tr>
+<td><strong>Labs</strong></td>
+<td>One executable lab per lecture, roughly 40 minutes, designed to be
+run alongside the deck</td>
+</tr>
+<tr>
+<td><strong>Assignments</strong></td>
+<td>Eleven submissions across seven assignments, each with its own
+prompt budget</td>
+</tr>
+<tr>
+<td><strong><a
+href="https://www.luozijun.com/forecasting-course/book/index.html">The
+book</a></strong></td>
+<td>Every lecture as continuous prose — the slides plus what was said
+about them</td>
+</tr>
+<tr>
+<td><strong><a
+href="https://www.luozijun.com/forecasting-course/workbook/index.html">The
+workbook</a></strong></td>
+<td>Every lab and assignment in one searchable volume, code shown rather
+than run</td>
+</tr>
+</tbody>
+</table>
+<p>The weekly schedule numbers the <strong>teaching weeks</strong> in
+order. It carries no calendar dates, because those belong to a
+particular term and section; enrolled students get the calendar,
+including any break weeks, from Canvas.</p>
+</body>
+</html>

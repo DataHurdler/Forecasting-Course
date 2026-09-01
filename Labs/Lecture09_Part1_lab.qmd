@@ -1,6 +1,6 @@
 ---
 title: "Lab 9 Part 1: Recurrence — and When Gates Are Not Worth It"
-subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha · Fall 2026"
+subtitle: "ECON 8310: Business Forecasting — University of Nebraska at Omaha"
 format:
   html:
     theme: cosmo
