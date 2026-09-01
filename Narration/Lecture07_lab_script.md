@@ -64,7 +64,9 @@ You need `torch`. Nothing today needs a GPU.
 
 ---
 
-# ▶ SETUP and ▶ STEP 1 — From a panel to windows
+# ▶ STEP 1 — From a panel to windows
+
+*(This covers the setup block as well — they run together.)*
 
 *(Screen: run setup, then the windowing loop.)*
 
