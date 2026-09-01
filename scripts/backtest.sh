@@ -2,7 +2,7 @@
 # backtest.sh — prove the whole repo is internally consistent and currently true.
 #
 # Run this after ANY change. It is the difference between a maintained repo and
-# one that merely looks maintained. Eleven gates:
+# one that merely looks maintained. Twelve gates:
 #
 #   1. surface-sync        counts + enumerative tables match what is on disk
 #   2. skill-integrity     frontmatter <-> body tool parity, anchors, flag parity
@@ -14,18 +14,23 @@
 #                         what its sources produce, its links resolve, and — the part
 #                         gate 4 is blind to — nothing is published under docs/ that
 #                         the landing page fails to link
-#   6. spec-conformance    every skill obeys the Agent Skills spec
-#   7. staleness           stale recommendations, source/render divergence, expired currency
-#   8. repo-hygiene       no scratch-as-main, no root clutter, archives documented
-#   9. derived-counts     enumerable claims (journals, patterns, phases, snippets)
+#   6. book-claims        the book's and workbook's prefaces are the only hand-written
+#                         pages in two generated volumes; every claim they make is
+#                         bound to its source (the Lecture 13 scoreboard, the chapter
+#                         list, the labs and assignments on disk), and a claim
+#                         reworded until it says nothing fails rather than skips
+#   7. spec-conformance    every skill obeys the Agent Skills spec
+#   8. staleness           stale recommendations, source/render divergence, expired currency
+#   9. repo-hygiene       no scratch-as-main, no root clutter, archives documented
+#  10. derived-counts     enumerable claims (journals, patterns, phases, snippets)
 #                         verified against their own source of truth
-#  10. ledger-coverage    the qualification ledger and the checks that actually run
+#  11. ledger-coverage    the qualification ledger and the checks that actually run
 #                         agree in BOTH directions, and every hook in settings.json
 #                         is wired to a file that exists (a mistyped path there
 #                         disables a hook in silence)
-#  11. hook-battery       the active guard hooks are driven with synthetic events
+#  12. hook-battery       the active guard hooks are driven with synthetic events
 #                         and must still go red on the failure each one targets —
-#                         gate 10 proves a hook is wired, this proves it still acts
+#                         gate 11 proves a hook is wired, this proves it still acts
 #   +  findings-validator  smoke test, so a review run cannot fail at the last step
 #
 # Every gate runs to completion even if an earlier one fails — you get the whole
@@ -56,7 +61,8 @@ run "surface-sync"       python3 "$DIR/check-surface-sync.py"
 run "skill-integrity"    python3 "$DIR/check-skill-integrity.py"
 run "model-versions"     "$DIR/check-model-versions.sh"
 run "links"              python3 "$DIR/check-links.py"
-run "site-index"       python3 "$DIR/check-site-index.py"
+run "site-index"        python3 "$DIR/check-site-index.py"
+run "book-claims"       python3 "$DIR/check-book-claims.py"
 run "spec-conformance"   python3 "$DIR/check-spec-conformance.py"
 run "staleness"          python3 "$DIR/check-staleness.py"
 run "repo-hygiene"       python3 "$DIR/check-repo-hygiene.py"

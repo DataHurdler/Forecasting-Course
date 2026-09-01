@@ -38,7 +38,34 @@ shipped.
   without a rebuild — 5/5 caught, 0/3 false alarms on the controls (clean tree, a declared
   `unlinked:` file, a `*_files/` asset directory). Ledger row filed.
 
-**Inventory at release: 60 skills, 18 agents, 37 rules, 8 hooks, 11 gates**
+- **Gate 6 — `scripts/check-book-claims.py`.** The book's and the workbook's prefaces are the
+  only hand-written pages in two generated volumes. Every chapter is assembled from the decks,
+  labs, assignments and narration, so a number in one cannot disagree with the material it came
+  from — it is never copied, it is read on every build. The prefaces are the exception, and
+  `book/index.qmd` had already carried one stale sentence.
+
+  The answer is not to stop writing them by hand. The specific numbers are what make a reader
+  keep going, and a preface with nothing checkable in it is duller and no more true. So the
+  prose stays authorial and each claim inside it is **bound to its source**: the chapter list
+  against `build_book.py`'s own `CHAPTERS`, the lab and assignment counts against the files on
+  disk, and the ordering claims — a 46-coefficient linear model at the top, ahead of four
+  neural architectures, with the two attention models fifth and sixth — against Lecture 13's
+  scoreboard. Ranks are recomputed **from the RMSE values**, not read off row positions: a
+  position-reading check is self-confirming, and would still say "fifth" about a model
+  re-measured at 640 that nobody re-sorted. The table's own ordering is gated for the same
+  reason. A claim whose pattern stops matching **fails** rather than skipping, because a
+  preface reworded until it says nothing is how coverage disappears quietly.
+
+  One claim is not a count and matters most: the workbook promises students that solutions are
+  not in it. The workbook is published to a public site and the solution keys are gitignored so
+  they cannot reach one — the gate now asserts that promise against what the build actually
+  produced.
+
+  Qualified against nine seeded defects — 9/9 caught, 0/3 false alarms on the controls (clean
+  tree, the preface re-wrapped with identical words, a non-neural row added to the scoreboard).
+  Ledger row filed.
+
+**Inventory at release: 60 skills, 18 agents, 37 rules, 8 hooks, 12 gates**
 (was 60 / 18 / 37 / 8 / 10 at template v2.5.1).
 
 ---

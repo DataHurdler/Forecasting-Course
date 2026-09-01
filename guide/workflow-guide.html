@@ -2921,7 +2921,7 @@ Five minutes in: make a gate go red, then green
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>The fastest way to <em>believe</em> the verification layer is to watch it catch you. From a fresh clone:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./scripts/backtest.sh</span>          <span class="co"># all eleven gates green on a clean tree</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./scripts/backtest.sh</span>          <span class="co"># all twelve gates green on a clean tree</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;&#39;</span> <span class="st">&#39;s/60 skills/61 skills/&#39;</span> README.md   <span class="co"># plant a lie (Linux: sed -i without &#39;&#39;)</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./scripts/backtest.sh</span>          <span class="co"># surface-sync goes RED: claim says 61, disk says 60</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">--</span> README.md      <span class="co"># undo</span></span>
@@ -3365,9 +3365,9 @@ What Is Actually Enforced (and how)
 </thead>
 <tbody>
 <tr class="odd">
-<td>Backtest (11 gates)</td>
+<td>Backtest (12 gates)</td>
 <td>scripts, pre-commit + CI</td>
-<td>repo-wide consistency/currency, <strong>plus the gate layer itself</strong> — ledger coverage and hook wiring (gate 10), the guard hooks re-fired against their target failures (gate 11)</td>
+<td>repo-wide consistency/currency, <strong>plus the gate layer itself</strong> — ledger coverage and hook wiring (gate 11), the guard hooks re-fired against their target failures (gate 12)</td>
 <td><strong>closed</strong> — commit blocked</td>
 <td><code>--no-verify</code></td>
 <td>gate output, CI log</td>
@@ -3555,9 +3555,9 @@ This is not hypothetical — it caught a live bug in this repo
 </tbody>
 </table>
 <p>And one command runs the mechanical half of all of it:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./scripts/backtest.sh</span>    <span class="co"># eleven gates: consistency, skill integrity, currency, links,</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                         <span class="co"># site-index completeness, spec, staleness, hygiene, derived counts,</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                         <span class="co"># ledger coverage, hook battery</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./scripts/backtest.sh</span>    <span class="co"># twelve gates: consistency, skill integrity, currency, links,</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                         <span class="co"># site-index completeness, book-preface claims, spec, staleness,</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                         <span class="co"># hygiene, derived counts, ledger coverage, hook battery</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The final pair check the checking layer rather than the content. <strong>Ledger coverage</strong> reads the qualification ledger and the set of checks that actually run, and requires them to agree in both directions: a registered check with no ledger row fails the build, a row naming a checker that no longer exists fails the build, and a row parked under <em>Not yet qualified</em> warns — visible debt rather than silence. It also verifies that every hook registered in <code>.claude/settings.json</code> points at a file that exists, is invocable, and is tracked in git. The <strong>hook battery</strong> then fires each active guard hook with synthetic events and requires it to still go red on the failure it was written for, alongside clean controls that must stay green. Gate 9 proves a hook is wired; gate 10 proves it still acts.</p>
 <p>Findings themselves are machine-checked rather than described: reviewers emit a JSON array validated against <a href="https://github.com/pedrohcgs/claude-code-my-workflow/blob/main/.claude/references/finding-schema.json"><code>finding-schema.json</code></a> by <code>scripts/validate-findings.py</code>. Every finding must cite the <strong>rule</strong> it violates (a finding citing no rule is an opinion) and give a <strong>failing case</strong> — a concrete configuration that breaks the claim, not “this could be clearer”. Finding ids are deterministic, so deduplication across review rounds is exact rather than fuzzy.</p>
 </section>

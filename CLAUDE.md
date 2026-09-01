@@ -67,6 +67,11 @@ python scripts/set_course_url.py https://new.host/path/ # rewrite all of them, t
 python scripts/build_index.py                          # rebuild it now
 python scripts/check-site-index.py                     # current? links resolve? nothing orphaned?
 
+# The book and workbook are generated; their PREFACES are the only hand-written pages in
+# them. Every claim a preface makes is bound to its source, so editing one means the claim
+# and its source have to still agree.
+python scripts/check-book-claims.py
+
 # Student-visible external links (skips commented-out blocks)
 python scripts/check_links.py
 

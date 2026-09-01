@@ -249,7 +249,7 @@ For more, see [Troubleshooting](#troubleshooting) in the Appendix.
 The fastest way to *believe* the verification layer is to watch it catch you. From a fresh clone:
 
 ```bash
-./scripts/backtest.sh          # all eleven gates green on a clean tree
+./scripts/backtest.sh          # all twelve gates green on a clean tree
 sed -i '' 's/60 skills/61 skills/' README.md   # plant a lie (Linux: sed -i without '')
 ./scripts/backtest.sh          # surface-sync goes RED: claim says 61, disk says 60
 git checkout -- README.md      # undo
@@ -520,7 +520,7 @@ A skeptical reader should distinguish "Claude was told to check" from "a determi
 
 | Check | Mechanism | Scope | Fail behavior | Bypass | Evidence left |
 |---|---|---|---|---|---|
-| Backtest (11 gates) | scripts, pre-commit + CI | repo-wide consistency/currency, **plus the gate layer itself** — ledger coverage and hook wiring (gate 10), the guard hooks re-fired against their target failures (gate 11) | **closed** — commit blocked | `--no-verify` | gate output, CI log |
+| Backtest (12 gates) | scripts, pre-commit + CI | repo-wide consistency/currency, **plus the gate layer itself** — ledger coverage and hook wiring (gate 11), the guard hooks re-fired against their target failures (gate 12) | **closed** — commit blocked | `--no-verify` | gate output, CI log |
 | Quality score ≥ 80 | script, pre-commit | staged `.tex`/`.qmd`/`.R` | **closed**; render checks best-effort → `UNVERIFIED` noted, not failed | `SKIP_QUALITY_GATE=1` | score report |
 | Destructive-git guard | PreToolUse hook | `git` commands in-session | **closed** — call blocked | run it yourself in a terminal | hook message |
 | Numeric-claim passport | script + skill | claims declared per paper | FAIL/STALE = must-fix at `/commit` | named override, recorded | `passport.yaml` rows |
@@ -667,9 +667,9 @@ These references carry it, loaded on demand rather than living in every session'
 And one command runs the mechanical half of all of it:
 
 ```bash
-./scripts/backtest.sh    # eleven gates: consistency, skill integrity, currency, links,
-                         # site-index completeness, spec, staleness, hygiene, derived counts,
-                         # ledger coverage, hook battery
+./scripts/backtest.sh    # twelve gates: consistency, skill integrity, currency, links,
+                         # site-index completeness, book-preface claims, spec, staleness,
+                         # hygiene, derived counts, ledger coverage, hook battery
 ```
 
 The final pair check the checking layer rather than the content. **Ledger coverage** reads
