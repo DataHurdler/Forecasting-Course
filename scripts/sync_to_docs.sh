@@ -128,7 +128,7 @@ echo ""
 # Restamp the landing page's "Last updated". A hand-maintained date is a claim
 # that rots; this makes it a fact about the last publish.
 if [ -f "$DOCS/index.html" ]; then
-  STAMP="$(date '+%-d %B %Y')"
+  STAMP="$(date '+%B %-d, %Y')"
   python3 - "$DOCS/index.html" "$STAMP" <<'PY'
 import re, sys
 p, stamp = sys.argv[1], sys.argv[2]
