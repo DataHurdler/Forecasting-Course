@@ -67,7 +67,40 @@ def clean_narration(block: str) -> str:
     if in_try:
         out.append(":::")
     text = "\n".join(out)
-    return re.sub(r'\n{3,}', '\n\n', text).strip()
+    return merge_beats(re.sub(r'\n{3,}', '\n\n', text).strip())
+
+# --- spoken beats -> paragraphs -------------------------------------------------
+# A recording script is written in BEATS: one thought per blank line, because a
+# reader-aloud needs the breath. On the page that becomes a stream of one-line
+# paragraphs — 40% of Lecture 9 Part 1's were under 25 words, 25 of them under 12
+# ("In principle." / "Back to that plus sign.").
+#
+# So join consecutive short prose beats into a paragraph. Only prose: anything
+# that is a heading, list item, quote, table, fence, div, or display math is left
+# exactly as written, and a beat that is already paragraph-length starts a new one
+# rather than swallowing its neighbour. Short beats that stand alone between two
+# structural blocks keep standing alone — those are the deliberate ones.
+_STRUCTURAL = re.compile(r'^\s*(#|[-*+]\s|\d+[.)]\s|>|\||:::|```|\$\$|!\[|\\\[)')
+JOIN_UNDER = 18          # words: a beat this short is a breath, not a paragraph
+
+def merge_beats(text: str) -> str:
+    blocks = re.split(r'\n\s*\n', text)
+    out = []
+    for b in blocks:
+        b = b.rstrip()
+        if not b:
+            continue
+        # A beat is prose when NO line in it opens with a structural marker.
+        # Beats are hard-wrapped, so testing only the first line missed almost
+        # all of them — the reason an earlier pass moved 191 paragraphs to 188.
+        prose = not any(_STRUCTURAL.match(l) for l in b.split('\n'))
+        short = len(b.split()) < JOIN_UNDER
+        if (out and prose and short and out[-1][0]
+                and len(out[-1][1].split()) < 70):
+            out[-1] = (True, out[-1][1] + ' ' + b.strip())
+        else:
+            out.append((prose, b))
+    return '\n\n'.join(b for _, b in out)
 
 # --- parsing ------------------------------------------------------------------
 # --- title matching ------------------------------------------------------------
