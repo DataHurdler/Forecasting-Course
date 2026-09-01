@@ -125,4 +125,20 @@ case "$TARGET" in
 esac
 
 echo ""
+# Restamp the landing page's "Last updated". A hand-maintained date is a claim
+# that rots; this makes it a fact about the last publish.
+if [ -f "$DOCS/index.html" ]; then
+  STAMP="$(date '+%-d %B %Y')"
+  python3 - "$DOCS/index.html" "$STAMP" <<'PY'
+import re, sys
+p, stamp = sys.argv[1], sys.argv[2]
+s = open(p, encoding="utf-8").read()
+# \g<1> not \1: a stamp beginning with a digit turns \1 into group 11.
+s2 = re.sub(r'(<span id="updated">Last updated: )[^<]*(</span>)', lambda m: m.group(1) + stamp + m.group(2), s)
+if s2 != s:
+    open(p, "w", encoding="utf-8").write(s2)
+PY
+  echo "  landing page stamped: $STAMP"
+fi
+
 echo "=== Done. Published to $DOCS ==="
