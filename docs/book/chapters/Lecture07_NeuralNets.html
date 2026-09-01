@@ -376,7 +376,8 @@ window.Quarto = {
 <p>So today is about the machinery. Lectures 8 and 9 are where it earns its place.</p>
 <p>Two honest reasons, and one honest warning.</p>
 <p>The first reason: a tree-based model treats every row as independent. Order is not part of the model. Everything a random forest knows about <em>time</em> — that last week matters, that fifty-two weeks ago matters — you put there by hand, as lag columns and rolling means. If you shuffled the feature columns, the model would be identical.</p>
-<p>The second reason: a tree’s prediction is <strong>piecewise constant</strong>. Remember Lab 4, where the tree could not predict above the largest value it had ever seen? That’s not a bug in our implementation. It is what a tree is. It averages training values in a leaf, so it cannot extrapolate. A neural network learns a smooth, continuous function, and it can. Now the warning, and I want to be blunt about it.</p>
+<p>The second reason: a tree’s prediction is <strong>piecewise constant</strong>. Remember Lab 4, where the tree could not predict above the largest value it had ever seen? That’s not a bug in our implementation. It is what a tree is. It averages training values in a leaf, so it cannot extrapolate. A neural network learns a smooth, continuous function, and it can.</p>
+<p>Now the warning, and I want to be blunt about it.</p>
 <p>This is <strong>not an upgrade</strong>. On the tabular problems in Homework 3 and Homework 4, gradient boosting and a tuned LASSO were hard to beat, and a network will often lose to both. You reach for a network when the data is genuinely a sequence, when the raw input is an image or audio, or when your sample size is very large. Otherwise you are paying in tuning time for accuracy you will not get.</p>
 <p>So today is about the machinery. Lectures 8 and 9 are where it earns its place.</p>
 </section>
@@ -443,7 +444,8 @@ window.Quarto = {
 <p><strong>Read that claim carefully.</strong> It says a network <em>can</em> represent the function — not that your optimizer will find it, that you have the data to identify it, or that it will generalize. Existence is not estimation, the same gap as between the optimal tree and the greedy one CART builds.</p>
 <p>I want to be precise about what that sigma actually buys, because it is easy to assume that <em>depth</em> is what makes a network powerful. It is not.</p>
 <p>Here is the thing to understand. A linear function of a linear function is linear. If you stack two layers with no activation between them, you get W-two times W-one times x — and W-two times W-one is just some other matrix. So you have a single matrix, applied once. You’ve built a linear model with extra steps and a slower fitting procedure. Depth alone gains you <strong>nothing</strong>.</p>
-<p>Put a nonlinearity between the layers and the picture changes completely. There’s a result called the <strong>universal approximation theorem</strong> which says a network with a single hidden layer can approximate any continuous function to arbitrary accuracy, given enough neurons. Now — read that claim carefully, because it is quoted far more often than it is understood.</p>
+<p>Put a nonlinearity between the layers and the picture changes completely. There’s a result called the <strong>universal approximation theorem</strong> which says a network with a single hidden layer can approximate any continuous function to arbitrary accuracy, given enough neurons.</p>
+<p>Now — read that claim carefully, because it is quoted far more often than it is understood.</p>
 <p>It says the network <strong>can represent</strong> the function. It does not say your optimizer will find it. It does not say you have enough data to identify it. And it certainly does not say the result will generalize to next quarter.</p>
 <p>Existence is not estimation. You’ve already met that gap: in Lecture 4 we said the optimal decision tree exists, and CART builds a greedy one instead, because finding the optimal one is computationally hopeless. Same shape of problem, different setting.</p>
 <p>There’s a practical reading of the theorem too, and it’s more useful than the theoretical one. The theorem is about a <em>single</em> hidden layer, made arbitrarily wide. In practice nobody builds that. Everybody builds narrow-and-deep instead, because depth composes features — layer two builds on what layer one found, rather than starting over — and that turns out to need far fewer total neurons for the same job.</p>
@@ -596,7 +598,8 @@ window.Quarto = {
 </div>
 <p><code>Dataset</code> fetches <em>one</em> example; <code>DataLoader</code> handles batching.</p>
 <p><strong>Note <code>shuffle=False</code>.</strong> Nearly every tutorial sets it <code>True</code> — right for images, wrong here. It destroys the ordering your lag features depend on.</p>
-<p>Two objects. A <code>Dataset</code> knows how to fetch <strong>one</strong> example — you give it <code>__len__</code> so it knows how many there are, and <code>__getitem__</code> so it can hand back item i. A <code>DataLoader</code> wraps that and handles batching, so your training loop can just iterate. You’ll write this exact class, or something very close to it, in Homework 5. Look at <code>shuffle=False</code>.</p>
+<p>Two objects. A <code>Dataset</code> knows how to fetch <strong>one</strong> example — you give it <code>__len__</code> so it knows how many there are, and <code>__getitem__</code> so it can hand back item i. A <code>DataLoader</code> wraps that and handles batching, so your training loop can just iterate. You’ll write this exact class, or something very close to it, in Homework 5.</p>
+<p>Look at <code>shuffle=False</code>.</p>
 <p>Nearly every PyTorch tutorial you find online sets that to <code>True</code>. For image classification that is correct — the order of your cat photos is meaningless, and shuffling helps.</p>
 <p>For us it is <strong>wrong</strong>, and it will quietly damage your model. Our rows are ordered in time, and the lag features depend on that ordering. Shuffling destroys it.</p>
 <p>This is the same discipline as <code>TimeSeriesSplit</code> instead of <code>KFold</code>, from Lecture 5. The default in the tooling assumes your rows are exchangeable. Ours are not.</p>
@@ -645,7 +648,8 @@ window.Quarto = {
 <p><strong>The one that bites:</strong> forget <code>zero_grad()</code> and PyTorch <em>accumulates</em> gradients rather than replacing them. No error, no warning — just a model that trains badly.</p>
 <p>And here is the loop. Four steps per mini-batch, and every PyTorch training loop you will ever read is these four lines with more scaffolding around them.</p>
 <p><code>zero_grad</code> — clear the old gradients. Forward pass and compute the loss. <code>backward</code> — compute the new gradients. <code>step</code> — update the weights.</p>
-<p>That’s it. Set up the optimizer with Adam, learning rate one-e-minus-three, weight decay one-e-minus-four — there’s your Ridge penalty. Loss function is MSE. Now the one that bites people.</p>
+<p>That’s it. Set up the optimizer with Adam, learning rate one-e-minus-three, weight decay one-e-minus-four — there’s your Ridge penalty. Loss function is MSE.</p>
+<p>Now the one that bites people.</p>
 <p>If you forget <code>zero_grad()</code>, PyTorch does not raise an error. It does not warn you. What it does is <strong>accumulate</strong> gradients across batches instead of replacing them — because gradient accumulation is a legitimate technique that some people want deliberately. So your model trains. It just trains badly, and you have no idea why.</p>
 <p>We will do this deliberately in the lab, so you can see what the loss curve looks like when it happens. It is worth seeing once in a controlled setting rather than at eleven at night before a deadline.</p>
 </section>
@@ -731,7 +735,8 @@ window.Quarto = {
 <p>Two. An FFN stacks those layers. Width and depth set capacity, and capacity accumulates faster than you expect. Twenty-two thousand parameters on five thousand rows. Three. Training is one loop: loss, <code>backward()</code>, <code>step()</code>, on mini-batches, using Adam. You never differentiate by hand.</p>
 <p>Four. Regularization is not new. Weight decay <em>is</em> Ridge; dropout and early stopping do the same job by other means. That’s the fifth appearance of one idea.</p>
 <p>Five. For time series specifically: do not shuffle the DataLoader, split by time, and call <code>zero_grad()</code> every batch.</p>
-<p>And six — the one that matters most. An FFN on engineered features is a <strong>competitor</strong> to XGBoost, not an upgrade. Architecture is what earns its keep, and that starts next week. Next time: CNN architectures. Convolution, pooling, and what a one-dimensional convolution does to a time series.</p>
+<p>And six — the one that matters most. An FFN on engineered features is a <strong>competitor</strong> to XGBoost, not an upgrade. Architecture is what earns its keep, and that starts next week.</p>
+<p>Next time: CNN architectures. Convolution, pooling, and what a one-dimensional convolution does to a time series.</p>
 </section>
 <section id="references" class="level3" data-number="7.6.3">
 <h3 data-number="7.6.3" class="anchored" data-anchor-id="references"><span class="header-section-number">7.6.3</span> References</h3>

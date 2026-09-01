@@ -347,7 +347,8 @@ window.Quarto = {
 <p><strong>The usual culprits</strong> are trending series — GDP, prices, sales — and variance that grows with the level. First-differencing removes a stochastic trend; a log transform stabilizes variance.</p>
 <p><span class="neutral smaller">Rule of thumb: visible trend or growing variance ⟹ likely non-stationary. Test formally with ADF or KPSS.</span></p>
 <p>Three conditions. A series is <strong>weakly stationary</strong> if the mean is constant over time, the variance is constant and finite, and the covariance between two points depends only on how far apart they are — the lag — not on <em>when</em> you are.</p>
-<p>Read that third condition carefully, because it’s the one people skim. It says the relationship between January and February should be the same as the relationship between June and July. The gap matters; the location doesn’t. Now, why does the definition earn its keep?</p>
+<p>Read that third condition carefully, because it’s the one people skim. It says the relationship between January and February should be the same as the relationship between June and July. The gap matters; the location doesn’t.</p>
+<p>Now, why does the definition earn its keep?</p>
 <p>If the mean drifts, there is no single value to forecast toward. Ask “what is the long-run level of this series?” and there’s no answer — it depends when you ask. If the variance grows, prediction intervals widen without bound. Your forecast is technically correct and operationally useless.</p>
 <p>Stationarity is what makes the past informative about the future. Every model today rests on it. When we get to neural networks in Week 7, that assumption is still hiding in there — it’s just less visible.</p>
 <p>The usual culprits are trending series — GDP, prices, sales, almost anything measured in dollars over time — and variance that grows with the level. First-differencing removes a stochastic trend. A log transform stabilizes variance. Often you need both.</p>
@@ -407,7 +408,8 @@ window.Quarto = {
 </div>
 <p>Before we go on, I want to show you <em>why</em> that differencing rule exists — because told as a rule it sounds like bookkeeping, and it is not.</p>
 <p>Look at these two series. Both trending up. They look related. If you saw this in a business deck you’d assume one drives the other.</p>
-<p>They have <strong>nothing to do with each other.</strong> Both are random walks I generated independently. Different random seeds, no shared shocks, no common cause. There is no relationship to find. Now look at the two numbers on the slide, because they’re the whole lesson.</p>
+<p>They have <strong>nothing to do with each other.</strong> Both are random walks I generated independently. Different random seeds, no shared shocks, no common cause. There is no relationship to find.</p>
+<p>Now look at the two numbers on the slide, because they’re the whole lesson.</p>
 <p>The correlation of their <em>changes</em> — week to week — is <strong>minus zero point one three</strong>. Essentially zero. That’s the truth: these series are independent.</p>
 <p>The correlation of their <em>levels</em> is <strong>plus zero point six two</strong>. And the levels are what you’d hand to a regression.</p>
 <p>Granger and Newbold demonstrated this in 1974. Regress two independent random walks on each other, and you reject the null of no relationship roughly <strong>three-quarters of the time</strong> at the five percent level. Not five percent, as the test promises. Seventy-five.</p>
@@ -459,7 +461,8 @@ window.Quarto = {
 <p><strong>Always unit-root test and difference <em>before</em> reading either plot.</strong> The ACF of a non-stationary series decays slowly no matter what the underlying process is, so it tells you nothing about <span class="math inline">\(p\)</span> or <span class="math inline">\(q\)</span> — only that you have not differenced yet.</p>
 <p>Two diagnostic plots, and together they tell you what model to fit.</p>
 <p>The <strong>autocorrelation function</strong> — the ACF — is the correlation between <span class="math inline">\(y_t\)</span> and <span class="math inline">\(y_{t-k}\)</span>. Straightforward: how does today relate to <span class="math inline">\(k\)</span> periods ago?</p>
-<p>The <strong>partial</strong> autocorrelation asks the same question but controls for everything in between. And that distinction matters more than it sounds. If today correlates with three days ago purely <em>because</em> today correlates with yesterday and yesterday correlates with three days ago, the ACF will show it and the PACF will not. The PACF isolates the direct link. Now the table, which is the practical payoff.</p>
+<p>The <strong>partial</strong> autocorrelation asks the same question but controls for everything in between. And that distinction matters more than it sounds. If today correlates with three days ago purely <em>because</em> today correlates with yesterday and yesterday correlates with three days ago, the ACF will show it and the PACF will not. The PACF isolates the direct link.</p>
+<p>Now the table, which is the practical payoff.</p>
 <p>For an <strong>AR(p)</strong> process, the ACF tails off geometrically, and the PACF <strong>cuts off</strong> sharply after lag <span class="math inline">\(p\)</span>. So if the PACF has two clear spikes and then nothing, you’re looking at an AR(2).</p>
 <p>For an <strong>MA(q)</strong> it’s the mirror image: the ACF cuts off after lag <span class="math inline">\(q\)</span>, the PACF tails off.</p>
 <p>For an <strong>ARMA</strong>, both tail off — which is less informative, and in practice is why people reach for automatic order selection.</p>
@@ -504,7 +507,8 @@ window.Quarto = {
 <p>What I like about this framework is how much of what you already know turns out to live inside it.</p>
 <p><strong>ARIMA(0,1,0)</strong> — no AR, one difference, no MA — is a random walk. That’s the naive forecast from Lecture 1. <strong>ARIMA(1,0,0)</strong> is a plain AR(1).</p>
 <p>And <strong>ARIMA(0,1,1)</strong> is algebraically equivalent to simple exponential smoothing. The model we spent twenty minutes on last week is a single point in this space.</p>
-<p>So ARIMA isn’t a competitor to what we did in Lecture 1. It’s a larger room that contains it. Let’s do one by hand, because the mechanics are less mysterious once you’ve turned the crank.</p>
+<p>So ARIMA isn’t a competitor to what we did in Lecture 1. It’s a larger room that contains it.</p>
+<p>Let’s do one by hand, because the mechanics are less mysterious once you’ve turned the crank.</p>
 <p>ARIMA(1,1,0) with phi-hat of one-half. We have <span class="math inline">\(y_{100} = 120\)</span> and <span class="math inline">\(y_{99} = 118\)</span>. So the change last period, delta-<span class="math inline">\(y_{100}\)</span>, is 2.</p>
 <p>The model says the next change is half of the last change: half of 2 is 1. Add that to where we are: 120 plus 1 equals <strong>121</strong>. That’s it. Differencing means we model the <em>change</em>, then add it back to the level.</p>
 <p>A word on where this comes from, because the name will follow you. Box and Jenkins formalized this in 1970 as a three-stage cycle: <strong>identify</strong> a candidate order from the ACF and PACF, <strong>estimate</strong> the parameters, then <strong>check</strong> the residuals — and if the residuals fail, go back to identification. It is a loop, not a pipeline. Half a century later that loop is still the methodology, and it’s why every ARIMA workflow you’ll see has the same three stages.</p>
@@ -584,8 +588,10 @@ window.Quarto = {
 <p>Each equation is estimated by ordinary least squares — it really is just regression — and the order <span class="math inline">\(p\)</span> is chosen by BIC. It’s worth knowing why this model exists, because it was a reaction to something.</p>
 <p>Christopher Sims proposed VAR in 1980, in a paper arguing that the large structural macroeconomic models of the day rested on assumptions nobody could defend. To identify those models, economists had to declare in advance which variables affected which — and Sims argued those restrictions were, in his word, incredible. Not wrong. Unbelievable.</p>
 <p>His alternative: stop pretending you know the structure. Let every variable depend on the lagged values of every variable, symmetrically, and let the data speak. He shared the Nobel Prize for it in 2011.</p>
-<p>I mention this because it frames what a VAR is <em>for</em>. It is deliberately agnostic. That’s its strength — you impose almost nothing — and it’s also why it can’t answer causal questions on its own, and why the parameter count explodes. You traded assumptions for parameters. Now the warning, and this one bites people in practice.</p>
-<p><strong>Parameter explosion.</strong> A VAR with <span class="math inline">\(k\)</span> variables and <span class="math inline">\(p\)</span> lags has <span class="math inline">\(k\)</span>-squared times <span class="math inline">\(p\)</span> coefficients. It’s quadratic in the number of variables. Five variables, four lags: one hundred coefficients.</p>
+<p>I mention this because it frames what a VAR is <em>for</em>. It is deliberately agnostic. That’s its strength — you impose almost nothing — and it’s also why it can’t answer causal questions on its own, and why the parameter count explodes. You traded assumptions for parameters.</p>
+<p>Now the warning, and this one bites people in practice.</p>
+<p><strong>Parameter explosion.</strong> A VAR with <span class="math inline">\(k\)</span> variables and <span class="math inline">\(p\)</span> lags has <span class="math inline">\(k\)</span>-squared times <span class="math inline">\(p\)</span> coefficients. It’s quadratic in the number of variables.</p>
+<p>Five variables, four lags: one hundred coefficients.</p>
 <p>Sit with that number. A monthly business series over ten years gives you a hundred and twenty observations. You’d be estimating a hundred parameters from a hundred and twenty data points. That model will fit your sample beautifully and forecast like a coin flip.</p>
 <p>So keep <span class="math inline">\(k\)</span> at four or fewer, unless you’re using a regularized LASSO-VAR — which is the kind of thing Lecture 6 gives you the tools for.</p>
 </section>

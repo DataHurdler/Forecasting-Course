@@ -403,7 +403,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="11.2">
 <h2 data-number="11.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">11.2</span> Setup</h2>
-<div id="0acc682a" class="cell" data-execution_count="1">
+<div id="277de6a4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -472,7 +472,7 @@ Walkthrough
 <h2 data-number="11.3" class="anchored" data-anchor-id="step-1-check-the-prior-before-you-use-it"><span class="header-section-number">11.3</span> Step 1 — Check the prior before you use it</h2>
 <p>We will model the count of high-SNAP weeks as Beta-Binomial. Start with <code>Beta(2, 2)</code> — weakly informative, centred at 0.5.</p>
 <p><strong>Before fitting anything</strong>, ask what that prior alone implies about the data.</p>
-<div id="c905c3a5" class="cell" data-execution_count="2">
+<div id="2ea2ed77" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> pm.Beta(<span class="st">"theta"</span>, alpha<span class="op">=</span><span class="dv">2</span>, beta<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    obs   <span class="op">=</span> pm.Binomial(<span class="st">"obs"</span>, n<span class="op">=</span>N_WEEKS, p<span class="op">=</span>theta, observed<span class="op">=</span>N_HIGH)</span>
@@ -514,7 +514,7 @@ Walkthrough
 </section>
 <section id="step-2-fit-it" class="level2" data-number="11.4">
 <h2 data-number="11.4" class="anchored" data-anchor-id="step-2-fit-it"><span class="header-section-number">11.4</span> Step 2 — Fit it</h2>
-<div id="394ce216" class="cell" data-execution_count="3">
+<div id="56a44966" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, chains<span class="op">=</span><span class="dv">4</span>, progressbar<span class="op">=</span><span class="va">False</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -549,7 +549,7 @@ theta  0.2628  0.026     0.22     0.31     3686     5175  1.00</code></pre>
 <section id="step-3-did-the-sampler-work" class="level2" data-number="11.5">
 <h2 data-number="11.5" class="anchored" data-anchor-id="step-3-did-the-sampler-work"><span class="header-section-number">11.5</span> Step 3 — Did the sampler work?</h2>
 <p>MCMC always returns samples. Whether they came from the posterior is a separate question, and one you are expected to answer every time.</p>
-<div id="dafdd860" class="cell" data-execution_count="4">
+<div id="1b1e1245" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(idata.sample_stats.diverging.<span class="bu">sum</span>())</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"R-hat        </span><span class="sc">{</span>summary<span class="sc">.</span>r_hat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.3f}</span><span class="ss">    (want &lt; 1.01)"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"ESS (bulk)   </span><span class="sc">{</span>summary<span class="sc">.</span>ess_bulk<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">      (want &gt; 400)"</span>)</span>
@@ -588,7 +588,7 @@ divergences  0        (want 0)</code></pre>
 <section id="step-4-ask-the-posterior-a-question" class="level2" data-number="11.6">
 <h2 data-number="11.6" class="anchored" data-anchor-id="step-4-ask-the-posterior-a-question"><span class="header-section-number">11.6</span> Step 4 — Ask the posterior a question</h2>
 <p>The posterior is a set of samples, so any question about <span class="math inline">\(\theta\)</span> is answered by counting.</p>
-<div id="c8081c2c" class="cell" data-execution_count="5">
+<div id="52fc38d1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> idata.posterior[<span class="st">"theta"</span>].values.ravel()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"P(theta &gt; 0.30)          = </span><span class="sc">{</span>(theta <span class="op">&gt;</span> <span class="fl">0.30</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
@@ -637,7 +637,7 @@ Try it
 <section id="step-5-how-much-did-the-prior-matter" class="level2" data-number="11.7">
 <h2 data-number="11.7" class="anchored" data-anchor-id="step-5-how-much-did-the-prior-matter"><span class="header-section-number">11.7</span> Step 5 — How much did the prior matter?</h2>
 <p>The honest objection to Bayesian work is that the prior is arbitrary. Test how much it moves the answer.</p>
-<div id="f9b6b624" class="cell" data-execution_count="6">
+<div id="7613d885" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, b, label <span class="kw">in</span> [(<span class="dv">2</span>, <span class="dv">2</span>, <span class="st">"Beta(2,2) — weak, centred 0.5"</span>),</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">5</span>, <span class="dv">15</span>, <span class="st">"Beta(5,15) — informed, centred 0.25"</span>),</span>
@@ -667,7 +667,7 @@ With enough data the prior stops mattering
 </div>
 </div>
 <p><strong>Your turn:</strong> re-run the badly-wrong prior against only the <strong>first 10 weeks</strong> of data and report how far the posterior moves.</p>
-<div id="1fc117f7" class="cell" data-execution_count="7">
+<div id="369607ea" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># n_small, k_small = 10, int((ca1.snap_days &gt;= 5).head(10).sum())</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># with pm.Model():</span></span>

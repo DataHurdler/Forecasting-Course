@@ -415,7 +415,8 @@ window.Quarto = {
 <p><strong>That leaves a floor at <span class="math inline">\(\rho\sigma^2\)</span></strong>, set by how alike the trees are rather than by how many you grow. Averaging a thousand nearly identical trees buys you almost nothing, and that is the problem the next section solves.</p>
 <p>Three steps.</p>
 <p>Draw <strong>B bootstrap samples</strong> — sample your training data with replacement, same size as the original. Because it’s with replacement, each sample gets some observations twice and misses others entirely. That’s the point: each sample is a slightly different view of the data.</p>
-<p>Fit one deep tree on each. Deep — we’re not pruning. We <em>want</em> each tree to be low-bias and high-variance, because averaging is about to handle the variance. Then average all B predictions. Now the equation, which is the most important thing on this slide. The variance of the averaged forecast is <strong>rho sigma squared, plus one-minus-rho over B, sigma squared</strong>. Two terms. Look at what happens as B — the number of trees — grows.</p>
+<p>Fit one deep tree on each. Deep — we’re not pruning. We <em>want</em> each tree to be low-bias and high-variance, because averaging is about to handle the variance. Then average all B predictions.</p>
+<p>Now the equation, which is the most important thing on this slide. The variance of the averaged forecast is <strong>rho sigma squared, plus one-minus-rho over B, sigma squared</strong>. Two terms. Look at what happens as B — the number of trees — grows.</p>
 <p>The second term has B in the denominator, so it shrinks toward zero. That’s why more trees never hurts. The first term has no B in it at all. It does not move.</p>
 <p>So you have a <strong>floor at rho sigma squared</strong>, where rho is the pairwise correlation between the trees’ predictions.</p>
 <p>Read what that says. If your trees are highly correlated — rho near one — the floor is near sigma squared, and averaging a thousand of them buys you essentially nothing. You have grown a thousand trees and reproduced one. That’s Galton’s crowd overhearing each other. And it’s exactly the problem the next section solves.</p>
@@ -612,9 +613,11 @@ window.Quarto = {
 <p>The forest cuts RMSE roughly <strong>28%</strong> against a single deep tree, and is the first method in this course to beat the seasonal naive benchmark on this series.</p>
 <p><span class="neutral smaller">What changed is not a better model of the series but a richer feature set — lags, price, and SNAP days are information ETS and ARIMA never had.</span></p>
 <p>The code is four lines, and the results table is the interesting part.</p>
-<p>On CA_1 food sales, fifty-two week test: seasonal naive at <strong>1,660</strong>. A single deep tree at <strong>1,415</strong>. The random forest at <strong>1,020</strong>. Two things.</p>
+<p>On CA_1 food sales, fifty-two week test: seasonal naive at <strong>1,660</strong>. A single deep tree at <strong>1,415</strong>. The random forest at <strong>1,020</strong>.</p>
+<p>Two things.</p>
 <p>The forest cuts RMSE about <strong>twenty-eight percent</strong> against the single tree. That’s the variance reduction, bought purely by averaging — same algorithm, same features, five hundred of them instead of one.</p>
-<p>And it is the <strong>first method in this course to beat the seasonal naive benchmark on this series.</strong> In Homework 1 you found that exponential smoothing couldn’t. ARIMA couldn’t either. This does, comfortably. Now — be careful about the conclusion you draw, because the obvious one is wrong.</p>
+<p>And it is the <strong>first method in this course to beat the seasonal naive benchmark on this series.</strong> In Homework 1 you found that exponential smoothing couldn’t. ARIMA couldn’t either. This does, comfortably.</p>
+<p>Now — be careful about the conclusion you draw, because the obvious one is wrong.</p>
 <p>What changed is not that random forests model time series better than ARIMA. It’s that we gave this model <strong>information the others never had</strong>: lags, price, SNAP days, event flags. ETS and ARIMA only ever saw the series’ own history.</p>
 <p>That’s the real lesson of the second half of this course. The gains from here are coming substantially from feature engineering, not from model sophistication. A random forest with one lag feature would lose to ARIMA. A random forest with a well-built feature set wins.</p>
 </section>
@@ -667,7 +670,8 @@ window.Quarto = {
 <p>The trees are deliberately <strong>shallow</strong> — depth 3 to 6 — because each one only has to capture a small piece of the remaining error. The ensemble converges slowly and on purpose.</p>
 <p><strong>The learning rate <span class="math inline">\(\eta\)</span> is the main dial.</strong> Small values (0.01–0.1) take a tiny step per tree: slower, needs more trees, far more robust. Large values (<span class="math inline">\(&gt; 0.3\)</span>) move fast and risk overshooting. The reliable recipe is a small <span class="math inline">\(\eta\)</span>, many trees, and <strong>early stopping</strong> — without which boosting will happily fit your noise.</p>
 <p>Formally, three steps in a loop.</p>
-<p>Start with the mean. Then repeatedly: compute the residuals, fit a shallow tree to those residuals, and add a fraction of that tree to the running prediction. Two design choices worth understanding.</p>
+<p>Start with the mean. Then repeatedly: compute the residuals, fit a shallow tree to those residuals, and add a fraction of that tree to the running prediction.</p>
+<p>Two design choices worth understanding.</p>
 <p><strong>The trees are deliberately shallow</strong> — depth three to six. That’s the opposite of bagging, where we grew them deep. Here each tree only needs to capture a small piece of the remaining error, so a small tree is enough. A deep tree would fit the residual noise, and the next iteration would be trying to correct noise.</p>
 <p><strong>The learning rate eta is the main dial.</strong> After fitting a tree to the residuals, you don’t add the whole thing — you add eta times it, where eta might be zero point zero five. Which means you deliberately under-correct at every step. Why on earth would you do that?</p>
 <p>Because each tree is fitted to the residuals of one particular sample, so part of what it sees is noise. Take the full correction and you bake that noise in. Take five percent of it, five hundred times, and the noise averages out while the signal accumulates.</p>
@@ -690,7 +694,8 @@ window.Quarto = {
 <p>Three improvements over vanilla gradient boosting.</p>
 <p><strong>The Newton step.</strong> Vanilla boosting uses the gradient — the direction of steepest descent. XGBoost also uses the second derivative, the curvature. Knowing how sharply the loss is bending lets you take a better-sized step, so it converges in fewer trees.</p>
 <p><strong>Explicit regularization.</strong> This is the important one. XGBoost puts penalties directly in the objective — gamma on the number of leaves, lambda on the magnitude of the leaf weights. So overfitting is controlled by the loss function itself, not only by stopping early.</p>
-<p><strong>Column subsampling.</strong> Borrowed straight from random forests: sample features per tree and per split. The decorrelation idea from slide nine, imported into boosting. Notice what that second advance actually is.</p>
+<p><strong>Column subsampling.</strong> Borrowed straight from random forests: sample features per tree and per split. The decorrelation idea from slide nine, imported into boosting.</p>
+<p>Notice what that second advance actually is.</p>
 <p><code>reg_lambda</code> penalizes the sum of squared leaf weights. That is an <strong>L2 penalty</strong> — it is Ridge regression, applied to leaf weights instead of regression coefficients. And <code>gamma</code> penalizes the count of leaves, which is what LASSO does to nonzero coefficients. You are seeing next week’s lecture, one week early, wearing different clothes.</p>
 <p>That’s not a coincidence. Regularization is not a linear-model topic. It is how <em>every</em> flexible model is kept honest, and you’ll meet it a fourth time in Lecture 7 as weight decay and dropout.</p>
 <p>XGBoost dominated Kaggle tabular competitions from 2014 to 2018. LightGBM is faster on large data; CatBoost handles categorical features natively. The ideas are the same.</p>

@@ -549,7 +549,8 @@ window.Quarto = {
 <p>Six lines. Two convolutions with ReLUs, a pooling step, a flatten, and a linear layer down to one number.</p>
 <p>One thing that trips everyone up: the input shape is <code>(batch, channels, time)</code>. Channels come <strong>before</strong> time. That is the transpose of how the data naturally sits in a dataframe, and it’s also the opposite of what <code>nn.LSTM</code> wants next week. You will get this wrong at least once; the error message is unhelpful.</p>
 <p>Everything from Lecture 7 still applies. Adam with weight decay. <code>zero_grad()</code> every batch. <code>shuffle=False</code>. Split by time, not at random.</p>
-<p>And note what <code>AdaptiveAvgPool1d(1)</code> does: it averages across the <em>entire</em> time axis, collapsing it to a single number per channel. Watch what that costs on the next slide.</p>
+<p>And note what <code>AdaptiveAvgPool1d(1)</code> does: it averages across the <em>entire</em> time axis, collapsing it to a single number per channel.</p>
+<p>Watch what that costs on the next slide.</p>
 </section>
 <section id="does-it-actually-work" class="level3" data-number="8.5.3">
 <h3 data-number="8.5.3" class="anchored" data-anchor-id="does-it-actually-work"><span class="header-section-number">8.5.3</span> Does It Actually Work?</h3>
@@ -603,7 +604,8 @@ window.Quarto = {
 <p><span class="key-result"><strong>Every CNN variant loses to a 46-coefficient linear model</strong></span> — a seven-week receptive field cannot see the annual lag LASSO was handed directly.</p>
 <p>And swapping average pooling for <code>Flatten</code>, which keeps <em>where</em> each pattern occurred, is worth about <strong>500 RMSE</strong> — three seeds each, against a spread of about 80.</p>
 <p>Same weekly panel. Twenty-six-week windows, four channels, thirty store-category series, the same test block as Homework 4 — so these numbers are directly comparable to work you’ve already done. LASSO, with forty-six engineered features: seven forty-four. XGBoost: seven eighty-one. Random forest: eight ninety-nine.</p>
-<p>Then the CNNs. Flatten head: one thousand thirty-two. Global max pool: fourteen eighteen. Global average pool: fifteen thirty-four. Seasonal naive, at the bottom: twenty-one fifty-two. Two things to take from this.</p>
+<p>Then the CNNs. Flatten head: one thousand thirty-two. Global max pool: fourteen eighteen. Global average pool: fifteen thirty-four. Seasonal naive, at the bottom: twenty-one fifty-two.</p>
+<p>Two things to take from this.</p>
 <p>First — <strong>every CNN variant loses to a forty-six-coefficient linear model.</strong> Not narrowly. And now you know why: a seven-week receptive field cannot see the annual lag that LASSO was simply handed as a column. The architecture’s assumption about locality is wrong for this data. Second, and this is the one I promised you.</p>
 <p>Swapping average pooling for <code>Flatten</code> — which keeps <em>where</em> each pattern occurred, instead of averaging it away — is worth about <strong>five hundred RMSE</strong>. Three seeds each, against a run-to-run spread of roughly eighty. That gap is real. That’s the objection from slide 7, measured. Pooling threw away position, and position was carrying signal.</p>
 <p>And I want to be careful about how far to push that conclusion, because there’s a tempting overreach here.</p>

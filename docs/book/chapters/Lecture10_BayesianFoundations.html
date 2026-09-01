@@ -423,7 +423,8 @@ window.Quarto = {
 <p><span class="neutral smaller">The cost is that you must state a prior, and defend it. That is the rest of this lecture.</span></p>
 <p>Here’s the sharpest version of the difference.</p>
 <p>A ninety-five percent <strong>confidence</strong> interval of point-oh-two to point-oh-eight does <strong>not</strong> mean there’s a ninety-five percent chance the parameter lies in that range. It means intervals constructed this way would contain the true value ninety-five percent of the time across repeated samples. That is a statement about the <em>procedure</em>, not about your parameter.</p>
-<p>A ninety-five percent <strong>credible</strong> interval of point-oh-two to point-oh-eight <em>does</em> mean there is a ninety-five percent probability the parameter lies in that range, given your model and your data. Now — I know that sounds like a technicality that only statisticians care about. It isn’t.</p>
+<p>A ninety-five percent <strong>credible</strong> interval of point-oh-two to point-oh-eight <em>does</em> mean there is a ninety-five percent probability the parameter lies in that range, given your model and your data.</p>
+<p>Now — I know that sounds like a technicality that only statisticians care about. It isn’t.</p>
 <p>It is the difference between a sentence you can say out loud to a decision-maker and a sentence you have to keep correcting. Everyone in every meeting you have ever been in interprets a confidence interval as a credible interval. The Bayesian version is the one that means what everybody already thinks it means.</p>
 <p>And there’s a second, larger payoff. Because the answer is a full distribution, you can interrogate it directly.</p>
 <p><em>What is the probability the promotion lifts demand by more than five percent?</em> Count the posterior samples above five percent. <em>What’s the chance we stock out if we order four hundred units?</em> Count the samples above four hundred.</p>
@@ -694,7 +695,8 @@ window.Quarto = {
 <p>A prior predictive check is <strong>model debugging</strong> that costs two lines — and the habit most often skipped.</p>
 </div>
 <p>One more habit, and it’s the one most often skipped. <strong>Before you touch the data</strong>, simulate from the prior alone. Two lines: <code>sample_prior_predictive</code>, then plot it.</p>
-<p>What you’re doing is asking your model to hallucinate datasets, using only your priors, and then looking at whether those datasets could plausibly have come from your business. Three things to look for.</p>
+<p>What you’re doing is asking your model to hallucinate datasets, using only your priors, and then looking at whether those datasets could plausibly have come from your business.</p>
+<p>Three things to look for.</p>
 <p><strong>Impossible values</strong> — negative sales, probabilities above one. That means the prior is misspecified, not merely wide. Fix the support.</p>
 <p><strong>Absurd ranges</strong> — simulated weekly demand spanning zero to a billion units. That prior is too vague, and vague is not the same as neutral.</p>
 <p><strong>Identical simulations</strong> — every simulated dataset looking the same. Now the prior is too tight and the data won’t be able to move it.</p>

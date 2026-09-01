@@ -413,7 +413,8 @@ window.Quarto = {
 <p>The price is quadratic: scoring every position against every other is <span class="math inline">\(O(T^2)\)</span> in time and memory — fine at <span class="math inline">\(T = 26\)</span>, painful at <span class="math inline">\(T = 10{,}000\)</span>.</p>
 </div>
 <p>Let me make that concrete for our problem.</p>
-<p>You’re predicting units for the first week of December. With attention, the model can place high weight on <strong>last</strong> December, and on the weeks around it, and near-zero weight on an unremarkable Tuesday in March. It looks where the information is. Two properties make that genuinely different from anything we’ve built.</p>
+<p>You’re predicting units for the first week of December. With attention, the model can place high weight on <strong>last</strong> December, and on the weeks around it, and near-zero weight on an unremarkable Tuesday in March. It looks where the information is.</p>
+<p>Two properties make that genuinely different from anything we’ve built.</p>
 <p><strong>The weights are learned, not specified.</strong> You do not tell the model that lag fifty-two matters. Contrast that with Lecture 6, where you built the <code>lag52</code> column by hand and the LASSO penalty merely decided whether to keep it. Here the model discovers which positions to consult.</p>
 <p><strong>And the path is direct.</strong> Attention reaches week t minus fifty-two in <strong>one</strong> operation. A recurrent model needs fifty-two successive state updates to get there — and we saw last week what survives fifty-two multiplications. A CNN needs a receptive field that wide, which it doesn’t have. Distance costs attention nothing. That’s the headline.</p>
 <p>There’s a third property worth naming, because it matters for how you’d sell this to a stakeholder. Attention weights are <strong>inspectable</strong>. You can pull out the matrix and look at which weeks the model consulted when it made a given forecast.</p>
@@ -502,7 +503,8 @@ window.Quarto = {
 <p>Three properties, in the order they actually mattered commercially.</p>
 <p><strong>Parallelism.</strong> Every position is computed at once. Training scales across hardware in a way recurrence never could. And I want to be clear that this — more than accuracy — is why the architecture won. It could absorb far more data and far more compute per unit of wall-clock time than an RNN. When your competitive advantage is training on more data, the architecture that trains faster wins by default.</p>
 <p><strong>Direct long-range paths.</strong> Any position reaches any other in one step. There is no distance at which information degrades. Compare the ten-to-the-minus-nine we computed last week.</p>
-<p><strong>Scale.</strong> The architecture kept getting better as parameters and data grew, well past the point where earlier architectures plateaued. That property is the entire foundation of the last five years of AI. BERT is an encoder stack used for understanding; GPT is a decoder stack used for generation. Both are this block, repeated. Read that list again with a forecaster’s eye, though. Every single one of those advantages is about <strong>large data and long sequences</strong>.</p>
+<p><strong>Scale.</strong> The architecture kept getting better as parameters and data grew, well past the point where earlier architectures plateaued. That property is the entire foundation of the last five years of AI. BERT is an encoder stack used for understanding; GPT is a decoder stack used for generation. Both are this block, repeated.</p>
+<p>Read that list again with a forecaster’s eye, though. Every single one of those advantages is about <strong>large data and long sequences</strong>.</p>
 <p>Hold that against what we actually have: a twenty-six-week window, and five thousand nine hundred forty training examples.</p>
 </section>
 </section>

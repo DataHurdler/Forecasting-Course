@@ -379,7 +379,8 @@ window.Quarto = {
 <p>Let’s be precise about what’s missing, because “doesn’t understand time” is too vague to act on.</p>
 <p>Lecture 7’s feedforward network treats each row independently. Everything it knows about <em>when</em> something happened, you encoded by hand as a lag column. Shuffle the feature columns and the model is unchanged. Time is not in the architecture; it’s in your feature engineering.</p>
 <p>Lecture 8’s CNN does better — it genuinely sees local shape. But its <strong>receptive field</strong> is fixed by the architecture. Stacked width-five and width-three filters reach about seven weeks back, and no reasonable stack of small filters reaches an annual lag.</p>
-<p>And worse, pooling deliberately discarded <em>where</em> in the window each pattern occurred. We measured that costing about five hundred RMSE. Here’s the assumption both of them share, and it’s the one we’re breaking today.</p>
+<p>And worse, pooling deliberately discarded <em>where</em> in the window each pattern occurred. We measured that costing about five hundred RMSE.</p>
+<p>Here’s the assumption both of them share, and it’s the one we’re breaking today.</p>
 <p>Both treat the input as a <strong>fixed-size block</strong>, to be processed all at once. Neither has any notion of reading a sequence <em>in order</em> and carrying something forward from one step to the next. That’s the gap. Everything today closes it.</p>
 <p>It’s worth noticing that we have been <em>compensating</em> for this gap all semester, quite successfully. Lag columns are a workaround. Rolling means are a workaround. The Fourier terms in Homework 4 are a workaround. Every one of them is you, the analyst, telling a memoryless model something about time that it cannot work out for itself.</p>
 <p>And they work well — LASSO on forty-six of those workarounds is still leading our scoreboard. So this isn’t a story where the old approach was broken. It’s a story about whether the model can <em>discover</em> the temporal structure instead of being handed it. That’s the question today tests.</p>
@@ -393,7 +394,8 @@ window.Quarto = {
 <p>The recurrent idea is simple enough to state in one sentence, and I’d like you to have it before any equations.</p>
 <p>A recurrent network reads the sequence one step at a time, and maintains a <strong>hidden state</strong> — call it h-t — which is a running summary of everything it has seen so far.</p>
 <p>At each step it does two things. It updates that summary, using the new observation <em>and</em> the previous summary. And optionally it emits an output.</p>
-<p>Critically, the <strong>same weights</strong> are used at every step. That’s weight sharing again — but along <em>time</em> rather than along space, which is where the CNN shared them. Now the consequence, and it’s a big claim.</p>
+<p>Critically, the <strong>same weights</strong> are used at every step. That’s weight sharing again — but along <em>time</em> rather than along space, which is where the CNN shared them.</p>
+<p>Now the consequence, and it’s a big claim.</p>
 <p>There is no fixed window. In principle, h-t encodes the <em>entire</em> history — every observation from step one to step t. The architecture imposes no limit whatsoever on how far back the model can look. Compare that with the CNN’s seven weeks, which was baked in by the filter sizes. <strong>In principle.</strong></p>
 <p>Most of this lecture is about the gap between that promise and what a recurrent network actually delivers. And then about the architecture that was invented specifically to close it.</p>
 </section>
@@ -522,7 +524,8 @@ window.Quarto = {
 <p>An LSTM carries <strong>two</strong> things forward instead of one.</p>
 <p>A <strong>cell state</strong>, c-t — that’s the long-term memory. And a <strong>hidden state</strong>, h-t — that’s what the rest of the network actually sees. Three gates control the traffic between them.</p>
 <p>The <strong>forget gate</strong> decides what fraction of the old memory to keep. The <strong>input gate</strong> decides how much of the new candidate value to write in. The <strong>output gate</strong> decides how much of the memory to expose to the outside world.</p>
-<p>Each gate is a sigmoid, so it outputs a number between zero and one. Think of it as a soft switch — not open or closed, but a dial, and the network learns where to set it. Now this line is the one that matters. Everything else is bookkeeping.</p>
+<p>Each gate is a sigmoid, so it outputs a number between zero and one. Think of it as a soft switch — not open or closed, but a dial, and the network learns where to set it.</p>
+<p>Now this line is the one that matters. Everything else is bookkeeping.</p>
 <p>The new cell state equals the forget gate times the old cell state, <strong>plus</strong> the input gate times the new candidate.</p>
 <p>Note the operations. There’s an element-wise multiply by a number between zero and one — that’s the forgetting. And then there’s an <strong>addition</strong>.</p>
 <p>Keep your eye on that plus sign. Two slides from now it will turn out to be the whole reason the architecture works.</p>
@@ -846,7 +849,8 @@ window.Quarto = {
 <p>Two. Training is backpropagation through time — unroll the recurrence and it’s a deep network whose layers share weights. Repeated multiplication shrinks the gradient exponentially. At fifty-two steps, around ten to the minus nine.</p>
 <p>Three. An LSTM adds a cell state updated <strong>additively</strong>. Addition preserves gradients where multiplication destroys them — the ResNet fix, eighteen years earlier. Four. Three gates: forget what’s stale, input what’s new, output what’s relevant now.</p>
 <p>Five. On our panel, both recurrent models beat every CNN variant, on four raw channels. And both still lose to a forty-six-coefficient LASSO.</p>
-<p>And six. The LSTM lost to the vanilla RNN at a thirty-epoch budget, at all three window lengths — and tied once both reached convergence. Gating solves long-range forgetting; a twenty-six-week window doesn’t suffer from it. So the gates bought four times the parameters and nothing else. <strong>Fit the architecture to the problem.</strong> Next week: attention and Transformers. Reading the whole sequence at once.</p>
+<p>And six. The LSTM lost to the vanilla RNN at a thirty-epoch budget, at all three window lengths — and tied once both reached convergence. Gating solves long-range forgetting; a twenty-six-week window doesn’t suffer from it. So the gates bought four times the parameters and nothing else. <strong>Fit the architecture to the problem.</strong></p>
+<p>Next week: attention and Transformers. Reading the whole sequence at once.</p>
 </section>
 <section id="references" class="level3" data-number="9.6.3">
 <h3 data-number="9.6.3" class="anchored" data-anchor-id="references"><span class="header-section-number">9.6.3</span> References</h3>

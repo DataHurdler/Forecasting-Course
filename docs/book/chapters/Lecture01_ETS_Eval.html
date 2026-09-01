@@ -396,10 +396,11 @@ window.Quarto = {
 <p>Forecasting monthly retail sales, <span class="math inline">\(h=1\)</span> is next month and <span class="math inline">\(h=12\)</span> is a year out. The problem gets harder as <span class="math inline">\(h\)</span> grows, because uncertainty compounds.</p>
 <p>Under squared-error loss the optimal forecast is the <strong>conditional expectation</strong>, <span class="math inline">\(\hat{y}_{t+h|t} = \mathbb{E}[y_{t+h} \mid \mathcal{F}_t]\)</span>, where <span class="math inline">\(\mathcal{F}_t\)</span> is everything known at time <span class="math inline">\(t\)</span>.</p>
 <p>Let’s get precise. Some notation, and we’ll use it for the rest of the semester.</p>
-<p>A <strong>time series</strong> is an ordered sequence of observations, y-one through y-T, where t indexes time. The word doing the work in that definition is <em>ordered</em>. Order is what makes this different from every other dataset you’ve worked with. If I shuffle the rows of a customer database, I’ve lost nothing. If I shuffle a time series, I’ve destroyed it. Four pieces of notation. y-sub-t is the observed value at time t. Straightforward.</p>
-<p>h is the <strong>forecast horizon</strong> — how many periods ahead we’re looking.</p>
+<p>A <strong>time series</strong> is an ordered sequence of observations, y-one through y-T, where t indexes time. The word doing the work in that definition is <em>ordered</em>. Order is what makes this different from every other dataset you’ve worked with. If I shuffle the rows of a customer database, I’ve lost nothing. If I shuffle a time series, I’ve destroyed it.</p>
+<p>Four pieces of notation. y-sub-t is the observed value at time t. Straightforward. h is the <strong>forecast horizon</strong> — how many periods ahead we’re looking.</p>
 <p>y-hat, subscript t-plus-h given t, is our forecast of the value at time t-plus-h, made using only the information we have at time t. That vertical bar matters enormously. It says: here is what I knew when I made this call. We’ll come back to that bar repeatedly. And e-sub-t is the <strong>forecast error</strong> — what actually happened minus what we said would happen.</p>
-<p>Concretely: forecasting monthly retail sales, h equals one is next month, and h equals twelve is a year out. And the problem gets harder as h grows, because uncertainty compounds. Next month is mostly determined by conditions that already exist. Twelve months out, the economy could turn, a competitor could enter, your supply chain could break. Now the line at the bottom is the theoretical anchor for the whole course.</p>
+<p>Concretely: forecasting monthly retail sales, h equals one is next month, and h equals twelve is a year out. And the problem gets harder as h grows, because uncertainty compounds. Next month is mostly determined by conditions that already exist. Twelve months out, the economy could turn, a competitor could enter, your supply chain could break.</p>
+<p>Now the line at the bottom is the theoretical anchor for the whole course.</p>
 <p>Under squared-error loss, the optimal forecast is the <strong>conditional expectation</strong> — the expected value of y at time t-plus-h, given everything we know at time t.</p>
 <p>Two things worth flagging. First, “under squared-error loss.” That qualifier is doing real work. If you care about squared errors, the conditional mean is optimal. Change the loss function and the optimal forecast changes — under absolute error, for instance, you’d want the conditional <em>median</em>. Optimal is always optimal <em>with respect to something</em>.</p>
 <p>Second, that script-F is the information set. Every model we build this semester is essentially a different guess about how to turn an information set into a conditional expectation. Exponential smoothing does it one way. Neural networks do it another. But that’s the target, all twelve lectures.</p>
@@ -420,7 +421,8 @@ window.Quarto = {
 <p>Before modeling anything, it helps to know what you’re looking at. The classical decomposition says any series is the sum of four parts. Trend — the long-run direction. Is this growing, shrinking, or flat over years?</p>
 <p>Seasonality — the regular, calendar-driven pattern. December retail. Summer electricity. Monday morning traffic. The key word is <em>regular</em>: it repeats on a known cycle.</p>
 <p>Cycle — medium-run swings. Business cycles. These are the ones people confuse with seasonality, so let me separate them clearly. Seasonality has a fixed, known period. Cycles don’t. A recession doesn’t arrive every forty-eight months on schedule. And irregular — the random shocks. Everything left over.</p>
-<p>Which parts matter depends entirely on the series. Retail sales are trend plus seasonality. Quarterly GDP is trend plus cycle. Daily stock returns are mostly irregular — which is why predicting them is so hard. Energy demand has all four. Now read the warning box with me, because this is a mistake I see constantly.</p>
+<p>Which parts matter depends entirely on the series. Retail sales are trend plus seasonality. Quarterly GDP is trend plus cycle. Daily stock returns are mostly irregular — which is why predicting them is so hard. Energy demand has all four.</p>
+<p>Now read the warning box with me, because this is a mistake I see constantly.</p>
 <p>Ignoring seasonality causes large, <em>systematic</em> errors. Not random ones — systematic. A non-seasonal model on monthly retail data will consistently under-forecast December and over-forecast January. Every single year.</p>
 <p>That word “systematic” is why this matters. Random error averages out. Systematic error doesn’t. If you’re wrong by the same amount in the same direction every December, you will be short of stock in the same month every year, and no amount of data collection fixes it. The model is structurally wrong.</p>
 </section>
@@ -465,10 +467,12 @@ window.Quarto = {
 </table>
 <p><span class="neutral smaller">This is not a formality. In the M4 Competition many machine learning models <em>failed</em> to beat simple exponential smoothing <span class="citation" data-cites="Makridakis2020">[@Makridakis2020]</span>.</span></p>
 <p>This slide is a professional standard, and I want to be blunt about it.</p>
-<p>Before you present any forecast model to anyone, check that it beats a naive benchmark. A model that can’t beat the baseline has zero value. Not “a little value.” Zero. Four standard benchmarks in the table.</p>
+<p>Before you present any forecast model to anyone, check that it beats a naive benchmark. A model that can’t beat the baseline has zero value. Not “a little value.” Zero.</p>
+<p>Four standard benchmarks in the table.</p>
 <p>The <strong>naive</strong> forecast: tomorrow equals today. y-hat equals y-sub-t. Sounds stupid. It is extremely hard to beat for asset prices, because if you could reliably beat it, you’d be rich rather than in this class.</p>
 <p>The <strong>seasonal naive</strong>: this December equals last December. Use it for any series with a season, and it is a genuinely tough benchmark for retail. The <strong>mean</strong>: forecast the historical average. Use when there’s no trend and no season.</p>
-<p>And <strong>drift</strong>: take the last value and extend the average historical slope. Use when there’s trend but no season. Now the line at the bottom. This is not a formality.</p>
+<p>And <strong>drift</strong>: take the last value and extend the average historical slope. Use when there’s trend but no season.</p>
+<p>Now the line at the bottom. This is not a formality.</p>
 <p>In the M4 Competition — one of the big open forecasting competitions, a hundred thousand series — many machine learning models <em>failed to beat</em> simple exponential smoothing.</p>
 <p>Sit with that. Sophisticated methods, real researchers, and they lost to a method from the 1950s that you’ll learn in about ten minutes.</p>
 <p>There are two lessons. One: complexity is not accuracy. A model isn’t better because it’s harder to explain. Two: the benchmark is how you find out. Without it, you have no idea whether your fancy model is adding anything at all.</p>
@@ -515,7 +519,8 @@ window.Quarto = {
 <p>Take a concrete case. A retailer renovates a store. Traffic patterns shift, the product mix shifts, sales shift. If your model is equal-weighting three years of pre-renovation data, it will keep forecasting the old store. And it won’t be wrong once — it’ll be wrong for months, in the same direction, until the new data finally outweighs the old. <strong>Exponential weighting</strong> fixes this. Assign geometrically declining weights, so recent observations matter more.</p>
 <p>Look at the table. The most recent observation, y-sub-T, gets weight alpha. The one before it gets alpha times one-minus-alpha. The one before that, alpha times one-minus-alpha squared. Each step back in time, the weight shrinks by a constant factor.</p>
 <p>Two things worth noticing. The weights never hit exactly zero — old data still counts, just less and less. And they sum to one, so this is a proper weighted average, not an arbitrary reweighting.</p>
-<p>Alpha is the forgetting rate. High alpha means short memory — you react fast, you forget fast. Low alpha means long memory — you’re stable, but slow to notice change. Hold onto alpha. It’s about to become the single parameter of our first model.</p>
+<p>Alpha is the forgetting rate. High alpha means short memory — you react fast, you forget fast. Low alpha means long memory — you’re stable, but slow to notice change.</p>
+<p>Hold onto alpha. It’s about to become the single parameter of our first model.</p>
 </section>
 <section id="simple-exponential-smoothing-ses" class="level3" data-number="1.3.2">
 <h3 data-number="1.3.2" class="anchored" data-anchor-id="simple-exponential-smoothing-ses"><span class="header-section-number">1.3.2</span> Simple Exponential Smoothing (SES)</h3>
@@ -550,7 +555,8 @@ window.Quarto = {
 <p>The level at time t equals alpha times the current observation, plus one-minus-alpha times the previous level. Alpha between zero and one.</p>
 <p>Read that as a compromise. Every period you get new information, y-sub-t, and you have your existing belief, ell-t-minus-one. Alpha is how much you let the new information move you. It’s a learning rate.</p>
 <p>And the forecast is just: y-hat equals ell-T, for every horizon h. Flat. Whatever the level is now is what we predict forever.</p>
-<p>That flatness is the model’s honest admission of its own limits. Simple exponential smoothing has no concept of trend. If your series is climbing, SES will forecast a horizontal line and be wrong by more every period. We’ll fix that on the next slide. Now the comparison in the middle.</p>
+<p>That flatness is the model’s honest admission of its own limits. Simple exponential smoothing has no concept of trend. If your series is climbing, SES will forecast a horizontal line and be wrong by more every period. We’ll fix that on the next slide.</p>
+<p>Now the comparison in the middle.</p>
 <p>Large alpha — say zero point eight. You react quickly to shocks. But your forecasts are noisy and volatile, because you’re chasing every wiggle. Good for rapidly changing series.</p>
 <p>Small alpha — say zero point one. You adapt slowly. Your forecasts are smooth and stable. Good for slowly evolving series.</p>
 <p>There’s no universally right answer. It’s a genuine bias-variance tradeoff, and we’ll name it that way in Lecture 4. In practice you estimate alpha from the data by minimizing squared error.</p>
@@ -570,11 +576,13 @@ window.Quarto = {
 </div>
 <p>Read <span class="math inline">\(\ell_t\)</span> as where the series <em>is</em> now and <span class="math inline">\(b_t\)</span> as its current growth rate.</p>
 <p><strong>Linear extrapolation gets unrealistic at long horizons.</strong> For <span class="math inline">\(h &gt; 6\)</span> use the <strong>damped trend</strong> variant, <span class="math inline">\(\hat{y}_{T+h|T} = \ell_T + \sum_{j=1}^{h}\phi^j b_T\)</span> with <span class="math inline">\(0 &lt; \phi &lt; 1\)</span>. At <span class="math inline">\(\phi = 0.85\)</span> the forecast converges to a finite ceiling instead of growing forever.</p>
-<p>SES gives a flat forecast. So if the series trends, we need more. Holt’s insight, from 1957, is to track two things instead of one: the level, and the slope. Three equations in the box.</p>
+<p>SES gives a flat forecast. So if the series trends, we need more. Holt’s insight, from 1957, is to track two things instead of one: the level, and the slope.</p>
+<p>Three equations in the box.</p>
 <p>The <strong>level</strong> equation looks like SES, with one change: instead of comparing against the old level, we compare against the old level plus the old trend. We account for the fact that the series was expected to move.</p>
 <p>The <strong>trend</strong> equation is the same smoothing idea applied to the slope. How much did the level change this period? Blend that with our previous estimate of the slope, controlled by beta-star.</p>
 <p>And the <strong>forecast</strong> is level plus h times trend. Now we get a sloped line instead of a flat one.</p>
-<p>The reading I’d offer: ell-t is where the series <em>is</em> right now, and b-sub-t is how fast it’s moving. Position and velocity. Now the caution, and this one has cost people real money.</p>
+<p>The reading I’d offer: ell-t is where the series <em>is</em> right now, and b-sub-t is how fast it’s moving. Position and velocity.</p>
+<p>Now the caution, and this one has cost people real money.</p>
 <p>Linear extrapolation gets unrealistic at long horizons. That forecast is a straight line extended forever. Twelve months out, fine. Five years out, your model is projecting a company that grows without limit. Nothing grows without limit.</p>
 <p>The fix is the <strong>damped trend</strong>. Multiply the trend by phi, then phi squared, then phi cubed, with phi between zero and one. Each step forward, the trend contributes a little less.</p>
 <p>At phi equals zero point eight-five, the forecast converges to a finite ceiling instead of growing forever. And empirically, damped trend is one of the strongest performers in forecasting competitions — often beating far more sophisticated models. Use it for anything beyond about six periods.</p>
@@ -609,7 +617,8 @@ window.Quarto = {
 <p><span class="neutral smaller">Requires at least <span class="math inline">\(2m\)</span> observations to initialize (<span class="math inline">\(m=12\)</span> for monthly data).</span></p>
 <p>One more component. Holt-Winters adds seasonality, so now we’re tracking three things.</p>
 <p>The equations look intimidating, so let me just point at the structure. Level, trend, and now a <strong>seasonal</strong> equation with a third smoothing parameter, gamma. And notice the subscript: s-sub-t-minus-m, where m is the seasonal period — twelve for monthly data, four for quarterly, seven for daily data with a weekly cycle. We’re looking back one full season.</p>
-<p>In the level equation, we subtract the seasonal component before updating. We de-seasonalize first, then update. Then the forecast adds the season back in. Now the comparison — and this is a real decision you’ll have to make.</p>
+<p>In the level equation, we subtract the seasonal component before updating. We de-seasonalize first, then update. Then the forecast adds the season back in.</p>
+<p>Now the comparison — and this is a real decision you’ll have to make.</p>
 <p><strong>Additive</strong> seasonality: swings are constant in size. December adds the same amount every year, whether the store is big or small.</p>
 <p><strong>Multiplicative</strong> seasonality: swings grow with the level. December is plus thirty <em>percent</em>, not plus a fixed number of dollars.</p>
 <p>How do you tell? Look at the plot. If the seasonal swings get visibly bigger as the series grows, it’s multiplicative.</p>
@@ -678,7 +687,8 @@ window.Quarto = {
 </div>
 <p><strong>RMSE vs.&nbsp;MAE:</strong> RMSE punishes large errors harder. When big misses are especially costly — a stockout, an understaffed shift — prefer RMSE.</p>
 <p><strong>MASE</strong> is the one to report across series: <span class="math inline">\(\text{MASE} &lt; 1\)</span> beats seasonal naïve, <span class="math inline">\(\text{MASE} &gt; 1\)</span> is <span class="negative">worse</span> than doing nothing clever. It is the standard in the M-Competitions <span class="citation" data-cites="Makridakis2020">[@Makridakis2020]</span>.</p>
-<p>We have out-of-sample errors — actual minus forecast. How do we summarize them into one number? Two families.</p>
+<p>We have out-of-sample errors — actual minus forecast. How do we summarize them into one number?</p>
+<p>Two families.</p>
 <p>On the left, <strong>scale-dependent</strong> measures. RMSE is the square root of the mean squared error. MAE is the mean absolute error. Both come out in the same units as your data — dollars, units, patients. Which makes them easy to explain to a manager: “we’re off by about four hundred units a month.” But it also means you can only compare models on the <em>same</em> series. An RMSE of four hundred means nothing next to an RMSE of two.</p>
 <p>On the right, <strong>scale-free</strong> measures. MAPE is mean absolute <em>percentage</em> error. MASE is the mean absolute error divided by the MAE of a seasonal naive forecast. These let you compare <em>across</em> series.</p>
 <p>Now, RMSE versus MAE. Because RMSE squares the errors before averaging, it punishes large errors much harder. One catastrophic miss hurts RMSE far more than several small ones.</p>
@@ -707,7 +717,8 @@ window.Quarto = {
 </div>
 <p>If you take one operational rule from this lecture, take this one. <strong>Never evaluate a forecast model on the data used to fit it.</strong></p>
 <p>In-sample fit measures how well the model memorized the past. It says almost nothing about how well it predicts the future. And the two can point in opposite directions — a model complex enough to fit your history perfectly will usually forecast terribly, because it has learned the noise along with the signal.</p>
-<p>The diagram shows the correct setup. Training set up to time T. Then the forecast origin. Then the test set beyond it. The model sees only the training data. We judge it only on the test data. The split is <em>chronological</em> — the test set is the future. Now the warning box, and this is the single most common technical error I see. <strong>Never randomly shuffle time series observations.</strong></p>
+<p>The diagram shows the correct setup. Training set up to time T. Then the forecast origin. Then the test set beyond it. The model sees only the training data. We judge it only on the test data. The split is <em>chronological</em> — the test set is the future.</p>
+<p>Now the warning box, and this is the single most common technical error I see. <strong>Never randomly shuffle time series observations.</strong></p>
 <p>In scikit-learn, use <code>TimeSeriesSplit</code>, never <code>KFold</code>. <code>KFold</code> is the default in most tutorials, and it shuffles. On a time series, that puts future observations into the training set and past observations into validation. The model gets to peek at the answer.</p>
 <p>This is called data leakage, and the reason it’s dangerous is that it doesn’t look like an error. Your cross-validation scores get <em>better</em>. The model looks excellent. Then it goes into production and fails, and nobody can work out why — because the bug was in the evaluation, not the model. So: <code>TimeSeriesSplit</code>. Every time. This will come back in every remaining lecture.</p>
 </section>
