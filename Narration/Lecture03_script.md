@@ -178,7 +178,7 @@ point four.
 
 **[pause]**
 
-The fix is on the slide. Instead of modelling the mean directly, we model a **transformation**
+The fix is on the slide. Instead of modeling the mean directly, we model a **transformation**
 of the mean — $g$ of the expected value of $y$ equals the additive predictor.
 
 That $g$ is called the **link function**, and it's the entire "generalized."
@@ -247,7 +247,7 @@ curvature. That's what makes it look like one smooth curve rather than a chain o
 The number of knots controls how much wiggle is *available*. Few knots, and the curve can only
 bend gently. Many knots, and it can bend almost anywhere.
 
-Now, you might expect that choosing the number of knots is the crucial modelling decision. It
+Now, you might expect that choosing the number of knots is the crucial modeling decision. It
 mostly isn't — and this is the elegant part of the penalized approach. You give the model
 plenty of knots, more than you think you need, and then let **lambda** control how much of
 that available flexibility actually gets used.

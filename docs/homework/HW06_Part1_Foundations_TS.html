@@ -2398,7 +2398,7 @@ Your numbers will not match mine, and that is fine
 </section>
 <section id="dataset-and-setup" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-and-setup">Dataset and Setup</h2>
-<div id="823af717" class="cell" data-execution_count="1">
+<div id="34393534" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2516,11 +2516,11 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <h3 class="anchored" data-anchor-id="q1-prior-predictive-check-suggested-prompts-3">Q1 — Prior Predictive Check <em>(Suggested prompts: 3)</em></h3>
 <p>Estimate the probability that any given week is a <strong>high-SNAP week</strong>. Model the count out of CA_1 FOODS’s 277 weeks as Beta-Binomial:</p>
 <ul>
-<li>Prior: <code>theta ~ Beta(2, 2)</code> — weakly informative, centred at 0.5</li>
+<li>Prior: <code>theta ~ Beta(2, 2)</code> — weakly informative, centered at 0.5</li>
 <li>Likelihood: <code>obs ~ Binomial(n=277, p=theta)</code>, observed = the actual count</li>
 </ul>
 <p><strong>Before fitting anything</strong>, run <code>pm.sample_prior_predictive(500)</code> and plot what the prior alone implies about the number of high-SNAP weeks.</p>
-<div id="13c3512d" class="cell" data-execution_count="2">
+<div id="0fc2cada" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>n_total <span class="op">=</span> <span class="bu">len</span>(ca1)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>n_hi <span class="op">=</span> <span class="bu">int</span>(ca1.hi_snap.<span class="bu">sum</span>())</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;CA_1 FOODS: </span><span class="sc">{</span>n_hi<span class="sc">}</span><span class="ss"> high-SNAP weeks out of </span><span class="sc">{</span>n_total<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>n_hi<span class="op">/</span>n_total<span class="sc">:.0f}</span><span class="ss">%)&quot;</span>)</span>
@@ -2538,7 +2538,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <section id="q2-posterior-inference-suggested-prompts-2" class="level3">
 <h3 class="anchored" data-anchor-id="q2-posterior-inference-suggested-prompts-2">Q2 — Posterior Inference <em>(Suggested prompts: 2)</em></h3>
 <p>Fit the model. Report the posterior mean and the 94% HDI, and report <span class="math inline">\(\hat{R}\)</span>, ESS and divergences.</p>
-<div id="593327ff" class="cell" data-execution_count="3">
+<div id="2d39b36b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit, then az.summary(idata, ci_kind=&quot;hdi&quot;, ci_prob=0.94) and az.plot_posterior</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2553,19 +2553,19 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <h3 class="anchored" data-anchor-id="q3-level-and-seasonality-suggested-prompts-3">Q3 — Level and Seasonality <em>(Suggested prompts: 3)</em></h3>
 <p>Build the model from Lecture 11 Part 1 on the <strong>first 225 weeks</strong>, holding out the final 52.</p>
 <ul>
-<li>A random-walk level, written <strong>non-centred</strong>: <code>level = cumsum(z * sigma_level)</code> with <code>z ~ Normal(0, 1)</code></li>
+<li>A random-walk level, written <strong>non-centered</strong>: <code>level = cumsum(z * sigma_level)</code> with <code>z ~ Normal(0, 1)</code></li>
 <li>Fourier seasonality with <code>K = 3</code> and period <code>P = 52</code> — six coefficients with <code>Normal(0, 0.5)</code> priors</li>
 <li><code>sigma_level ~ Exponential(10)</code>, <code>sigma ~ Exponential(1)</code></li>
 <li><strong>Standardize <code>units</code> before fitting</strong>, and invert afterwards</li>
 </ul>
-<div id="db2d19ae" class="cell" data-execution_count="4">
+<div id="a1fe384a" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Build Fourier design matrix, standardize, fit</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Your response:</strong> Report <span class="math inline">\(\hat{R}\)</span>, ESS and divergences. Then: the lecture noted that writing the level with <code>pm.GaussianRandomWalk</code> gave <span class="math inline">\(\hat{R}\)</span> = 1.022 and ESS = 252 — both failing their thresholds while the forecast still looked reasonable. Explain what the non-centred form changes — not statistically, but about the <em>shape</em> the sampler has to explore.</p>
+<p><strong>Your response:</strong> Report <span class="math inline">\(\hat{R}\)</span>, ESS and divergences. Then: the lecture noted that writing the level with <code>pm.GaussianRandomWalk</code> gave <span class="math inline">\(\hat{R}\)</span> = 1.022 and ESS = 252 — both failing their thresholds while the forecast still looked reasonable. Explain what the non-centered form changes — not statistically, but about the <em>shape</em> the sampler has to explore.</p>
 </blockquote>
 <hr>
 </section>
@@ -2575,7 +2575,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <p><strong>(a) Propagated</strong> — let the level keep random-walking forward, which is what the fitted model implies. <strong>(b) Held constant</strong> — carry the last level forward unchanged.</p>
 <p>Report coverage and mean interval width for each, and additionally <strong>split coverage by horizon</strong> (roughly weeks 1–13, 14–39, 40–52). The frozen version produces intervals of near-constant width; the propagated one widens with horizon. Which is better calibrated on this series is a question for your data, not for theory — answer it from your numbers.</p>
 <p>Report three things: RMSE, the seasonal-naive RMSE for comparison, and the <strong>coverage</strong> of your 94% interval (the fraction of held-out weeks falling inside).</p>
-<div id="2fecaa2b" class="cell" data-execution_count="5">
+<div id="2dc98abe" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast both ways; compute RMSE, coverage and mean width for each</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Then split coverage by horizon</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>

@@ -483,7 +483,7 @@ window.Quarto = {
 </table>
 <p><strong>The promise from two slides ago fails in practice.</strong> A vanilla RNN <em>can</em> in principle encode arbitrarily long history, but the gradient that would teach it to do so has vanished long before it reaches back that far. In practice these networks learn dependencies of roughly ten steps.</p>
 <p><strong>Bengio and colleagues</strong> proved this is not an optimization bug to be tuned away — it is inherent to the architecture. Which is why the fix had to be a different architecture.</p>
-<p>Let’s put numbers on it, because “the gradient shrinks” is not vivid enough to change anyone’s behaviour.</p>
+<p>Let’s put numbers on it, because “the gradient shrinks” is not vivid enough to change anyone’s behavior.</p>
 <p>Suppose each backward step multiplies the gradient by a factor of zero-point-seven. That’s an unremarkable value for a tanh network — nothing pathological. One step back: zero-point-seven. Full signal. Five steps: zero-point-one-seven. Weakened, but usable. Ten steps: zero-point-zero-two-eight. Barely present. Twenty-six steps — our window length — <strong>two millionths.</strong> Gone.</p>
 <p>Fifty-two steps, which is the annual lag: about ten to the minus nine. Invisible. There is no optimizer, no learning rate, no amount of training that recovers a signal that small.</p>
 <p>So the promise from slide five fails in practice. A vanilla RNN <em>can</em>, in principle, encode arbitrarily long history. But the gradient that would <em>teach</em> it to do so has vanished long before it reaches back that far. In practice these networks learn dependencies of roughly ten steps. Not fifty-two.</p>
@@ -535,7 +535,7 @@ window.Quarto = {
 </section>
 <section id="what-the-gates-are-doing-in-plain-terms" class="level3" data-number="9.4.2">
 <h3 data-number="9.4.2" class="anchored" data-anchor-id="what-the-gates-are-doing-in-plain-terms"><span class="header-section-number">9.4.2</span> What the Gates Are Doing, in Plain Terms</h3>
-<p>The equations are compact but the behaviour is intuitive. Take a store forecasting demand week by week.</p>
+<p>The equations are compact but the behavior is intuitive. Take a store forecasting demand week by week.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -557,7 +557,7 @@ window.Quarto = {
 </tbody>
 </table>
 <p><strong>The output gate is the one people skip, and it is the subtle one.</strong> It separates <em>what the model remembers</em> from <em>what the model uses right now</em>. A vanilla RNN cannot make that distinction — its single hidden state has to serve both jobs at once, so anything it stores is immediately in play.</p>
-<p>The equations are compact, but the behaviour is genuinely intuitive. Let me put it in the language of a store forecasting demand week by week.</p>
+<p>The equations are compact, but the behavior is genuinely intuitive. Let me put it in the language of a store forecasting demand week by week.</p>
 <p>The <strong>forget</strong> gate says: “the promotion that ran three months ago no longer explains anything — drop it.” The gate closes toward zero, and that part of memory decays away.</p>
 <p>The <strong>input</strong> gate says: “this week is Thanksgiving and the spike is enormous — record it.” The gate opens toward one, and the event is written into the cell.</p>
 <p>The <strong>output</strong> gate says: “I’m holding a memory of last December, but this week is April — don’t act on it yet.” The information stays in the cell state without contaminating this week’s prediction. The output gate is the one people skip when they explain this, and it’s the subtle one.</p>
@@ -773,7 +773,7 @@ window.Quarto = {
 </div>
 <p>Second check. Gating pays off when a value has to survive many steps that would otherwise overwrite it. Does this panel have anything like that? Three measurements say no.</p>
 <p><strong>One. Most of the variance is not sequential at all.</strong> Ninety-one percent of the variation in weekly units is <em>between</em> series — which store, which category — and nine percent is within a series over time. The main thing a model has to get right is the level of the series in front of it, and the last few weeks tell you that. No memory mechanism required.</p>
-<p><strong>Two. The series are smooth</strong> — and this one is counter-intuitive, so take it slowly. Within-series autocorrelation is point eight three at lag one, and still point four three at lag fifty-two. That <em>looks</em> like long memory, and it is actually the reason long memory is unnecessary. Because neighbouring weeks are nearly the same number, the recent past is a <strong>sufficient statistic</strong> for the distant past. Nothing has to be carried across the gap, because the gap was filled in continuously along the way.</p>
+<p><strong>Two. The series are smooth</strong> — and this one is counter-intuitive, so take it slowly. Within-series autocorrelation is point eight three at lag one, and still point four three at lag fifty-two. That <em>looks</em> like long memory, and it is actually the reason long memory is unnecessary. Because neighboring weeks are nearly the same number, the recent past is a <strong>sufficient statistic</strong> for the distant past. Nothing has to be carried across the gap, because the gap was filled in continuously along the way.</p>
 <p>Gating earns its keep when something must survive steps that would overwrite it. Here nothing overwrites anything.</p>
 <p><strong>Three. Nothing in the inputs arrives early.</strong> SNAP days correlate about point one four with units in the same week, and essentially zero at every lead. Event days are flat everywhere, including at zero. There is no <strong>announcement</strong> structure in this data — nothing shows up at time <em>t</em> that has to be stored until <em>t</em> plus <em>k</em>. That is the textbook use for a forget gate and an input gate, and this panel does not contain one instance of it.</p>
 <p>And this is the part to carry out of the lecture — not the answer, the three questions. Before you reach for a gated model, or an attention model, on your own series: how much of my variance is cross-sectional rather than sequential? Is my series smooth enough that recent values already summarize the old ones? Does anything in my inputs <em>lead</em> the target? If the answers look like this panel’s, the extra machinery has nothing to do.</p>

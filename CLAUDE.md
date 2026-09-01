@@ -56,7 +56,9 @@ python scripts/set_course_url.py https://new.host/path/ # rewrite all of them, t
 # STUDENT_QUICKSTART). The student repo is found via $FORECASTING_ENV_REPO or a sibling
 # Forecasting-Env directory; if neither exists the script says so loudly rather than skipping.
 
-# Publish to GitHub Pages (docs/). Targets: all | slides | labs | homework | docs | LectureNN
+# Publish to GitHub Pages (docs/). Targets: all | slides | labs | homework | docs | books | LectureNN
+# 'all' includes the book and workbook -- they are assembled from the decks, labs and
+# narration, so any source edit leaves them stale until they are rebuilt.
 ./scripts/sync_to_docs.sh            # everything -- slow, labs fit real models
 ./scripts/sync_to_docs.sh slides     # RevealJS mirrors only (PDFs are not published)
 ./scripts/sync_to_docs.sh Lecture07  # one lecture

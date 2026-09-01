@@ -103,11 +103,11 @@ print(f"train {len(train):,} rows | held-out {len(heldout):,} rows")
 print(f"{thin.sum()} thin series (8 weeks each), {(~thin).sum()} full series")
 ```
 
-Here is the model. It is the one from lecture, written non-centred, and it takes a flag so we can
+Here is the model. It is the one from lecture, written non-centered, and it takes a flag so we can
 reuse it for the unpooled fit.
 
 ```{python}
-def fit(data, kind, n_series, centred=False, target_accept=0.9):
+def fit(data, kind, n_series, centered=False, target_accept=0.9):
     """kind: 'unpooled' or 'hier'. Returns the InferenceData."""
     i = data.idx.values
     x = data.hi_snap.values.astype(float)
@@ -120,7 +120,7 @@ def fit(data, kind, n_series, centred=False, target_accept=0.9):
         else:
             mu_b = pm.Normal("mu_b", 0, 0.5)
             sd_b = pm.HalfNormal("sd_b", 0.25)
-            if centred:
+            if centered:
                 b = pm.Normal("b", mu_b, sd_b, shape=n_series)
             else:
                 z = pm.Normal("z", 0, 1, shape=n_series)
@@ -261,7 +261,7 @@ for cat, grp in df.groupby("cat_id"):
 
 Two findings, and they compound.
 
-**The groups were not exchangeable.** SNAP is a *food* assistance programme. FOODS responds;
+**The groups were not exchangeable.** SNAP is a *food* assistance program. FOODS responds;
 HOBBIES and HOUSEHOLD barely move. Putting all thirty in one hierarchy told the model these are
 thirty interchangeable draws from one distribution — so it estimated a group mean near zero,
 dominated by the twenty series with no effect, and pulled the FOODS series down to it.
@@ -271,7 +271,7 @@ three categories each, so every third one is a FOODS series. We starved precisel
 that had something to say, then pooled them toward twenty that did not.
 
 ::: {.callout-warning}
-## Exchangeability is a modelling assumption, and it is yours to defend
+## Exchangeability is a modeling assumption, and it is yours to defend
 
 Groups are exchangeable when, before seeing the data, you have no reason to expect one to differ
 from another in a particular direction. Ten FOODS series in ten stores: plausible. FOODS against
@@ -376,20 +376,20 @@ One more failure, and this one *is* mechanical. The natural way to write the hie
 exactly like the equation:
 
 ```python
-b = pm.Normal("b", mu_b, sd_b, shape=J)   # the centred form
+b = pm.Normal("b", mu_b, sd_b, shape=J)   # the centered form
 ```
 
 Fit it that way and watch the diagnostics.
 
 ```{python}
-idata_cent = fit(train_f, "hier", Jf, centred=True)
+idata_cent = fit(train_f, "hier", Jf, centered=True)
 
 print("Diagnostics")
-diag(idata_cent, "centred")
-diag(idata_hf, "non-centred")
+diag(idata_cent, "centered")
+diag(idata_hf, "non-centered")
 ```
 
-Same model. Same data. Same answer, if you could sample it — but the centred form makes the
+Same model. Same data. Same answer, if you could sample it — but the centered form makes the
 sampler walk a funnel: when `sd_b` is small the `b_j` must crowd into a narrow neck, and a
 sampler tuned for the wide part cannot get in.
 
@@ -414,7 +414,7 @@ On hierarchical models, divergences are the sensitive instrument. Do not wait fo
 > chain. Name one variable that, if it differed across those stores, would break exchangeability
 > the way category did here — and say how you would handle it without abandoning the hierarchy.
 >
-> **Discuss (the judgement):** In Step 5, `sd_b` came out around 0.07 — stores genuinely differ.
+> **Discuss (the judgment):** In Step 5, `sd_b` came out around 0.07 — stores genuinely differ.
 > The unpooled fit put the range at roughly 5% to 33%. Given both numbers, what do you actually
 > recommend the business do for the next SNAP week?
 >

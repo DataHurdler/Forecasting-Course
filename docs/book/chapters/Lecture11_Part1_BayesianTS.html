@@ -408,7 +408,7 @@ window.Quarto = {
 <p><strong>Components get error bars.</strong> Not just a forecast, but “how confident am I that there’s a trend at all?” — separately from the seasonality. You can decompose your uncertainty, not just your signal.</p>
 <p><strong>Uncertainty compounds honestly.</strong> Forecast fifty-two weeks out and the interval widens, because the model propagates uncertainty forward rather than assuming it away. That third row is the one people underestimate, so let me sharpen it.</p>
 <p>An ARIMA prediction interval widens too. But it widens according to a <strong>formula</strong>, derived under assumptions about the error process that you did not check and probably could not check.</p>
-<p>Here, the widening is a <em>consequence of the model you wrote down</em>. If you said the level follows a random walk, then fifty-two steps of random walk uncertainty is what you get. You can trace the interval back to a modelling choice and argue about that choice.</p>
+<p>Here, the widening is a <em>consequence of the model you wrote down</em>. If you said the level follows a random walk, then fifty-two steps of random walk uncertainty is what you get. You can trace the interval back to a modeling choice and argue about that choice.</p>
 <p>That traceability is worth more than it sounds. When a planner tells you the interval is too wide to use — which is exactly what will happen at the end of this lecture — you can point at the specific assumption producing it and propose changing <em>that</em>, rather than shrugging at a formula. An ARIMA interval you can only accept or reject. This one you can negotiate with.</p>
 <p>And the price is real: it’s slower, it needs priors you must defend, and — as we’ll see in twenty minutes — it can fail silently in ways a least-squares fit simply cannot.</p>
 </section>
@@ -432,7 +432,7 @@ window.Quarto = {
 <p>That’s why the approach is called <strong>structural</strong>. You are not fitting a flexible curve to data and hoping. You are stating what you believe the series is <em>made of</em>, and asking the data how much of each part there is.</p>
 <p>Contrast ARIMA, which we spent Lecture 2 on. There, trend and seasonality are handled by <em>differencing</em> — you remove them rather than model them — and the parameters that come out are autocorrelation coefficients. Nobody has ever walked into a planning meeting and explained the business implications of an MA(2) coefficient. Here, every parameter is a quantity somebody outside the room can interpret. There’s a real trade being made, though, and I don’t want to sell only one side.</p>
 <p>ARIMA’s differencing is <em>automatic</em>. You don’t have to know whether the trend is linear or wandering or damped — you difference, and the trend is gone, whatever shape it had.</p>
-<p>Structural modelling makes you <strong>commit</strong>. You have to say what kind of level you believe in before you fit. Commit correctly and you get interpretable components and honest uncertainty. Commit wrongly and you have baked a false assumption into the model, and the posterior will look perfectly confident about it.</p>
+<p>Structural modeling makes you <strong>commit</strong>. You have to say what kind of level you believe in before you fit. Commit correctly and you get interpretable components and honest uncertainty. Commit wrongly and you have baked a false assumption into the model, and the posterior will look perfectly confident about it.</p>
 <p>That’s the same bargain as the DAG in Lecture 12: stating your assumptions gets you more, and makes you responsible for them.</p>
 </section>
 <section id="the-level-a-random-walk-with-a-prior-on-it" class="level3" data-number="12.3.2">
@@ -478,7 +478,7 @@ window.Quarto = {
 <p>Same device, third appearance. The difference now is that a-k and b-k come back as <strong>distributions</strong>, so you can ask how confident you are that the seasonal peak is where you think it is.</p>
 <p>K trades flexibility against overfitting, exactly like spline knots in Lecture 3. We use K equals three — six coefficients standing in for fifty-two parameters.</p>
 <p>Notice what that construction <em>assumes</em>, because it’s an assumption and not a free lunch: it assumes the seasonal shape is <strong>smooth</strong>.</p>
-<p>Three sine-cosine pairs can describe a broad annual hump with a couple of gentle bumps. What they cannot describe is a single enormous one-week spike — Black Friday, say — sitting on an otherwise flat year. Fourier terms will smear that spike across neighbouring weeks, because smooth curves are all they can make.</p>
+<p>Three sine-cosine pairs can describe a broad annual hump with a couple of gentle bumps. What they cannot describe is a single enormous one-week spike — Black Friday, say — sitting on an otherwise flat year. Fourier terms will smear that spike across neighboring weeks, because smooth curves are all they can make.</p>
 <p>If your business has sharp calendar events, the honest answer is to model them as <strong>separate indicator variables</strong> rather than raising K until the waves can approximate a spike. That’s what Prophet does with its holiday regressors, and it’s what you did by hand with the SNAP and event flags in Homework 2.</p>
 </section>
 </section>
@@ -493,7 +493,7 @@ window.Quarto = {
 </div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">"sigma_level"</span>, <span class="fl">10.0</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    z           <span class="op">=</span> pm.Normal(<span class="st">"z"</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>n)     <span class="co"># non-centred</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    z           <span class="op">=</span> pm.Normal(<span class="st">"z"</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>n)     <span class="co"># non-centered</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    level <span class="op">=</span> pm.Deterministic(<span class="st">"level"</span>, pm.math.cumsum(z <span class="op">*</span> sigma_level))</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    beta  <span class="op">=</span> pm.Normal(<span class="st">"beta"</span>, <span class="dv">0</span>, <span class="fl">0.5</span>, shape<span class="op">=</span><span class="dv">2</span><span class="op">*</span>K)    <span class="co"># Fourier</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> pm.Exponential(<span class="st">"sigma"</span>, <span class="fl">1.0</span>)</span>
@@ -547,7 +547,7 @@ window.Quarto = {
 </table>
 <p>Nothing crashed. The model returned a forecast, and the forecast looked reasonable. Only the diagnostics said the chains had not agreed with each other.</p>
 <div class="warningbox">
-<p><strong>The fix was reparameterization, not more samples.</strong> Writing the walk as <code>cumsum(z * sigma)</code> with <span class="math inline">\(z \sim \mathcal{N}(0,1)\)</span> — the <em>non-centred</em> form — gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will meet it again next week.</p>
+<p><strong>The fix was reparameterization, not more samples.</strong> Writing the walk as <code>cumsum(z * sigma)</code> with <span class="math inline">\(z \sim \mathcal{N}(0,1)\)</span> — the <em>non-centered</em> form — gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will meet it again next week.</p>
 </div>
 <p>Now something worth your attention.</p>
 <p>The obvious way to write this model uses <code>pm.GaussianRandomWalk</code>, which is exactly what it sounds like and exactly what the equation says. We wrote it that way first. And it sampled <strong>badly</strong> — even with <code>target_accept</code> raised to point-nine-five.</p>
@@ -556,7 +556,7 @@ window.Quarto = {
 <p>The only thing that told us was R-hat saying the four chains had not agreed with each other.</p>
 <p>That is precisely why Lecture 10 made those three numbers non-negotiable. This is the failure mode they exist for. And the fix is worth understanding, because you’ll meet it again next week.</p>
 <p>The fix was <strong>reparameterization</strong>, not more samples. Not a longer run, not a smaller step size — a different way of writing the <em>same model</em>.</p>
-<p>Writing the walk as <code>cumsum(z * sigma)</code>, with z a standard Normal, is called the <strong>non-centred</strong> form. It gives the sampler a geometry it can actually navigate. Identical model, identical posterior in principle, completely different sampling behaviour.</p>
+<p>Writing the walk as <code>cumsum(z * sigma)</code>, with z a standard Normal, is called the <strong>non-centered</strong> form. It gives the sampler a geometry it can actually navigate. Identical model, identical posterior in principle, completely different sampling behavior.</p>
 <p>BMCP section four-point-six-point-one covers exactly this, and next week we’ll see the same fix applied to a hierarchy — where it will matter even more.</p>
 </section>
 </section>

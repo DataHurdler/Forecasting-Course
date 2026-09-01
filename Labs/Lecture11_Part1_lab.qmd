@@ -83,7 +83,7 @@ The model is a drifting level plus seasonality. PyMC has a distribution for a ra
 natural thing is to use it.
 
 ```{python}
-with pm.Model() as centred:
+with pm.Model() as centered:
     sigma_level = pm.Exponential("sigma_level", 10.0)
     level = pm.GaussianRandomWalk("level", sigma=sigma_level, shape=n)
     beta  = pm.Normal("beta", 0, 0.5, shape=2*K)

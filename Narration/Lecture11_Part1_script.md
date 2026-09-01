@@ -117,7 +117,7 @@ assumptions about the error process that you did not check and probably could no
 
 Here, the widening is a *consequence of the model you wrote down*. If you said the level follows a
 random walk, then fifty-two steps of random walk uncertainty is what you get. You can trace the
-interval back to a modelling choice and argue about that choice.
+interval back to a modeling choice and argue about that choice.
 
 **[pause]**
 
@@ -182,7 +182,7 @@ There's a real trade being made, though, and I don't want to sell only one side.
 ARIMA's differencing is *automatic*. You don't have to know whether the trend is linear or
 wandering or damped — you difference, and the trend is gone, whatever shape it had.
 
-Structural modelling makes you **commit**. You have to say what kind of level you believe in
+Structural modeling makes you **commit**. You have to say what kind of level you believe in
 before you fit. Commit correctly and you get interpretable components and honest uncertainty.
 Commit wrongly and you have baked a false assumption into the model, and the posterior will look
 perfectly confident about it.
@@ -265,7 +265,7 @@ assumes the seasonal shape is **smooth**.
 
 Three sine-cosine pairs can describe a broad annual hump with a couple of gentle bumps. What they
 cannot describe is a single enormous one-week spike — Black Friday, say — sitting on an otherwise
-flat year. Fourier terms will smear that spike across neighbouring weeks, because smooth curves
+flat year. Fourier terms will smear that spike across neighboring weeks, because smooth curves
 are all they can make.
 
 If your business has sharp calendar events, the honest answer is to model them as **separate
@@ -364,9 +364,9 @@ And the fix is worth understanding, because you'll meet it again next week.
 The fix was **reparameterization**, not more samples. Not a longer run, not a smaller step size —
 a different way of writing the *same model*.
 
-Writing the walk as `cumsum(z * sigma)`, with z a standard Normal, is called the **non-centred**
+Writing the walk as `cumsum(z * sigma)`, with z a standard Normal, is called the **non-centered**
 form. It gives the sampler a geometry it can actually navigate. Identical model, identical
-posterior in principle, completely different sampling behaviour.
+posterior in principle, completely different sampling behavior.
 
 BMCP section four-point-six-point-one covers exactly this, and next week we'll see the same fix
 applied to a hierarchy — where it will matter even more.

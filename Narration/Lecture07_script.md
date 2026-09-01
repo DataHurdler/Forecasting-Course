@@ -481,7 +481,7 @@ that trend forward. So will a network.
 
 Whether that is a *feature* depends entirely on whether the trend is real. Extrapolating a
 genuine trend is the right answer. Extrapolating a temporary run-up is how forecasts embarrass
-people. The model cannot tell the difference — that judgement is yours, and it's the kind of
+people. The model cannot tell the difference — that judgment is yours, and it's the kind of
 thing a DAG in Lecture 12 helps you reason about.
 
 ---

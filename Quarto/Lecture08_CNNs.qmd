@@ -44,7 +44,7 @@ Look at a small window, and look for the same thing everywhere. Two ideas, and t
 
 Start with why a fully connected layer fails on structured input. A $224 \times 224$ image has 50,176 pixels, so a single hidden layer of 1,000 neurons needs **50 million weights** — for one layer. Lecture 7's network had 22,657 parameters in total.
 
-Worse than the cost is the waste. That layer ignores **spatial structure**: it has no notion that neighbouring pixels are related and distant ones usually are not. And it does not **generalize position** — a pattern learned in the top-left corner is stored separately from the same pattern in the bottom-right.
+Worse than the cost is the waste. That layer ignores **spatial structure**: it has no notion that neighboring pixels are related and distant ones usually are not. And it does not **generalize position** — a pattern learned in the top-left corner is stored separately from the same pattern in the bottom-right.
 
 ::: {.keybox}
 A convolutional layer fixes both with two ideas. **Local connectivity:** each neuron sees only a small **receptive field**. **Weight sharing:** the same filter is applied at every position. Far fewer parameters, and a pattern learned anywhere is recognized everywhere.
@@ -81,7 +81,7 @@ Pooling shrinks the feature map and buys robustness — at a price that matters 
 
 **Pooling** reduces a feature map by summarizing each small region with a single number. Max pooling takes the largest value in the window; average pooling takes the mean. A $2\times2$ max pool with stride 2 quarters the number of values.
 
-Two things are bought. **Fewer parameters downstream**, because later layers see a smaller input. And **translation invariance**: shift the input slightly and the pooled output barely changes, so the network recognizes a cat whether it sits left or right of centre.
+Two things are bought. **Fewer parameters downstream**, because later layers see a smaller input. And **translation invariance**: shift the input slightly and the pooled output barely changes, so the network recognizes a cat whether it sits left or right of center.
 
 ::: {.warningbox}
 **Translation invariance is a feature for images and a problem for forecasting.** If a demand spike moved three weeks later, that is not a nuisance to be smoothed away — it is the thing you are trying to predict. Pooling deliberately discards *where* in the window a pattern occurred, and for a time series the position is often the signal.

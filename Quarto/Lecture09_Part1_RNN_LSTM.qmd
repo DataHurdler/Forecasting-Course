@@ -147,7 +147,7 @@ Each gate is a sigmoid, so it outputs between 0 and 1 — a soft switch the netw
 
 ## What the Gates Are Doing, in Plain Terms
 
-The equations are compact but the behaviour is intuitive. Take a store forecasting demand week by week.
+The equations are compact but the behavior is intuitive. Take a store forecasting demand week by week.
 
 | | |
 |---|---|

@@ -307,7 +307,7 @@ that is readable off the most recent few weeks. No memory mechanism is involved 
 **Two, and this one is counter-intuitive, so slow down.** The autocorrelation is 0.83 at lag 1 and
 still 0.43 at lag 52. That *looks* like long memory — like exactly the case for an LSTM.
 
-It is the opposite. Because neighbouring weeks are nearly the same number, **the recent past is a
+It is the opposite. Because neighboring weeks are nearly the same number, **the recent past is a
 sufficient statistic for the distant past.** Week 51 already tells you most of what week 40 knew.
 Gating earns its keep when a value must survive many steps that would otherwise **overwrite** it
 — and here nothing overwrites anything, because the series was filled in continuously the whole

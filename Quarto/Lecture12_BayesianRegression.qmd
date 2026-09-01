@@ -76,7 +76,7 @@ with pm.Model() as model:
 ```
 :::
 
-**Do not standardize log price** — with both in logs `b_price` is an **elasticity**, percent change in demand per percent change in price. Standardizing rescales it to "per SD" and destroys that reading. `lpc` is log price centred within series, which fixed ESS 184 $\rightarrow$ 3,097.
+**Do not standardize log price** — with both in logs `b_price` is an **elasticity**, percent change in demand per percent change in price. Standardizing rescales it to "per SD" and destroys that reading. `lpc` is log price centered within series, which fixed ESS 184 $\rightarrow$ 3,097.
 
 # Reading the Posterior
 

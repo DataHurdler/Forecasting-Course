@@ -340,7 +340,7 @@ and that is readable from the most recent few weeks. No memory mechanism is need
 
 **2. The series are smooth, which is the opposite of needing memory.** Within-series
 autocorrelation is **0.83 at lag 1** and still **0.43 at lag 52**. That looks like long memory and
-is in fact the reason long memory is unnecessary: because neighbouring weeks are nearly the same
+is in fact the reason long memory is unnecessary: because neighboring weeks are nearly the same
 number, *the recent past is a sufficient statistic for the distant past.* Nothing has to be
 carried across the gap, because the gap has been filled in continuously along the way. Gating pays
 off when a value must survive many steps that would otherwise **overwrite** it — and here nothing
@@ -359,7 +359,7 @@ convergence they return a tie.
 
 **The transferable part** is the three questions, not the answer. Before reaching for a gated or
 attention-based model on your own series, ask: how much of my variance is cross-sectional rather
-than sequential? Is my series smooth enough that recent values already summarise old ones? Does
+than sequential? Is my series smooth enough that recent values already summarize old ones? Does
 anything in my inputs *lead* the target? If the answers look like this panel's, the extra
 machinery has nothing to do.
 

@@ -189,7 +189,7 @@ Every 25 December the stores close and recorded sales are **exactly zero** — f
 | Actual | 0 | 0 | 0 | 0 |
 | Seasonal naive | 2,230 | 2,045 | 2,485 | 2,365 |
 
-Four days — **0.25%** of the evaluation window — carry **4.6%** of its squared error, eighteen times their share. Drop them and the benchmark's RMSE falls from 537 to 525 without a single modelling change.
+Four days — **0.25%** of the evaluation window — carry **4.6%** of its squared error, eighteen times their share. Drop them and the benchmark's RMSE falls from 537 to 525 without a single modeling change.
 
 **The information was never missing.** `is_event` fires on **158** days, of which **5** are closures: the feature cannot tell "the doors are locked" from an ordinary Super Bowl, so no model learned the difference.
 

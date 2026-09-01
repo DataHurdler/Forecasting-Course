@@ -17,7 +17,7 @@ is the course material itself, and is the same in every offering.
 The course develops practical forecasting skills for graduate students in business, economics and
 data science. It works through a broad suite of methods — from classical time series models to
 machine learning to Bayesian inference — applied to real business forecasting problems. Three
-things are emphasised throughout: implementation in Python, interpretation of model output for
+things are emphasized throughout: implementation in Python, interpretation of model output for
 business decisions, and honest comparison of methods against each other and against a benchmark.
 
 The first half covers traditional econometric forecasting; the second half turns to predictive
@@ -148,7 +148,7 @@ effect compounds. Use office hours early rather than after you are stuck.
 
 ---
 
-## How the material is organised
+## How the material is organized
 
 | | |
 |---|---|

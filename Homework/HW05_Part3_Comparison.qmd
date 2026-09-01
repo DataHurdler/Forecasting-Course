@@ -219,7 +219,7 @@ Build the complete comparison spanning every homework. Fill in from your own rec
 | LASSO / Elastic Net | Regularized linear | |
 | FFN / CNN / RNN / LSTM / Transformer | Neural Net | |
 
-Sort ascending and plot as a horizontal bar chart, coloured by category.
+Sort ascending and plot as a horizontal bar chart, colored by category.
 
 ::: {.callout-warning}
 ## Only compare what is comparable

@@ -355,7 +355,7 @@ outside the fold. A rolling feature you forgot to shift. `shuffle=True` on a Dat
 are ordered in time. And now a Transformer with no positional encoding.
 
 Not one of those raises an exception. Every one of them returns a plausible number. The only
-defence is procedural — you check them because they're on a list, not because something broke.
+defense is procedural — you check them because they're on a list, not because something broke.
 
 *(Point at the muted note.)*
 

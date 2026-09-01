@@ -123,7 +123,7 @@ difference between two product categories.
 
 # Step 2 — Control for the confounder
 
-Add per-series intercepts and a trend. Centre log price within each series, so the model uses
+Add per-series intercepts and a trend. Center log price within each series, so the model uses
 only price variation *inside* a series over time — which is the variation a manager could
 actually create.
 
@@ -178,7 +178,7 @@ b_std = idata_std.posterior["b_price"].values.ravel()
 
 print(f"  unstandardized  b_price = {b_ctrl.mean():+.4f}")
 print(f"  standardized    b_price = {b_std.mean():+.4f}")
-print(f"  sd(centred log price)   = {df.lpc.std():.4f}")
+print(f"  sd(centered log price)   = {df.lpc.std():.4f}")
 print(f"  ratio                   = {b_ctrl.mean()/b_std.mean():.4f}")
 ```
 
@@ -209,7 +209,7 @@ for label, b in [("correct (elasticity)", b_ctrl), ("standardized", b_std)]:
 
 Read the two lines. Using the standardized coefficient, a manager is told a 5% price rise costs
 about a tenth of a percent of volume. The truth is **more than twenty times that** — because the
-coefficient was divided by the standard deviation of centred log price, which is only 0.0455.
+coefficient was divided by the standard deviation of centered log price, which is only 0.0455.
 The revenue projection is inflated too, from $+2.5\%$ to $+4.9\%$.
 
 The smaller the standard deviation you divide by, the larger the distortion. Here the within-series

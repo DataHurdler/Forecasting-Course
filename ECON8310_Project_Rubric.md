@@ -39,7 +39,7 @@ One to two pages. The purpose is to catch a doomed project while there is still 
 | **Business question** | 5 | A specific, decidable question tied to an action someone would take — "forecast weekly demand for category X to set reorder points," not "predict sales." States who the decision-maker is. |
 | **Dataset** | 5 | Source named and accessible; at least 100 time periods; frequency stated; you have actually loaded it. Known limitations named honestly. |
 | **Planned methods** | 5 | At least three methods from two or more parts of the course, plus the benchmark you will use. A sentence on *why those* suit this series — seasonality, sample size, exogenous drivers. |
-| **Preliminary EDA** | 5 | At least one plot of the target over time, plus a stated observation about trend, seasonality, or breaks that will shape the modelling. |
+| **Preliminary EDA** | 5 | At least one plot of the target over time, plus a stated observation about trend, seasonality, or breaks that will shape the modeling. |
 
 **Common ways to lose points here:** a question that no decision follows from; a dataset you have
 not yet opened; three methods from a single part of the course; no benchmark named.
@@ -90,9 +90,9 @@ outputs, and written analysis in one self-contained document. No page limit; a w
 | **Methods implemented** | 12 | Three or more methods, drawn from **at least two** of the four parts of the course, each correctly specified and actually fitted. Three variants of one family does not satisfy this. |
 | **Benchmark** | 6 | A benchmark computed on your own data — seasonal naive or another one-line rule — reported alongside every model. A report without one cannot show that any of its work was worth doing, and caps at 6 lost points here plus the credibility cost throughout. |
 | **Walk-forward validation** | 8 | Time-aware validation used for **all** model comparisons. No random splits, no `KFold`, no scaling fitted outside the fold, no unshifted rolling features. |
-| **Business recommendation** | 10 | Written for a non-technical decision-maker: actionable, jargon-free, in the units of the business, with uncertainty stated. A reader who skipped the modelling section can act on it. |
+| **Business recommendation** | 10 | Written for a non-technical decision-maker: actionable, jargon-free, in the units of the business, with uncertainty stated. A reader who skipped the modeling section can act on it. |
 | **Methods reflection** | 8 | Which model performed best, and **what about your specific dataset** made it win. Connects the result to a property of the series — sample size, seasonal structure, exogenous drivers, noise level. |
-| **Reproducibility and craft** | 6 | Renders top to bottom from a clean restart. Random seeds set. Figures labelled. Sources cited. AI use logged per the course policy. |
+| **Reproducibility and craft** | 6 | Renders top to bottom from a clean restart. Random seeds set. Figures labeled. Sources cited. AI use logged per the course policy. |
 
 ### The four parts of the course
 

@@ -103,7 +103,7 @@ are low.
 Here is the step almost everyone skips, and it costs about four seconds.
 
 Before fitting anything, we ask what the prior **alone** implies about the data. `Beta(2,2)` —
-weakly informative, centred at one half. Draw five hundred values of θ from it, simulate a count
+weakly informative, centered at one half. Draw five hundred values of θ from it, simulate a count
 of high-SNAP weeks from each, and look at what comes out.
 
 ```
@@ -239,15 +239,15 @@ practical appeal, and it is bought with the prior.
 Now the honest objection, the one you should expect from any audience: **the prior is arbitrary,
 so the answer is arbitrary.** Test it rather than argue about it.
 
-Three priors. Weak and centred at 0.5. Informed and centred at 0.25 — roughly right. And one
-centred at **0.91**, which is not a mild disagreement, it is a belief that nine weeks in ten are
+Three priors. Weak and centered at 0.5. Informed and centered at 0.25 — roughly right. And one
+centered at **0.91**, which is not a mild disagreement, it is a belief that nine weeks in ten are
 high-SNAP weeks. Deliberately, badly wrong.
 
 ```
                                  prior  prior_mean  posterior_mean
-         Beta(2,2) — weak, centred 0.5       0.500           0.265
-   Beta(5,15) — informed, centred 0.25       0.250           0.259
-Beta(20,2) — badly wrong, centred 0.91       0.909           0.309
+         Beta(2,2) — weak, centered 0.5       0.500           0.265
+   Beta(5,15) — informed, centered 0.25       0.250           0.259
+Beta(20,2) — badly wrong, centered 0.91       0.909           0.309
 ```
 
 **[pause]**
@@ -317,7 +317,7 @@ not it converged.*
 
 **For Homework 6.** Part 1 asks you to run a prior predictive check and propose something better
 than `Beta(2,2)` for a rate you know is around a quarter. Choose your alpha and beta — and defend
-the **strength**, not just the centre. `Beta(5,15)` and `Beta(50,150)` have the same mean and say
+the **strength**, not just the center. `Beta(5,15)` and `Beta(50,150)` have the same mean and say
 very different things about how sure you are.
 
 Solutions for the coded parts go up on Canvas after the deadline. Next week: the same machinery

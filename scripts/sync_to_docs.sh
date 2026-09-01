@@ -2,11 +2,12 @@
 # sync_to_docs.sh — render course materials and publish them to docs/ for GitHub Pages.
 #
 # Usage:
-#   ./scripts/sync_to_docs.sh                 # everything (slides, labs, homework, documents)
+#   ./scripts/sync_to_docs.sh                 # everything (slides, labs, homework, documents, books)
 #   ./scripts/sync_to_docs.sh slides          # RevealJS mirrors only (no PDFs -- see below)
 #   ./scripts/sync_to_docs.sh labs            # labs only  (slow: several render for minutes)
 #   ./scripts/sync_to_docs.sh homework        # homework only
-#   ./scripts/sync_to_docs.sh docs            # syllabus / datasets / rubric only
+#   ./scripts/sync_to_docs.sh docs            # about / datasets / rubric / troubleshooting only
+#   ./scripts/sync_to_docs.sh books           # the book and the workbook only
 #   ./scripts/sync_to_docs.sh Lecture07       # one lecture's mirror
 #
 # Everything is rendered with the project venv so package versions match the labs.
@@ -116,13 +117,28 @@ sync_documents() {
   sync_student_docs
 }
 
+# The book and the workbook are ASSEMBLED from the decks, labs, assignments and
+# narration, so an edit to any of those leaves them stale until they are rebuilt.
+# They were absent from `all` until 2026-09-01, and it showed: a repo-wide spelling
+# pass corrected 50 source files, `all` republished every deck, lab and assignment,
+# and the book still carried the old prose because nothing here rebuilt it.
+sync_books() {
+  echo "=== Book and workbook ==="
+  cd "$REPO_ROOT"
+  python3 scripts/build_book.py     >/dev/null || { echo "  FAIL build_book.py";     return 1; }
+  python3 scripts/build_workbook.py >/dev/null || { echo "  FAIL build_workbook.py"; return 1; }
+  (cd book     && quarto render >/dev/null 2>&1) && echo "  OK   book"     || echo "  FAIL book render"
+  (cd workbook && quarto render >/dev/null 2>&1) && echo "  OK   workbook" || echo "  FAIL workbook render"
+}
+
 sync_figures() {
   if command -v rsync >/dev/null; then rsync -a --delete "$REPO_ROOT/Figures/" "$DOCS/Figures/"
   else rm -rf "$DOCS/Figures"; cp -r "$REPO_ROOT/Figures" "$DOCS/Figures"; fi
 }
 
 case "$TARGET" in
-  all)      sync_slides; sync_labs; sync_homework; sync_documents; sync_figures ;;
+  all)      sync_slides; sync_labs; sync_homework; sync_documents; sync_books; sync_figures ;;
+  books)    sync_books ;;
   slides)   sync_slides; sync_figures ;;
   labs)     sync_labs ;;
   homework) sync_homework ;;

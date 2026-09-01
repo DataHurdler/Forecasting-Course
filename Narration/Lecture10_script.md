@@ -181,7 +181,7 @@ One reassurance, since some of you are looking at that equation with concern.
 homework in this course.
 
 What you are responsible for is three things: choosing a prior you can defend, checking that the
-sampler actually worked, and reading the posterior correctly. Those are judgement skills, and they
+sampler actually worked, and reading the posterior correctly. Those are judgment skills, and they
 are the ones that matter in practice.
 
 **[pause]**
@@ -220,7 +220,7 @@ And it lands *between* them — closer to whichever one was more confident.
 
 *(Point at the numbers.)*
 
-Our numbers. The prior is centred on point-one-zero. The data say point-one-five. And the
+Our numbers. The prior is centered on point-one-zero. The data say point-one-five. And the
 posterior mean comes out at **point-one-four**.
 
 Between the two, much nearer the data — because two hundred observations outweigh a prior worth
@@ -260,10 +260,10 @@ be positive.
 And the first thing to get right is the **support** — the set of values the distribution allows.
 
 Put a Normal prior on a standard deviation and you have allowed negative standard deviations,
-which are not a modelling approximation, they're impossible. The sampler will struggle, and the
+which are not a modeling approximation, they're impossible. The sampler will struggle, and the
 model isn't so much wrong as **incoherent**.
 
-That's the most common beginner error in Bayesian modelling, and it's entirely avoidable: match
+That's the most common beginner error in Bayesian modeling, and it's entirely avoidable: match
 the support to the parameter.
 
 *(Point at the footnote.)*

@@ -403,7 +403,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level2" data-number="11.2">
 <h2 data-number="11.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">11.2</span> Setup</h2>
-<div id="277de6a4" class="cell" data-execution_count="1">
+<div id="24002a82" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -470,9 +470,9 @@ Walkthrough
 </section>
 <section id="step-1-check-the-prior-before-you-use-it" class="level2" data-number="11.3">
 <h2 data-number="11.3" class="anchored" data-anchor-id="step-1-check-the-prior-before-you-use-it"><span class="header-section-number">11.3</span> Step 1 — Check the prior before you use it</h2>
-<p>We will model the count of high-SNAP weeks as Beta-Binomial. Start with <code>Beta(2, 2)</code> — weakly informative, centred at 0.5.</p>
+<p>We will model the count of high-SNAP weeks as Beta-Binomial. Start with <code>Beta(2, 2)</code> — weakly informative, centered at 0.5.</p>
 <p><strong>Before fitting anything</strong>, ask what that prior alone implies about the data.</p>
-<div id="2ea2ed77" class="cell" data-execution_count="2">
+<div id="d2cba104" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> pm.Beta(<span class="st">"theta"</span>, alpha<span class="op">=</span><span class="dv">2</span>, beta<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    obs   <span class="op">=</span> pm.Binomial(<span class="st">"obs"</span>, n<span class="op">=</span>N_WEEKS, p<span class="op">=</span>theta, observed<span class="op">=</span>N_HIGH)</span>
@@ -502,7 +502,7 @@ Walkthrough
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Here is the step almost everyone skips, and it costs about four seconds.</p>
-<p>Before fitting anything, we ask what the prior <strong>alone</strong> implies about the data. <code>Beta(2,2)</code> — weakly informative, centred at one half. Draw five hundred values of θ from it, simulate a count of high-SNAP weeks from each, and look at what comes out.</p>
+<p>Before fitting anything, we ask what the prior <strong>alone</strong> implies about the data. <code>Beta(2,2)</code> — weakly informative, centered at one half. Draw five hundred values of θ from it, simulate a count of high-SNAP weeks from each, and look at what comes out.</p>
 <pre><code>prior predictive spans 8 to 276 weeks</code></pre>
 <p>Eight to two hundred seventy-six. Out of 277. The prior considers essentially every possible answer plausible — from almost never to almost always.</p>
 <p>The observed value, 72, sits comfortably inside that. So the prior is <strong>not wrong.</strong> Nothing here is going to blow up.</p>
@@ -514,7 +514,7 @@ Walkthrough
 </section>
 <section id="step-2-fit-it" class="level2" data-number="11.4">
 <h2 data-number="11.4" class="anchored" data-anchor-id="step-2-fit-it"><span class="header-section-number">11.4</span> Step 2 — Fit it</h2>
-<div id="56a44966" class="cell" data-execution_count="3">
+<div id="79a77994" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, chains<span class="op">=</span><span class="dv">4</span>, progressbar<span class="op">=</span><span class="va">False</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -549,7 +549,7 @@ theta  0.2628  0.026     0.22     0.31     3686     5175  1.00</code></pre>
 <section id="step-3-did-the-sampler-work" class="level2" data-number="11.5">
 <h2 data-number="11.5" class="anchored" data-anchor-id="step-3-did-the-sampler-work"><span class="header-section-number">11.5</span> Step 3 — Did the sampler work?</h2>
 <p>MCMC always returns samples. Whether they came from the posterior is a separate question, and one you are expected to answer every time.</p>
-<div id="1b1e1245" class="cell" data-execution_count="4">
+<div id="9c7ec466" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(idata.sample_stats.diverging.<span class="bu">sum</span>())</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"R-hat        </span><span class="sc">{</span>summary<span class="sc">.</span>r_hat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.3f}</span><span class="ss">    (want &lt; 1.01)"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"ESS (bulk)   </span><span class="sc">{</span>summary<span class="sc">.</span>ess_bulk<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">      (want &gt; 400)"</span>)</span>
@@ -588,7 +588,7 @@ divergences  0        (want 0)</code></pre>
 <section id="step-4-ask-the-posterior-a-question" class="level2" data-number="11.6">
 <h2 data-number="11.6" class="anchored" data-anchor-id="step-4-ask-the-posterior-a-question"><span class="header-section-number">11.6</span> Step 4 — Ask the posterior a question</h2>
 <p>The posterior is a set of samples, so any question about <span class="math inline">\(\theta\)</span> is answered by counting.</p>
-<div id="52fc38d1" class="cell" data-execution_count="5">
+<div id="b4eda1a6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> idata.posterior[<span class="st">"theta"</span>].values.ravel()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"P(theta &gt; 0.30)          = </span><span class="sc">{</span>(theta <span class="op">&gt;</span> <span class="fl">0.30</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
@@ -637,11 +637,11 @@ Try it
 <section id="step-5-how-much-did-the-prior-matter" class="level2" data-number="11.7">
 <h2 data-number="11.7" class="anchored" data-anchor-id="step-5-how-much-did-the-prior-matter"><span class="header-section-number">11.7</span> Step 5 — How much did the prior matter?</h2>
 <p>The honest objection to Bayesian work is that the prior is arbitrary. Test how much it moves the answer.</p>
-<div id="7613d885" class="cell" data-execution_count="6">
+<div id="7c3801ab" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, b, label <span class="kw">in</span> [(<span class="dv">2</span>, <span class="dv">2</span>, <span class="st">"Beta(2,2) — weak, centred 0.5"</span>),</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">5</span>, <span class="dv">15</span>, <span class="st">"Beta(5,15) — informed, centred 0.25"</span>),</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">20</span>, <span class="dv">2</span>, <span class="st">"Beta(20,2) — badly wrong, centred 0.91"</span>)]:</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, b, label <span class="kw">in</span> [(<span class="dv">2</span>, <span class="dv">2</span>, <span class="st">"Beta(2,2) — weak, centered 0.5"</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">5</span>, <span class="dv">15</span>, <span class="st">"Beta(5,15) — informed, centered 0.25"</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">20</span>, <span class="dv">2</span>, <span class="st">"Beta(20,2) — badly wrong, centered 0.91"</span>)]:</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> pm.Model():</span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        th <span class="op">=</span> pm.Beta(<span class="st">"theta"</span>, alpha<span class="op">=</span>a, beta<span class="op">=</span>b)</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        pm.Binomial(<span class="st">"obs"</span>, n<span class="op">=</span>N_WEEKS, p<span class="op">=</span>th, observed<span class="op">=</span>N_HIGH)</span>
@@ -661,13 +661,13 @@ With enough data the prior stops mattering
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Three priors, including one centred on 0.91 — badly, deliberately wrong. All three posteriors land close together, because 277 observations dominate.</p>
+<p>Three priors, including one centered on 0.91 — badly, deliberately wrong. All three posteriors land close together, because 277 observations dominate.</p>
 <p><strong>That is the answer to the arbitrariness objection</strong>, and it comes with a condition attached: it holds <em>when you have enough data</em>. With 8 observations rather than 277, the third prior would still be visible in the answer.</p>
 <p>Which is exactly the situation Lecture 11 Part 2 is about.</p>
 </div>
 </div>
 <p><strong>Your turn:</strong> re-run the badly-wrong prior against only the <strong>first 10 weeks</strong> of data and report how far the posterior moves.</p>
-<div id="369607ea" class="cell" data-execution_count="7">
+<div id="d94af99c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># n_small, k_small = 10, int((ca1.snap_days &gt;= 5).head(10).sum())</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># with pm.Model():</span></span>
@@ -690,11 +690,11 @@ Walkthrough
 <div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Now the honest objection, the one you should expect from any audience: <strong>the prior is arbitrary, so the answer is arbitrary.</strong> Test it rather than argue about it.</p>
-<p>Three priors. Weak and centred at 0.5. Informed and centred at 0.25 — roughly right. And one centred at <strong>0.91</strong>, which is not a mild disagreement, it is a belief that nine weeks in ten are high-SNAP weeks. Deliberately, badly wrong.</p>
+<p>Three priors. Weak and centered at 0.5. Informed and centered at 0.25 — roughly right. And one centered at <strong>0.91</strong>, which is not a mild disagreement, it is a belief that nine weeks in ten are high-SNAP weeks. Deliberately, badly wrong.</p>
 <pre><code>                                 prior  prior_mean  posterior_mean
-         Beta(2,2) — weak, centred 0.5       0.500           0.265
-   Beta(5,15) — informed, centred 0.25       0.250           0.259
-Beta(20,2) — badly wrong, centred 0.91       0.909           0.309</code></pre>
+         Beta(2,2) — weak, centered 0.5       0.500           0.265
+   Beta(5,15) — informed, centered 0.25       0.250           0.259
+Beta(20,2) — badly wrong, centered 0.91       0.909           0.309</code></pre>
 <p>The prior means span 0.25 to 0.91 — a range of <strong>0.66</strong>. The posterior means span 0.259 to 0.309 — a range of <strong>0.05</strong>. The data compressed the disagreement by a factor of thirteen.</p>
 <p>Now let me be more careful than the word “close” allows, because this is the step where it is tempting to oversell.</p>
 <p>The badly-wrong prior did <strong>not</strong> land in the same place as the others. It landed at 0.309, and the weak prior’s 94% interval runs up to 0.313. So the wrong prior’s answer sits <em>just inside</em> the upper edge of what the honest analysis considered plausible — inside the range, but at the very boundary of it. And its own interval, [0.258, 0.358], barely contains the observed proportion of 0.260 at its lower edge.</p>
@@ -724,7 +724,7 @@ Try it
 <blockquote class="blockquote">
 <p><strong>Discuss (the prior):</strong> Your Step 5 table says a deliberately wrong prior barely changed the answer. Under what circumstances would you <em>not</em> be reassured by that, and what would you check?</p>
 <p><strong>Discuss (the check):</strong> You verified <span class="math inline">\(\hat{R}\)</span>, ESS and divergences before reading any result. Name the equivalent check you have been doing all semester for a non-Bayesian model, and say which is easier to skip.</p>
-<p><strong>Discuss (for Homework 6):</strong> Part 1 asks you to run a prior predictive check and propose a better prior than <code>Beta(2, 2)</code> for a rate you know is roughly a quarter. What <code>alpha</code> and <code>beta</code> would you choose, and how would you defend the strength of it rather than just the centre?</p>
+<p><strong>Discuss (for Homework 6):</strong> Part 1 asks you to run a prior predictive check and propose a better prior than <code>Beta(2, 2)</code> for a rate you know is roughly a quarter. What <code>alpha</code> and <code>beta</code> would you choose, and how would you defend the strength of it rather than just the center?</p>
 </blockquote>
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>
@@ -758,7 +758,7 @@ Try it
 <p>A prior on a variance, or on a hierarchical scale parameter, can dominate a posterior with far more data than 277 observations. Lecture 11 Part 2 has an example.*</p>
 <p><strong>The check.</strong> You verified R-hat, ESS and divergences before reading any result. Name the equivalent check you have been running all semester on non-Bayesian models — and say which of the two is easier to skip.</p>
 <p>is easier to skip, because MCMC hands you a tidy summary table that looks authoritative whether or not it converged.*</p>
-<p><strong>For Homework 6.</strong> Part 1 asks you to run a prior predictive check and propose something better than <code>Beta(2,2)</code> for a rate you know is around a quarter. Choose your alpha and beta — and defend the <strong>strength</strong>, not just the centre. <code>Beta(5,15)</code> and <code>Beta(50,150)</code> have the same mean and say very different things about how sure you are.</p>
+<p><strong>For Homework 6.</strong> Part 1 asks you to run a prior predictive check and propose something better than <code>Beta(2,2)</code> for a rate you know is around a quarter. Choose your alpha and beta — and defend the <strong>strength</strong>, not just the center. <code>Beta(5,15)</code> and <code>Beta(50,150)</code> have the same mean and say very different things about how sure you are.</p>
 <p>Solutions for the coded parts go up on Canvas after the deadline. Next week: the same machinery pointed at a time series.</p>
 </div>
 </div>

@@ -134,7 +134,7 @@ Local level $+$ Fourier seasonality
 ```python
 with pm.Model() as model:
     sigma_level = pm.Exponential("sigma_level", 10.0)
-    z           = pm.Normal("z", 0, 1, shape=n)     # non-centred
+    z           = pm.Normal("z", 0, 1, shape=n)     # non-centered
     level = pm.Deterministic("level", pm.math.cumsum(z * sigma_level))
     beta  = pm.Normal("beta", 0, 0.5, shape=2*K)    # Fourier
     sigma = pm.Exponential("sigma", 1.0)
@@ -162,7 +162,7 @@ Written the obvious way, with `pm.GaussianRandomWalk`, this model samples badly 
 Nothing crashed. The model returned a forecast, and the forecast looked reasonable. Only the diagnostics said the chains had not agreed with each other.
 
 ::: {.warningbox}
-**The fix was reparameterization, not more samples.** Writing the walk as `cumsum(z * sigma)` with $z \sim \mathcal{N}(0,1)$ — the *non-centred* form — gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will meet it again next week.
+**The fix was reparameterization, not more samples.** Writing the walk as `cumsum(z * sigma)` with $z \sim \mathcal{N}(0,1)$ — the *non-centered* form — gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will meet it again next week.
 :::
 
 # Reading the Forecast

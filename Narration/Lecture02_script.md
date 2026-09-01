@@ -170,7 +170,7 @@ appear to drift together or apart, and the regression will happily report that a
 This is why economics has a long history of embarrassing published findings between
 non-stationary series. And it's why the rule is: **difference first, then regress.**
 
-Once you difference, you're modelling changes rather than levels — and the spurious
+Once you difference, you're modeling changes rather than levels — and the spurious
 correlation goes away, because the changes really are independent. Minus zero point one three.
 
 ---
@@ -392,7 +392,7 @@ Granger causality is the formal test of exactly that claim, and we get to it in 
 
 **[pause]**
 
-That leaves you a modelling choice, and it turns on whether influence runs one way or both.
+That leaves you a modeling choice, and it turns on whether influence runs one way or both.
 
 **VAR** treats everything symmetrically. Every variable predicts every other variable. No
 variable is privileged. Use it when the influence genuinely runs in both directions.

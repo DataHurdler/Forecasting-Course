@@ -10,7 +10,7 @@ Deck: `Slides/Lecture11_Part2_Hierarchical.pdf` (19 pages) · Measured runtime: 
 
 - **`▶ SLIDE n — Title`** marks where to advance. The number is the PDF page.
 - *Italic parentheticals* are stage directions. **[pause]** means stop for a beat.
-- Slides 4 and 5 come *before* any modelling on purpose. The exchangeability question is the one
+- Slides 4 and 5 come *before* any modeling on purpose. The exchangeability question is the one
   students will skip, and the lab is built to punish skipping it. Do not rush them.
 - Slide 12's lesson is that divergences fired while $\hat{R}$ and ESS both passed. That inverts
   what students took from Lecture 11 Part 1, so say it explicitly.
@@ -67,7 +67,7 @@ we check.
 
 But one question comes before the model, and it costs nothing to ask.
 
-SNAP is a **food** assistance programme. So let's measure the raw SNAP-week effect — no model, just
+SNAP is a **food** assistance program. So let's measure the raw SNAP-week effect — no model, just
 the difference in mean log units — in all thirty series, grouped by category.
 
 *(Walk the table.)*
@@ -94,7 +94,7 @@ sampler, no priors. Two minutes of work.
 
 That is characteristic of the most valuable checks in this course — the leakage checks, the
 benchmark, the planted noise control in Homework 3. They are nearly free, they happen before the
-modelling, and they are the ones people skip because they don't feel like real analysis.
+modeling, and they are the ones people skip because they don't feel like real analysis.
 
 ---
 
@@ -114,13 +114,13 @@ That's the test. Not "are they similar?" — but "would relabelling them change 
 **[pause]**
 
 That distinction matters, so let me push on it. Exchangeable does **not** mean identical. The ten
-FOODS stores certainly differ — different neighbourhoods, different sizes, different customers.
+FOODS stores certainly differ — different neighborhoods, different sizes, different customers.
 Exchangeability doesn't deny that.
 
 It says something weaker and more useful: that before seeing data, you have no basis for ordering
 them. You cannot say *in advance* that the Texas store's SNAP effect should exceed California's.
 
-That's a claim about your knowledge, not about the world. Which is why it's a judgement call you
+That's a claim about your knowledge, not about the world. Which is why it's a judgment call you
 have to make and defend — and why no diagnostic can make it for you.
 
 **[pause]**
@@ -130,7 +130,7 @@ could not say in advance which store's SNAP effect should be largest. Swap the s
 you'd believe exactly the same things.
 
 FOODS against HOBBIES does **not** qualify. You know before looking that a food-assistance
-programme moves food. There's a direction, and you knew it in advance.
+program moves food. There's a direction, and you knew it in advance.
 
 *(Point at the setup.)*
 
@@ -174,7 +174,7 @@ close to complete pooling.
 Homework 1 fitted ARIMA to one series at a time, completely independently. That's no pooling.
 
 You made that choice twice, and both times you made it by **convenience** — by what the library
-made easy. Partial pooling turns it into a modelling decision, with a parameter, and lets the data
+made easy. Partial pooling turns it into a modeling decision, with a parameter, and lets the data
 settle where between the two extremes you should sit.
 
 **[pause]**
@@ -371,11 +371,11 @@ point where sigma-b is small.
 A sampler tunes its step size for the wide part of the funnel. Then it tries to get into the neck
 with steps that are far too big, fails, and reports a divergence.
 
-The non-centred form samples z from a plain standard Normal — a nice round shape with no funnel —
+The non-centered form samples z from a plain standard Normal — a nice round shape with no funnel —
 and *constructs* b afterwards. Same model. Same posterior. Geometry the sampler can actually walk.
 
 This is BMCP section four-point-six-point-one, and it is the single most common failure in applied
-hierarchical modelling.
+hierarchical modeling.
 
 **[pause]**
 
@@ -386,10 +386,10 @@ that helps a little. Here it mostly doesn't: at point-nine-five you still get di
 get fewer, and the sampler runs much slower for the privilege.
 
 Reparameterizing is the actual fix, and it costs nothing. Same answer, no divergences, and it runs
-faster than the centred version did.
+faster than the centered version did.
 
 So the habit: when a hierarchical model diverges, your first move is to check whether you wrote it
-centred — not to tune the sampler.
+centered — not to tune the sampler.
 
 ---
 
@@ -433,7 +433,7 @@ and kept spread that two hundred seventy-seven weeks *could*.
 
 *(Beat.)*
 
-That's a strong claim, and you should be sceptical of it. So the next slide tests it against data
+That's a strong claim, and you should be skeptical of it. So the next slide tests it against data
 the model never saw.
 
 ---
@@ -546,7 +546,7 @@ weeks it was **two point six times** more accurate.
 Five. This is regularization for the sixth time, and the only version where the shrinkage strength
 is estimated rather than tuned.
 
-And six. **Write it non-centred.** The obvious form gave a hundred and twenty-seven divergences;
+And six. **Write it non-centered.** The obvious form gave a hundred and twenty-seven divergences;
 the reparameterized form gave one. Same model, different geometry — and divergences objected
 loudest, against a threshold that allows no argument.
 

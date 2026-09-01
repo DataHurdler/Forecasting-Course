@@ -44,7 +44,7 @@ Before you pool anything, ask what the groups have in common.
 
 A concrete one, and you have met it before. **Does demand rise in weeks when SNAP benefits are disbursed, and by how much — store by store?** Homework 3's memo had you stock up for SNAP weeks store by store, which assumed those differences are real. Today we check.
 
-**But one question comes before the model.** SNAP is a *food* assistance programme. Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:
+**But one question comes before the model.** SNAP is a *food* assistance program. Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:
 
 | Category | Mean effect | Spread across stores |
 |---|---:|---:|
@@ -67,7 +67,7 @@ Exchangeable
 Groups are **exchangeable** when, before seeing the data, you have no reason to expect one to differ from another in a particular direction. Swapping their labels would not change what you believe.
 :::
 
-The ten FOODS series qualify: same category, different stores, and you could not say in advance which store's SNAP effect should be largest. FOODS against HOBBIES does **not** — you know before looking that a food-assistance programme moves food.
+The ten FOODS series qualify: same category, different stores, and you could not say in advance which store's SNAP effect should be largest. FOODS against HOBBIES does **not** — you know before looking that a food-assistance program moves food.
 
 **The setup for today.** We work with the **ten FOODS series**, and deliberately thin **five** of them down to **8 weeks**. Five series are data-rich, five are data-poor. That imbalance is the whole point.
 
@@ -84,7 +84,7 @@ Within that exchangeable set there are two obvious approaches, and each fails in
 | **Complete pooling** | One SNAP effect for all ten series. `b = pm.Normal("b", 0, 1)` | Denies that stores differ at all. A genuinely different store is averaged away. |
 | **No pooling** | A separate effect per series, estimated independently. `shape=10` | A series with 8 weeks gets an estimate built from 8 weeks. Mostly noise, reported as a finding. |
 
-**You have used both already without naming them.** Homework 3's random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modelling decision and lets the data settle it.
+**You have used both already without naming them.** Homework 3's random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modeling decision and lets the data settle it.
 
 # Partial Pooling
 
@@ -132,13 +132,13 @@ The obvious code does not work, and the reason is geometry rather than statistic
 
 ::: {.examplebox}
 ::: {.examplebox-title}
-Non-centred hierarchical model
+Non-centered hierarchical model
 :::
 ```python
 with pm.Model() as model:
     mu_b = pm.Normal("mu_b", 0, 0.5)        # typical SNAP effect
     sd_b = pm.HalfNormal("sd_b", 0.25)      # how much stores differ
-    z    = pm.Normal("z", 0, 1, shape=J)    # non-centred
+    z    = pm.Normal("z", 0, 1, shape=J)    # non-centered
     b    = pm.Deterministic("b", mu_b + z * sd_b)
 
     a = pm.Normal("a", y.mean(), 1, shape=J)  # per-series level
@@ -156,9 +156,9 @@ with pm.Model() as model:
 
 ## The Trap: Write It the Obvious Way and It Breaks
 
-The natural way to write the hierarchy is `b = pm.Normal("b", mu_b, sd_b, shape=J)` — the *centred* form, which reads exactly like the equation. On our data it produces:
+The natural way to write the hierarchy is `b = pm.Normal("b", mu_b, sd_b, shape=J)` — the *centered* form, which reads exactly like the equation. On our data it produces:
 
-| | Centred | Non-centred | Want |
+| | Centered | Non-centered | Want |
 |---|---:|---:|---|
 | Divergences | **127** | **1** | 0 |
 | $\hat{R}$ | **1.044** | 1.002 | $< 1.01$ |
@@ -168,7 +168,7 @@ The natural way to write the hierarchy is `b = pm.Normal("b", mu_b, sd_b, shape=
 
 **Note how the alarms differ in kind.** ESS *passes* — 413, just over the line, and you would not look twice. $\hat{R}$ at 1.044 fails, but it is the sort of near-miss people talk themselves out of. **127 divergences against a threshold of exactly zero admits no such conversation.** On hierarchical models divergences fire first and least ambiguously; do not wait for $\hat{R}$ to decide for you.
 
-[BMCP §4.6.1, *Posterior Geometry Matters* — the single most common failure in applied hierarchical modelling.]{.neutral .smaller}
+[BMCP §4.6.1, *Posterior Geometry Matters* — the single most common failure in applied hierarchical modeling.]{.neutral .smaller}
 
 # Reading the Result
 
@@ -189,7 +189,7 @@ Fit both models. Compare each series' estimated SNAP effect before and after poo
 
 Read the two right-hand columns together. The thin series' apparent spread of $0.108$ nearly vanishes, while the full series **keep most of theirs** ($0.055 \rightarrow 0.037$). The hierarchy did not flatten everything: it discarded spread that 8 weeks could not support and kept spread that 277 weeks could.
 
-**That is the claim to be sceptical of, so the next slide tests it.**
+**That is the claim to be skeptical of, so the next slide tests it.**
 
 ---
 
@@ -243,7 +243,7 @@ What hierarchy buys, and what it costs.
 
 5. This is **regularization for the sixth time** — and the only version where the shrinkage strength is estimated rather than tuned.
 
-6. **Write it non-centred.** The obvious form gave 127 divergences; the reparameterized form gave 1. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.
+6. **Write it non-centered.** The obvious form gave 127 divergences; the reparameterized form gave 1. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.
 :::
 
 [Next: Bayesian linear regression — coefficients as distributions, and what you can ask them.]{.neutral}

@@ -272,7 +272,7 @@ Every model so far — ETS, ARIMA — uses only $y_t$'s own history. But busines
 
 The principle underneath all of it: **if $x_t$ carries information about $y_{t+h}$ that is not already in $y_t$'s own history, including $x_t$ reduces forecast error.** **Granger causality** [@Granger1969] is the formal test of exactly that claim, and we get to it in two slides.
 
-That leaves a modelling choice, and it turns on whether the influence runs one way or both:
+That leaves a modeling choice, and it turns on whether the influence runs one way or both:
 
 :::: {.columns}
 ::: {.column width="48%"}

@@ -93,7 +93,7 @@ a 26-by-4 block.
 Now notice the count, because it is a trap dressed as good news. **8,310 rows became 7,530
 examples.** It looks like you have seven and a half thousand independent observations. You do not.
 Every week appears in twenty-six different windows — once as a target, twenty-five times as
-interior context. The examples overlap almost completely with their neighbours.
+interior context. The examples overlap almost completely with their neighbors.
 
 So the effective sample size is far smaller than 7,530, and that matters for how much you should
 trust anything this network tells you. Half of Homework 5's difficulty is remembering this.

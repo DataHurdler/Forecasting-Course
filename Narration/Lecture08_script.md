@@ -77,7 +77,7 @@ parameters in total.
 
 But the cost is not the worst part. The waste is.
 
-That fully connected layer has no notion that neighbouring pixels are related and distant ones
+That fully connected layer has no notion that neighboring pixels are related and distant ones
 usually are not — it treats pixel one and pixel fifty thousand as equally likely to interact. And
 it does not generalize position: a pattern it learns in the top-left corner is stored completely
 separately from the same pattern in the bottom-right. It has to learn everything twice.
@@ -165,7 +165,7 @@ stride two cuts the number of values to a quarter.
 
 You buy two things. **Fewer parameters downstream**, because the later layers see a smaller input.
 And **translation invariance** — shift the input slightly and the pooled output barely changes,
-so the network recognizes a cat whether it's left or right of centre.
+so the network recognizes a cat whether it's left or right of center.
 
 **[pause]**
 
@@ -229,7 +229,7 @@ sharing. The expensive part was the ordinary dense layers bolted on the end, whi
 at all.
 
 When you profile a model and find the bottleneck, it is very often in the least interesting
-component. That's true of forecasting pipelines too: the modelling is rarely what costs you, the
+component. That's true of forecasting pipelines too: the modeling is rarely what costs you, the
 data preparation is.
 
 ---

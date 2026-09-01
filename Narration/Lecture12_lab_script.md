@@ -114,7 +114,7 @@ difference between two product categories, and calling it elasticity.
 
 *(Screen: run the controlled fit and the comparison.)*
 
-Add per-series intercepts and a trend, and centre log price *within* each series — so the model
+Add per-series intercepts and a trend, and center log price *within* each series — so the model
 uses only price variation inside a series over time, which is the only variation a manager could
 actually create.
 
@@ -172,7 +172,7 @@ Do it to log price here.
 ```
   unstandardized  b_price = -0.4921
   standardized    b_price = -0.0224
-  sd(centred log price)   = 0.0455
+  sd(centered log price)   = 0.0455
   ratio                   = 21.9384
 ```
 
@@ -191,15 +191,15 @@ Same model, same fit, different unit — and the number no longer means "elastic
 Now look at what it was divided by. **0.0455.**
 
 Remember the setup printed 0.2444 for log price across the whole panel? This is not that number.
-This is the standard deviation of log price **within** a series, after centring — and it is five
+This is the standard deviation of log price **within** a series, after centering — and it is five
 times smaller, because prices move very little inside a single store-category over time.
 
 **[pause]** — *this is the subtle part; say it slowly.*
 
 And here is the irony worth naming. That within-series variation is small **because of the good
-decision we made in Step 2.** Centring within series is what removed the confounding. It is also
+decision we made in Step 2.** Centering within series is what removed the confounding. It is also
 what makes the standard deviation tiny, and the smaller the number you divide by, the larger the
-distortion. **The correct modelling choice amplified the preprocessing error.**
+distortion. **The correct modeling choice amplified the preprocessing error.**
 
 *(Run the scenario block.)*
 
@@ -355,7 +355,7 @@ Solutions go up on Canvas after the deadline. See you in Week 16 for the synthes
 | Bias | naive is **5.7× too large** |
 | Interval widths | naive **0.100** vs controlled **0.207** — the wrong model is *twice as precise* |
 | Standardized `b_price` | **−0.0224** |
-| sd(**centred** log price) | **0.0455** — five times smaller than the panel-wide 0.2444 |
+| sd(**centered** log price) | **0.0455** — five times smaller than the panel-wide 0.2444 |
 | Rescaling ratio | **21.94** ( = 1 / 0.0455 ) |
 | 5% rise, correct | units **−2.37%** [−2.86, −1.87] · revenue **+2.51%** [+2.00, +3.04] |
 | 5% rise, standardized | units **−0.11%** · revenue +4.89% — **21× understated** |
@@ -366,8 +366,8 @@ Solutions go up on Canvas after the deadline. See you in Week 16 for the synthes
 **Three things to know before recording.**
 
 *Step 3's irony is the best thing in the lab, and it is easy to skip.* The within-series standard
-deviation is small (0.0455) **because** Step 2 centred within series to remove the confounding.
-The correct modelling decision is what makes the preprocessing error enormous. Say it explicitly;
+deviation is small (0.0455) **because** Step 2 centered within series to remove the confounding.
+The correct modeling decision is what makes the preprocessing error enormous. Say it explicitly;
 it is the kind of interaction students never anticipate.
 
 *Do not let Step 2's headline be "the estimate changed."* The headline is that the **wrong model

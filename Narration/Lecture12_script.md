@@ -95,7 +95,7 @@ particular preference for exactly zero. LASSO's Laplace prior has a sharp spike 
 you believe many coefficients are exactly zero.
 
 That's why LASSO produces sparse solutions and Ridge doesn't. It's not a quirk of the optimizer.
-It's the prior doing what you asked. Once you see the penalty as a belief, the behaviour stops
+It's the prior doing what you asked. Once you see the penalty as a belief, the behavior stops
 being a rule to memorize and becomes something you can reason about.
 
 ---
@@ -132,14 +132,14 @@ on it downstream will be wrong by exactly the factor you divided by.
 The lab does this deliberately, and the business answer moves by a factor of twenty-two. With
 clean diagnostics throughout. No warning of any kind.
 
-*(Point at the centring note.)*
+*(Point at the centering note.)*
 
-One thing you *should* do: subtract each series' own mean log price. That's **centring**, not
+One thing you *should* do: subtract each series' own mean log price. That's **centering**, not
 scaling — it shifts the variable without changing its units, so the elasticity survives intact. And
 it fixed our sampling badly: effective sample size went from one hundred eighty-four to three
 thousand ninety-seven.
 
-Centre, don't scale. That's the rule.
+Center, don't scale. That's the rule.
 
 **[pause]**
 
@@ -147,7 +147,7 @@ And there's a general principle underneath it that outlives this example.
 
 Ask, for every transformation you apply: **does my coefficient still answer the question I asked?**
 
-Logging both sides gives you an elasticity, which is interpretable. Centring preserves it.
+Logging both sides gives you an elasticity, which is interpretable. Centering preserves it.
 Scaling destroys it. Taking a difference changes it into something else again.
 
 None of those are wrong operations. What's wrong is applying one out of habit and then reading the
@@ -211,7 +211,7 @@ events don't matter much for this series. An effect you cannot detect because th
 means collect more data, or find a better design, because the question is still open.
 
 A p-value above point-oh-five is compatible with both, and gives you no way to tell which you're
-in. The interval tells you immediately: narrow and centred on zero is the first, wide and spanning
+in. The interval tells you immediately: narrow and centered on zero is the first, wide and spanning
 zero is the second.
 
 ---

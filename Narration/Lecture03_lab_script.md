@@ -112,7 +112,7 @@ thirty-three percent, and even the weakest — day of week — is nearly twelve 
 these is a rounding error you could ignore and still have a usable forecast.
 
 That is the situation Lecture 3 said GAMs are for. Not one dominant season with noise around it.
-Three real cycles, all worth modelling, all on different time scales.
+Three real cycles, all worth modeling, all on different time scales.
 
 ---
 

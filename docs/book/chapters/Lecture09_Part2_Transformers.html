@@ -534,7 +534,7 @@ window.Quarto = {
 <p>You add that yourself. It’s the <code>+ self.pe</code> on the forward pass. And if you forget it, PyTorch does not complain. There’s no error, no warning, no shape mismatch. The model trains perfectly happily on an unordered bag of weeks and returns a forecast.</p>
 <p>It’s a <strong>silent failure</strong>, which by now you should recognize as the most dangerous kind. We’ll quantify it in two slides.</p>
 <p>Add it to the catalogue we’ve been building all semester. <code>KFold</code> on a time series. Scaling outside the fold. A rolling feature you forgot to shift. <code>shuffle=True</code> on a DataLoader whose rows are ordered in time. And now a Transformer with no positional encoding.</p>
-<p>Not one of those raises an exception. Every one of them returns a plausible number. The only defence is procedural — you check them because they’re on a list, not because something broke.</p>
+<p>Not one of those raises an exception. Every one of them returns a plausible number. The only defense is procedural — you check them because they’re on a list, not because something broke.</p>
 <p>One aside: for multi-step forecasting you also need a causal mask, so position t can’t attend to positions after it. We’re doing one-step-ahead, so we don’t need it here — but if you extend this in your project, that’s the thing to look up.</p>
 </section>
 <section id="does-it-work" class="level3" data-number="10.5.2">

@@ -80,7 +80,7 @@ the honest summary.
 # Step 1 — Check the prior before you use it
 
 We will model the count of high-SNAP weeks as Beta-Binomial. Start with `Beta(2, 2)` — weakly
-informative, centred at 0.5.
+informative, centered at 0.5.
 
 **Before fitting anything**, ask what that prior alone implies about the data.
 
@@ -172,9 +172,9 @@ answer.
 
 ```{python}
 rows = []
-for a, b, label in [(2, 2, "Beta(2,2) — weak, centred 0.5"),
-                    (5, 15, "Beta(5,15) — informed, centred 0.25"),
-                    (20, 2, "Beta(20,2) — badly wrong, centred 0.91")]:
+for a, b, label in [(2, 2, "Beta(2,2) — weak, centered 0.5"),
+                    (5, 15, "Beta(5,15) — informed, centered 0.25"),
+                    (20, 2, "Beta(20,2) — badly wrong, centered 0.91")]:
     with pm.Model():
         th = pm.Beta("theta", alpha=a, beta=b)
         pm.Binomial("obs", n=N_WEEKS, p=th, observed=N_HIGH)
@@ -188,7 +188,7 @@ print(pd.DataFrame(rows).to_string(index=False))
 ::: {.callout-important}
 ## With enough data the prior stops mattering
 
-Three priors, including one centred on 0.91 — badly, deliberately wrong. All three posteriors land
+Three priors, including one centered on 0.91 — badly, deliberately wrong. All three posteriors land
 close together, because 277 observations dominate.
 
 **That is the answer to the arbitrariness objection**, and it comes with a condition attached:
@@ -224,7 +224,7 @@ how far the posterior moves.
 >
 > **Discuss (for Homework 6):** Part 1 asks you to run a prior predictive check and propose a
 > better prior than `Beta(2, 2)` for a rate you know is roughly a quarter. What `alpha` and `beta`
-> would you choose, and how would you defend the strength of it rather than just the centre?
+> would you choose, and how would you defend the strength of it rather than just the center?
 
 ---
 

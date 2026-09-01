@@ -104,7 +104,7 @@ Take a concrete case: estimating a conversion rate $\theta$ from 200 trials.
 | **Likelihood** | A second curve, from the data alone: 30 successes out of 200 peaks near 0.15. |
 | **Posterior** | Multiply the two curves point by point and rescale. It sits *between* them, closer to whichever was more confident. |
 
-**Our numbers:** the prior is centred on 0.10, the data say 0.15, and the posterior mean lands at [**0.14**]{.hi} — between them, nearer the data, because 200 observations outweigh a prior worth about 50.
+**Our numbers:** the prior is centered on 0.10, the data say 0.15, and the posterior mean lands at [**0.14**]{.hi} — between them, nearer the data, because 200 observations outweigh a prior worth about 50.
 
 More data sharpens the likelihood, so the posterior moves toward it and the prior matters less. With little data the prior does most of the work — a feature when it is defensible, a problem when it is not.
 
@@ -126,7 +126,7 @@ A prior is a distribution over a parameter, chosen to match what that parameter 
 
 **The support is the first thing to get right.** Putting a Normal prior on a standard deviation allows negative values, which are impossible — the sampler will struggle and the model may not be wrong so much as incoherent.
 
-[$\text{Beta}(5, 45)$ has mean $5/50 = 0.1$ — a prior centred on a 10% rate, worth about 50 observations of prior evidence.]{.neutral .smaller}
+[$\text{Beta}(5, 45)$ has mean $5/50 = 0.1$ — a prior centered on a 10% rate, worth about 50 observations of prior evidence.]{.neutral .smaller}
 
 ---
 

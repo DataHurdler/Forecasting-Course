@@ -416,7 +416,7 @@ window.Quarto = {
 <p>Think about what that means. Your t-statistic is large. Your R-squared is high. Every diagnostic you were taught to check looks excellent — and the relationship does not exist.</p>
 <p>The regression isn’t detecting a relationship between the series. It’s detecting that both of them wander. Two things that drift will drift <em>somewhere</em>, and over any finite sample they’ll appear to drift together or apart, and the regression will happily report that as signal.</p>
 <p>This is why economics has a long history of embarrassing published findings between non-stationary series. And it’s why the rule is: <strong>difference first, then regress.</strong></p>
-<p>Once you difference, you’re modelling changes rather than levels — and the spurious correlation goes away, because the changes really are independent. Minus zero point one three.</p>
+<p>Once you difference, you’re modeling changes rather than levels — and the spurious correlation goes away, because the changes really are independent. Minus zero point one three.</p>
 </section>
 <section id="acf-and-pacf-model-identification" class="level3" data-number="2.2.4">
 <h3 data-number="2.2.4" class="anchored" data-anchor-id="acf-and-pacf-model-identification"><span class="header-section-number">2.2.4</span> ACF and PACF: Model Identification</h3>
@@ -547,7 +547,7 @@ window.Quarto = {
 <h3 data-number="2.4.1" class="anchored" data-anchor-id="why-use-multiple-series"><span class="header-section-number">2.4.1</span> Why Use Multiple Series?</h3>
 <p>Every model so far — ETS, ARIMA — uses only <span class="math inline">\(y_t\)</span>’s own history. But business variables are linked: consumer sentiment today moves retail spending next month, interest rates move housing starts within two quarters, advertising spend moves sales over the following weeks.</p>
 <p>The principle underneath all of it: <strong>if <span class="math inline">\(x_t\)</span> carries information about <span class="math inline">\(y_{t+h}\)</span> that is not already in <span class="math inline">\(y_t\)</span>’s own history, including <span class="math inline">\(x_t\)</span> reduces forecast error.</strong> <strong>Granger causality</strong> <span class="citation" data-cites="Granger1969">[@Granger1969]</span> is the formal test of exactly that claim, and we get to it in two slides.</p>
-<p>That leaves a modelling choice, and it turns on whether the influence runs one way or both:</p>
+<p>That leaves a modeling choice, and it turns on whether the influence runs one way or both:</p>
 <div class="columns">
 <div class="column" style="width:48%;">
 <p><strong>VAR — symmetric</strong></p>
@@ -569,7 +569,7 @@ window.Quarto = {
 <p>But business variables are linked, and often the link runs forward in time. Consumer sentiment today moves retail spending next month. Interest rates today move housing starts within two quarters. Advertising spend this week moves sales over the following few.</p>
 <p>The principle underneath all of it is this: <strong>if <span class="math inline">\(x_t\)</span> carries information about <span class="math inline">\(y_{t+h}\)</span> that is not already in <span class="math inline">\(y_t\)</span>’s own history, then including <span class="math inline">\(x_t\)</span> reduces forecast error.</strong></p>
 <p>Note the qualifier — “not already in <span class="math inline">\(y\)</span>’s own history.” That’s doing real work. If <span class="math inline">\(x\)</span> is just a lagged reflection of <span class="math inline">\(y\)</span>, it adds nothing. It has to bring genuinely new information.</p>
-<p>Granger causality is the formal test of exactly that claim, and we get to it in two slides. That leaves you a modelling choice, and it turns on whether influence runs one way or both.</p>
+<p>Granger causality is the formal test of exactly that claim, and we get to it in two slides. That leaves you a modeling choice, and it turns on whether influence runs one way or both.</p>
 <p><strong>VAR</strong> treats everything symmetrically. Every variable predicts every other variable. No variable is privileged. Use it when the influence genuinely runs in both directions.</p>
 <p><strong>ARIMAX</strong> is one-directional. <span class="math inline">\(x\)</span> drives <span class="math inline">\(y\)</span>, and not the reverse. Use it when the causal story is clear — but note the third bullet, because it’s the catch we’ll come back to: ARIMAX needs a forecast of <span class="math inline">\(x\)</span> itself.</p>
 </section>

@@ -1196,7 +1196,7 @@ Department of Economics
 </div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb1-2"><a href></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">&quot;sigma_level&quot;</span>, <span class="fl">10.0</span>)</span>
-<span id="cb1-3"><a href></a>    z           <span class="op">=</span> pm.Normal(<span class="st">&quot;z&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>n)     <span class="co"># non-centred</span></span>
+<span id="cb1-3"><a href></a>    z           <span class="op">=</span> pm.Normal(<span class="st">&quot;z&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>n)     <span class="co"># non-centered</span></span>
 <span id="cb1-4"><a href></a>    level <span class="op">=</span> pm.Deterministic(<span class="st">&quot;level&quot;</span>, pm.math.cumsum(z <span class="op">*</span> sigma_level))</span>
 <span id="cb1-5"><a href></a>    beta  <span class="op">=</span> pm.Normal(<span class="st">&quot;beta&quot;</span>, <span class="dv">0</span>, <span class="fl">0.5</span>, shape<span class="op">=</span><span class="dv">2</span><span class="op">*</span>K)    <span class="co"># Fourier</span></span>
 <span id="cb1-6"><a href></a>    sigma <span class="op">=</span> pm.Exponential(<span class="st">&quot;sigma&quot;</span>, <span class="fl">1.0</span>)</span>
@@ -1242,7 +1242,7 @@ Department of Economics
 </table>
 <p>Nothing crashed. The model returned a forecast, and the forecast looked reasonable. Only the diagnostics said the chains had not agreed with each other.</p>
 <div class="warningbox">
-<p><strong>The fix was reparameterization, not more samples.</strong> Writing the walk as <code>cumsum(z * sigma)</code> with <span class="math inline">\(z \sim \mathcal{N}(0,1)\)</span> — the <em>non-centred</em> form — gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will meet it again next week.</p>
+<p><strong>The fix was reparameterization, not more samples.</strong> Writing the walk as <code>cumsum(z * sigma)</code> with <span class="math inline">\(z \sim \mathcal{N}(0,1)\)</span> — the <em>non-centered</em> form — gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will meet it again next week.</p>
 </div>
 </section></section>
 <section>

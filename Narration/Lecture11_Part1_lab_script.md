@@ -79,7 +79,7 @@ final year.
 *(Point at the Fourier line.)*
 
 One line deserves attention. **Six coefficients standing in for fifty-two.** Three sine-cosine
-pairs describe the annual shape, rather than fifty-two weekly dummies. That is a modelling choice
+pairs describe the annual shape, rather than fifty-two weekly dummies. That is a modeling choice
 with a cost and a benefit: you cannot represent a one-week spike, but you have six parameters to
 estimate instead of fifty-two, on 225 observations. Remember it — it comes back in Step 3 as a
 suspect.
@@ -92,7 +92,7 @@ the line that makes them defensible.
 
 # ▶ STEP 1 — Fit it the obvious way
 
-*(Screen: run the centred model.)*
+*(Screen: run the centered model.)*
 
 The model is a drifting level plus seasonality. PyMC has a distribution for a random walk, so the
 obvious thing is to reach for it: `pm.GaussianRandomWalk`. It reads exactly like the maths.
@@ -136,7 +136,7 @@ And note this is **not** fixed by asking the sampler to try harder. `target_acce
 
 The problem is the **shape of the posterior**, not the model.
 
-A centred random walk couples the level to `sigma_level`: when the scale is small, the steps must
+A centered random walk couples the level to `sigma_level`: when the scale is small, the steps must
 be small, so the posterior narrows into a funnel that the sampler cannot traverse at a single step
 size. The fix is to write the walk as a cumulative sum of **standard** Normal draws, scaled
 afterwards. Now `z` and `sigma_level` are independent in the posterior geometry.
@@ -157,7 +157,7 @@ And here is the sentence to say slowly: **same model, same data, same priors.**
 Nothing about what we believe has changed. Only the coordinate system the sampler explores.
 
 That is worth internalising, because it is unlike everything else in this course. This is not a
-modelling improvement or a bias-variance trade. It is a **computational** fix to a **computational**
+modeling improvement or a bias-variance trade. It is a **computational** fix to a **computational**
 problem, and the give-away is that the posterior it targets is unchanged.
 
 *(Screen: the components figure.)*
@@ -343,8 +343,8 @@ one, and what happens when some of them barely have any data.
 | Quantity | Value |
 |---|---|
 | Split | train **225** weeks, test **52** · 6 Fourier coefficients (3 pairs) for a 52-week period |
-| **Centred** model | R-hat **1.022** · ESS **274** · divergences **0** |
-| **Non-centred** model | R-hat **1.002** · ESS **2,376** · divergences 0 |
+| **Centered** model | R-hat **1.022** · ESS **274** · divergences **0** |
+| **Non-centered** model | R-hat **1.002** · ESS **2,376** · divergences 0 |
 | ESS improvement | 274 → 2,376, about **8.7×**, from a reparameterization that changes no belief |
 | Level held constant | RMSE **1,589** · coverage **96%** · mean width 6,340 |
 | Level propagated | RMSE **1,589** (identical by construction) · coverage **100%** · mean width **11,667** |

@@ -376,7 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">5.2</span> Setup</h2>
-<div id="8725e44e" class="cell" data-execution_count="1">
+<div id="cf5f6130" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -447,7 +447,7 @@ Single tree (Lab 4)                     324
 </section>
 <section id="step-1-the-real-thing" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="step-1-the-real-thing"><span class="header-section-number">5.3</span> Step 1 — The real thing</h2>
-<div id="728ddacf" class="cell" data-execution_count="2">
+<div id="5adb0681" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>rf.fit(X_train, y_train)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -480,7 +480,7 @@ Walkthrough
 <section id="step-2-how-many-trees-is-enough" class="level2" data-number="5.4">
 <h2 data-number="5.4" class="anchored" data-anchor-id="step-2-how-many-trees-is-enough"><span class="header-section-number">5.4</span> Step 2 — How many trees is enough?</h2>
 <p>The usual worry about a big model is overfitting. Adding trees to a forest is the rare knob where that worry does not apply — but it does stop paying.</p>
-<div id="0a28c30a" class="cell" data-execution_count="3">
+<div id="c5321b8c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> [<span class="dv">5</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">300</span>, <span class="dv">600</span>]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>curve <span class="op">=</span> []</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> counts:</span>
@@ -530,7 +530,7 @@ Try it
 </div>
 <p>Pause and describe this curve in one sentence, then say what it implies for a compute budget.</p>
 <p>It drops hard to about fifty trees, and then it is flat. Fifty trees gets you 251; six hundred gets you 248. You paid twelve times the compute for three units of RMSE — on a series where a typical day is around 2,900 units.</p>
-<p>Now the property that makes this curve unusual, and please notice it, because Step 6 breaks it: <strong>the curve never turns up.</strong> More trees never made the forest worse. That is not the normal behaviour of a model knob. Usually “more” eventually means overfitting, and here it simply does not, because each tree is fitted independently and averaging more independent things cannot make the average worse.</p>
+<p>Now the property that makes this curve unusual, and please notice it, because Step 6 breaks it: <strong>the curve never turns up.</strong> More trees never made the forest worse. That is not the normal behavior of a model knob. Usually “more” eventually means overfitting, and here it simply does not, because each tree is fitted independently and averaging more independent things cannot make the average worse.</p>
 <p>So <code>n_estimators</code> in a forest is not really a tuning parameter — it is a budget question. Pick the point where the curve goes flat, spend nothing beyond it, and never worry that you have chosen badly. Hold that thought for twenty minutes.</p>
 </div>
 </div>
@@ -540,7 +540,7 @@ Try it
 <h2 data-number="5.5" class="anchored" data-anchor-id="step-3-the-random-in-random-forest"><span class="header-section-number">5.5</span> Step 3 — The “random” in Random Forest</h2>
 <p>Bagging alone gives every tree a different sample of <em>rows</em>. A Random Forest also gives each split a different random subset of <em>columns</em> — <code>max_features</code>. Lecture 5 argued this decorrelates the trees, so their errors cancel more completely when averaged.</p>
 <p>Test it.</p>
-<div id="df2bf50d" class="cell" data-execution_count="4">
+<div id="9bd795d8" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> mf <span class="kw">in</span> [<span class="va">None</span>, <span class="fl">0.6</span>, <span class="st">"sqrt"</span>, <span class="fl">0.2</span>]:</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, max_features<span class="op">=</span>mf,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                              random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>).fit(X_train, y_train)</span>
@@ -594,7 +594,7 @@ Walkthrough
 <section id="step-4-validation-for-free" class="level2" data-number="5.6">
 <h2 data-number="5.6" class="anchored" data-anchor-id="step-4-validation-for-free"><span class="header-section-number">5.6</span> Step 4 — Validation for free</h2>
 <p>Each bootstrap sample leaves out about a third of the rows. Those out-of-bag rows never trained that tree, so they can score it — a validation estimate with no holdout set.</p>
-<div id="44137581" class="cell" data-execution_count="5">
+<div id="7024cd75" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rf_oob <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">300</span>, oob_score<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                               random_state<span class="op">=</span>RANDOM_STATE, n_jobs<span class="op">=-</span><span class="dv">1</span>).fit(X_train, y_train)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -645,7 +645,7 @@ Try it
 </section>
 <section id="step-5-two-importances-two-different-answers" class="level2" data-number="5.7">
 <h2 data-number="5.7" class="anchored" data-anchor-id="step-5-two-importances-two-different-answers"><span class="header-section-number">5.7</span> Step 5 — Two importances, two different answers</h2>
-<div id="bbdf90f2" class="cell" data-execution_count="6">
+<div id="da29b00e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mdi <span class="op">=</span> pd.Series(rf.feature_importances_, index<span class="op">=</span>FEATURES)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>perm <span class="op">=</span> permutation_importance(rf, X_test, y_test, n_repeats<span class="op">=</span><span class="dv">10</span>,</span>
@@ -666,7 +666,7 @@ Try it
 <li><code>avg_price</code> against <code>is_event</code>: MDI ranks the price column <em>above</em> the event flag, while permutation scores price at exactly zero and the event flag at 22 units of RMSE</li>
 </ul>
 <p><strong>Your turn:</strong> plot the two rankings side by side as horizontal bar charts so the disagreements are visible at a glance.</p>
-<div id="d4b512b1" class="cell" data-execution_count="7">
+<div id="b0a8a1a6" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the two blanks ----</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fig, axes = plt.subplots(1, 2, figsize=(11, 3.5))</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># mdi.sort_values().plot.barh(ax=axes[0], title="MDI (impurity)")</span></span>
@@ -738,7 +738,7 @@ Try it
 <h2 data-number="5.8" class="anchored" data-anchor-id="step-6-stop-averaging.-start-correcting."><span class="header-section-number">5.8</span> Step 6 — Stop averaging. Start correcting.</h2>
 <p>A forest builds many trees <strong>in parallel</strong> and averages them. Boosting builds them <strong>in sequence</strong>, each one fitted to what the previous ones got wrong.</p>
 <p>The first four rows hold the learning rate fixed and add rounds — the same experiment you ran on the forest in Step 2. The last two change the rate instead.</p>
-<div id="01b25ccf" class="cell" data-execution_count="8">
+<div id="69622fae" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr, n <span class="kw">in</span> [(<span class="fl">0.1</span>, <span class="dv">100</span>), (<span class="fl">0.1</span>, <span class="dv">300</span>), (<span class="fl">0.1</span>, <span class="dv">1000</span>), (<span class="fl">0.1</span>, <span class="dv">3000</span>),</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>              (<span class="fl">0.3</span>, <span class="dv">100</span>), (<span class="fl">0.05</span>, <span class="dv">1000</span>)]:</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span>n, learning_rate<span class="op">=</span>lr, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
@@ -747,7 +747,7 @@ Try it
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  lr=</span><span class="sc">{</span>lr<span class="sc">:&lt;5}</span><span class="ss"> n=</span><span class="sc">{</span>n<span class="sc">:&lt;5}</span><span class="ss"> train </span><span class="sc">{</span>rmse(y_train, m.predict(X_train))<span class="sc">:5,.0f}</span><span class="ss">"</span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"   test </span><span class="sc">{</span>rmse(y_test, m.predict(X_test))<span class="sc">:5,.0f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="d3fe7b5c" class="cell" data-execution_count="9">
+<div id="e3dbe497" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>best <span class="op">=</span> xgb.XGBRegressor(n_estimators<span class="op">=</span><span class="dv">100</span>, learning_rate<span class="op">=</span><span class="fl">0.1</span>, max_depth<span class="op">=</span><span class="dv">4</span>,</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                        subsample<span class="op">=</span><span class="fl">0.8</span>, colsample_bytree<span class="op">=</span><span class="fl">0.8</span>,</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                        random_state<span class="op">=</span>RANDOM_STATE).fit(X_train, y_train)</span>
@@ -782,7 +782,7 @@ Walkthrough
 <p>Read the first four rows as a curve — the learning rate is fixed, only the number of rounds changes. That is the identical experiment you ran in Step 2 on the forest.</p>
 <p>Training error goes 171, 95, 19, <strong>zero</strong>. Test error goes 244, 243, 250, 253. It bottoms out around three hundred rounds and then <strong>turns up</strong>.</p>
 <p>Now put that next to Step 2, where you took a forest from five trees to six hundred and it never got worse once.</p>
-<p>Same data, same features, same family of base learner. Opposite behaviour on the same knob. The reason is structural, and it is worth stating carefully: a forest’s trees are fitted independently of one another, so an extra one only adds to an average and cannot corrupt what is already there. A boosted tree is fitted to the <em>residuals</em> of everything before it — so once the real signal is used up, the next tree fits noise, and it is added to the ensemble anyway, with nothing to average it away.</p>
+<p>Same data, same features, same family of base learner. Opposite behavior on the same knob. The reason is structural, and it is worth stating carefully: a forest’s trees are fitted independently of one another, so an extra one only adds to an average and cannot corrupt what is already there. A boosted tree is fitted to the <em>residuals</em> of everything before it — so once the real signal is used up, the next tree fits noise, and it is added to the ensemble anyway, with nothing to average it away.</p>
 <p>So: <code>n_estimators</code> in a forest is a budget. <code>n_estimators</code> in boosting is a tuning parameter, and getting it wrong costs you accuracy in a way no amount of forest-tuning ever will. That is also why boosting <em>has</em> a learning rate — it is the knob that decides how much damage each additional tree is allowed to do.</p>
 <p>The last two rows are the complement. A big rate with few rounds (238) and a small rate with many (239) end up in much the same place: roughly, the product sets the budget. What you cannot do is fix a rate and let the rounds run.</p>
 <pre><code>Benchmark (same day last year)       625

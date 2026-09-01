@@ -133,7 +133,7 @@ typical day is around 2,900 units.
 
 Now the property that makes this curve unusual, and please notice it, because Step 6 breaks it:
 **the curve never turns up.** More trees never made the forest worse. That is not the normal
-behaviour of a model knob. Usually "more" eventually means overfitting, and here it simply does
+behavior of a model knob. Usually "more" eventually means overfitting, and here it simply does
 not, because each tree is fitted independently and averaging more independent things cannot make
 the average worse.
 
@@ -331,7 +331,7 @@ got worse once.
 
 **[pause]**
 
-Same data, same features, same family of base learner. Opposite behaviour on the same knob. The
+Same data, same features, same family of base learner. Opposite behavior on the same knob. The
 reason is structural, and it is worth stating carefully: a forest's trees are fitted independently
 of one another, so an extra one only adds to an average and cannot corrupt what is already there.
 A boosted tree is fitted to the *residuals* of everything before it — so once the real signal is

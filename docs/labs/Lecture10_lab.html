@@ -2359,7 +2359,7 @@ window.Quarto = {
 </section>
 <section id="setup" class="level1">
 <h1>Setup</h1>
-<div id="201b4d53" class="cell" data-execution_count="1">
+<div id="7f77e60a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2410,9 +2410,9 @@ ArviZ changed its default interval
 </section>
 <section id="step-1-check-the-prior-before-you-use-it" class="level1">
 <h1>Step 1 — Check the prior before you use it</h1>
-<p>We will model the count of high-SNAP weeks as Beta-Binomial. Start with <code>Beta(2, 2)</code> — weakly informative, centred at 0.5.</p>
+<p>We will model the count of high-SNAP weeks as Beta-Binomial. Start with <code>Beta(2, 2)</code> — weakly informative, centered at 0.5.</p>
 <p><strong>Before fitting anything</strong>, ask what that prior alone implies about the data.</p>
-<div id="50139305" class="cell" data-execution_count="2">
+<div id="5d66955e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> pm.Beta(<span class="st">&quot;theta&quot;</span>, alpha<span class="op">=</span><span class="dv">2</span>, beta<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    obs   <span class="op">=</span> pm.Binomial(<span class="st">&quot;obs&quot;</span>, n<span class="op">=</span>N_WEEKS, p<span class="op">=</span>theta, observed<span class="op">=</span>N_HIGH)</span>
@@ -2442,7 +2442,7 @@ ArviZ changed its default interval
 </section>
 <section id="step-2-fit-it" class="level1">
 <h1>Step 2 — Fit it</h1>
-<div id="7866caf3" class="cell" data-execution_count="3">
+<div id="34f3be40" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, chains<span class="op">=</span><span class="dv">4</span>, progressbar<span class="op">=</span><span class="va">False</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2459,7 +2459,7 @@ theta  0.2628  0.026     0.22     0.31     3686     5175  1.00   0.00043  0.0003
 <section id="step-3-did-the-sampler-work" class="level1">
 <h1>Step 3 — Did the sampler work?</h1>
 <p>MCMC always returns samples. Whether they came from the posterior is a separate question, and one you are expected to answer every time.</p>
-<div id="fcc3ae68" class="cell" data-execution_count="4">
+<div id="691bb7d0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(idata.sample_stats.diverging.<span class="bu">sum</span>())</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;R-hat        </span><span class="sc">{</span>summary<span class="sc">.</span>r_hat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.3f}</span><span class="ss">    (want &lt; 1.01)&quot;</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;ESS (bulk)   </span><span class="sc">{</span>summary<span class="sc">.</span>ess_bulk<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">      (want &gt; 400)&quot;</span>)</span>
@@ -2487,7 +2487,7 @@ divergences  0        (want 0)</code></pre>
 <section id="step-4-ask-the-posterior-a-question" class="level1">
 <h1>Step 4 — Ask the posterior a question</h1>
 <p>The posterior is a set of samples, so any question about <span class="math inline">\(\theta\)</span> is answered by counting.</p>
-<div id="37c36d09" class="cell" data-execution_count="5">
+<div id="c04d0b46" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> idata.posterior[<span class="st">&quot;theta&quot;</span>].values.ravel()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;P(theta &gt; 0.30)          = </span><span class="sc">{</span>(theta <span class="op">&gt;</span> <span class="fl">0.30</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
@@ -2505,11 +2505,11 @@ P(0.24 &lt; theta &lt; 0.28)   = 0.558
 <section id="step-5-how-much-did-the-prior-matter" class="level1">
 <h1>Step 5 — How much did the prior matter?</h1>
 <p>The honest objection to Bayesian work is that the prior is arbitrary. Test how much it moves the answer.</p>
-<div id="86c4b6e6" class="cell" data-execution_count="6">
+<div id="bb0243a8" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, b, label <span class="kw">in</span> [(<span class="dv">2</span>, <span class="dv">2</span>, <span class="st">&quot;Beta(2,2) — weak, centred 0.5&quot;</span>),</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">5</span>, <span class="dv">15</span>, <span class="st">&quot;Beta(5,15) — informed, centred 0.25&quot;</span>),</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">20</span>, <span class="dv">2</span>, <span class="st">&quot;Beta(20,2) — badly wrong, centred 0.91&quot;</span>)]:</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a, b, label <span class="kw">in</span> [(<span class="dv">2</span>, <span class="dv">2</span>, <span class="st">&quot;Beta(2,2) — weak, centered 0.5&quot;</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">5</span>, <span class="dv">15</span>, <span class="st">&quot;Beta(5,15) — informed, centered 0.25&quot;</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">20</span>, <span class="dv">2</span>, <span class="st">&quot;Beta(20,2) — badly wrong, centered 0.91&quot;</span>)]:</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> pm.Model():</span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        th <span class="op">=</span> pm.Beta(<span class="st">&quot;theta&quot;</span>, alpha<span class="op">=</span>a, beta<span class="op">=</span>b)</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        pm.Binomial(<span class="st">&quot;obs&quot;</span>, n<span class="op">=</span>N_WEEKS, p<span class="op">=</span>th, observed<span class="op">=</span>N_HIGH)</span>
@@ -2519,10 +2519,10 @@ P(0.24 &lt; theta &lt; 0.28)   = 0.558
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;posterior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(s[<span class="st">&quot;mean&quot;</span>].iloc[<span class="dv">0</span>]), <span class="dv">3</span>)})</span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame(rows).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                                 prior  prior_mean  posterior_mean
-         Beta(2,2) — weak, centred 0.5       0.500           0.265
-   Beta(5,15) — informed, centred 0.25       0.250           0.259
-Beta(20,2) — badly wrong, centred 0.91       0.909           0.309</code></pre>
+<pre><code>                                  prior  prior_mean  posterior_mean
+         Beta(2,2) — weak, centered 0.5       0.500           0.265
+   Beta(5,15) — informed, centered 0.25       0.250           0.259
+Beta(20,2) — badly wrong, centered 0.91       0.909           0.309</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -2535,13 +2535,13 @@ With enough data the prior stops mattering
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Three priors, including one centred on 0.91 — badly, deliberately wrong. All three posteriors land close together, because 277 observations dominate.</p>
+<p>Three priors, including one centered on 0.91 — badly, deliberately wrong. All three posteriors land close together, because 277 observations dominate.</p>
 <p><strong>That is the answer to the arbitrariness objection</strong>, and it comes with a condition attached: it holds <em>when you have enough data</em>. With 8 observations rather than 277, the third prior would still be visible in the answer.</p>
 <p>Which is exactly the situation Lecture 11 Part 2 is about.</p>
 </div>
 </div>
 <p><strong>Your turn:</strong> re-run the badly-wrong prior against only the <strong>first 10 weeks</strong> of data and report how far the posterior moves.</p>
-<div id="57e93049" class="cell" data-execution_count="7">
+<div id="049abaa2" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># n_small, k_small = 10, int((ca1.snap_days &gt;= 5).head(10).sum())</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># with pm.Model():</span></span>
@@ -2557,7 +2557,7 @@ With enough data the prior stops mattering
 <blockquote class="blockquote">
 <p><strong>Discuss (the prior):</strong> Your Step 5 table says a deliberately wrong prior barely changed the answer. Under what circumstances would you <em>not</em> be reassured by that, and what would you check?</p>
 <p><strong>Discuss (the check):</strong> You verified <span class="math inline">\(\hat{R}\)</span>, ESS and divergences before reading any result. Name the equivalent check you have been doing all semester for a non-Bayesian model, and say which is easier to skip.</p>
-<p><strong>Discuss (for Homework 6):</strong> Part 1 asks you to run a prior predictive check and propose a better prior than <code>Beta(2, 2)</code> for a rate you know is roughly a quarter. What <code>alpha</code> and <code>beta</code> would you choose, and how would you defend the strength of it rather than just the centre?</p>
+<p><strong>Discuss (for Homework 6):</strong> Part 1 asks you to run a prior predictive check and propose a better prior than <code>Beta(2, 2)</code> for a rate you know is roughly a quarter. What <code>alpha</code> and <code>beta</code> would you choose, and how would you defend the strength of it rather than just the center?</p>
 </blockquote>
 <hr>
 <p><em>Solutions posted to Canvas after class.</em></p>

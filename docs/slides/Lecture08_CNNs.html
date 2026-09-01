@@ -1104,7 +1104,7 @@ Department of Economics
 <section id="why-convolution" class="slide level2">
 <h2>Why Convolution?</h2>
 <p>Start with why a fully connected layer fails on structured input. A <span class="math inline">\(224 \times 224\)</span> image has 50,176 pixels, so a single hidden layer of 1,000 neurons needs <strong>50 million weights</strong> — for one layer. Lecture 7’s network had 22,657 parameters in total.</p>
-<p>Worse than the cost is the waste. That layer ignores <strong>spatial structure</strong>: it has no notion that neighbouring pixels are related and distant ones usually are not. And it does not <strong>generalize position</strong> — a pattern learned in the top-left corner is stored separately from the same pattern in the bottom-right.</p>
+<p>Worse than the cost is the waste. That layer ignores <strong>spatial structure</strong>: it has no notion that neighboring pixels are related and distant ones usually are not. And it does not <strong>generalize position</strong> — a pattern learned in the top-left corner is stored separately from the same pattern in the bottom-right.</p>
 <div class="keybox">
 <p>A convolutional layer fixes both with two ideas. <strong>Local connectivity:</strong> each neuron sees only a small <strong>receptive field</strong>. <strong>Weight sharing:</strong> the same filter is applied at every position. Far fewer parameters, and a pattern learned anywhere is recognized everywhere.</p>
 </div>
@@ -1151,7 +1151,7 @@ Department of Economics
 <section id="pooling-downsampling-feature-maps" class="slide level2">
 <h2>Pooling: Downsampling Feature Maps</h2>
 <p><strong>Pooling</strong> reduces a feature map by summarizing each small region with a single number. Max pooling takes the largest value in the window; average pooling takes the mean. A <span class="math inline">\(2\times2\)</span> max pool with stride 2 quarters the number of values.</p>
-<p>Two things are bought. <strong>Fewer parameters downstream</strong>, because later layers see a smaller input. And <strong>translation invariance</strong>: shift the input slightly and the pooled output barely changes, so the network recognizes a cat whether it sits left or right of centre.</p>
+<p>Two things are bought. <strong>Fewer parameters downstream</strong>, because later layers see a smaller input. And <strong>translation invariance</strong>: shift the input slightly and the pooled output barely changes, so the network recognizes a cat whether it sits left or right of center.</p>
 <div class="warningbox">
 <p><strong>Translation invariance is a feature for images and a problem for forecasting.</strong> If a demand spike moved three weeks later, that is not a nuisance to be smoothed away — it is the thing you are trying to predict. Pooling deliberately discards <em>where</em> in the window a pattern occurred, and for a time series the position is often the signal.</p>
 </div>

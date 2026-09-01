@@ -1104,7 +1104,7 @@ Department of Economics
 <section id="the-question" class="slide level2">
 <h2>The Question</h2>
 <p>A concrete one, and you have met it before. <strong>Does demand rise in weeks when SNAP benefits are disbursed, and by how much — store by store?</strong> Homework 3’s memo had you stock up for SNAP weeks store by store, which assumed those differences are real. Today we check.</p>
-<p><strong>But one question comes before the model.</strong> SNAP is a <em>food</em> assistance programme. Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:</p>
+<p><strong>But one question comes before the model.</strong> SNAP is a <em>food</em> assistance program. Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -1142,7 +1142,7 @@ Department of Economics
 </div>
 <p>Groups are <strong>exchangeable</strong> when, before seeing the data, you have no reason to expect one to differ from another in a particular direction. Swapping their labels would not change what you believe.</p>
 </div>
-<p>The ten FOODS series qualify: same category, different stores, and you could not say in advance which store’s SNAP effect should be largest. FOODS against HOBBIES does <strong>not</strong> — you know before looking that a food-assistance programme moves food.</p>
+<p>The ten FOODS series qualify: same category, different stores, and you could not say in advance which store’s SNAP effect should be largest. FOODS against HOBBIES does <strong>not</strong> — you know before looking that a food-assistance program moves food.</p>
 <p><strong>The setup for today.</strong> We work with the <strong>ten FOODS series</strong>, and deliberately thin <strong>five</strong> of them down to <strong>8 weeks</strong>. Five series are data-rich, five are data-poor. That imbalance is the whole point.</p>
 <p><span class="neutral smaller">The lab pools all thirty anyway, and measures what it costs.</span></p>
 </section>
@@ -1175,7 +1175,7 @@ Department of Economics
 </tr>
 </tbody>
 </table>
-<p><strong>You have used both already without naming them.</strong> Homework 3’s random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modelling decision and lets the data settle it.</p>
+<p><strong>You have used both already without naming them.</strong> Homework 3’s random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modeling decision and lets the data settle it.</p>
 </section></section>
 <section>
 <section id="partial-pooling" class="title-slide slide level1 center">
@@ -1227,12 +1227,12 @@ Department of Economics
 <h2>The Model in PyMC</h2>
 <div class="examplebox">
 <div class="examplebox-title">
-<p>Non-centred hierarchical model</p>
+<p>Non-centered hierarchical model</p>
 </div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb1-2"><a href></a>    mu_b <span class="op">=</span> pm.Normal(<span class="st">&quot;mu_b&quot;</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)        <span class="co"># typical SNAP effect</span></span>
 <span id="cb1-3"><a href></a>    sd_b <span class="op">=</span> pm.HalfNormal(<span class="st">&quot;sd_b&quot;</span>, <span class="fl">0.25</span>)      <span class="co"># how much stores differ</span></span>
-<span id="cb1-4"><a href></a>    z    <span class="op">=</span> pm.Normal(<span class="st">&quot;z&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>J)    <span class="co"># non-centred</span></span>
+<span id="cb1-4"><a href></a>    z    <span class="op">=</span> pm.Normal(<span class="st">&quot;z&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>J)    <span class="co"># non-centered</span></span>
 <span id="cb1-5"><a href></a>    b    <span class="op">=</span> pm.Deterministic(<span class="st">&quot;b&quot;</span>, mu_b <span class="op">+</span> z <span class="op">*</span> sd_b)</span>
 <span id="cb1-6"><a href></a></span>
 <span id="cb1-7"><a href></a>    a <span class="op">=</span> pm.Normal(<span class="st">&quot;a&quot;</span>, y.mean(), <span class="dv">1</span>, shape<span class="op">=</span>J)  <span class="co"># per-series level</span></span>
@@ -1245,13 +1245,13 @@ Department of Economics
 </section>
 <section id="the-trap-write-it-the-obvious-way-and-it-breaks" class="slide level2">
 <h2>The Trap: Write It the Obvious Way and It Breaks</h2>
-<p>The natural way to write the hierarchy is <code>b = pm.Normal(&quot;b&quot;, mu_b, sd_b, shape=J)</code> — the <em>centred</em> form, which reads exactly like the equation. On our data it produces:</p>
+<p>The natural way to write the hierarchy is <code>b = pm.Normal(&quot;b&quot;, mu_b, sd_b, shape=J)</code> — the <em>centered</em> form, which reads exactly like the equation. On our data it produces:</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
 <th></th>
-<th style="text-align: right;">Centred</th>
-<th style="text-align: right;">Non-centred</th>
+<th style="text-align: right;">Centered</th>
+<th style="text-align: right;">Non-centered</th>
 <th>Want</th>
 </tr>
 </thead>
@@ -1278,7 +1278,7 @@ Department of Economics
 </table>
 <p><strong>Why:</strong> when <span class="math inline">\(\sigma_b\)</span> is small, the <span class="math inline">\(b_j\)</span> must crowd into a narrow band, and the posterior takes on a funnel shape — wide where <span class="math inline">\(\sigma_b\)</span> is large, pinched where it is small. A sampler tuned for the wide part cannot navigate the neck, and reports divergences.</p>
 <p><strong>Note how the alarms differ in kind.</strong> ESS <em>passes</em> — 413, just over the line, and you would not look twice. <span class="math inline">\(\hat{R}\)</span> at 1.044 fails, but it is the sort of near-miss people talk themselves out of. <strong>127 divergences against a threshold of exactly zero admits no such conversation.</strong> On hierarchical models divergences fire first and least ambiguously; do not wait for <span class="math inline">\(\hat{R}\)</span> to decide for you.</p>
-<p><span class="neutral smaller">BMCP §4.6.1, <em>Posterior Geometry Matters</em> — the single most common failure in applied hierarchical modelling.</span></p>
+<p><span class="neutral smaller">BMCP §4.6.1, <em>Posterior Geometry Matters</em> — the single most common failure in applied hierarchical modeling.</span></p>
 </section></section>
 <section>
 <section id="reading-the-result" class="title-slide slide level1 center">
@@ -1314,7 +1314,7 @@ Department of Economics
 </table>
 <p><span class="key-result"><strong>The data-poor series moved 8.2 times further toward the group mean than the data-rich ones.</strong></span> Nobody told the model which series were thin. It inferred that from how much each series had to say.</p>
 <p>Read the two right-hand columns together. The thin series’ apparent spread of <span class="math inline">\(0.108\)</span> nearly vanishes, while the full series <strong>keep most of theirs</strong> (<span class="math inline">\(0.055 \rightarrow 0.037\)</span>). The hierarchy did not flatten everything: it discarded spread that 8 weeks could not support and kept spread that 277 weeks could.</p>
-<p><strong>That is the claim to be sceptical of, so the next slide tests it.</strong></p>
+<p><strong>That is the claim to be skeptical of, so the next slide tests it.</strong></p>
 </section>
 <section id="checked-against-data-the-model-never-saw" class="slide level2">
 <h2>Checked Against Data the Model Never Saw</h2>
@@ -1393,7 +1393,7 @@ Department of Economics
 <li><p><strong>Partial pooling</strong> gives each group its own parameter drawn from a shared distribution, and estimates how much groups genuinely differ.</p></li>
 <li><p><strong>Shrinkage is automatic and proportionate.</strong> Our thin series moved <strong>8.1<span class="math inline">\(\times\)</span></strong> further toward the group mean than data-rich ones, with nobody specifying that — and on held-out weeks it was <strong>2.6<span class="math inline">\(\times\)</span></strong> more accurate.</p></li>
 <li><p>This is <strong>regularization for the sixth time</strong> — and the only version where the shrinkage strength is estimated rather than tuned.</p></li>
-<li><p><strong>Write it non-centred.</strong> The obvious form gave 127 divergences; the reparameterized form gave 1. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p></li>
+<li><p><strong>Write it non-centered.</strong> The obvious form gave 127 divergences; the reparameterized form gave 1. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p></li>
 </ol>
 </div>
 <p><span class="neutral">Next: Bayesian linear regression — coefficients as distributions, and what you can ask them.</span></p>

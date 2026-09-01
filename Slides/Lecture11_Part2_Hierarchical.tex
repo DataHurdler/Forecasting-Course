@@ -39,7 +39,7 @@
   for SNAP weeks store by store, which assumed those differences are real. Today we check.
 
   \vspace{0.15cm}
-  \textbf{But one question comes before the model.} SNAP is a \emph{food} assistance programme.
+  \textbf{But one question comes before the model.} SNAP is a \emph{food} assistance program.
   Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:
 
   \begin{center}
@@ -74,7 +74,7 @@
   \vspace{0.1cm}
   The ten FOODS series qualify: same category, different stores, and you could not say in advance
   which store's SNAP effect should be largest. FOODS against HOBBIES does \textbf{not} --- you
-  know before looking that a food-assistance programme moves food.
+  know before looking that a food-assistance program moves food.
 
   \vspace{0.15cm}
   \textbf{The setup for today.} We work with the \textbf{ten FOODS series}, and deliberately thin
@@ -110,7 +110,7 @@
   \textbf{You have used both already without naming them.} Homework 3's random forest pooled all
   thirty series into one model with store dummies --- close to complete pooling. Homework 1
   fitted ARIMA to one series at a time --- no pooling. The choice has always been made by
-  convenience; partial pooling makes it a modelling decision and lets the data settle it.
+  convenience; partial pooling makes it a modeling decision and lets the data settle it.
 \end{frame}
 
 % =============================================================================
@@ -186,12 +186,12 @@
 
 % --- Slide: PyMC ------------------------------------------------------------
 \begin{frame}{The Model in PyMC}
-  \begin{examplebox}{Non-centred hierarchical model}
+  \begin{examplebox}{Non-centered hierarchical model}
     {\tiny\linespread{1.05}\selectfont
     \texttt{with pm.Model() as model:}\\
     \texttt{\ \ mu\_b = pm.Normal("mu\_b", 0, 0.5)\ \ \ \ \ \ \ \# typical SNAP effect}\\
     \texttt{\ \ sd\_b = pm.HalfNormal("sd\_b", 0.25)\ \ \ \ \ \# how much stores differ}\\
-    \texttt{\ \ z\ \ \ \ = pm.Normal("z", 0, 1, shape=J)\ \ \ \ \# non-centred}\\
+    \texttt{\ \ z\ \ \ \ = pm.Normal("z", 0, 1, shape=J)\ \ \ \ \# non-centered}\\
     \texttt{\ \ b\ \ \ \ = pm.Deterministic("b", mu\_b + z * sd\_b)}\\[2pt]
     \texttt{\ \ a = pm.Normal("a", y.mean(), 1, shape=J)\ \ \# per-series level}\\
     \texttt{\ \ s = pm.Exponential("s", 1.0)}\\[2pt]
@@ -209,12 +209,12 @@
 % --- Slide: the funnel ------------------------------------------------------
 \begin{frame}{The Trap: Write It the Obvious Way and It Breaks}
   The natural way to write the hierarchy is \texttt{b = pm.Normal("b", mu\_b, sd\_b, shape=J)}
-  --- the \emph{centred} form, which reads exactly like the equation. On our data it produces:
+  --- the \emph{centered} form, which reads exactly like the equation. On our data it produces:
   \begin{center}
     {\small
     \begin{tabular}{lrrl}
       \toprule
-      & \textbf{Centred} & \textbf{Non-centred} & \textbf{Want} \\
+      & \textbf{Centered} & \textbf{Non-centered} & \textbf{Want} \\
       \midrule
       Divergences & \textbf{127} & \textbf{1} & 0 \\
       $\hat{R}$ & \textbf{1.044} & 1.002 & $< 1.01$ \\
@@ -236,7 +236,7 @@
 
   \vspace{0.02cm}
   \muted{\footnotesize\itshape BMCP §4.6.1, \emph{Posterior Geometry Matters} --- the single most
-  common failure in applied hierarchical modelling.}
+  common failure in applied hierarchical modeling.}
 \end{frame}
 
 % =============================================================================
@@ -275,7 +275,7 @@
   kept spread that 277 weeks could.
 
   \vspace{0.1cm}
-  \textbf{That is the claim to be sceptical of, so the next slide tests it.}
+  \textbf{That is the claim to be skeptical of, so the next slide tests it.}
 \end{frame}
 
 % --- Slide: held-out check --------------------------------------------------
@@ -362,7 +362,7 @@
       \item This is \textbf{regularization for the sixth time} --- and the only version where the
             shrinkage strength is estimated rather than tuned.
 
-      \item \textbf{Write it non-centred.} The obvious form gave 127 divergences, the
+      \item \textbf{Write it non-centered.} The obvious form gave 127 divergences, the
             reparameterized form 1 --- same model, different geometry.
     \end{enumerate}
     }

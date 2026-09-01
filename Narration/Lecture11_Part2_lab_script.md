@@ -20,10 +20,10 @@ Lab: `Labs/Lecture11_Part2_lab.qmd` (6 steps) · Measured runtime: **~28 minutes
 ### A correction this script triggered, and it reached the deck
 
 Step 6's diagnostics did not match what Lecture 11 Part 2 claims. The deck's table said the
-centred fit gave **43 divergences with R-hat 1.003 and ESS 966** — both passing — and concluded
+centered fit gave **43 divergences with R-hat 1.003 and ESS 966** — both passing — and concluded
 *"on those numbers you would have shipped it; only the divergence count objects."*
 
-Measured from this lab's own code, on the pinned environment with seed 42, the centred fit gives
+Measured from this lab's own code, on the pinned environment with seed 42, the centered fit gives
 **127 divergences, R-hat 1.044, ESS 413.** R-hat *fails*. I could not reproduce 43 / 1.003 / 966
 from any configuration in the repository — the same model on all thirty series gives 792
 divergences and R-hat 1.074.
@@ -241,7 +241,7 @@ Empirical high-SNAP effect by category (all data, no model):
   HOUSEHOLD  n=10  mean +0.011  sd 0.014
 ```
 
-And there it is. **SNAP is a food assistance programme.** FOODS responds at +0.089. HOBBIES and
+And there it is. **SNAP is a food assistance program.** FOODS responds at +0.089. HOBBIES and
 HOUSEHOLD are at +0.006 and +0.011 — indistinguishable from nothing.
 
 So put the two together, because neither alone is fatal.
@@ -268,7 +268,7 @@ series would sharpen each estimate, and the hierarchy would still be pulling FOO
 mean computed from HOBBIES and HOUSEHOLD. The error is in the *structure* we imposed, and no
 quantity of data corrects a structural mistake. It just makes you more confident about it.
 
-**Exchangeability is a modelling assumption and it is yours to defend.** Groups are exchangeable
+**Exchangeability is a modeling assumption and it is yours to defend.** Groups are exchangeable
 when, before seeing the data, you have no reason to expect one to differ from another in a
 particular direction. Ten FOODS series across ten stores: plausible. FOODS against HOBBIES: you
 knew the answer before you looked.
@@ -356,23 +356,23 @@ what percentage here? *(Roughly 5% there against 61% here.)*
 
 # ▶ STEP 6 — The trap in the code
 
-*(Screen: the centred form, then run.)*
+*(Screen: the centered form, then run.)*
 
 One more failure, and this one **is** mechanical rather than conceptual.
 
 The natural way to write a hierarchy reads exactly like the equation:
 `b = pm.Normal("b", mu_b, sd_b, shape=J)`. Everybody writes it that way first. It is called the
-centred form.
+centered form.
 
 ```
 Diagnostics
-  centred        r_hat 1.044  ess   413  divergences  127
-  non-centred    r_hat 1.002  ess  1728  divergences    1
+  centered        r_hat 1.044  ess   413  divergences  127
+  non-centered    r_hat 1.002  ess  1728  divergences    1
 ```
 
 **[pause]**
 
-Same model. Same data. The same posterior, if you could sample it — but the centred form makes the
+Same model. Same data. The same posterior, if you could sample it — but the centered form makes the
 sampler walk a **funnel**: when `sd_b` is small the individual `b_j` must crowd into a narrow
 neck, and a sampler tuned for the wide part of the funnel cannot get into the neck.
 
@@ -414,7 +414,7 @@ category did here — and say how you would handle it **without** abandoning the
 **[pause]** — *the good answer is a level the hierarchy can absorb: put the offending variable in
 as a predictor, or nest the hierarchy — stores within regions — rather than giving up on pooling.*
 
-**The judgement.** In Step 5, `sd_b` came out around 0.066, so stores genuinely differ. The
+**The judgment.** In Step 5, `sd_b` came out around 0.066, so stores genuinely differ. The
 unpooled fit put the range at roughly 5% to 33%. Given both numbers, what do you actually
 recommend the business do for the next SNAP week?
 
@@ -449,8 +449,8 @@ answer.
 | **Step 5** hierarchy | `mu_b` **0.077** [0.016, 0.150] · `sd_b` **0.066** — 8× Step 2's |
 | Step 5 shrinkage | thin 0.108 → 0.010 · full 0.055 → **0.038** (70% retained) · ratio **8.2×** |
 | Step 5 grading | unpooled 0.126 · hierarchical **0.049** — **2.6× better** |
-| **Step 6** centred | R-hat **1.044** · ESS 413 · divergences **127** |
-| Step 6 non-centred | R-hat 1.002 · ESS 1,728 · divergences **1** |
+| **Step 6** centered | R-hat **1.044** · ESS 413 · divergences **127** |
+| Step 6 non-centered | R-hat 1.002 · ESS 1,728 · divergences **1** |
 
 **Three things to know before recording.**
 

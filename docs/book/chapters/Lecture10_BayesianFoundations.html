@@ -440,7 +440,7 @@ window.Quarto = {
 <p>The denominator — p of D, the evidence — is only that rescaling. It doesn’t change the <em>shape</em> of the distribution, only its normalization. So in practice people write the working form: <strong>Posterior is proportional to likelihood times prior.</strong></p>
 <p>That proportionality is what we’ll actually use, and it’s why the denominator being uncomputable turns out not to matter — which is the subject of slide 13. One reassurance, since some of you are looking at that equation with concern.</p>
 <p><strong>You will not compute this by hand.</strong> This course never asks you to. There is no integral on any homework in this course.</p>
-<p>What you are responsible for is three things: choosing a prior you can defend, checking that the sampler actually worked, and reading the posterior correctly. Those are judgement skills, and they are the ones that matter in practice.</p>
+<p>What you are responsible for is three things: choosing a prior you can defend, checking that the sampler actually worked, and reading the posterior correctly. Those are judgment skills, and they are the ones that matter in practice.</p>
 <p>And it’s worth registering that the equation itself is not controversial. It’s a theorem — it follows from the definition of conditional probability in two lines, and no statistician of any persuasion disputes it.</p>
 <p>What was historically contested is whether you’re entitled to put a probability distribution on a <em>parameter</em> at all, as opposed to on data. That’s a philosophical argument, it ran for most of the twentieth century, and it is not one we’re going to settle in this room.</p>
 <p>What settled it in practice was computation. These methods were mathematically fine and practically impossible until MCMC and cheap computers arrived in the 1990s. The philosophy didn’t change; the feasibility did.</p>
@@ -461,7 +461,7 @@ window.Quarto = {
 <p>The denominator — p of D, the evidence — is only that rescaling. It doesn’t change the <em>shape</em> of the distribution, only its normalization. So in practice people write the working form: <strong>Posterior is proportional to likelihood times prior.</strong></p>
 <p>That proportionality is what we’ll actually use, and it’s why the denominator being uncomputable turns out not to matter — which is the subject of slide 13. One reassurance, since some of you are looking at that equation with concern.</p>
 <p><strong>You will not compute this by hand.</strong> This course never asks you to. There is no integral on any homework in this course.</p>
-<p>What you are responsible for is three things: choosing a prior you can defend, checking that the sampler actually worked, and reading the posterior correctly. Those are judgement skills, and they are the ones that matter in practice.</p>
+<p>What you are responsible for is three things: choosing a prior you can defend, checking that the sampler actually worked, and reading the posterior correctly. Those are judgment skills, and they are the ones that matter in practice.</p>
 <p>And it’s worth registering that the equation itself is not controversial. It’s a theorem — it follows from the definition of conditional probability in two lines, and no statistician of any persuasion disputes it.</p>
 <p>What was historically contested is whether you’re entitled to put a probability distribution on a <em>parameter</em> at all, as opposed to on data. That’s a philosophical argument, it ran for most of the twentieth century, and it is not one we’re going to settle in this room.</p>
 <p>What settled it in practice was computation. These methods were mathematically fine and practically impossible until MCMC and cheap computers arrived in the 1990s. The philosophy didn’t change; the feasibility did.</p>
@@ -489,13 +489,13 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p><strong>Our numbers:</strong> the prior is centred on 0.10, the data say 0.15, and the posterior mean lands at <span class="hi"><strong>0.14</strong></span> — between them, nearer the data, because 200 observations outweigh a prior worth about 50.</p>
+<p><strong>Our numbers:</strong> the prior is centered on 0.10, the data say 0.15, and the posterior mean lands at <span class="hi"><strong>0.14</strong></span> — between them, nearer the data, because 200 observations outweigh a prior worth about 50.</p>
 <p>More data sharpens the likelihood, so the posterior moves toward it and the prior matters less. With little data the prior does most of the work — a feature when it is defensible, a problem when it is not.</p>
 <p>Let’s make it concrete with a case you could actually meet. Estimating a conversion rate — theta — from two hundred trials.</p>
 <p>The <strong>prior</strong> is a curve over theta, from zero to one, showing what you thought before you looked. Broad if you know little; peaked if you have history.</p>
 <p>The <strong>likelihood</strong> is a second curve, coming from the data alone. Thirty successes out of two hundred peaks near point-one-five.</p>
 <p>The <strong>posterior</strong> is what you get when you multiply those two curves point by point and rescale. And it lands <em>between</em> them — closer to whichever one was more confident.</p>
-<p>Our numbers. The prior is centred on point-one-zero. The data say point-one-five. And the posterior mean comes out at <strong>point-one-four</strong>.</p>
+<p>Our numbers. The prior is centered on point-one-zero. The data say point-one-five. And the posterior mean comes out at <strong>point-one-four</strong>.</p>
 <p>Between the two, much nearer the data — because two hundred observations outweigh a prior worth about fifty.</p>
 <p>That’s the whole mechanism, and it behaves the way you’d want. More data sharpens the likelihood, so the posterior moves toward it and the prior matters less. With very little data the prior does most of the work — which is a feature when the prior is defensible, and a problem when it isn’t.</p>
 </section>
@@ -538,11 +538,11 @@ window.Quarto = {
 </tbody>
 </table>
 <p><strong>The support is the first thing to get right.</strong> Putting a Normal prior on a standard deviation allows negative values, which are impossible — the sampler will struggle and the model may not be wrong so much as incoherent.</p>
-<p><span class="neutral smaller"><span class="math inline">\(\text{Beta}(5, 45)\)</span> has mean <span class="math inline">\(5/50 = 0.1\)</span> — a prior centred on a 10% rate, worth about 50 observations of prior evidence.</span></p>
+<p><span class="neutral smaller"><span class="math inline">\(\text{Beta}(5, 45)\)</span> has mean <span class="math inline">\(5/50 = 0.1\)</span> — a prior centered on a 10% rate, worth about 50 observations of prior evidence.</span></p>
 <p>A prior is just a distribution over a parameter, chosen to match what that parameter <em>can</em> be. <strong>Beta</strong>, on the interval zero to one — for rates and proportions. Conversion rates, click-through, defect rates. <strong>Normal</strong>, on all the reals — for regression coefficients, trends, anything that can legitimately be negative. <strong>Exponential</strong>, on zero to infinity — for standard deviations, waiting times, anything that must be positive.</p>
 <p>And the first thing to get right is the <strong>support</strong> — the set of values the distribution allows.</p>
-<p>Put a Normal prior on a standard deviation and you have allowed negative standard deviations, which are not a modelling approximation, they’re impossible. The sampler will struggle, and the model isn’t so much wrong as <strong>incoherent</strong>.</p>
-<p>That’s the most common beginner error in Bayesian modelling, and it’s entirely avoidable: match the support to the parameter.</p>
+<p>Put a Normal prior on a standard deviation and you have allowed negative standard deviations, which are not a modeling approximation, they’re impossible. The sampler will struggle, and the model isn’t so much wrong as <strong>incoherent</strong>.</p>
+<p>That’s the most common beginner error in Bayesian modeling, and it’s entirely avoidable: match the support to the parameter.</p>
 <p>One arithmetic note worth internalizing. Beta of five and forty-five has a mean of five over fifty — point-one. And it carries about as much weight as fifty prior observations. That’s a useful way to think about prior strength: how many observations is this worth?</p>
 <p>That question — <em>how many observations is my prior worth?</em> — is the most useful one to ask when you’re choosing, and it turns an abstract decision into a concrete one.</p>
 <p>If you have two hundred data points and your prior is worth fifty, the data will dominate but the prior will still pull. If your prior is worth five thousand, you have effectively decided the answer in advance and the data is decoration.</p>

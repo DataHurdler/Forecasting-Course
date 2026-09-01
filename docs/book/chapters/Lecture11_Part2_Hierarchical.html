@@ -367,7 +367,7 @@ window.Quarto = {
 <section id="the-question" class="level3" data-number="13.2.1">
 <h3 data-number="13.2.1" class="anchored" data-anchor-id="the-question"><span class="header-section-number">13.2.1</span> The Question</h3>
 <p>A concrete one, and you have met it before. <strong>Does demand rise in weeks when SNAP benefits are disbursed, and by how much — store by store?</strong> Homework 3’s memo had you stock up for SNAP weeks store by store, which assumed those differences are real. Today we check.</p>
-<p><strong>But one question comes before the model.</strong> SNAP is a <em>food</em> assistance programme. Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:</p>
+<p><strong>But one question comes before the model.</strong> SNAP is a <em>food</em> assistance program. Measure the raw SNAP-week effect on log units in all thirty series, grouped by category:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -397,11 +397,11 @@ window.Quarto = {
 <p><strong>These are not thirty versions of the same thing.</strong> FOODS responds; the other two barely move. Pooling all thirty would tell the model they are interchangeable.</p>
 <p>Here’s a concrete business question, and you’ve met it before. <strong>Does demand rise in weeks when SNAP benefits are disbursed, and by how much — store by store?</strong></p>
 <p>Homework 3’s memo had you decide which store-categories to stock up for a SNAP week rather than applying one national uplift. That question <em>assumed</em> the per-series differences were real. Today we check. But one question comes before the model, and it costs nothing to ask.</p>
-<p>SNAP is a <strong>food</strong> assistance programme. So let’s measure the raw SNAP-week effect — no model, just the difference in mean log units — in all thirty series, grouped by category. FOODS, ten series: plus point-oh-eight-nine, with a spread across stores of point-oh-five-eight. HOBBIES, ten series: plus point-oh-oh-six. HOUSEHOLD, ten series: plus point-oh-one-one.</p>
+<p>SNAP is a <strong>food</strong> assistance program. So let’s measure the raw SNAP-week effect — no model, just the difference in mean log units — in all thirty series, grouped by category. FOODS, ten series: plus point-oh-eight-nine, with a spread across stores of point-oh-five-eight. HOBBIES, ten series: plus point-oh-oh-six. HOUSEHOLD, ten series: plus point-oh-one-one.</p>
 <p>Look at that first column. FOODS responds. The other two barely move — and that is not a surprise once you say it out loud, because SNAP is food assistance. You could have predicted the sign of that table before computing it.</p>
 <p><strong>These are not thirty versions of the same thing.</strong> Pooling all thirty would be telling the model they are interchangeable, and the model would believe you.</p>
 <p>And I want to stress how cheap that check was. Three group-bys and a subtraction. No model, no sampler, no priors. Two minutes of work.</p>
-<p>That is characteristic of the most valuable checks in this course — the leakage checks, the benchmark, the planted noise control in Homework 3. They are nearly free, they happen before the modelling, and they are the ones people skip because they don’t feel like real analysis.</p>
+<p>That is characteristic of the most valuable checks in this course — the leakage checks, the benchmark, the planted noise control in Homework 3. They are nearly free, they happen before the modeling, and they are the ones people skip because they don’t feel like real analysis.</p>
 </section>
 <section id="exchangeability-the-assumption-under-every-hierarchy" class="level3" data-number="13.2.2">
 <h3 data-number="13.2.2" class="anchored" data-anchor-id="exchangeability-the-assumption-under-every-hierarchy"><span class="header-section-number">13.2.2</span> Exchangeability: the Assumption Under Every Hierarchy</h3>
@@ -412,16 +412,16 @@ window.Quarto = {
 </div>
 <p>Groups are <strong>exchangeable</strong> when, before seeing the data, you have no reason to expect one to differ from another in a particular direction. Swapping their labels would not change what you believe.</p>
 </div>
-<p>The ten FOODS series qualify: same category, different stores, and you could not say in advance which store’s SNAP effect should be largest. FOODS against HOBBIES does <strong>not</strong> — you know before looking that a food-assistance programme moves food.</p>
+<p>The ten FOODS series qualify: same category, different stores, and you could not say in advance which store’s SNAP effect should be largest. FOODS against HOBBIES does <strong>not</strong> — you know before looking that a food-assistance program moves food.</p>
 <p><strong>The setup for today.</strong> We work with the <strong>ten FOODS series</strong>, and deliberately thin <strong>five</strong> of them down to <strong>8 weeks</strong>. Five series are data-rich, five are data-poor. That imbalance is the whole point.</p>
 <p><span class="neutral smaller">The lab pools all thirty anyway, and measures what it costs.</span></p>
 <p>So let’s name the assumption properly, because it sits under every hierarchical model you will ever build.</p>
 <p>Groups are <strong>exchangeable</strong> when, <em>before seeing the data</em>, you have no reason to expect one to differ from another in a particular direction. Swapping their labels would not change what you believe. That’s the test. Not “are they similar?” — but “would relabelling them change my expectations?”</p>
-<p>That distinction matters, so let me push on it. Exchangeable does <strong>not</strong> mean identical. The ten FOODS stores certainly differ — different neighbourhoods, different sizes, different customers. Exchangeability doesn’t deny that.</p>
+<p>That distinction matters, so let me push on it. Exchangeable does <strong>not</strong> mean identical. The ten FOODS stores certainly differ — different neighborhoods, different sizes, different customers. Exchangeability doesn’t deny that.</p>
 <p>It says something weaker and more useful: that before seeing data, you have no basis for ordering them. You cannot say <em>in advance</em> that the Texas store’s SNAP effect should exceed California’s.</p>
-<p>That’s a claim about your knowledge, not about the world. Which is why it’s a judgement call you have to make and defend — and why no diagnostic can make it for you.</p>
+<p>That’s a claim about your knowledge, not about the world. Which is why it’s a judgment call you have to make and defend — and why no diagnostic can make it for you.</p>
 <p>Apply it. The ten FOODS series <strong>qualify</strong>: same category, ten different stores, and you genuinely could not say in advance which store’s SNAP effect should be largest. Swap the store labels and you’d believe exactly the same things.</p>
-<p>FOODS against HOBBIES does <strong>not</strong> qualify. You know before looking that a food-assistance programme moves food. There’s a direction, and you knew it in advance.</p>
+<p>FOODS against HOBBIES does <strong>not</strong> qualify. You know before looking that a food-assistance program moves food. There’s a direction, and you knew it in advance.</p>
 <p>So for today we work with the <strong>ten FOODS series</strong> — the defensible set — and we deliberately thin <strong>five</strong> of them down to eight weeks of data. Five data-rich, five data-poor. That imbalance is the whole point of the exercise.</p>
 <p>And in the lab, we pool all thirty anyway — on purpose — and measure exactly what it costs. I’d encourage you to do that one carefully. It is the most instructive forty minutes of the semester, because the wrong model looks <em>completely fine</em> until you check it against held-out data.</p>
 </section>
@@ -454,12 +454,12 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p><strong>You have used both already without naming them.</strong> Homework 3’s random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modelling decision and lets the data settle it.</p>
+<p><strong>You have used both already without naming them.</strong> Homework 3’s random forest pooled all thirty series into one model with store dummies — close to complete pooling. Homework 1 fitted ARIMA to one series at a time — no pooling. The choice has always been made by convenience; partial pooling makes it a modeling decision and lets the data settle it.</p>
 <p>Within that exchangeable set, there are two obvious things you could do, and each fails in a different direction.</p>
 <p><strong>Complete pooling</strong>: one SNAP effect for all ten series. One parameter. This denies that stores differ at all, so a genuinely different store gets averaged away into the crowd.</p>
 <p><strong>No pooling</strong>: a separate effect per series, estimated independently — <code>shape=10</code>. Now a series with eight weeks of data gets an estimate built from eight weeks of data. That’s mostly noise, reported as a finding. And here’s the thing — <strong>you have used both of these already, without naming them.</strong></p>
 <p>Homework 3’s random forest pooled all thirty series into one model with store dummies. That’s close to complete pooling. Homework 1 fitted ARIMA to one series at a time, completely independently. That’s no pooling.</p>
-<p>You made that choice twice, and both times you made it by <strong>convenience</strong> — by what the library made easy. Partial pooling turns it into a modelling decision, with a parameter, and lets the data settle where between the two extremes you should sit.</p>
+<p>You made that choice twice, and both times you made it by <strong>convenience</strong> — by what the library made easy. Partial pooling turns it into a modeling decision, with a parameter, and lets the data settle where between the two extremes you should sit.</p>
 <p>It’s worth noticing that this is a recurring shape in the course. Something you had been deciding implicitly, by tooling default, gets promoted into an explicit parameter with a posterior.</p>
 <p>Lecture 6 did it for which predictors survive — you were choosing by intuition, then LASSO made it a penalty. Lecture 11 Part 1 did it for how fast the level may move. Today it’s how much groups share.</p>
 <p>Each time, the gain is the same: the decision becomes visible, arguable, and estimable rather than buried in a default nobody wrote down.</p>
@@ -526,12 +526,12 @@ window.Quarto = {
 <h3 data-number="13.4.1" class="anchored" data-anchor-id="the-model-in-pymc"><span class="header-section-number">13.4.1</span> The Model in PyMC</h3>
 <div class="examplebox">
 <div class="examplebox-title">
-<p>Non-centred hierarchical model</p>
+<p>Non-centered hierarchical model</p>
 </div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    mu_b <span class="op">=</span> pm.Normal(<span class="st">"mu_b"</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)        <span class="co"># typical SNAP effect</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    sd_b <span class="op">=</span> pm.HalfNormal(<span class="st">"sd_b"</span>, <span class="fl">0.25</span>)      <span class="co"># how much stores differ</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    z    <span class="op">=</span> pm.Normal(<span class="st">"z"</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>J)    <span class="co"># non-centred</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    z    <span class="op">=</span> pm.Normal(<span class="st">"z"</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>J)    <span class="co"># non-centered</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    b    <span class="op">=</span> pm.Deterministic(<span class="st">"b"</span>, mu_b <span class="op">+</span> z <span class="op">*</span> sd_b)</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> pm.Normal(<span class="st">"a"</span>, y.mean(), <span class="dv">1</span>, shape<span class="op">=</span>J)  <span class="co"># per-series level</span></span>
@@ -551,13 +551,13 @@ window.Quarto = {
 </section>
 <section id="the-trap-write-it-the-obvious-way-and-it-breaks" class="level3" data-number="13.4.2">
 <h3 data-number="13.4.2" class="anchored" data-anchor-id="the-trap-write-it-the-obvious-way-and-it-breaks"><span class="header-section-number">13.4.2</span> The Trap: Write It the Obvious Way and It Breaks</h3>
-<p>The natural way to write the hierarchy is <code>b = pm.Normal("b", mu_b, sd_b, shape=J)</code> — the <em>centred</em> form, which reads exactly like the equation. On our data it produces:</p>
+<p>The natural way to write the hierarchy is <code>b = pm.Normal("b", mu_b, sd_b, shape=J)</code> — the <em>centered</em> form, which reads exactly like the equation. On our data it produces:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
 <th></th>
-<th style="text-align: right;">Centred</th>
-<th style="text-align: right;">Non-centred</th>
+<th style="text-align: right;">Centered</th>
+<th style="text-align: right;">Non-centered</th>
 <th>Want</th>
 </tr>
 </thead>
@@ -584,7 +584,7 @@ window.Quarto = {
 </table>
 <p><strong>Why:</strong> when <span class="math inline">\(\sigma_b\)</span> is small, the <span class="math inline">\(b_j\)</span> must crowd into a narrow band, and the posterior takes on a funnel shape — wide where <span class="math inline">\(\sigma_b\)</span> is large, pinched where it is small. A sampler tuned for the wide part cannot navigate the neck, and reports divergences.</p>
 <p><strong>Note how the alarms differ in kind.</strong> ESS <em>passes</em> — 413, just over the line, and you would not look twice. <span class="math inline">\(\hat{R}\)</span> at 1.044 fails, but it is the sort of near-miss people talk themselves out of. <strong>127 divergences against a threshold of exactly zero admits no such conversation.</strong> On hierarchical models divergences fire first and least ambiguously; do not wait for <span class="math inline">\(\hat{R}\)</span> to decide for you.</p>
-<p><span class="neutral smaller">BMCP §4.6.1, <em>Posterior Geometry Matters</em> — the single most common failure in applied hierarchical modelling.</span></p>
+<p><span class="neutral smaller">BMCP §4.6.1, <em>Posterior Geometry Matters</em> — the single most common failure in applied hierarchical modeling.</span></p>
 <p>Now, why did I write <code>b</code> as <code>mu_b + z * sd_b</code> instead of the obvious thing?</p>
 <p>The obvious thing is <code>pm.Normal("b", mu_b, sd_b, shape=J)</code> — which reads <em>exactly</em> like the equation on slide 8. It is the natural translation. Everybody writes it that way first. And on our data it produces this. Divergences: <strong>one hundred twenty-seven</strong>, where we want zero. R-hat: one-point-oh-four-four. <strong>Fails</strong>, but only just enough to argue about. ESS: four hundred thirteen. <strong>Passes</strong> — barely, thirteen over the line.</p>
 <p>Look at those three numbers again, because they do not fail in the same way.</p>
@@ -593,10 +593,10 @@ window.Quarto = {
 <p>So the rule to carry forward: on hierarchical models, <strong>divergences fire first and least ambiguously.</strong> Do not wait for R-hat to decide for you. Do not wait for R-hat to tell you something is wrong. It may never say so.</p>
 <p>Why does it happen? When sigma-b is small, all the b-j have to crowd into a very narrow band. So the posterior takes on a <strong>funnel</strong> shape — wide and open where sigma-b is large, pinched to a point where sigma-b is small.</p>
 <p>A sampler tunes its step size for the wide part of the funnel. Then it tries to get into the neck with steps that are far too big, fails, and reports a divergence.</p>
-<p>The non-centred form samples z from a plain standard Normal — a nice round shape with no funnel — and <em>constructs</em> b afterwards. Same model. Same posterior. Geometry the sampler can actually walk. This is BMCP section four-point-six-point-one, and it is the single most common failure in applied hierarchical modelling.</p>
+<p>The non-centered form samples z from a plain standard Normal — a nice round shape with no funnel — and <em>constructs</em> b afterwards. Same model. Same posterior. Geometry the sampler can actually walk. This is BMCP section four-point-six-point-one, and it is the single most common failure in applied hierarchical modeling.</p>
 <p>The instinct when you see divergences is to raise <code>target_accept</code> — force smaller steps. Sometimes that helps a little. Here it mostly doesn’t: at point-nine-five you still get divergences, you just get fewer, and the sampler runs much slower for the privilege.</p>
-<p>Reparameterizing is the actual fix, and it costs nothing. Same answer, no divergences, and it runs faster than the centred version did.</p>
-<p>So the habit: when a hierarchical model diverges, your first move is to check whether you wrote it centred — not to tune the sampler.</p>
+<p>Reparameterizing is the actual fix, and it costs nothing. Same answer, no divergences, and it runs faster than the centered version did.</p>
+<p>So the habit: when a hierarchical model diverges, your first move is to check whether you wrote it centered — not to tune the sampler.</p>
 </section>
 </section>
 <section id="reading-the-result" class="level2" data-number="13.5">
@@ -631,14 +631,14 @@ window.Quarto = {
 </table>
 <p><span class="key-result"><strong>The data-poor series moved 8.2 times further toward the group mean than the data-rich ones.</strong></span> Nobody told the model which series were thin. It inferred that from how much each series had to say.</p>
 <p>Read the two right-hand columns together. The thin series’ apparent spread of <span class="math inline">\(0.108\)</span> nearly vanishes, while the full series <strong>keep most of theirs</strong> (<span class="math inline">\(0.055 \rightarrow 0.037\)</span>). The hierarchy did not flatten everything: it discarded spread that 8 weeks could not support and kept spread that 277 weeks could.</p>
-<p><strong>That is the claim to be sceptical of, so the next slide tests it.</strong></p>
+<p><strong>That is the claim to be skeptical of, so the next slide tests it.</strong></p>
 <p>Now let’s see what the pooling actually did. Fit both models — unpooled and hierarchical — and compare each series’ estimate before and after.</p>
 <p>The <strong>thin</strong> series, eight weeks each: unpooled spread of point-one-oh-eight, collapsing to point-oh-one-oh after pooling. Mean movement: point-one-two-zero. The <strong>full</strong> series, two hundred seventy-seven weeks: spread of point-oh-five-five, going to point-oh-three-seven. Mean movement: point-oh-one-five.</p>
 <p>So the data-poor series moved <strong>eight times further</strong> toward the group mean than the data-rich ones. And nobody told the model which series were thin. It inferred that entirely from how much each series had to say.</p>
 <p>Now read those two columns together, because this is what separates partial pooling from just averaging everything.</p>
 <p>The thin series’ apparent spread of point-one-oh-eight nearly <strong>vanishes</strong> — down to point-oh-one. But the full series <strong>keep most of theirs</strong> — point-oh-five-five down to point-oh-three-seven.</p>
 <p>The hierarchy did not flatten everything. It discarded spread that eight weeks could not support, and kept spread that two hundred seventy-seven weeks <em>could</em>.</p>
-<p>That’s a strong claim, and you should be sceptical of it. So the next slide tests it against data the model never saw.</p>
+<p>That’s a strong claim, and you should be skeptical of it. So the next slide tests it against data the model never saw.</p>
 </section>
 <section id="checked-against-data-the-model-never-saw" class="level3" data-number="13.5.2">
 <h3 data-number="13.5.2" class="anchored" data-anchor-id="checked-against-data-the-model-never-saw"><span class="header-section-number">13.5.2</span> Checked Against Data the Model Never Saw</h3>
@@ -730,7 +730,7 @@ window.Quarto = {
 <li><p><strong>Partial pooling</strong> gives each group its own parameter drawn from a shared distribution, and estimates how much groups genuinely differ.</p></li>
 <li><p><strong>Shrinkage is automatic and proportionate.</strong> Our thin series moved <strong>8.1<span class="math inline">\(\times\)</span></strong> further toward the group mean than data-rich ones, with nobody specifying that — and on held-out weeks it was <strong>2.6<span class="math inline">\(\times\)</span></strong> more accurate.</p></li>
 <li><p>This is <strong>regularization for the sixth time</strong> — and the only version where the shrinkage strength is estimated rather than tuned.</p></li>
-<li><p><strong>Write it non-centred.</strong> The obvious form gave 127 divergences; the reparameterized form gave 1. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p></li>
+<li><p><strong>Write it non-centered.</strong> The obvious form gave 127 divergences; the reparameterized form gave 1. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p></li>
 </ol>
 </div>
 <p><span class="neutral">Next: Bayesian linear regression — coefficients as distributions, and what you can ask them.</span></p>
@@ -739,7 +739,7 @@ window.Quarto = {
 <p>Three. Partial pooling gives each group its own parameter drawn from a shared distribution, and estimates how much groups genuinely differ.</p>
 <p>Four. Shrinkage is automatic and proportionate. Our thin series moved <strong>eight point one times</strong> further toward the group mean than data-rich ones, with nobody specifying that — and on held-out weeks it was <strong>two point six times</strong> more accurate.</p>
 <p>Five. This is regularization for the sixth time, and the only version where the shrinkage strength is estimated rather than tuned.</p>
-<p>And six. <strong>Write it non-centred.</strong> The obvious form gave a hundred and twenty-seven divergences; the reparameterized form gave one. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p>
+<p>And six. <strong>Write it non-centered.</strong> The obvious form gave a hundred and twenty-seven divergences; the reparameterized form gave one. Same model, different geometry — and divergences objected loudest, against a threshold that allows no argument.</p>
 <p>Next time: Bayesian linear regression. Coefficients as distributions, what you can ask them — and a preprocessing step you have used all semester that will silently destroy the answer.</p>
 </section>
 <section id="references" class="level3" data-number="13.6.2">

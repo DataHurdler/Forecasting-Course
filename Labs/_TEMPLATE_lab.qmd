@@ -40,7 +40,7 @@ import matplotlib.pyplot as plt
 
 # Step 1 — [Look at the data]
 
-*(Always start with a plot. Students should see the series before modelling it.)*
+*(Always start with a plot. Students should see the series before modeling it.)*
 
 ```{python}
 # fully written

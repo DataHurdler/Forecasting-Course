@@ -1189,7 +1189,7 @@ Department of Economics
 <h2>Why Use Multiple Series?</h2>
 <p>Every model so far — ETS, ARIMA — uses only <span class="math inline">\(y_t\)</span>’s own history. But business variables are linked: consumer sentiment today moves retail spending next month, interest rates move housing starts within two quarters, advertising spend moves sales over the following weeks.</p>
 <p>The principle underneath all of it: <strong>if <span class="math inline">\(x_t\)</span> carries information about <span class="math inline">\(y_{t+h}\)</span> that is not already in <span class="math inline">\(y_t\)</span>’s own history, including <span class="math inline">\(x_t\)</span> reduces forecast error.</strong> <strong>Granger causality</strong> <span class="citation" data-cites="Granger1969">(<a href="#/references" role="doc-biblioref" onclick>Granger 1969</a>)</span> is the formal test of exactly that claim, and we get to it in two slides.</p>
-<p>That leaves a modelling choice, and it turns on whether the influence runs one way or both:</p>
+<p>That leaves a modeling choice, and it turns on whether the influence runs one way or both:</p>
 <div class="columns">
 <div class="column" style="width:48%;">
 <p><strong>VAR — symmetric</strong></p>

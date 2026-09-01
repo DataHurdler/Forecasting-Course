@@ -210,7 +210,7 @@ whole second half of the lecture is about.
 # ▶ SLIDE 9 — Why a Vanilla RNN Forgets
 
 Let's put numbers on it, because "the gradient shrinks" is not vivid enough to change anyone's
-behaviour.
+behavior.
 
 Suppose each backward step multiplies the gradient by a factor of zero-point-seven. That's an
 unremarkable value for a tanh network — nothing pathological.
@@ -300,7 +300,7 @@ pay for whether or not you need it.
 
 # ▶ SLIDE 12 — What the Gates Are Doing, in Plain Terms
 
-The equations are compact, but the behaviour is genuinely intuitive. Let me put it in the language
+The equations are compact, but the behavior is genuinely intuitive. Let me put it in the language
 of a store forecasting demand week by week.
 
 *(Walk the three rows in a storytelling register.)*
@@ -541,7 +541,7 @@ it, and the last few weeks tell you that. No memory mechanism required.
 **Two. The series are smooth** — and this one is counter-intuitive, so take it slowly.
 Within-series autocorrelation is point eight three at lag one, and still point four three at lag
 fifty-two. That *looks* like long memory, and it is actually the reason long memory is
-unnecessary. Because neighbouring weeks are nearly the same number, the recent past is a
+unnecessary. Because neighboring weeks are nearly the same number, the recent past is a
 **sufficient statistic** for the distant past. Nothing has to be carried across the gap, because
 the gap was filled in continuously along the way.
 

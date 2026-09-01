@@ -185,7 +185,7 @@
     {\tiny\linespread{1.0}\selectfont
     \texttt{with pm.Model() as model:}\\
     \texttt{\ \ sigma\_level = pm.Exponential("sigma\_level", 10.0)}\\
-    \texttt{\ \ z\ \ \ \ \ \ \ \ \ \ \ = pm.Normal("z", 0, 1, shape=n)\ \ \ \# non-centred}\\
+    \texttt{\ \ z\ \ \ \ \ \ \ \ \ \ \ = pm.Normal("z", 0, 1, shape=n)\ \ \ \# non-centered}\\
     \texttt{\ \ level = pm.Deterministic("level", pm.math.cumsum(z * sigma\_level))}\\
     \texttt{\ \ beta\ = pm.Normal("beta", 0, 0.5, shape=2*K)\ \ \ \ \ \ \# Fourier}\\
     \texttt{\ \ sigma = pm.Exponential("sigma", 1.0)}\\[2pt]
@@ -223,7 +223,7 @@
 
   \begin{warningbox}
     \textbf{The fix was reparameterization, not more samples.} Writing the walk as
-    \texttt{cumsum(z * sigma)} with $z \sim \mathcal{N}(0,1)$ --- the \emph{non-centred} form ---
+    \texttt{cumsum(z * sigma)} with $z \sim \mathcal{N}(0,1)$ --- the \emph{non-centered} form ---
     gives the sampler a geometry it can navigate. BMCP §4.6.1 covers exactly this, and you will
     meet it again next week.
   \end{warningbox}
