@@ -89,30 +89,13 @@ BMCP is written by PyMC core developers, and every example is PyMC and ArviZ cod
 
 A note on level. BMCP is mathematically heavier than FPP in places, and **you are not responsible for the derivations**. Read the assigned sections for the ideas and the code, run the examples, and treat the rest as reference. The slides define what you are accountable for; BMCP shows you the same ideas in working PyMC.
 
-Two further free resources, both referenced in our materials:
+Three further free resources, all referenced in our materials:
 
 - **XGBoost, "Introduction to Boosted Trees"** — [https://xgboost.readthedocs.io/en/stable/tutorials/model.html](https://xgboost.readthedocs.io/en/stable/tutorials/model.html). Derives the regularized objective and the split-gain formula we cover in Lecture 5.
 - **Molnar, *Interpretable Machine Learning*** — [https://christophm.github.io/interpretable-ml-book/](https://christophm.github.io/interpretable-ml-book/). Ch. 9 (decision trees), Ch. 19 (partial dependence), Ch. 23 (permutation feature importance). Useful for Lectures 3 through 5.
+- **McElreath, *Statistical Rethinking* (lecture series)** — free on YouTube. BMCP does not cover causal graphs, so this is the place to go further on the **DAGs** in Lecture 12. It is the standard treatment.
 
 Per-week readings are in the **weekly schedule** at the end of this syllabus.
-
-<!--
-### What the Textbook Does *Not* Cover
-The textbook is our anchor, not our boundary. Several topics we cover have no FPP chapter, and for those the lecture slides are your primary source:
-
-- **Everything tree-based (Lectures 4–5).** FPP covers **no** tree methods — not decision trees, not random forests, not gradient boosting or XGBoost. This is what ISLP Ch. 8 is for.
-
-    FPP §12.4 (§12.5 in the R edition) is still worth reading for Lecture 5. It covers *bagging* — averaging forecasts across bootstrapped versions of a series — which is the ensembling idea random forests rest on. It is the idea only: FPP bags ETS models fitted to resampled series, not trees, and there is no feature subsampling. Read it for the intuition about why averaging many noisy models helps.
-
-- **Regularization (Lecture 6).** FPP has no Ridge, LASSO, or Elastic Net; ISLP Ch. 6 covers all three. FPP §7.5 *Selecting predictors* is genuinely useful here, because Lecture 6 opens with exactly that material — adjusted R², AIC, AICc, BIC, and best-subset or stepwise search — before showing why shrinkage replaces it. Read §7.5 as the classical answer we are about to improve on.
-- **All Bayesian methods (Lectures 10–12).** FPP is written from a frequentist perspective throughout. Its sections on distributional forecasts and prediction intervals (§5.5, §5.9) are useful framing for why we want full predictive distributions, but the book does no Bayesian inference. **BMCP is the text for these three weeks**, and unlike Lectures 4–6 it is not a supplement — it is the primary reading.
-
-    One topic stays slide-only: the **DAGs** in Lecture 12. BMCP does not cover causal graphs. If you want to go further, Richard McElreath's *Statistical Rethinking* lecture series is free on YouTube and is the standard treatment.
-- **The Diebold-Mariano test (Lecture 1) and Granger causality (Lecture 2).**
-- **The internals of neural architectures (Lectures 7–9).** FPP-Py Ch. 14 is written at the level of *which model to use and how to call it* through the `neuralforecast` library. We go a layer deeper — backpropagation, convolution arithmetic, LSTM gates, scaled dot-product attention — and write our models directly in PyTorch.
-
-**A warning about the word "hierarchical."** FPP Chapter 11 is titled *Forecasting hierarchical and grouped time series*, and Lecture 11 is *Bayesian Statistics II — Time Series & Hierarchical Models*. **These are different things.** FPP Ch. 11 is about forecast reconciliation: making forecasts of sub-series add up to forecasts of their totals. Our Lecture 11 is about partial pooling, where groups share information through a common prior. Chapter 11 is genuinely worth reading, but do not read it expecting Lecture 11.
--->
 
 ## Software
 All lecture code and all assignments use Python. You should have a working Python 3.10+ environment with the following packages before the first class:
@@ -194,7 +177,6 @@ No late homework is otherwise accepted.
 
 All homework is submitted through the course repository, and is due **before class begins** on the date shown in the weekly schedule.
 A submission pushed after that time is late and will not be accepted.
-
 
 There are 7 homework assignments worth **300 points in total**. They are not equally weighted —
 points follow the scope of the assignment, and three of them are submitted in parts across
@@ -322,13 +304,6 @@ Use office hours early and often.
 
 ## Important Dates
 See the [UNO Academic Calendar](https://www.unomaha.edu/registrar/academic-calendar.php) for all important dates.
-
-<!--
-## CBA Business Core Three-Attempt Rule
-Effective Fall 2002, a student may only attempt each required business core course three times. This course is in the business core.
-Any grade earned, excluding CR, W, NC, NR, I, IP, AU, S, U or R will count as an attempt for the three times limit.
-The Undergraduate Program Council will only consider appeals of the three-attempt rule when the circumstances for the appeal are documented and the reason for the appeal is extraordinary.
--->
 
 ## Accessibility Services Center Statement
 Reasonable accommodations are provided for students who are registered with Accessibility Services Center (ASC) and make their requests sufficiently in advance.
