@@ -28,14 +28,15 @@ csl: https://www.zotero.org/styles/chicago-author-date
 
 ## Lecture Outline
 
-1. Convolution and Pooling
-2. The Architecture Lineage
-3. 1D CNNs for Time Series
-4. Key Takeaways
+1. Convolution: The Core Idea
+2. Pooling and Dropout
+3. CNN Architecture Evolution
+4. 1D CNNs for Time Series
+5. Key Takeaways
 
-# Convolution and Pooling
+# Convolution: The Core Idea
 
-Two ideas — look locally, and reuse what you learn everywhere.
+Look at a small window, and look for the same thing everywhere. Two ideas, and they are the whole architecture.
 
 ---
 
@@ -70,6 +71,12 @@ Each filter learns one **local pattern** — an edge, a spike, a seasonal dip. I
 
 ---
 
+# Pooling and Dropout
+
+Pooling shrinks the feature map and buys robustness — at a price that matters more for forecasting than for images.
+
+---
+
 ## Pooling: Downsampling Feature Maps
 
 **Pooling** reduces a feature map by summarizing each small region with a single number. Max pooling takes the largest value in the window; average pooling takes the mean. A $2\times2$ max pool with stride 2 quarters the number of values.
@@ -82,7 +89,7 @@ Two things are bought. **Fewer parameters downstream**, because later layers see
 
 Hold that objection. We measure exactly what it costs later in this lecture.
 
-# The Architecture Lineage
+# CNN Architecture Evolution
 
 Twenty years of image models, and the three ideas that outlived them.
 

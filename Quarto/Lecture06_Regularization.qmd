@@ -68,6 +68,12 @@ Subset selection is **discrete** — a predictor is in or out. Small changes in 
 
 ---
 
+# Shrinkage Methods
+
+Keep every predictor, but pull its coefficient toward zero.
+
+---
+
 ## Ridge Regression ($\ell_2$)
 
 ::: {.definitionbox}
@@ -144,6 +150,12 @@ The mix keeps LASSO's ability to zero out predictors while adding Ridge's **grou
 
 ---
 
+# Choosing the Penalty
+
+$\lambda$ is not estimated from the model. It is tuned — and how you tune it decides whether the model generalizes.
+
+---
+
 ## The Regularization Path
 
 Fit the model across a grid of $\lambda$ values and trace each coefficient as it moves.
@@ -167,6 +179,12 @@ $\lambda$ is not estimated from the model — it is tuned, and how you tune it d
 ::: {.warningbox}
 **Never use `KFold` here.** Random folds put future observations in the training set and past ones in validation. The CV error will look excellent and the forecast will fail [@Bergmeir2018]. Use `TimeSeriesSplit`, exactly as in Lecture 1's walk-forward evaluation.
 :::
+
+---
+
+# In Practice
+
+Standardize, tune on a time-aware split, and read the path.
 
 ---
 

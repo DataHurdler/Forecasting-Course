@@ -349,6 +349,12 @@ $\mathbf{x}_t$ are exogenous regressors; $\eta_t$ absorbs whatever autocorrelati
 
 ---
 
+# Key Takeaways and Roadmap
+
+Stationarity, ARIMA, VAR, and ARIMAX form the classical time series toolkit.
+
+---
+
 ## Key Takeaways
 
 ::: {.keybox}

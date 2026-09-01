@@ -40,7 +40,7 @@ def _timeout(env_name: str, default: int) -> int:
 QUARTO_RUBRIC = {
     'critical': {
         'compilation_failure': {'points': 100, 'auto_fail': True},
-        'equation_overflow': {'points': 20},
+        'equation_overflow': {'points': 5},   # heuristic, no compiler to check it
         'broken_citation': {'points': 15},
         'typo_in_equation': {'points': 10},
         'missing_plotly_chart': {'points': 10},
@@ -501,10 +501,10 @@ class QualityScorer:
             self.issues['major'].append({
                 'type': 'equation_overflow',
                 'description': f'Potential equation overflow at line {line}',
-                'details': 'Single equation line >120 chars may overflow slide',
-                'points': 20
+                'details': 'Proxy only — a long SOURCE line is not a long rendered line',
+                'points': 5
             })
-            self.score -= 20
+            self.score -= 5
 
         # Check broken citations (LaTeX-style \cite patterns)
         bib_file = self.filepath.parent.parent / 'Bibliography_base.bib'

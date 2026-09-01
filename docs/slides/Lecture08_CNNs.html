@@ -1089,16 +1089,17 @@ Department of Economics
 <section id="lecture-outline" class="slide level2">
 <h2>Lecture Outline</h2>
 <ol type="1">
-<li>Convolution and Pooling</li>
-<li>The Architecture Lineage</li>
+<li>Convolution: The Core Idea</li>
+<li>Pooling and Dropout</li>
+<li>CNN Architecture Evolution</li>
 <li>1D CNNs for Time Series</li>
 <li>Key Takeaways</li>
 </ol>
 </section>
 <section>
-<section id="convolution-and-pooling" class="title-slide slide level1 center">
-<h1>Convolution and Pooling</h1>
-<p>Two ideas — look locally, and reuse what you learn everywhere.</p>
+<section id="convolution-the-core-idea" class="title-slide slide level1 center">
+<h1>Convolution: The Core Idea</h1>
+<p>Look at a small window, and look for the same thing everywhere. Two ideas, and they are the whole architecture.</p>
 </section>
 <section id="why-convolution" class="slide level2">
 <h2>Why Convolution?</h2>
@@ -1139,6 +1140,14 @@ Department of Economics
 </table>
 <p>Each filter learns one <strong>local pattern</strong> — an edge, a spike, a seasonal dip. Its output is a <strong>feature map</strong> whose high values mark where that pattern was found.</p>
 </section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="pooling-and-dropout" class="title-slide slide level1 center">
+<h1>Pooling and Dropout</h1>
+<p>Pooling shrinks the feature map and buys robustness — at a price that matters more for forecasting than for images.</p>
+</section>
 <section id="pooling-downsampling-feature-maps" class="slide level2">
 <h2>Pooling: Downsampling Feature Maps</h2>
 <p><strong>Pooling</strong> reduces a feature map by summarizing each small region with a single number. Max pooling takes the largest value in the window; average pooling takes the mean. A <span class="math inline">\(2\times2\)</span> max pool with stride 2 quarters the number of values.</p>
@@ -1149,8 +1158,8 @@ Department of Economics
 <p>Hold that objection. We measure exactly what it costs later in this lecture.</p>
 </section></section>
 <section>
-<section id="the-architecture-lineage" class="title-slide slide level1 center">
-<h1>The Architecture Lineage</h1>
+<section id="cnn-architecture-evolution" class="title-slide slide level1 center">
+<h1>CNN Architecture Evolution</h1>
 <p>Twenty years of image models, and the three ideas that outlived them.</p>
 </section>
 <section id="lenet-to-vgg-depth-and-small-filters" class="slide level2">
