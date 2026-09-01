@@ -14,6 +14,13 @@ and all eleven due dates match. Where this document says something is clean, it 
 
 ---
 
+
+> **Status update, 2026-09-01 (end of session).** Six findings fixed, one resolved by policy, one
+> partly fixed, two relocated to the Canvas syllabus, two retracted as wrong, and two still open
+> (§2.2 solutions pointer, §3.5 lab time budget). Each heading below carries its own verdict.
+> Two of the findings here produced permanent gates rather than one-off repairs: `check-site-index`
+> (gate 5) and `check-book-claims` (gate 6).
+
 ## 1. Inconsistencies
 
 ### 1.1 ~~The intake meeting is called two different lengths~~ — **WRONG, retracted 2026-09-01**
@@ -37,14 +44,22 @@ The body and the booking link agree on ten minutes; only the heading says twenty
 reads the heading, books ten minutes, and does not know which is true. The heading is the
 outlier and is the thing to change.
 
-### 1.2 `TROUBLESHOOTING.md` is reachable from nowhere — **confirmed**
+### 1.2 `TROUBLESHOOTING.md` is reachable from nowhere — **FIXED 2026-09-01**
+
+> Published as `docs/files/troubleshooting.html`, linked twice from the landing page, once
+> from the syllabus, and now from the student repo's quickstart.
 
 278 lines of setup and error guidance, linked from **zero** of: the course website, the syllabus,
 the student repository's `STUDENT_QUICKSTART.md`, its `README.md`. A student finds it only by
 browsing the course repository, which they are never told to clone. See §3.6 — for a remote
 student this is the most costly item in this document.
 
-### 1.3 A commented-out line sits in the syllabus source — **confirmed**
+### 1.3 A commented-out line sits in the syllabus source — **FIXED 2026-09-01** (`00a67ff8`)
+
+> Both remaining blocks removed: "What the Textbook Does *Not* Cover" (redundant with what the
+> syllabus already says in the open) and the CBA Three-Attempt Rule (an undergraduate policy;
+> ECON 8310 is graduate). McElreath's *Statistical Rethinking* survived the deletion as the one
+> item appearing nowhere else.
 
 ```
 line 156   - Ask questions <!-- - Email me a link to a drone video for three extra points -->
@@ -94,14 +109,22 @@ website has no route to the solution and no way to know when "after class" was. 
 for graded work — it is the reason the keys are private — but the sentence should say **when** and
 **where**, because as written it is an instruction a student cannot act on.
 
-### 2.3 `docs/index.html` is hand-maintained while everything around it is generated
+### 2.3 `docs/index.html` is hand-maintained — **FIXED 2026-09-01** (`7f472737`)
+
+> Generated from `scripts/site.yml` + a prose template by `build_index.py`. `check-site-index.py`
+> (backtest gate 5) additionally fails on any page published under `docs/` that the landing page
+> does not link — the check nothing else performed. Qualified 5/5, 0/3 false alarms.
 
 It drifted twice in a single day: it kept the old "Codex, Copilot, ChatGPT…" AI wording after the
 syllabus, the AI policy and all eleven assignments were corrected, and it needed manual edits to
 link the book and the workbook. Every other student-facing surface is either generated or covered
 by a gate. This page is the one that will silently fall behind again.
 
-### 2.4 The book's preface is the only hand-written page in a generated book
+### 2.4 The book's preface is the only hand-written page — **FIXED 2026-09-01** (`07e3d638`)
+
+> The prose stays hand-written; its ten claims are now bound to their sources by
+> `check-book-claims.py` (gate 6). Ranks are recomputed from the scoreboard's RMSE values rather
+> than read off row positions, which would have been self-confirming. Qualified 9/9, 0/3.
 
 It makes claims about the course's own history. It has already been corrected once for a stale
 count. It is worth deciding whether that paragraph is maintained deliberately or removed.
@@ -113,13 +136,16 @@ count. It is worth deciding whether that paragraph is maintained deliberately or
 The syllabus currently describes a course that meets in person, with **one** asynchronous week
 (Week 5). Everything below is what would need attention if the whole course ran online.
 
-### 3.1 A required **in-person** meeting — blocker
+### 3.1 A required **in-person** meeting — **RELOCATED 2026-09-01**
+
+> Still true of the syllabus, but the syllabus is no longer published: it is Canvas-only, one copy
+> per section. So this is now a *spring Canvas copy* task, not a public-site defect.
 
 *"Each student is required to sign up for a 10-minute meeting"*, under a heading reading
 **In-Person**, booked through Calendly in the first two weeks. A remote student cannot comply. The
 requirement is good practice; the modality needs an alternative.
 
-### 3.2 Office hours discourage the only remote channel — blocker
+### 3.2 Office hours discourage the only remote channel — **RELOCATED 2026-09-01** (see §3.1)
 
 > Designated hours: Tuesday, 1-3pm · Outside designated hours: Email me for appointments ·
 > **Zoom possible but not encouraged**
@@ -127,12 +153,21 @@ requirement is good practice; the modality needs an alternative.
 For an online student Zoom is not a fallback, it is the only door. As written the syllabus tells
 them the door is discouraged.
 
-### 3.3 A 25-point in-class presentation with no stated alternative
+### 3.3 A 25-point in-class presentation — **PARTLY FIXED 2026-09-01** (`99961c3d`)
+
+> The public rubric now reads "Project Presentation", and says the format — in person, live
+> online, or recorded — differs by section and is set by the instructor. The syllabus still says
+> "in-class"; that copy is Canvas-only now, so it is a spring-variant task.
 
 25 of the project's 100 points. No asynchronous equivalent — recorded presentation, live session,
 written defence — is described anywhere.
 
-### 3.4 Three labs instruct the student to talk to a neighbour
+### 3.4 Three labs instruct the student to talk to a neighbour — **FIXED 2026-09-01** (`2a403af4`)
+
+> Each moment now branches, and the solo branch names a checkable action rather than a gesture:
+> score yourself against the number you wrote in Step 2; write the `(p,d,q)` with the lag that
+> decided each term; predict which side of the root split has higher sales, then read the node
+> values off the plot.
 
 | Lab | Line |
 |---|---|
@@ -150,13 +185,17 @@ Each lab states "~40 minutes" and assumes someone is present to unblock a stuck 
 workbook mitigates this — every step now carries a collapsible walkthrough and every lab ends with
 the output a correct run produces — but the time estimates still describe a classroom.
 
-### 3.6 The troubleshooting guide is invisible
+### 3.6 The troubleshooting guide is invisible — **FIXED 2026-09-01** (see §1.2)
 
 Repeating §1.2 because the consequence differs online. In a classroom a stuck student raises a
 hand. Online they hit `import xgboost` failing on macOS without `libomp`, and the 278-line document
 that answers it is linked from nowhere they will look.
 
-### 3.7 Recordings are implied but never located
+### 3.7 Recordings are implied but never located — **RESOLVED BY POLICY 2026-09-01**
+
+> The instructional designer's rule settles it: lecture videos live on **Canvas only**. The public
+> site correctly carries none, and the Week 5 note that promised a recording "on the course site"
+> has moved to Canvas with the rest of the section-specific schedule.
 
 Fifteen lecture scripts, fourteen lab scripts and eleven solution scripts exist — the course is
 clearly built to be recorded. Yet "recording" appears in the syllabus only for Week 5's
