@@ -29,7 +29,7 @@ CONF = ROOT / "scripts" / "course_url.txt"
 
 # Student-facing documents in THIS repo that carry the live URL.
 TARGETS = [
-    "ECON8310Syllabus2026Fall.md",
+    "syllabi/ECON8310_2026Fall.md",
     "ECON8310_Datasets.md",
     "ECON8310_Project_Rubric.md",
     "ECON8310_About.md",

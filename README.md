@@ -21,7 +21,7 @@ GitHub Pages from `docs/`. All course code is Python.
 | `scripts/` | Build/sync utilities, data prep, repo gate checks |
 | `quality_reports/` | Plans, session logs, merge reports |
 | `.claude/` | Claude Code workflow: skills, agents, hooks, rules |
-| `ECON8310Syllabus2026Fall.md` | Course syllabus |
+| `syllabi/` | One syllabus per term, kept forever (`ECON8310_2026Fall.md`, ...) |
 
 ---
 
