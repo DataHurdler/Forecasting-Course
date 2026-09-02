@@ -410,7 +410,7 @@ window.Quarto = {
 <section id="dataset-and-split" class="level1" data-number="18">
 <h1 data-number="18"><span class="header-section-number">18</span> Dataset and Split</h1>
 <p>Same M5 weekly panel as Part 1, and <strong>the same train/test split</strong>, so your Part 2 numbers are directly comparable to Part 1.</p>
-<div id="dd071b76" class="cell" data-execution_count="1">
+<div id="39512a03" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -539,7 +539,7 @@ This one is not clean, and that is the point
 <p><strong>(b)</strong> Plot the ACF and PACF of the (possibly differenced) series. Based on the plots, propose an ARIMA(<span class="math inline">\(p, d, q\)</span>) order and explain your reasoning. Compare what you see against the four reference patterns from Lecture 2 — which one does this series most resemble?</p>
 <p><strong>(c)</strong> Fit your chosen ARIMA model on <code>train</code>. Report the AIC and compute the forecast RMSE on <code>test</code>.</p>
 <p><strong>(d)</strong> Implement walk-forward cross-validation: use an expanding window with a minimum training length of 104 weeks, re-fit your ARIMA at each step, and produce a 1-step-ahead forecast. Report the mean RMSE across all steps.</p>
-<div id="054d22c1" class="cell" data-execution_count="2">
+<div id="5bf31276" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) ADF test</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) ACF and PACF plots</span></span>
@@ -561,7 +561,7 @@ This one is not clean, and that is the point
 <p>Use <strong>the transformation you justified in Q3(a)</strong> — levels if you concluded the series is stationary, differences if you concluded it has a unit root. State which you used and why. Lecture 2 covered both hazards: regressing non-stationary series gives you spurious results, and differencing an already-stationary series induces autocorrelation you then have to model away.</p>
 <p><strong>(b)</strong> Fit a VAR(4) on the training window of both series — same transformation as in (a) — using <code>statsmodels.tsa.api.VAR</code>. Forecast the next 4 weeks. Plot actual versus forecast for CA_1 only.</p>
 <p><strong>(c)</strong> Report the contemporaneous correlation between the two series’ weekly changes.</p>
-<div id="1dfc21df" class="cell" data-execution_count="3">
+<div id="eb70fbe3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ca3 <span class="op">=</span> (weekly[(weekly.store_id <span class="op">==</span> <span class="st">"CA_3"</span>) <span class="op">&amp;</span> (weekly.cat_id <span class="op">==</span> <span class="st">"FOODS"</span>)]</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>       .set_index(<span class="st">"week_start"</span>)[<span class="st">"units"</span>].sort_index())</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -599,9 +599,9 @@ This one is not clean, and that is the point
 <li><label><input type="checkbox">Written responses are completed in your own words — AI-generated prose is not accepted for written sections</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> is saved in your Part 2 submission folder</label></li>
 <li><label><input type="checkbox"><code>PROMPT_LOG.md</code> is complete with <strong>8 or fewer</strong> entries (one entry per prompt sent)</label></li>
-<li><label><input type="checkbox">One git commit per prompt used, following the format: <code>hw01_part2 prompt &lt;id&gt;: &lt;one-line summary&gt;</code></label></li>
-<li><label><input type="checkbox"><code>REPORT.md</code> included with a final business recommendation (3–5 sentences) addressed to a non-technical manager, drawing on <strong>both</strong> parts of Homework 1</label></li>
+<li><label><input type="checkbox">Every file above uploaded to the <strong>Canvas</strong> assignment</label></li>
 </ul>
+<p><em>Not graded, but worth doing:</em> commit locally once per prompt, <code>hw01_part2 prompt &lt;id&gt;: &lt;summary&gt;</code>. Nobody sees these — they are your own record of which prompt produced what, and they make it far easier to retrace your steps when something breaks. - [ ] <code>REPORT.md</code> included with a final business recommendation (3–5 sentences) addressed to a non-technical manager, drawing on <strong>both</strong> parts of Homework 1</p>
 
 
 </section>

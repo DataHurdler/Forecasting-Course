@@ -1,9 +1,18 @@
 # Syllabi
 
-One syllabus per term, in chronological order. **A syllabus is never edited once its term has
-started** — it is the record of what students were actually told, and correcting it after the fact
-destroys exactly the thing it is kept for. Start the next term by copying the previous file, not by
+One syllabus per term, in chronological order.
+
+**A syllabus is live until it is locked, then frozen.** Early in a term things genuinely change —
+a mechanism turns out not to work, a date shifts — and editing the syllabus is the right response.
+**Every change while it is live gets an announcement**; the syllabus says what is true, the
+announcement says what moved and when. Once the term settles, lock it: from that point it is the
+record of what students were told, and the next term starts by copying the file rather than
 editing it.
+
+Record the lock in the file itself, so a reader years later can tell which state they are looking
+at:
+
+    > **Locked 2026-09-17.** Changes after this date were announced, not edited in.
 
 | Term | File | Modality | Notes |
 |---|---|---|---|

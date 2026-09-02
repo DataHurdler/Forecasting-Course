@@ -2396,7 +2396,7 @@ Your numbers will not match mine, and that is fine
 <section id="dataset-and-setup" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-and-setup">Dataset and Setup</h2>
 <p>The question for this assignment is a causal one: <strong>how much does demand respond to price?</strong> That is an elasticity, and it is the number a category manager would actually act on.</p>
-<div id="18308a0f" class="cell" data-execution_count="1">
+<div id="7b13a779" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2542,7 +2542,7 @@ avg_price → units     (the effect we want to estimate)
 <p><strong>(a) Naive</strong> — regress <code>ly</code> on <code>lp</code>, <code>snap</code>, <code>event</code>.</p>
 <p><strong>(b) Controlled</strong> — regress <code>ly</code> on <code>lpc</code>, <code>snap</code>, <code>event</code>, plus a trend (<code>t</code>) and series fixed effects (<code>pd.get_dummies(df.series)</code>).</p>
 <p>Report the coefficient table for each, and put the two price elasticities side by side.</p>
-<div id="dc0afd52" class="cell" data-execution_count="2">
+<div id="c6019c77" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) naive OLS</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) OLS with trend and series fixed effects</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the two price coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2577,7 +2577,7 @@ Ask ArviZ for the HDI explicitly
 <p>An equal-tailed interval cuts 5.5% off each tail; an HDI is the <em>shortest</em> interval holding 94% of the mass. They coincide for a symmetric posterior and diverge for a skewed one.</p>
 </div>
 </div>
-<div id="a05344ca" class="cell" data-execution_count="3">
+<div id="1f313874" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build and sample Bayesian linear regression</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2590,7 +2590,7 @@ Ask ArviZ for the HDI explicitly
 <h3 class="anchored" data-anchor-id="q4-posterior-visualization-suggested-prompts-2">Q4 — Posterior Visualization <em>(Suggested prompts: 2)</em></h3>
 <p>Plot the posterior distributions for the three coefficients that matter most for a business decision — justify the choice from your DAG.</p>
 <p>For each, report: - Posterior mean - 94% HDI - <code>P(beta &gt; 0)</code> — probability the effect is positive - Whether the HDI excludes zero (the Bayesian analog of significance)</p>
-<div id="fd039451" class="cell" data-execution_count="4">
+<div id="d6cfa663" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot posterior distributions and compute P(beta &gt; 0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2624,7 +2624,7 @@ Ask ArviZ for the HDI explicitly
 </tbody>
 </table>
 <p>A predictor is “practically significant” if less than 5% of its posterior falls in the ROPE.</p>
-<div id="8abf62b1" class="cell" data-execution_count="5">
+<div id="c362b0e8" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute % of posterior in ROPE for each predictor</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2637,7 +2637,7 @@ Ask ArviZ for the HDI explicitly
 <h3 class="anchored" data-anchor-id="q6-conditional-scenario-simulation-suggested-prompts-3">Q6 — Conditional Scenario Simulation <em>(Suggested prompts: 3)</em></h3>
 <p>A category manager is considering a <strong>5% price increase</strong> across the board and wants to know what happens to volume — and how confident anyone can be about it.</p>
 <p>Push the scenario through your posterior rather than through a point estimate.</p>
-<div id="5a66d378" class="cell" data-execution_count="6">
+<div id="61c84047" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># b = idata.posterior[&quot;b_price&quot;].values.ravel()</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pct_change = 100 * (np.exp(b * np.log(1.05)) - 1)</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># report the mean and the 94% interval of pct_change</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2672,9 +2672,9 @@ Ask ArviZ for the HDI explicitly
 <li><label><input type="checkbox">Written responses completed in your own words</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in <code>submissions/hw07_&lt;your_name&gt;/</code></label></li>
 <li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with <strong>16 or fewer</strong> entries</label></li>
-<li><label><input type="checkbox">One git commit per prompt (<code>hw07 prompt &lt;id&gt;: &lt;short summary&gt;</code>)</label></li>
-<li><label><input type="checkbox"><code>REPORT.md</code> with a clear business recommendation</label></li>
+<li><label><input type="checkbox">Every file above uploaded to the <strong>Canvas</strong> assignment</label></li>
 </ul>
+<p><em>Not graded, but worth doing:</em> commit locally once per prompt, <code>hw07 prompt &lt;id&gt;: &lt;summary&gt;</code>. Nobody sees these — they are your own record of which prompt produced what, and they make it far easier to retrace your steps when something breaks. - [ ] <code>REPORT.md</code> with a clear business recommendation</p>
 </section>
 
 </main>
