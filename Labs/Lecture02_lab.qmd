@@ -26,7 +26,7 @@ to know whether watching the food aisle helps you predict it. Then, in Step 6, y
 test on the macro question from the lecture slide — does unemployment predict retail sales? —
 and find that the answer depends on which years you include.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `statsmodels`, and
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `statsmodels`, and
 two prepared files: `data/processed/m5_weekly.csv` (`prep_m5.py`) and
 `data/processed/fred_monthly.csv` (`prep_fred.py`).
 

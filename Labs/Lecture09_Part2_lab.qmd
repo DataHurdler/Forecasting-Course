@@ -25,7 +25,7 @@ Today you build a Transformer encoder, then delete one line from it and watch it
 line is the one PyTorch does not add for you, and forgetting it is the most common way this
 architecture fails silently.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
 `data/processed/m5_weekly.csv`.
 
 ::: {.callout-note}

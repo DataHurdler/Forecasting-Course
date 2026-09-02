@@ -28,7 +28,7 @@ with something better.
 Same series throughout: daily units for CA_1 FOODS. You have now fitted a GAM to it (Homework 2)
 and a single tree (Lab 4), so every number today lands on a scale you already know.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`,
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`,
 `xgboost`, and `data/processed/m5_daily.csv`.
 
 ---

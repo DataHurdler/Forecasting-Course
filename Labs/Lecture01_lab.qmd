@@ -24,7 +24,7 @@ it fail on a different one.
 The business question: you are forecasting weekly HOUSEHOLD-goods demand at store TX_1 to set
 inventory a year out. Which method should you actually ship?
 
-**Time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `statsmodels`, and
+**Suggested time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `statsmodels`, and
 `data/processed/m5_weekly.csv` (run `python scripts/prep_m5.py` if it is missing).
 
 ---

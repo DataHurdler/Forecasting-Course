@@ -28,7 +28,7 @@ The business question: you are forecasting daily demand for a grid operator. Bei
 expensive in both directions — under-forecast and you buy power at spot prices, over-forecast
 and you have paid to keep generation spinning for nothing.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `prophet`, `pygam`,
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `prophet`, `pygam`,
 and `data/processed/electricity_daily.csv` + `electricity_hourly.csv` (run
 `python scripts/prep_electricity.py` once).
 

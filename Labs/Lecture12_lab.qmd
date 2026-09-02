@@ -24,7 +24,7 @@ ways it can be wrong while every diagnostic still says the model is fine.
 Two of the three are not statistical failures at all. One is a routine preprocessing step you
 have used in every lab since Lecture 6.
 
-**Time:** ~45 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
+**Suggested time:** ~45 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
 `data/processed/m5_weekly.csv`. Four model fits, most under 30 seconds.
 
 ---

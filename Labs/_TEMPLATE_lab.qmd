@@ -20,7 +20,7 @@ execute:
 *(2–3 sentences. The technique from today's lecture, and the concrete question we are
 pointing it at. Name the business decision, not just the model.)*
 
-**Time:** ~35 minutes · **You will need:** *(packages, data files)*
+**Suggested time:** ~35 minutes · **You will need:** *(packages, data files)*
 
 ---
 

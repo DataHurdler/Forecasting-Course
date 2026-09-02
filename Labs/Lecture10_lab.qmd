@@ -25,7 +25,7 @@ The question is small on purpose so the workflow stays visible: **what fraction 
 high-SNAP weeks at CA_1 FOODS?** You will state a prior, check it before looking at the data, fit
 the model, verify the sampler, and then ask the posterior questions no point estimate can answer.
 
-**Time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
+**Suggested time:** ~35 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
 `data/processed/m5_weekly.csv`. Each fit takes about ten seconds.
 
 ---

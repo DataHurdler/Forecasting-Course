@@ -400,7 +400,7 @@ window.Quarto = {
 <p>A convolution does know. It slides a filter along the time axis and looks for local shapes.</p>
 <p>Today you will build one, and then find out <strong>how far back it can actually see</strong> — which is considerably less than the window you hand it, and is the single most useful thing to understand about this architecture.</p>
 <p>You will also use last week’s lesson: every comparison here runs on <strong>three seeds</strong>, because one run tells you nothing.</p>
-<p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>torch</code>, and <code>data/processed/m5_weekly.csv</code>.</p>
+<p><strong>Suggested time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>torch</code>, and <code>data/processed/m5_weekly.csv</code>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -419,7 +419,7 @@ Two cells here are slow
 <section id="setup" class="level2" data-number="8.2">
 <h2 data-number="8.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">8.2</span> Setup</h2>
 <p>Same windowing as Lab 7, with one change that matters.</p>
-<div id="04629a0c" class="cell" data-execution_count="1">
+<div id="87f836ef" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -508,7 +508,7 @@ Walkthrough
 <li>A neuron in <strong>layer 1</strong> sees <strong>5</strong> consecutive weeks.</li>
 <li>A neuron in <strong>layer 2</strong> sees 3 layer-1 neurons — which between them span <span class="math inline">\(3 + (5 - 1) = \mathbf{7}\)</span> weeks.</li>
 </ul>
-<div id="506a21a1" class="cell" data-execution_count="2">
+<div id="6c892694" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> receptive_field(kernels):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    rf <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">reversed</span>(kernels):</span>
@@ -549,7 +549,7 @@ kernels (5, 3, 3, 3)-&gt; receptive field 11 weeks</code></pre>
 </section>
 <section id="step-2-build-the-cnn" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="step-2-build-the-cnn"><span class="header-section-number">8.4</span> Step 2 — Build the CNN</h2>
-<div id="20188842" class="cell" data-execution_count="3">
+<div id="02669317" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> conv_out_len(W):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W <span class="op">-</span> <span class="dv">4</span> <span class="op">-</span> <span class="dv">2</span>          <span class="co"># kernel 5, then kernel 3, no padding</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -608,7 +608,7 @@ test RMSE:  980</code></pre>
 <h2 data-number="8.5" class="anchored" data-anchor-id="step-3-does-pooling-belong-here"><span class="header-section-number">8.5</span> Step 3 — Does pooling belong here?</h2>
 <p>Lecture 8 argued that pooling buys <strong>translation invariance</strong> — an image classifier should not care where in the frame the cat is — and that a forecaster usually <em>should</em> care where the spike was.</p>
 <p>Test it. Three heads, three seeds each, because of last week.</p>
-<div id="72b6c31f" class="cell" data-execution_count="4">
+<div id="bba53ffb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>head_runs <span class="op">=</span> {}</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> head <span class="kw">in</span> (<span class="st">"flatten"</span>, <span class="st">"maxpool"</span>, <span class="st">"avgpool"</span>):</span>
@@ -669,7 +669,7 @@ Try it
 <section id="step-4-a-longer-window-the-same-receptive-field" class="level2" data-number="8.6">
 <h2 data-number="8.6" class="anchored" data-anchor-id="step-4-a-longer-window-the-same-receptive-field"><span class="header-section-number">8.6</span> Step 4 — A longer window, the same receptive field</h2>
 <p>Now the experiment Step 1 set up. Keep the architecture fixed and vary only the window.</p>
-<div id="b4788df4" class="cell" data-execution_count="5">
+<div id="bce3bb11" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W <span class="kw">in</span> (<span class="dv">13</span>, <span class="dv">26</span>, <span class="dv">52</span>):</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># W=26 was already fitted in Step 3 -- reuse those three rather than paying twice</span></span>
@@ -697,7 +697,7 @@ The result runs the wrong way, and that is the lesson
 </div>
 </div>
 <p><strong>Your turn:</strong> using <code>receptive_field()</code>, find how many kernel-3 layers you would need to stack after the first kernel-5 layer to actually span 52 weeks.</p>
-<div id="f33918e7" class="cell" data-execution_count="6">
+<div id="8743e56d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># k = [5]</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># while receptive_field(k) &lt; 52:</span></span>
@@ -754,7 +754,7 @@ Try it
 </section>
 <section id="step-5-where-does-it-land" class="level2" data-number="8.7">
 <h2 data-number="8.7" class="anchored" data-anchor-id="step-5-where-does-it-land"><span class="header-section-number">8.7</span> Step 5 — Where does it land?</h2>
-<div id="ed1ada47" class="cell" data-execution_count="7">
+<div id="afe5c9a6" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>board <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LASSO, 46 features (HW4)"</span>: <span class="dv">744</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"XGBoost (HW4)"</span>: <span class="dv">781</span>,</span>

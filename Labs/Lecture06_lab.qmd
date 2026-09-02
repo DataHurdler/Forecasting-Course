@@ -28,7 +28,7 @@ analyst would actually build — 28 consecutive lags, weekly and annual lags, ro
 Fourier terms, day-of-week dummies — which is how you end up with more predictors than you meant
 to have.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`, and
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`, and
 `data/processed/m5_daily.csv`.
 
 ---

@@ -2354,12 +2354,12 @@ window.Quarto = {
 <p>A structural model writes a series as parts you can name — a level that drifts, a seasonal shape, and noise — and puts a prior on each. The output is not a forecast line but a distribution for every future week.</p>
 <p>Today you will build one, hit a failure the diagnostics catch, fix it — and then find that the <em>correct</em> way to forecast produces a worse-calibrated interval than the shortcut.</p>
 <p>That last result is not a mistake in the lab. It is the model telling you something, and working out what takes the rest of the session.</p>
-<p><strong>Time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pymc</code>, <code>arviz</code>, and <code>data/processed/m5_weekly.csv</code>. Sampling takes about 20 seconds per fit.</p>
+<p><strong>Suggested time:</strong> ~40 minutes · <strong>You will need:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>pymc</code>, <code>arviz</code>, and <code>data/processed/m5_weekly.csv</code>. Sampling takes about 20 seconds per fit.</p>
 <hr>
 </section>
 <section id="setup" class="level1">
 <h1>Setup</h1>
-<div id="4cc0804c" class="cell" data-execution_count="1">
+<div id="66c3399f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2407,7 +2407,7 @@ window.Quarto = {
 <section id="step-1-fit-it-the-obvious-way" class="level1">
 <h1>Step 1 — Fit it the obvious way</h1>
 <p>The model is a drifting level plus seasonality. PyMC has a distribution for a random walk, so the natural thing is to use it.</p>
-<div id="679b8ed5" class="cell" data-execution_count="2">
+<div id="5af89cdb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> centered:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">&quot;sigma_level&quot;</span>, <span class="fl">10.0</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    level <span class="op">=</span> pm.GaussianRandomWalk(<span class="st">&quot;level&quot;</span>, sigma<span class="op">=</span>sigma_level, shape<span class="op">=</span>n)</span>
@@ -2434,7 +2434,7 @@ divergences  0</code></pre>
 <section id="step-2-reparameterize" class="level1">
 <h1>Step 2 — Reparameterize</h1>
 <p>The problem is the <em>shape</em> of the posterior, not the model. Write the walk as a cumulative sum of standard Normal draws scaled by <code>sigma_level</code>, and the sampler gets a geometry it can navigate.</p>
-<div id="d4995c48" class="cell" data-execution_count="3">
+<div id="95d20537" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.Exponential(<span class="st">&quot;sigma_level&quot;</span>, <span class="fl">10.0</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> pm.Normal(<span class="st">&quot;z&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>, shape<span class="op">=</span>n)                              <span class="co"># standard normal</span></span>
@@ -2457,7 +2457,7 @@ divergences  0</code></pre>
 </div>
 <p><strong>Same model, same data, same priors.</strong> <code>cumsum(z * sigma)</code> and <code>GaussianRandomWalk(sigma=sigma)</code> describe the identical distribution — only the coordinates the sampler explores have changed.</p>
 <p>Look at the components it recovered:</p>
-<div id="e80b2240" class="cell" data-execution_count="4">
+<div id="dade0e1e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>lev <span class="op">=</span> idata.posterior[<span class="st">&quot;level&quot;</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, n).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sea <span class="op">=</span> (idata.posterior[<span class="st">&quot;beta&quot;</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span><span class="op">*</span>K) <span class="op">@</span> X_tr.T).mean(<span class="dv">0</span>) <span class="op">*</span> y_sd</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2483,7 +2483,7 @@ divergences  0</code></pre>
 <p>To forecast you need the level at each future week. There are two candidates, and one of them is theoretically right.</p>
 <p><strong>Held constant:</strong> carry the last estimated level forward unchanged. Simple, and it asserts the level stops drifting the moment your data ends — which is not what the model says.</p>
 <p><strong>Propagated:</strong> let the level keep random-walking forward, exactly as it did in-sample. This is what the fitted model actually implies.</p>
-<div id="778bab93" class="cell" data-execution_count="5">
+<div id="5434f742" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>post <span class="op">=</span> idata.posterior</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>lev_last <span class="op">=</span> post[<span class="st">&quot;level&quot;</span>].values[:, :, <span class="op">-</span><span class="dv">1</span>].ravel()</span>
@@ -2541,7 +2541,7 @@ The theoretically correct choice calibrated worse. Work out why.
 </div>
 </div>
 <p><strong>Your turn:</strong> check the size of the estimated drift against the noise it is competing with.</p>
-<div id="2cdb2663" class="cell" data-execution_count="6">
+<div id="94376d2c" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in ----</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(az.summary(idata, var_names=[___, ___],        # &lt;- the two scale parameters</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                  ci_kind=&quot;hdi&quot;, ci_prob=0.94).round(4).to_string())</span></span>
@@ -2550,7 +2550,7 @@ The theoretically correct choice calibrated worse. Work out why.
 </div>
 <hr>
 <p><strong>Now split coverage by horizon</strong>, which is where the difference actually shows.</p>
-<div id="53e37a83" class="cell" data-execution_count="7">
+<div id="f6ef4212" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> by_horizon(draws, label):</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(draws, [<span class="dv">3</span>, <span class="dv">97</span>], axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> y_sd <span class="op">+</span> y_mu</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    inside <span class="op">=</span> (actual <span class="op">&gt;=</span> lo) <span class="op">&amp;</span> (actual <span class="op">&lt;=</span> hi)</span>
@@ -2577,7 +2577,7 @@ level held constant 100% / 6,255   92% / 6,537  100% / 6,027
 <section id="step-4-calibrated-is-not-the-same-as-useful" class="level1">
 <h1>Step 4 — Calibrated is not the same as useful</h1>
 <p>Take the propagated version — the one the model implies — and ask two separate questions of it.</p>
-<div id="8adfc39c" class="cell" data-execution_count="8">
+<div id="c55613b0" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> score(draws_b, <span class="st">&quot;level propagated&quot;</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;coverage      </span><span class="sc">{</span>res[<span class="st">&#39;coverage_%&#39;</span>]<span class="sc">}</span><span class="ss">%   against a nominal 94%&quot;</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;mean width    </span><span class="sc">{</span>res[<span class="st">&#39;mean_width&#39;</span>]<span class="sc">:,}</span><span class="ss"> units&quot;</span>)</span>
@@ -2595,7 +2595,7 @@ seasonal naive  1,660</code></pre>
 <p><strong>Question one: is it calibrated?</strong> Compare coverage against 94%.</p>
 <p><strong>Question two: is it useful?</strong> Compare the width against the size of the thing you are forecasting, and ask whether you would place an inventory order against it.</p>
 <p><strong>Your turn:</strong> state, in one sentence each, your answer to both — and whether passing the first excuses failing the second.</p>
-<div id="48739983" class="cell" data-execution_count="9">
+<div id="969fdcb1" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and answer in the strings ----</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># calibrated = &quot;...&quot;</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># useful     = &quot;...&quot;</span></span>

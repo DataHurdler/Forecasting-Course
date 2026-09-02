@@ -16,6 +16,11 @@ ignore it while you are still working the step out.
 Every lab also ends with **what your run should produce**. Where a model is stochastic your numbers
 will differ, and several labs are entirely about how much they differ and what that means.
 
+**On the suggested time.** Each lab opens with one — thirty-five to forty-five minutes. That is the
+pace of a classroom slot with an instructor on hand, not a target you are being measured against.
+Alone, expect longer: reading the walkthrough, re-running a cell, and looking something up all cost
+time that the number does not include. Nothing about this course is graded on speed.
+
 ## The assignments
 
 Reproduced as you receive them, with their prompt budgets and initial prompts. Solutions are not

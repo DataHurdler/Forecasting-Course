@@ -29,7 +29,7 @@ about this architecture.
 You will also use last week's lesson: every comparison here runs on **three seeds**, because one
 run tells you nothing.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
 `data/processed/m5_weekly.csv`.
 
 ::: {.callout-note}

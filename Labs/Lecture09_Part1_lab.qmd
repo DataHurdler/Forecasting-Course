@@ -28,7 +28,7 @@ anyone would have used, the more sophisticated one loses badly. Then you vary th
 result changes. Working out which claim the evidence actually supports, and why, is the point of
 the lab, and it is the most transferable thing in it.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
 `data/processed/m5_weekly.csv`. Most fits are quick — about six seconds each. The exception is
 **Step 4**, which trains four models to 100 epochs and takes two to three minutes; start it and
 read the text underneath while it runs.

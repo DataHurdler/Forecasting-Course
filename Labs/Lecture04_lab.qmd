@@ -28,7 +28,7 @@ By the end you will have done four things: read a fitted tree out loud, watched 
 bias–variance tradeoff happen in a table, discovered why a single tree is unstable, and found the
 one place trees reliably fail.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`, and
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `scikit-learn`, and
 `data/processed/m5_daily.csv` (run `python scripts/prep_m5.py` if it is missing).
 
 ---

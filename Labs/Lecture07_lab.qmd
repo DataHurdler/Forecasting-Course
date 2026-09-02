@@ -27,7 +27,7 @@ part of Homework 5 most likely to eat an evening, so we do it together.
 different answer every time. Then you will find out how large that variation is, and what it
 means for every neural network result you will ever read — including your own.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `torch`, and
 `data/processed/m5_weekly.csv`.
 
 ---

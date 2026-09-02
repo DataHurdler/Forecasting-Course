@@ -27,7 +27,7 @@ Today you will build one, hit a failure the diagnostics catch, fix it — and th
 That last result is not a mistake in the lab. It is the model telling you something, and working
 out what takes the rest of the session.
 
-**Time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
+**Suggested time:** ~40 minutes · **You will need:** `pandas`, `numpy`, `matplotlib`, `pymc`, `arviz`, and
 `data/processed/m5_weekly.csv`. Sampling takes about 20 seconds per fit.
 
 ---
