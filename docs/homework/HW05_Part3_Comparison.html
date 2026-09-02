@@ -2248,7 +2248,7 @@ Your numbers will not match mine, and that is fine
 <section id="dataset-and-setup" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-and-setup">Dataset and Setup</h2>
 <p>We construct fixed-length sliding windows over each store-category series. Each input is a window of past weeks; the target is the next week’s units. <strong>Part A</strong> (FFN, CNN) uses a 26-week window; <strong>Part B</strong> (RNN, LSTM, Transformer) uses 52 weeks, so the sequence models get a full annual cycle.</p>
-<div id="abe026b2" class="cell" data-execution_count="1">
+<div id="dab497a1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2346,6 +2346,9 @@ each question before asking.
 
 
 Repository rules — these apply to every prompt in this thread:
+- If you cannot write files or run git — a browser chat cannot — then the file and commit
+  rules below are mine to carry out, not yours. Tell me what to write and what to commit,
+  and I will do it. Everything else in this list still applies to you.
 - My submission folder is `submissions/hw05_part3_&lt;my_name&gt;/`. Put everything there.
 - Keep a `PROMPT_LOG.md` in that folder. For every prompt I send, append a block:
       ### Prompt &lt;n&gt; — YYYY-MM-DD HH:MM
@@ -2416,7 +2419,7 @@ Confirm by responding with: HW05P3_CONTEXT_ACK</code></pre>
 </tbody>
 </table>
 <p>Plot actual vs predicted for one series over the test period, all five neural models on one axes.</p>
-<div id="cf9768c6" class="cell" data-execution_count="2">
+<div id="5bed6c8e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparison table and actual-vs-predicted plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">

@@ -405,7 +405,7 @@ window.Quarto = {
 <section id="setup" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="setup"><span class="header-section-number">1.2</span> Setup</h2>
 <p>Nothing to fill in here — run it and move on.</p>
-<div id="b0e21bfa" class="cell" data-execution_count="1">
+<div id="ba4985b2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -444,7 +444,7 @@ window.Quarto = {
 <section id="step-1-look-at-it-first" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="step-1-look-at-it-first"><span class="header-section-number">1.3</span> Step 1 — Look at it first</h2>
 <p>Never fit anything before you have seen the series.</p>
-<div id="e62dc6e9" class="cell" data-execution_count="2">
+<div id="bd127e45" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.5</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ax.plot(train.index, train.values, label<span class="op">=</span><span class="st">"train"</span>, lw<span class="op">=</span><span class="fl">1.4</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, test.values, label<span class="op">=</span><span class="st">"test (held out)"</span>, lw<span class="op">=</span><span class="fl">1.4</span>)</span>
@@ -475,7 +475,7 @@ Walkthrough
 <section id="step-2-establish-the-benchmark" class="level2" data-number="1.4">
 <h2 data-number="1.4" class="anchored" data-anchor-id="step-2-establish-the-benchmark"><span class="header-section-number">1.4</span> Step 2 — Establish the benchmark</h2>
 <p>Before any model, the thing to beat. <strong>Seasonal naive</strong> says: this week next year looks like this week last year.</p>
-<div id="47027001" class="cell" data-execution_count="3">
+<div id="c86b92e6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rmse(actual, pred):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(np.sqrt(np.mean((np.asarray(actual) <span class="op">-</span> np.asarray(pred)) <span class="op">**</span> <span class="dv">2</span>)))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -527,7 +527,7 @@ Try it
 <section id="step-3-fit-the-three-models" class="level2" data-number="1.5">
 <h2 data-number="1.5" class="anchored" data-anchor-id="step-3-fit-the-three-models"><span class="header-section-number">1.5</span> Step 3 — Fit the three models</h2>
 <p>All three calls come straight from Lecture 1. Run this, then <strong>predict the ordering before you look at Step 4</strong> — write your guess down.</p>
-<div id="c7cb3ad3" class="cell" data-execution_count="4">
+<div id="30df821e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SES — level only.</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ses_fit <span class="op">=</span> SimpleExpSmoothing(train).fit()</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>results[<span class="st">"SES"</span>] <span class="op">=</span> (rmse(test, ses_fit.forecast(N_TEST)),</span>
@@ -595,7 +595,7 @@ Try it
 </section>
 <section id="step-4-compare-honestly" class="level2" data-number="1.6">
 <h2 data-number="1.6" class="anchored" data-anchor-id="step-4-compare-honestly"><span class="header-section-number">1.6</span> Step 4 — Compare honestly</h2>
-<div id="b97d967e" class="cell" data-execution_count="5">
+<div id="02e2c65a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> (pd.DataFrame(results, index<span class="op">=</span>[<span class="st">"RMSE"</span>, <span class="st">"MAE"</span>]).T</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>         .sort_values(<span class="st">"RMSE"</span>).<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>))</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tbl.to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -656,7 +656,7 @@ Try it
 <section id="step-5-break-it-then-fix-it" class="level2" data-number="1.7">
 <h2 data-number="1.7" class="anchored" data-anchor-id="step-5-break-it-then-fix-it"><span class="header-section-number">1.7</span> Step 5 — Break it, then fix it</h2>
 <p>Look at where Holt’s forecast goes.</p>
-<div id="7a5a533d" class="cell" data-execution_count="6">
+<div id="e0fd3443" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.5</span>))</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, test.values, label<span class="op">=</span><span class="st">"actual"</span>, lw<span class="op">=</span><span class="fl">1.6</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ax.plot(test.index, ses_fit.forecast(N_TEST), label<span class="op">=</span><span class="st">"SES"</span>, ls<span class="op">=</span><span class="st">"--"</span>)</span>
@@ -665,7 +665,7 @@ Try it
 </div>
 <p>Lecture 1 warned that undamped linear extrapolation gets unrealistic past about six periods. You are forecasting <strong>52</strong>.</p>
 <p><strong>Your turn:</strong> refit Holt with a damped trend and add it to the table. One keyword argument.</p>
-<div id="516c6cde" class="cell" data-execution_count="7">
+<div id="0fe9f970" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- your turn: uncomment and fill in the one keyword argument ----</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># holt_damped = Holt(train, ___).fit()             # &lt;- damped_trend=True</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
@@ -723,7 +723,7 @@ SES              427   352</code></pre>
 <section id="step-6-same-store.-different-aisle.-opposite-answer." class="level2" data-number="1.8">
 <h2 data-number="1.8" class="anchored" data-anchor-id="step-6-same-store.-different-aisle.-opposite-answer."><span class="header-section-number">1.8</span> Step 6 — Same store. Different aisle. Opposite answer.</h2>
 <p>Change one word — <code>HOUSEHOLD</code> becomes <code>FOODS</code>. Same store, same code, same horizon.</p>
-<div id="b149933e" class="cell" data-execution_count="8">
+<div id="3c802fcf" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>y2 <span class="op">=</span> get_series(<span class="st">"TX_1"</span>, <span class="st">"FOODS"</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>train2, test2 <span class="op">=</span> y2.iloc[:<span class="op">-</span>N_TEST], y2.iloc[<span class="op">-</span>N_TEST:]</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>

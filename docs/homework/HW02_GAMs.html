@@ -2239,7 +2239,7 @@ vertical-align: -.125em;
 <p>This homework switches from weekly to <strong>daily</strong> data. Prophet and pyGAM both benefit from finer time granularity: daily data expose intra-week patterns that are averaged away in weekly aggregates, and Prophet’s changepoint detection is more reliable with a denser observation grid.</p>
 <p>You will work with <strong>store CA_1, FOODS category</strong> — 1,941 daily observations from the M5/Walmart data. Note that this is the same store and category you used in Homework 1 Part 1, but at daily rather than weekly frequency, so you can compare directly against what you already fitted.</p>
 <p>The preprocessed file is <code>data/processed/m5_daily.csv</code>. If it does not exist, run <code>python scripts/prep_m5.py</code> once from the repository root.</p>
-<div id="c764bb0a" class="cell" data-execution_count="1">
+<div id="fbdec997" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2374,6 +2374,9 @@ My prompt budget is 10 (this context prompt is excluded). I will label each ques
 
 
 Repository rules — these apply to every prompt in this thread:
+- If you cannot write files or run git — a browser chat cannot — then the file and commit
+  rules below are mine to carry out, not yours. Tell me what to write and what to commit,
+  and I will do it. Everything else in this list still applies to you.
 - My submission folder is `submissions/hw02_&lt;my_name&gt;/`. Put everything there.
 - Keep a `PROMPT_LOG.md` in that folder. For every prompt I send, append a block:
       ### Prompt &lt;n&gt; — YYYY-MM-DD HH:MM
@@ -2409,7 +2412,7 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 <li>Forecast plot with uncertainty bands (use Prophet’s built-in <code>plot()</code> method)</li>
 <li>Component decomposition plot showing trend, weekly seasonality, and yearly seasonality (use <code>plot_components()</code>)</li>
 </ol>
-<div id="20884169" class="cell" data-execution_count="2">
+<div id="7bbacfd2" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prophet requires columns named &#39;ds&#39; (date) and &#39;y&#39; (target)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>prophet_df <span class="op">=</span> daily[[<span class="st">&quot;date&quot;</span>, <span class="st">&quot;units&quot;</span>]].rename(columns<span class="op">=</span>{<span class="st">&quot;date&quot;</span>: <span class="st">&quot;ds&quot;</span>, <span class="st">&quot;units&quot;</span>: <span class="st">&quot;y&quot;</span>})</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2449,7 +2452,7 @@ Why SNAP is the interesting one
 <p>SNAP (the Supplemental Nutrition Assistance Program) benefits are disbursed on fixed calendar days that vary by state. California’s schedule puts them on roughly the first ten days of each month. This is a <strong>known, published, future-dated schedule</strong> — you always know next year’s SNAP days in advance. That is what makes it usable as a forecasting regressor, and it is the property you should look for when someone proposes a predictor.</p>
 </div>
 </div>
-<div id="d474ab7f" class="cell" data-execution_count="3">
+<div id="d39c7198" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add regressor columns to the dataframe before fitting</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>prophet_reg_df <span class="op">=</span> daily[[<span class="st">&quot;date&quot;</span>, <span class="st">&quot;units&quot;</span>, <span class="st">&quot;snap&quot;</span>, <span class="st">&quot;is_event&quot;</span>]].rename(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">&quot;date&quot;</span>: <span class="st">&quot;ds&quot;</span>, <span class="st">&quot;units&quot;</span>: <span class="st">&quot;y&quot;</span>}</span>
@@ -2513,7 +2516,7 @@ Why SNAP is the interesting one
 </table>
 <p>Two of those choices are deliberate and you should be able to defend them. <strong><code>basis=&quot;cp&quot;</code></strong> makes the spline <em>cyclic</em>, so the fitted curve meets itself at the year boundary instead of being free to jump between December 31 and January 1. And <strong><code>f(1)</code> rather than <code>s(1)</code></strong>: day of week takes seven discrete values with no meaningful “between,” so a factor term is the honest choice — a smooth spline would interpolate a fractional Wednesday-and-a-half.</p>
 <p>After fitting, compute test RMSE. Then plot the partial dependence curves for <code>day_of_year</code> and <code>day_of_week</code> using the model’s <code>plot_partial_dependence()</code> method or by calling <code>partial_dependence()</code> manually.</p>
-<div id="9cc80a80" class="cell" data-execution_count="4">
+<div id="8845c9c8" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, l, f</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">&quot;day_of_year&quot;</span>] <span class="op">=</span> daily[<span class="st">&quot;date&quot;</span>].dt.dayofyear</span>
@@ -2579,7 +2582,7 @@ Why SNAP is the interesting one
 </table>
 <p>Compute the seasonal-naive benchmark yourself: predict each test day using the value 364 days earlier (364 rather than 365 keeps the day of week aligned). A model that cannot beat this is not earning its complexity.</p>
 <p>Then produce a single figure showing actual versus predicted for the three fitted models over the test period, with distinct colors and a legend.</p>
-<div id="a44f1f70" class="cell" data-execution_count="5">
+<div id="ac411b96" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the seasonal-naive benchmark, then collect RMSE values from Q1, Q2, Q3</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot actual vs predicted for the test period for Prophet (both variants) and pyGAM</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a single figure with distinct colors and a legend</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

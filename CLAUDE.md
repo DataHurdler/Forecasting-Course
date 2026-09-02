@@ -74,6 +74,10 @@ python scripts/check-site-index.py                     # current? links resolve?
 # and its source have to still agree.
 python scripts/check-book-claims.py
 
+# Assignments are authored in Homework/ and COPIED to the student repo. Keep them in sync;
+# every other gate runs inside this repo and cannot see the other copy.
+python scripts/check-assignment-sync.py
+
 # Student-visible external links (skips commented-out blocks)
 python scripts/check_links.py
 

@@ -65,7 +65,16 @@ shipped.
   tree, the preface re-wrapped with identical words, a non-neural row added to the scoreboard).
   Ledger row filed.
 
-**Inventory at release: 60 skills, 18 agents, 37 rules, 8 hooks, 12 gates**
+- **Gate 7 — `scripts/check-assignment-sync.py`.** Assignments are authored in `Homework/` and
+  **copied** to the student repo's `assignments/`; students read the copy. Nothing enforced that
+  the two matched, and on 2026-09-01 all eleven drifted within a single day — the term stamp was
+  removed from every subtitle here and the American-English pass corrected four more, while the
+  student repo kept the old text. The cause is structural: every other gate runs *inside* this
+  repo, so cross-repo drift is invisible to all of them by construction. The gate compares both
+  directions and names the first differing line. A genuinely absent student repo reports and
+  passes — a missing peer is not drift. Qualified 3/3, 0/2 on controls. Ledger row filed.
+
+**Inventory at release: 60 skills, 18 agents, 37 rules, 8 hooks, 13 gates**
 (was 60 / 18 / 37 / 8 / 10 at template v2.5.1).
 
 ---

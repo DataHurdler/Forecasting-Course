@@ -101,6 +101,8 @@ Homework</a>
 <ul>
 <li><a href="#any-tool-is-fine" id="toc-any-tool-is-fine">Any tool is
 fine</a></li>
+<li><a href="#working-in-a-browser-chat"
+id="toc-working-in-a-browser-chat">Working in a browser chat</a></li>
 <li><a href="#your-prompt-log" id="toc-your-prompt-log">Your prompt
 log</a></li>
 <li><a href="#the-prompt-budget-is-a-target-not-a-limit"
@@ -130,6 +132,44 @@ across, run it yourself, and paste results back. <strong>That is a
 perfectly good way to do this course</strong>, and arguably a better
 one: you will see every error message with your own eyes, which is where
 a lot of the learning is.</p>
+<p><strong>If you want an assistant inside your editor</strong>, GitHub
+Copilot is free for verified students through <a
+href="https://education.github.com/">GitHub Education</a> and works
+natively in VS Code. Apply early rather than the night before Homework 1
+— eligibility is verified, and it is re-checked periodically.</p>
+<hr />
+<h2 id="working-in-a-browser-chat">Working in a browser chat</h2>
+<p>Everything below applies if your assistant lives in a browser tab and
+cannot touch your files.</p>
+<p><strong>You do not need to share the data.</strong> Every
+assignment’s initial prompt already describes the dataset column by
+column — that is why it is written the way it is. An assistant can write
+correct code for <code>m5_weekly.csv</code> without ever seeing the
+file. If something looks wrong and you want the assistant to see the
+data, paste the output of <code>df.head()</code> and
+<code>df.dtypes</code>. That is almost always enough.</p>
+<p><strong>If you do upload the file, upload it so the assistant can
+<em>see</em> it, not so it can <em>run</em> it.</strong> The prepared
+files are small enough to attach — <code>m5_weekly.csv</code> is 657 KB
+— and a chat assistant will happily run an analysis on an uploaded copy
+and hand you finished numbers and plots. Those numbers came out of its
+environment, not yours.</p>
+<blockquote>
+<p><strong>What is graded is the interpretation of your own
+output.</strong> Your <code>.qmd</code> has to render on your machine,
+and your written answers have to follow from the numbers <em>that
+render</em> produced. A result you got from a chat sandbox and cannot
+reproduce locally is worse than a modest result you can.</p>
+</blockquote>
+<p><strong>The file and git rules are yours.</strong> Each assignment’s
+initial prompt tells the assistant where to put files and how to commit.
+A browser chat cannot do either — so it should tell you what to write
+and what to commit, and you do it. That costs nothing in marks.
+Submitting through the browser needs no git at all: on github.com open
+<code>submissions/</code>, choose <strong>Add file → Upload
+files</strong>, and drag your folder in (<a
+href="STUDENT_QUICKSTART.md">STUDENT_QUICKSTART.md</a> has all three
+routes).</p>
 <hr />
 <h2 id="your-prompt-log">Your prompt log</h2>
 <p>Keep a <code>PROMPT_LOG.md</code> in your submission folder listing
