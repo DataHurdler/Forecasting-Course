@@ -59,6 +59,10 @@ documented natural experiment: the magnitude 7.8 earthquake of **16 April 2016**
 spiked for weeks. A group that wants to study a genuine structural break rather than simulate one
 has a clean case waiting.
 
+**A third option may appear.** Your instructor may supply a real, non-public sales panel from a
+working website; if it is ready it will be announced by Week 4. Favorita is the supported fallback
+either way — do not hold your project waiting for it.
+
 **What you may not use:** the M5 weekly panel exactly as the homework uses it. Reframing it — a
 different aggregation, a different question, a different horizon — is fine and sometimes strong.
 Re-running Homework 4 is not a project.
