@@ -19,9 +19,9 @@
 #                         bound to its source (the Lecture 13 scoreboard, the chapter
 #                         list, the labs and assignments on disk), and a claim
 #                         reworded until it says nothing fails rather than skips
-#   7. assignment-sync    the two copies of every assignment agree, AND the three
-#                         student-repo documents this site publishes were built from
-#                         their sources as they stand now. Assignments are authored in
+#   7. assignment-sync    the two copies of every assignment AND every data-prep script
+#                         agree, and the three student-repo documents this site
+#                         publishes were built from their sources as they stand now. Assignments are authored in
 #                         Homework/ and COPIED to the student repo; the setup guide, AI
 #                         policy and quickstart are AUTHORED there and RENDERED here.
 #                         Every other gate runs inside one repo, so both kinds of

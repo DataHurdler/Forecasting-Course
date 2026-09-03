@@ -45,6 +45,13 @@ def student_repo() -> str | None:
 # Canvas submission, the published page still told students to `git push`, and every
 # gate was green. sync_to_docs.sh records each source's hash when it publishes; this
 # compares the current sources against that record.
+# The data-prep scripts live in BOTH repositories: the course repo authors them, the
+# student repo is where students actually run them. `ECON8310_Datasets.md` tells
+# students to run `python scripts/prep_favorita.py` from their clone, and on
+# 2026-09-03 that script existed only here — the instruction pointed at a file they
+# did not have. Same shape as the assignment drift, one directory over.
+SHARED_SCRIPTS = "scripts/prep_*.py"
+
 PUBLISHED_FROM_STUDENT_REPO = {
     "QUARTO_GUIDE.md": "docs/files/setup-guide.html",
     "AI_POLICY.md": "docs/files/ai-policy.html",
@@ -56,6 +63,25 @@ STAMP = os.path.join(ROOT, ".student-docs-stamp")
 def short_hash(path: str) -> str:
     with open(path, "rb") as fh:
         return hashlib.sha256(fh.read()).hexdigest()[:16]
+
+
+def check_shared_scripts(sr: str) -> list[str]:
+    """Every prep script exists in both repos, byte-for-byte."""
+    out = []
+    here = {os.path.basename(f) for f in glob.glob(os.path.join(ROOT, SHARED_SCRIPTS))}
+    there = {os.path.basename(f) for f in glob.glob(os.path.join(sr, SHARED_SCRIPTS))}
+    for name in sorted(here - there):
+        out.append(f"scripts/{name}: authored here, missing from the student repo — "
+                   f"students are told to run it from their clone")
+    for name in sorted(there - here):
+        out.append(f"scripts/{name}: in the student repo but not authored here")
+    for name in sorted(here & there):
+        a = open(os.path.join(ROOT, "scripts", name), "rb").read()
+        b = open(os.path.join(sr, "scripts", name), "rb").read()
+        if a != b:
+            out.append(f"scripts/{name}: the two copies differ — "
+                       f"cp scripts/{name} <student repo>/scripts/")
+    return out
 
 
 def check_published_docs(sr: str) -> list[str]:
@@ -119,6 +145,7 @@ def main() -> int:
         if not os.path.exists(os.path.join(ROOT, "Homework", name)):
             problems.append(f"{name}: in the student repo but not authored in Homework/")
 
+    problems += check_shared_scripts(sr)
     problems += check_published_docs(sr)
 
     if problems:
@@ -128,8 +155,10 @@ def main() -> int:
         print("\n  fix: cp Homework/HW*.qmd <student repo>/assignments/")
         return 1
 
-    print(f"check-assignment-sync: all {checked} assignments identical in both repos; "
-          f"{len(PUBLISHED_FROM_STUDENT_REPO)} published documents built from current sources")
+    n_scripts = len(glob.glob(os.path.join(ROOT, SHARED_SCRIPTS)))
+    print(f"check-assignment-sync: all {checked} assignments and {n_scripts} prep scripts "
+          f"identical in both repos; {len(PUBLISHED_FROM_STUDENT_REPO)} published documents "
+          f"built from current sources")
     return 0
 
 
