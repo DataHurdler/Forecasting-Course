@@ -252,6 +252,7 @@ budget, and the folder stem is also the commit-message prefix and the key in the
 `python scripts/prep_m5.py` → `data/processed/m5_weekly.csv`, `m5_daily.csv`
 `python scripts/prep_fred.py` → `fred_monthly.csv` (L02 Granger; no API key)
 `python scripts/prep_electricity.py` → `electricity_daily.csv`, `electricity_hourly.csv` (L03 GAMs)
+`python scripts/prep_favorita.py` → `favorita_weekly.csv`, `favorita_daily.csv` (**final projects only**; needs a Kaggle account and a 4.6 GB download)
 **Format:** Quarto `.qmd` (students render to HTML). Each assignment includes an initial Codex prompt and per-question prompt budgets.
 **Student repo:** https://github.com/DataHurdler/forecasting-env (Codex workflows, submission structure, validation script). Assignment `.qmd` files are authored in `Homework/` here and **copied** to that repo's `assignments/` — keep them in sync.
 

@@ -135,7 +135,32 @@ covering 2013 to 2017. It includes promotions, store metadata, national holidays
 Ecuador's economy is oil-dependent — a daily **oil price**.
 
 **Where to get it.** [Kaggle: Corporación Favorita Grocery Sales Forecasting](https://www.kaggle.com/c/favorita-grocery-sales-forecasting).
-This one does require a Kaggle account.
+This one does require a Kaggle account, and you must accept the competition rules on the site
+before the download will work.
+
+The raw download is about 4.6 GB and `train.csv` alone is roughly 125 million rows, which is not
+a useful starting point. Run the prep script once and work from what it writes:
+
+```bash
+kaggle competitions download -c favorita-grocery-sales-forecasting -p data/raw/
+unzip 'data/raw/*.zip' -d data/raw/
+python scripts/prep_favorita.py
+```
+
+It produces two files:
+
+| File | |
+|---|---|
+| `data/processed/favorita_weekly.csv` | store × product family, weekly, with promotions, holidays, the oil price and store metadata |
+| `data/processed/favorita_daily.csv` | one store × family, daily — if you would rather work one series than a panel |
+
+**Store × family, not item level.** Item level is four thousand series, most of them mostly zeros,
+which teaches sparsity rather than forecasting. Store × family is the same shape as the M5 panel
+you already know, so your methods transfer while the data does not — which is the point of using
+it.
+
+**The earthquake is left unflagged.** There is no column marking 16 April 2016. If your project
+studies that break, find it in the series.
 
 **What makes it interesting.** On **16 April 2016**, a magnitude 7.8 earthquake struck Ecuador.
 Sales spiked for weeks afterward as people bought water and relief supplies, and the competition
