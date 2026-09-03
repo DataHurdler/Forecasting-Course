@@ -22,6 +22,7 @@ byte-for-byte.
 from __future__ import annotations
 
 import glob
+import hashlib
 import os
 import sys
 
@@ -35,6 +36,52 @@ def student_repo() -> str | None:
         if c and os.path.isfile(os.path.join(c, "QUARTO_GUIDE.md")):
             return os.path.abspath(c)
     return None
+
+
+# The three student-repo documents this site publishes. Their SOURCE lives there and
+# their RENDER lives here, so check-staleness -- which pairs a source with its output
+# inside one repository -- has no pair to compare and cannot see them go stale. That
+# is exactly how the quickstart shipped stale on 2026-09-02: its source had moved to
+# Canvas submission, the published page still told students to `git push`, and every
+# gate was green. sync_to_docs.sh records each source's hash when it publishes; this
+# compares the current sources against that record.
+PUBLISHED_FROM_STUDENT_REPO = {
+    "QUARTO_GUIDE.md": "docs/files/setup-guide.html",
+    "AI_POLICY.md": "docs/files/ai-policy.html",
+    "STUDENT_QUICKSTART.md": "docs/files/quickstart.html",
+}
+STAMP = os.path.join(ROOT, ".student-docs-stamp")
+
+
+def short_hash(path: str) -> str:
+    with open(path, "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()[:16]
+
+
+def check_published_docs(sr: str) -> list[str]:
+    """Is each published copy built from the source as it stands now?"""
+    if not os.path.exists(STAMP):
+        return ["no .student-docs-stamp — run ./scripts/sync_to_docs.sh docs"]
+    with open(STAMP, encoding="utf-8") as fh:
+        recorded = dict(l.split(":", 1) for l in fh.read().split("\n") if ":" in l)
+    out = []
+    for src, rendered in PUBLISHED_FROM_STUDENT_REPO.items():
+        src_path = os.path.join(sr, src)
+        if not os.path.exists(src_path):
+            out.append(f"{src}: named as a published source but missing from the student repo")
+            continue
+        if not os.path.exists(os.path.join(ROOT, rendered)):
+            out.append(f"{rendered}: not published, though {src} exists")
+            continue
+        now, then = short_hash(src_path), recorded.get(src, "").strip()
+        if not then:
+            out.append(f"{src}: not in .student-docs-stamp — re-publish to record it")
+        elif now != then:
+            out.append(
+                f"{src} changed since {rendered} was built ({then} -> {now})\n"
+                f"        the published page is STALE — students are reading the old text\n"
+                f"        fix: ./scripts/sync_to_docs.sh docs")
+    return out
 
 
 def main() -> int:
@@ -72,6 +119,8 @@ def main() -> int:
         if not os.path.exists(os.path.join(ROOT, "Homework", name)):
             problems.append(f"{name}: in the student repo but not authored in Homework/")
 
+    problems += check_published_docs(sr)
+
     if problems:
         print(f"check-assignment-sync: {len(problems)} problem(s)\n")
         for p in problems:
@@ -79,7 +128,8 @@ def main() -> int:
         print("\n  fix: cp Homework/HW*.qmd <student repo>/assignments/")
         return 1
 
-    print(f"check-assignment-sync: all {checked} assignments identical in both repos")
+    print(f"check-assignment-sync: all {checked} assignments identical in both repos; "
+          f"{len(PUBLISHED_FROM_STUDENT_REPO)} published documents built from current sources")
     return 0
 
 

@@ -20,6 +20,7 @@ ROOT_ALLOW = {
     # the root because it is repo-wide and read by check-staleness.py; git does not
     # preserve mtimes, so content fingerprints are the only portable answer.
     ".render-stamp",
+    ".student-docs-stamp",
     # Written by /voice-profile at the root (the skill documents this location);
     # an author's voice profile is a legitimate committed artifact.
     "voice-profile.md",

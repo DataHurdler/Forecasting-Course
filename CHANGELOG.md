@@ -74,6 +74,22 @@ shipped.
   directions and names the first differing line. A genuinely absent student repo reports and
   passes — a missing peer is not drift. Qualified 3/3, 0/2 on controls. Ledger row filed.
 
+- **Gate 7 widened — cross-repo render staleness.** `check-assignment-sync.py` also verifies
+  that the three documents this site publishes *from* the student repository — the setup guide,
+  the AI policy and the quickstart — were built from those sources as they stand now.
+
+  This closes the last of three staleness bugs found on 2026-09-02, and the only one no existing
+  gate could have caught. `check-staleness` pairs a source with its rendered output, but here the
+  **source lives in the student repo and the render lives in this one**, so it has no pair to
+  compare. The quickstart shipped stale for roughly a day as a result: its source had moved to
+  Canvas submission while the published page still told students to `git push`, and every gate
+  stayed green throughout. The owner found it, not the suite.
+
+  `sync_to_docs.sh` now writes `.student-docs-stamp` recording each source's hash **as it
+  publishes**, so the record cannot be forgotten the way a separate stamping command can. The gate
+  recomputes and compares. Qualified 4/4 — including a replay of the actual quickstart failure —
+  with 0/2 false alarms.
+
 **Inventory at release: 60 skills, 18 agents, 37 rules, 8 hooks, 13 gates**
 (was 60 / 18 / 37 / 8 / 10 at template v2.5.1).
 

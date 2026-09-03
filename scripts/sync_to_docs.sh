@@ -94,6 +94,18 @@ sync_student_docs() {
      --metadata title="ECON 8310 — Using AI on Homework" -o "$DOCS/files/ai-policy.html"
   "$PANDOC" "$SR/STUDENT_QUICKSTART.md" -s --toc --toc-depth=2 -c docstyle.css \
      --metadata title="ECON 8310 — Homework Quickstart" -o "$DOCS/files/quickstart.html"
+  # Record which SOURCE each of these three renders came from. Their sources live in
+  # the student repository and their renders live here, so check-staleness -- which
+  # compares a source to its output inside one repo -- has no pair to compare and is
+  # structurally blind to them. That is how the quickstart shipped stale on
+  # 2026-09-02, still telling students to `git push` a day after the source said
+  # Canvas. The stamp is written HERE, by the publish step, so it cannot be forgotten
+  # the way a separate stamping command can.
+  {
+    for f in QUARTO_GUIDE.md AI_POLICY.md STUDENT_QUICKSTART.md; do
+      printf '%s:%s\n' "$f" "$(shasum -a 256 "$SR/$f" | cut -c1-16)"
+    done
+  } > "$REPO_ROOT/.student-docs-stamp"
   echo "  OK   setup-guide, ai-policy, quickstart"
 }
 
