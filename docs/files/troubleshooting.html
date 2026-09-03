@@ -95,573 +95,168 @@
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#troubleshooting"
-id="toc-troubleshooting">Troubleshooting</a>
+<li><a href="#econ-8310-troubleshooting"
+id="toc-econ-8310-troubleshooting">ECON 8310 — Troubleshooting</a>
 <ul>
-<li><a href="#environment-setup" id="toc-environment-setup">Environment
-/ setup</a></li>
-<li><a href="#models-and-api" id="toc-models-and-api">Models and
-API</a></li>
-<li><a href="#compilation-rendering"
-id="toc-compilation-rendering">Compilation / rendering</a></li>
-<li><a href="#git-hooks-ci" id="toc-git-hooks-ci">Git / hooks /
-CI</a></li>
-<li><a href="#palette-theming" id="toc-palette-theming">Palette /
-theming</a></li>
-<li><a href="#r-data-analysis" id="toc-r-data-analysis">R / data
-analysis</a></li>
-<li><a href="#permissions-bypass-statusline-v1.6.0-v1.8.0"
-id="toc-permissions-bypass-statusline-v1.6.0-v1.8.0">Permissions /
-bypass / statusline (v1.6.0 / v1.8.0)</a></li>
-<li><a href="#peer-review-pipeline-v1.5.0"
-id="toc-peer-review-pipeline-v1.5.0">Peer-review pipeline
-(v1.5.0)</a></li>
-<li><a href="#surface-sync-gate-v1.6.0"
-id="toc-surface-sync-gate-v1.6.0">Surface-sync gate (v1.6.0)</a></li>
-<li><a href="#pre-flight-reports-v1.6.0"
-id="toc-pre-flight-reports-v1.6.0">Pre-Flight Reports (v1.6.0)</a></li>
-<li><a href="#decision-records-v1.6.0"
-id="toc-decision-records-v1.6.0">Decision records (v1.6.0)</a></li>
-<li><a href="#post-flight-verification-chain-of-verification-v1.7.0"
-id="toc-post-flight-verification-chain-of-verification-v1.7.0">Post-Flight
-Verification / Chain-of-Verification (v1.7.0)</a></li>
-<li><a href="#check-skill-integrity-failures"
-id="toc-check-skill-integrity-failures"><code>check-skill-integrity</code>
-failures</a></li>
-<li><a href="#scheduling-autonomous-work"
-id="toc-scheduling-autonomous-work">Scheduling autonomous work</a></li>
-<li><a href="#still-stuck" id="toc-still-stuck">Still stuck?</a></li>
+<li><a href="#running-code" id="toc-running-code">Running code</a></li>
+<li><a href="#rendering" id="toc-rendering">Rendering</a></li>
+<li><a href="#github-and-submitting"
+id="toc-github-and-submitting">GitHub and submitting</a></li>
+<li><a href="#results-and-grading" id="toc-results-and-grading">Results
+and grading</a></li>
+<li><a href="#still-stuck" id="toc-still-stuck">Still stuck</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 id="troubleshooting">Troubleshooting</h1>
-<p>Top failure modes newcomers hit, with the fix. If you’re stuck
-somewhere else, run <code>./scripts/validate-setup.sh</code> — it
-reports exactly what’s missing.</p>
-<h2 id="environment-setup">Environment / setup</h2>
+<h1 id="econ-8310-troubleshooting">ECON 8310 — Troubleshooting</h1>
+<p><a href="https://www.luozijun.com/forecasting-course/">← Course
+website</a> · <a
+href="https://www.luozijun.com/forecasting-course/files/setup-guide.html">Setup
+and Quarto guide</a></p>
+<p>The failures this course actually produces, with the fix. Read this
+before emailing — most of what goes wrong here goes wrong for everybody,
+and the answer is usually one line.</p>
+<hr />
+<h2 id="running-code">Running code</h2>
 <h3
-id="claude-command-not-found"><code>claude: command not found</code></h3>
-<p>Claude Code isn’t installed. Install it from <a
-href="https://claude.ai/install">claude.ai/install</a> (or your OS’s
-package manager). Then re-run
-<code>./scripts/validate-setup.sh</code>.</p>
-<h3
-id="xelatex-command-not-found"><code>xelatex: command not found</code></h3>
-<p>No TeX Live on the system. Install MacTeX (macOS) or TeX Live
-(Linux/Windows). Until you do, <code>/compile-latex</code> and
-<code>/extract-tikz</code> are disabled; <code>/deploy</code> (Quarto)
-still works.</p>
-<h3
-id="quarto-command-not-found"><code>quarto: command not found</code></h3>
-<p>Install Quarto from <a
-href="https://quarto.org/docs/get-started/">quarto.org/docs/get-started</a>.
-Until you do, <code>/deploy</code> and <code>/qa-quarto</code> are
-disabled; Beamer workflows still work.</p>
-<h3
-id="pdf2svg-command-not-found"><code>pdf2svg: command not found</code></h3>
-<p>Required by <code>/extract-tikz</code>.
-<code>brew install pdf2svg</code> (macOS) /
-<code>apt install pdf2svg</code> (Debian/Ubuntu) /
-<code>dnf install pdf2svg</code> (Fedora).</p>
-<h3
-id="stata-replication-halts-at-stata-mcp-not-registered"><code>/stata-replication</code>
-halts at “stata-mcp not registered”</h3>
-<p>The Stata pipeline skill needs the <a
-href="https://github.com/SepineTam/stata-mcp"><code>stata-mcp</code></a>
-MCP server. Install once per user:</p>
+id="running-cells-with-python-3.12.x-requires-the-ipykernel-package"><code>Running cells with 'Python 3.12.x' requires the ipykernel package</code></h3>
+<p><strong>VS Code is pointed at a different Python than the one you
+installed the packages into.</strong> This is the most common first-week
+error, and installing <code>ipykernel</code> is usually the
+<em>wrong</em> fix — it clears this message and leaves you missing
+<code>statsmodels</code> on the next cell.</p>
+<p>Point VS Code at the right interpreter instead:</p>
+<blockquote>
+<p><strong>⌘⇧P</strong> (macOS) or <strong>Ctrl+Shift+P</strong> →
+<code>Python: Select Interpreter</code> → pick the environment where you
+ran <code>pip install</code>.</p>
+</blockquote>
+<p>If you are not sure which that is, run this in the terminal where
+<code>pip install</code> worked:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">claude</span> mcp add stata-mcp <span class="at">--scope</span> user <span class="at">--</span> uvx stata-mcp</span></code></pre></div>
-<p><code>uvx</code> is the <code>uv</code> package runner
-(<code>brew install uv</code> if missing). The MCP server requires a
-local Stata installation — it’s a bridge, not a replacement. Once
-installed, restart your Claude Code session so the MCP server
-registers.</p>
-<p>Verify with <code>claude mcp list</code> — <code>stata-mcp</code>
-should appear with status <code>connected</code>. The skill also halts
-if Stata itself is not on <code>PATH</code>; the install instructions
-documented in <a
-href=".claude/skills/stata-replication/SKILL.md"><code>/stata-replication</code></a>
-Phase 0 cover both pre-flight checks.</p>
-<h3 id="claude-keeps-asking-permission-for-every-tool">Claude keeps
-asking permission for every tool</h3>
-<p>Default permission mode prompts on every <code>Bash</code>,
-<code>Edit</code>, <code>Write</code>. Two fixes:</p>
-<ul>
-<li><strong>Auto-accept edits</strong> — keybinding in Claude Code; see
-guide’s <a
-href="https://psantanna.com/claude-code-my-workflow/workflow-guide.html#settings---permissions-and-hooks">permission
-modes section</a>.</li>
-<li><strong>Bypass mode</strong> —
-<code>claude --permission-mode acceptEdits</code> (auto-approves edits
-but still prompts for sensitive ops) or
-<code>claude --permission-mode bypassPermissions</code> (skips prompts
-entirely — use only on trusted repos).</li>
-</ul>
-<p>The template’s <code>.claude/settings.json</code> pre-approves ~100
-common patterns, so even at default most routine work is unattended.</p>
-<h2 id="models-and-api">Models and API</h2>
-<h3 id="sonnet-4-original-opus-4-retire-2026-06-15">Sonnet 4 / original
-Opus 4 retire 2026-06-15</h3>
-<p>Anthropic retires <strong>Sonnet 4</strong> and the <strong>original
-Opus 4</strong> on <strong>2026-06-15</strong>. If your environment pins
-one of these, requests will fail after that date.</p>
-<p>Migration checklist:</p>
-<ul>
-<li><strong>Check <code>ANTHROPIC_MODEL</code> env:</strong>
-<code>echo $ANTHROPIC_MODEL</code> — if it’s
-<code>claude-sonnet-4-*</code> or <code>claude-opus-4-*</code> (without
-a 4.5/4.6/4.7 suffix), update.</li>
-<li><strong>Check <code>.claude/settings.json</code> and
-<code>.claude/settings.local.json</code></strong> for any
-<code>model:</code> override at the project layer.</li>
-<li><strong>Check agent frontmatter:</strong>
-<code>grep -rn "claude-sonnet-4\b\|claude-opus-4\b" .claude/agents/</code>
-— agents that pin to retired models will fall through to inherit, which
-is usually fine, but worth knowing.</li>
-<li><strong>Check CI:</strong> any GitHub Actions or other CI that calls
-<code>claude -p</code> with <code>--model</code>.</li>
-</ul>
-<p>Recommended replacements: <code>claude-sonnet-4-6</code> for Sonnet
-4, <code>claude-opus-4-8</code> for original Opus 4 (the newest Opus, GA
-2026-05-28, same $5/$25 pricing as 4.6/4.7). The 1M-context beta for
-Sonnet 4.5 / Sonnet 4 retired 2026-04-30 — migrate to Sonnet 4.6 for
-long-context workflows.</p>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-c</span> <span class="st">&quot;import sys; print(sys.executable)&quot;</span></span></code></pre></div>
+<p>That path is the interpreter to select. If you genuinely have only
+one Python and want to install into it,
+<code>pip install ipykernel</code> is then correct.</p>
 <h3
-id="coarse-review-and-other-claude--p-skills-may-bill-differently-after-2026-06-15"><code>/coarse-review</code>
-and other <code>claude -p</code> skills may bill differently after
-2026-06-15</h3>
-<p>Starting <strong>2026-06-15</strong>, headless subprocess calls
-(<code>claude -p</code>, Agent SDK) on subscription plans draw from a
-<strong>separate Agent SDK credit pool</strong>, decoupled from
-interactive credits. Skills affected in this template:
-<code>/coarse-review</code> (every pipeline stage runs as a
-<code>claude -p</code> subprocess). If <code>/coarse-review</code> fails
-after the cutover with a credit-exhaustion error even though your
-interactive session works, check the Agent SDK credit balance
-separately. See <a
-href="https://platform.claude.com/docs/en/release-notes/overview">Anthropic’s
-release notes</a> for the current credit allocation per plan tier.</p>
-<h2 id="compilation-rendering">Compilation / rendering</h2>
-<h3 id="undefined-citation-in-beamer"><code>Undefined citation</code> in
-Beamer</h3>
-<p>The <code>.bib</code> key isn’t in
-<code>Bibliography_base.bib</code>. Run <code>/validate-bib</code> to
-cross-check citations against the bib file. The 3-pass XeLaTeX + bibtex
-sequence in <code>/compile-latex</code> resolves keys that exist; it
-can’t invent them.</p>
-<h3 id="overfull-hbox-warnings"><code>Overfull \hbox</code>
-warnings</h3>
-<p>Text exceeds the slide’s printable width. Either shorten the
-offending content, wrap it in a <code>text width=...</code> node (for
-TikZ), or switch to <code>\resizebox</code>. <code>/visual-audit</code>
-flags these; <code>/proofread</code> does too.</p>
-<h3 id="quarto-render-fails-with-no-valid-input-files">Quarto render
-fails with <code>No valid input files</code></h3>
-<p>You likely invoked <code>quarto render</code> from the wrong cwd. Run
-it from the repo root. <code>/deploy</code> handles this
-automatically.</p>
-<h3 id="helloworld.tex-fails-to-compile">HelloWorld.tex fails to
-compile</h3>
-<p><code>./scripts/validate-setup.sh</code> first. If XeLaTeX is
-installed, re-fork a clean copy — you may have edited the sample deck
-without realizing it. HelloWorld is intentionally minimal and should
-always compile on a fresh clone.</p>
+id="modulenotfounderror-no-module-named-statsmodels-or-pandas-torch-pymc"><code>ModuleNotFoundError: No module named 'statsmodels'</code>
+(or pandas, torch, pymc…)</h3>
+<p>Same cause as above nine times out of ten: the packages went into one
+Python and you are running another. Check with the command above before
+installing anything twice.</p>
+<p>If the interpreter is right, install what is missing:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install jupyter pandas numpy matplotlib statsmodels scikit-learn</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install prophet pygam xgboost torch pymc arviz</span></code></pre></div>
 <h3
-id="extract-tikz-halts-at-prevention-pre-check"><code>/extract-tikz</code>
-halts at prevention pre-check</h3>
-<p>Good — the pre-check caught a P3 (bare <code>scale=</code>) or P4
-(missing directional keyword on an edge label) violation. Fix the
-offending line in the Beamer source and re-run. See
-<code>.claude/rules/tikz-prevention.md</code>.</p>
-<h2 id="git-hooks-ci">Git / hooks / CI</h2>
-<h3 id="hook-script-permission-denied">Hook script permission
-denied</h3>
-<p><code>chmod +x .claude/hooks/*.py .claude/hooks/*.sh</code>.
-<code>./scripts/validate-setup.sh</code> also reports non-executable
-hooks.</p>
-<h3 id="pre-compact-hook-didnt-save-the-plan">Pre-compact hook didn’t
-save the plan</h3>
-<p>The PreCompact hook (<code>.claude/hooks/pre-compact.py</code>)
-writes state to <code>~/.claude/sessions/&lt;hash&gt;/</code>. If the
-state isn’t there after compaction:</p>
-<ul>
-<li>Check the hook’s exit code:
-<code>echo '{}' | python3 .claude/hooks/pre-compact.py</code> should
-exit 0.</li>
-<li>Check permissions on <code>~/.claude/sessions/</code>.</li>
-<li>Check the session hash matches — compaction logs the hash.</li>
-</ul>
+id="filenotfounderror-could-not-find-dataprocessedm5_weekly.csv"><code>FileNotFoundError: Could not find data/processed/m5_weekly.csv</code></h3>
+<p>The prepared data is <strong>already committed</strong> to the course
+environment repository, so this usually means you are running from the
+wrong folder rather than that the file is missing.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> data/processed/          <span class="co"># from the top of your clone — you should see five .csv files</span></span></code></pre></div>
+<p>If they are there, open the repository <em>root</em> in your editor,
+not the <code>assignments/</code> folder. If they are genuinely absent,
+rebuild them:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/prep_m5.py            <span class="co"># about 48 MB, a few minutes</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/prep_fred.py</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/prep_electricity.py</span></code></pre></div>
+<h3 id="import-xgboost-fails-on-macos"><code>import xgboost</code> fails
+on macOS</h3>
+<p>XGBoost needs the OpenMP runtime, which macOS does not ship.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install libomp</span></code></pre></div>
+<p>Once, before Week 5. Nothing earlier needs it.</p>
+<hr />
+<h2 id="rendering">Rendering</h2>
 <h3
-id="commit-fails-with-quality_score.py-below-threshold"><code>/commit</code>
-fails with <code>quality_score.py</code> below threshold</h3>
-<p>The script detected issues in changed files. Either fix them
-(recommended) or re-run <code>/commit</code> and explicitly tell Claude
-<strong>“commit anyway”</strong> or <strong>“skip quality gate”</strong>
-with a reason — the override is logged in the commit message. (There is
-no <code>--skip-quality-gate</code> CLI flag; the override is a
-natural-language signal to the skill.)</p>
-<h2 id="palette-theming">Palette / theming</h2>
-<h3 id="beamer-and-quarto-renderings-use-different-colors">Beamer and
-Quarto renderings use different colors</h3>
-<p>The palette contract broke. Run
-<code>./scripts/check-palette-sync.sh</code> — it reports which color
-names are missing from one surface. Fix HEX values in
-<strong>both</strong> <code>Preambles/header.tex</code> and
-<code>Quarto/theme-template.scss</code> to match. See
-<code>Preambles/README.md</code> for the full contract.</p>
-<h2 id="r-data-analysis">R / data analysis</h2>
+id="quarto-render-fails-with-a-kernel-or-jupyter-error"><code>quarto render</code>
+fails with a kernel or jupyter error</h3>
+<p>Quarto runs your Python through a Jupyter kernel even though nothing
+in your code imports it.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install jupyter</span></code></pre></div>
+<p>Into the same interpreter your code runs in — see the first entry
+above.</p>
+<h3 id="it-runs-in-the-editor-but-fails-when-i-render">It runs in the
+editor but fails when I render</h3>
+<p><strong>That is the whole point of rendering</strong>, and it is
+worth understanding rather than working around. Cells you ran
+interactively kept variables alive in an order you no longer remember. A
+render starts from nothing and runs top to bottom.</p>
+<p>Before you submit, always:</p>
+<blockquote>
+<p><strong>Restart the kernel, then run everything from the
+top.</strong></p>
+</blockquote>
+<p>If it survives that, it will render. <strong>The single most common
+way to lose points in this course is submitting a <code>.qmd</code> that
+does not render.</strong></p>
+<h3 id="my-.html-is-older-than-my-.qmd">My <code>.html</code> is older
+than my <code>.qmd</code></h3>
+<p>You edited and forgot to re-render.
+<code>python scripts/check_my_submission.py</code> catches this
+specifically — run it before every submission.</p>
+<h3 id="google-colab-will-not-open-my-file">Google Colab will not open
+my file</h3>
+<p>Colab cannot open <code>.qmd</code> files, and this course is built
+on them. Use <strong>VS Code</strong> (with the Quarto extension) or
+<strong>Positron</strong> (Quarto built in). Both are free.</p>
+<hr />
+<h2 id="github-and-submitting">GitHub and submitting</h2>
+<h3 id="git-push-permission-denied-403"><code>git push</code> →
+<code>permission denied</code> / <code>403</code></h3>
+<p><strong>Expected.</strong> <code>forecasting-env</code> is the
+instructor’s repository and you do not have write access to it. It is
+your <em>working folder</em>, not your submission.</p>
+<p><strong>Submit on Canvas.</strong> Upload <code>HWxx.html</code>,
+<code>HWxx.qmd</code>, <code>PROMPT_LOG.md</code> and
+<code>INITIAL_PROMPT.md</code> (plus <code>REPORT.md</code> where the
+assignment asks for one), individually or zipped.</p>
+<h3 id="then-why-clone-it-at-all">Then why clone it at all?</h3>
+<p>For <code>git pull</code>. When an assignment is corrected during the
+term, pulling brings you the fix without re-downloading anything. Local
+commits also work perfectly well with nowhere to push to.</p>
+<h3 id="can-i-keep-my-work-on-github">Can I keep my work on GitHub?</h3>
+<p>Yes, and it is optional. If you do, <strong>make your repository
+private</strong> — a fork of a public repository is always public, and a
+public copy puts your work and your prompt log in front of the whole
+class.</p>
 <h3
-id="herehere-resolves-to-the-wrong-directory"><code>here::here()</code>
-resolves to the wrong directory</h3>
-<p><code>here</code> needs a project root marker (<code>.here</code>,
-<code>.git</code>, <code>DESCRIPTION</code>, or <code>.Rproj</code>). If
-you see wrong paths, create an empty <code>.here</code> file at the repo
-root.</p>
-<h3
-id="sessioninfo.txt-not-updated-after-analysis-changes"><code>sessionInfo.txt</code>
-not updated after analysis changes</h3>
-<p>You ran <code>03_analyze.R</code> directly instead of
-<code>00_run_all.R</code>. Re-run <code>00_run_all.R</code> (e.g. via
-the <code>/data-analysis</code> skill or your usual pipeline runner) —
-that entrypoint writes the session snapshot as its last step.</p>
-<h2 id="permissions-bypass-statusline-v1.6.0-v1.8.0">Permissions /
-bypass / statusline (v1.6.0 / v1.8.0)</h2>
-<h3 id="prompts-fire-despite-bypasspermissions">“Prompts fire despite
-<code>bypassPermissions</code>”</h3>
-<p>Mid-session permission-mode toggles override file settings until
-session end. The 6-tier stack (VSCode user → VSCode workspace → CLI user
-<code>~/.claude/settings.json</code> → project
-<code>.claude/settings.json</code> → project-local
-<code>.claude/settings.local.json</code> → in-session runtime) is
-<strong>last-wins</strong>. Run <code>/permission-check</code> — it
-diffs every layer and reports which wins. Then either exit and restart
-the session, or <code>/permission-mode bypassPermissions</code> to set
-it for the current session.</p>
-<h3
-id="permission-check-asks-before-reading-.claude"><code>/permission-check</code>
-asks before reading <code>~/.claude/</code></h3>
-<p>That’s intentional. Host-global config can contain unrelated paths
-and secrets. Phase A (repo-local) is automatic; Phase B (host-global,
-with key redaction) requires explicit confirmation. See <a
-href="CHANGELOG.md">CHANGELOG v1.6.0 — privacy boundary</a> for
-context.</p>
-<h3 id="seeing-too-many-permission-prompts">Seeing too many permission
-prompts?</h3>
-<p>If <code>/permission-check</code> confirms your config is permissive
-but you’re still being prompted, the built-in Claude Code skill
-<strong><code>/fewer-permission-prompts</code></strong> (Apr 2026) scans
-your transcripts for common read-only Bash and MCP tool calls and
-proposes a prioritized allowlist for <code>.claude/settings.json</code>.
-Pairs with our <code>/permission-check</code>:
-<code>permission-check</code> diagnoses;
-<code>fewer-permission-prompts</code> remediates.</p>
-<h3 id="statusline-shows-unknown-or-blank">Statusline shows
-<code>[UNKNOWN]</code> or blank</h3>
-<p>Session JSON parse failure. Check
-<code>.claude/scripts/statusline.sh</code> is executable
-(<code>chmod +x</code>) and that <code>python3</code> is on
-<code>PATH</code>. Fallback output is
-<code>[?] &lt;model&gt; @ &lt;pwd&gt;</code> — if you see that, the hook
-caught a malformed session file. Restart Claude Code.</p>
-<h3
-id="bypass-mode-still-prompts-on-edits-to-.claude-.git-.vscode-v1.8.0">Bypass
-mode still prompts on edits to <code>.claude/</code>,
-<code>.git/</code>, <code>.vscode/</code> (v1.8.0)</h3>
-<p>This is <strong>not a bug.</strong> Per Anthropic’s <a
-href="https://code.claude.com/docs/en/permission-modes">permission-modes
-docs</a>, a small set of paths are <em>protected</em> and never
-auto-approved in any mode except <code>auto</code>. The protected list
-as of Apr 2026:</p>
-<ul>
-<li>Directories: <code>.git</code>, <code>.vscode</code>,
-<code>.idea</code>, <code>.husky</code>, <code>.claude</code>
-(carve-outs: <code>.claude/commands</code>, <code>.claude/agents</code>,
-<code>.claude/skills</code>, <code>.claude/worktrees</code> — these
-<em>do</em> auto-approve under bypass).</li>
-<li>Files: <code>.gitconfig</code>, <code>.gitmodules</code>,
-<code>.bashrc</code>, <code>.bash_profile</code>, <code>.zshrc</code>,
-<code>.zprofile</code>, <code>.profile</code>, <code>.ripgreprc</code>,
-<code>.mcp.json</code>, <code>.claude.json</code>.</li>
-</ul>
-<p>So edits to <code>.claude/references/</code>,
-<code>.claude/rules/</code>, <code>.claude/hooks/</code>,
-<code>.claude/scripts/</code> will always prompt under bypass. The only
-mode that doesn’t fire an interactive prompt on protected paths is
-<strong>auto mode</strong> — which, since 2026-08-14, is the
-<em>default</em> starting mode for new interactive sessions on Pro, Max,
-and Team — protected-path writes route through a classifier model
-instead. The classifier is still a gate (it can block) — it’s just not
-human-in-the-loop, so you don’t get the click-through interruption. Auto
-mode is available on Pro, Max, and Team (and is the default starting
-mode for new interactive sessions there since 2026-08-14), plus Bedrock,
-Google Cloud’s Agent Platform, and Microsoft Foundry with no opt-in
-flag; toggle visibility in the VSCode mode dropdown by setting
-<code>allowDangerouslySkipPermissions: true</code> in
-<code>.vscode/settings.json</code> and reloading the window.</p>
-<p>Since <strong>2026-08-14</strong> auto mode is the <strong>default
-starting mode</strong> for new interactive sessions on Pro, Max, and
-Team, so most users now have it. If you are on a plan or provider
-without it, or you have deliberately pinned
-<code>bypassPermissions</code>, two workarounds:</p>
-<ol type="1">
-<li><strong>Edit through the Bash tool</strong> —
-<code>python3 -c '...'</code> or
-<code>python3 &lt;&lt; EOF ... EOF</code> heredoc patterns can write to
-<code>.claude/references/</code> etc. without firing the protected-paths
-gate, because Bash isn’t subject to it the same way Edit is. Useful for
-batch refactors.</li>
-<li><strong>Move the edit out of <code>.claude/</code></strong> when
-possible — keep field-customization content under
-<code>templates/</code> or root-level documentation that’s not
-protected.</li>
-</ol>
-<h3
-id="vscodesettings.json-claudecode.allowdangerouslyskippermissions-is-the-wrong-key-v1.8.0"><code>.vscode/settings.json</code>
-— <code>claudeCode.allowDangerouslySkipPermissions</code> is the wrong
-key (v1.8.0)</h3>
-<p>The Claude Code VSCode extension expects
-<strong><code>allowDangerouslySkipPermissions: true</code></strong> (no
-<code>claudeCode.</code> prefix). The prefixed form
-<code>claudeCode.allowDangerouslySkipPermissions</code> is silently
-ignored, leaving the protected-paths gate active even with broad CLI
-bypass. Fix: drop the <code>claudeCode.</code> prefix on that one key
-(<code>claudeCode.initialPermissionMode</code> keeps its prefix). Reload
-the VSCode window after editing <code>.vscode/settings.json</code> for
-the change to register.</p>
-<h2 id="peer-review-pipeline-v1.5.0">Peer-review pipeline (v1.5.0)</h2>
-<h3
-id="review-paper---peer-aer-fails-with-journal-not-found"><code>/review-paper --peer AER</code>
-fails with “journal not found”</h3>
-<p>The target must be in <a
-href=".claude/references/journal-profiles.md"><code>.claude/references/journal-profiles.md</code></a>.
-Ships with AER / QJE / JPE / ECMA / ReStud. To add your field’s journal,
-copy <a
-href="templates/journal-profile-template.md"><code>templates/journal-profile-template.md</code></a>
-into <code>journal-profiles.md</code> and fill in the 7 schema sections
-(focus, bar, domain adjustments, methods adjustments, typical concerns,
-referee-pool weights, optional table format).</p>
-<h3 id="referees-return-near-identical-reports">Referees return
-near-identical reports</h3>
-<p>They weren’t dispositioned. The editor agent should select
-<strong>two different</strong> dispositions from the 6-way taxonomy
-(STRUCTURAL / CREDIBILITY / MEASUREMENT / POLICY / THEORY / SKEPTIC). If
-reports are clones, the editor collapsed selection — usually because the
-paper is narrow enough that only one taxonomy applies. Try
-<code>--peer &lt;journal&gt; --stress</code> to force adversarial
-disposition pairing.</p>
-<h3 id="rr-follow-up-loses-prior-round-context">R&amp;R follow-up loses
-prior round context</h3>
-<p>Use <code>--r2</code> / <code>--r3</code> to continue a prior review.
-The editor agent reloads the previous
-<code>quality_reports/peer_review_*/decision.md</code> and classifies
-each revision (addressed / partially / deferred / disagreement). If the
-prior decision file is missing or renamed, the chain breaks — start
-fresh with <code>--peer</code>.</p>
-<h2 id="surface-sync-gate-v1.6.0">Surface-sync gate (v1.6.0)</h2>
-<h3
-id="commit-fails-at-step-0b-with-count-drift-detected"><code>/commit</code>
-fails at Step 0b with “count drift detected”</h3>
-<p><code>scripts/check-surface-sync.sh</code> detected a count mismatch
-(skills / agents / rules / hooks) across docs. The script reports which
-surface has the stale number. Fix every surface the script flags, then
-re-run. <strong>Do not bypass</strong> — the gate exists because manual
-<code>replace_all</code> has missed sibling phrasings three times (PRs
-#70/#76/#78 in v1.5.x).</p>
-<h3 id="adding-a-new-skill-agent-rule-breaks-the-gate">Adding a new
-skill / agent / rule breaks the gate</h3>
-<p>Expected. The gate counts <code>.claude/skills/</code> on disk vs
-prose assertions. After adding a skill, update the counts in README.md,
-CLAUDE.md (if mentioned), <code>guide/workflow-guide.qmd</code>,
-<code>docs/index.html</code> og:description, and
-<code>templates/skill-template.md</code>. The script tells you which are
-stale.</p>
-<h2 id="pre-flight-reports-v1.6.0">Pre-Flight Reports (v1.6.0)</h2>
-<h3
-id="skill-halts-at-pre-flight-report-failed-inputs-not-readable">Skill
-halts at “Pre-Flight Report failed — inputs not readable”</h3>
-<p>The skill couldn’t read one of its required inputs (dataset, journal
-profile, notation registry, <code>r-code-conventions.md</code>, etc.).
-Check the file path in the error, confirm permissions, and confirm that
-fresh forks have the expected file (e.g., <code>/create-lecture</code>
-has a fresh-fork fallback for the notation registry; other skills do
-not). Do NOT edit the skill to skip Pre-Flight — the point is to catch
-hallucinated variable names and missing conventions before real work
-starts.</p>
-<h3 id="pre-flight-passes-but-the-agent-hallucinates-anyway">Pre-Flight
-passes but the agent hallucinates anyway</h3>
-<p>Open an issue with the Pre-Flight Report attached. Either the input
-schema was incomplete, or the agent ignored the report. Both are bugs
-worth filing.</p>
-<h2 id="decision-records-v1.6.0">Decision records (v1.6.0)</h2>
-<h3 id="where-do-i-save-an-adr">Where do I save an ADR?</h3>
-<p><code>quality_reports/decisions/YYYY-MM-DD_short-description.md</code>
-using <a
-href="templates/decision-record.md"><code>templates/decision-record.md</code></a>.
-The directory is gitignored like <code>plans/</code> and
-<code>specs/</code> — commit only if you want the record visible to
-others. (Most forkers keep decisions local.)</p>
-<h2
-id="post-flight-verification-chain-of-verification-v1.7.0">Post-Flight
-Verification / Chain-of-Verification (v1.7.0)</h2>
-<h3 id="verify-claims-times-out-or-errors"><code>/verify-claims</code>
-times out or errors</h3>
-<p>The forked <code>claim-verifier</code> agent is conservative by
-design: it won’t mark a claim as verified unless it has evidence. If it
-times out or errors mid-run, the skill surfaces a warning block instead
-of silently shipping the draft (fail-closed, like Pre-Flight). The draft
-is returned as <strong>provisional</strong> — treat it as unverified.
-Next steps:</p>
-<ul>
-<li><strong>Retry</strong> with a narrower source scope.
-<code>/verify-claims --source &lt;specific-paper.pdf&gt;</code> is
-faster and more reliable than letting the agent guess.</li>
-<li><strong>Switch from WebSearch to direct fetch.</strong> If the agent
-is timing out on web searches, download the PDF to
-<code>master_supporting_docs/</code> and pass it as
-<code>--source</code>.</li>
-<li><strong>Downgrade to warning-only</strong> with
-<code>--no-fail-closed</code> if you are actively reading the source
-yourself and just want a report.</li>
-</ul>
-<h3
-id="verifier-says-cannot-verify-on-a-claim-you-believe-is-correct">Verifier
-says “cannot-verify” on a claim you believe is correct</h3>
-<p>This is the verifier being honest, not stubborn. It means:</p>
-<ul>
-<li>The source material is inaccessible (paywalled, broken URL,
-restricted dataset codebook not public).</li>
-<li>The claim is worded in a way that doesn’t map to a specific
-verifiable question (e.g., “this is a promising direction” is an
-opinion, not a factual claim).</li>
-<li>The evidence exists but in a venue the agent can’t reach (conference
-proceedings behind a login wall, working paper not on arXiv).</li>
-</ul>
-<p>Resolution: supply a canonical source (DOI / arXiv / repo path), or
-accept the <code>cannot-verify</code> flag in the final output and
-manually confirm yourself.</p>
-<h3
-id="integration-skill-e.g.-lit-review-hangs-at-post-flight-step">Integration
-skill (e.g., <code>/lit-review</code>) hangs at Post-Flight step</h3>
-<p>If the invoking skill doesn’t return after launching
-<code>claim-verifier</code>, check:</p>
-<ol type="1">
-<li><code>Task</code> tool is available to the invoking skill (check its
-<code>allowed-tools</code> in <code>SKILL.md</code>).</li>
-<li>The agent’s <code>allowed-tools</code> include what it needs
-(<code>WebFetch</code>, <code>WebSearch</code>, <code>Read</code>).</li>
-<li>Network access: WebSearch + WebFetch require internet; on an offline
-fork they must be disabled or the verifier gated behind a check.</li>
-</ol>
-<p>If blocked, bypass with <code>--no-verify</code> for the current run.
-File an issue if the hang persists.</p>
-<h3 id="opting-out-of-post-flight">Opting out of Post-Flight</h3>
-<p>Every affected skill accepts <code>--no-verify</code> to skip the
-Post-Flight step. Use when:</p>
-<ul>
-<li>You are iterating rapidly and verifying yourself.</li>
-<li>You have already fact-checked the sources manually.</li>
-<li>CoVe’s extra ~2× token cost is blocking a tight budget.</li>
-</ul>
-<p>Do <strong>not</strong> opt out when:</p>
-<ul>
-<li>Producing a deliverable for external readers (literature review for
-a committee, R&amp;R response for an editor, grant-proposal lit
-survey).</li>
-<li>The draft contains &gt;5 citations you haven’t personally
-verified.</li>
-<li><code>/lit-review</code> just returned results — the most common
-hallucination vector in the whole template.</li>
-</ul>
-<h2
-id="check-skill-integrity-failures"><code>check-skill-integrity</code>
-failures</h2>
-<p>The surface-sync gate now chains
-<code>check-skill-integrity.py</code> after the count-sync check. It
-runs four mechanical parity checks (frontmatter↔︎body tools,
-argument-hint↔︎body flags, internal anchor resolution, rule↔︎skill keyword
-parity) and reports P0/P1/P2 findings per file.</p>
-<h3 id="p0-body-invokes-tool-x-but-frontmatter-allowed-tools-is">P0:
-body invokes tool X but frontmatter allowed-tools is […]</h3>
-<p>The skill’s Steps/Workflow section says to use a tool (typically
-<code>Task</code> to spawn an agent, or
-<code>Edit</code>/<code>Write</code>/<code>MultiEdit</code>/<code>NotebookEdit</code>)
-but the frontmatter <code>allowed-tools</code> array doesn’t list it.
-Runtime behavior: the skill will hit a tool-permission error or silently
-skip the step. Fix: add the missing tool to
-<code>allowed-tools</code>.</p>
-<h3 id="p1-anchor-foo-not-found-in-pathtofile.md">P1: anchor
-<code>#foo</code> not found in path/to/file.md</h3>
-<p>An internal markdown link <code>[text](path#anchor)</code> targets a
-heading that doesn’t exist. Either the heading was renamed, the anchor
-slug was hand-typed and doesn’t match the GitHub-flavored-markdown
-transform of the heading, or the link target file is wrong. Fix: either
-update the anchor to match an existing heading, or add the missing
-heading.</p>
-<h3 id="p2-body-documents---foo-as-option-flag-but-argument-hint-is">P2:
-body documents <code>--foo</code> as option flag but argument-hint is
-‘…’</h3>
-<p>A flag is described in the skill’s body (in a table, a list, or with
-opt-out language) but doesn’t appear in the one-line
-<code>argument-hint</code>. Users won’t discover the flag from the hint.
-Fix: append the flag to <code>argument-hint</code> (or remove it from
-the body if it’s not a real option).</p>
-<h3
-id="p0-rule-foo.md-lists-this-skill-in-paths-but-the-skill-body-contains-none-of">P0:
-rule foo.md lists this skill in paths: but the skill body contains none
-of […]</h3>
-<p>A rule’s <code>paths:</code> claims the skill follows the rule’s
-protocol, but the skill body doesn’t mention the protocol’s keywords.
-Either add the protocol to the skill (preferred) or remove the skill
-from the rule’s <code>paths:</code>. The keyword map lives in
-<code>scripts/check-skill-integrity.py</code> under
-<code>RULE_KEYWORDS</code> — new rules need an entry there.</p>
-<h3 id="false-positives-and-regex-tuning">False positives and regex
-tuning</h3>
-<p>If a finding looks wrong (e.g., a shell command flag being treated as
-a skill flag, or an example link being treated as a real link), the
-regex in <code>scripts/check-skill-integrity.py</code> needs tuning.
-Shared helper: <code>strip_code()</code> blanks out inline code spans
-and fenced code blocks. For new classes of false positive, add an
-exclusion to the relevant check and document it inline.</p>
-<h2 id="scheduling-autonomous-work">Scheduling autonomous work</h2>
-<h3 id="croncreate-dies-when-my-session-closes"><code>CronCreate</code>
-dies when my session closes</h3>
-<p>By design. <code>CronCreate</code> schedules in the Claude Code
-REPL’s own event loop — when the REPL exits (you close the window,
-Claude Code crashes, your usage hits a rate limit and the session
-terminates), the cron goes with it. Even <code>durable: true</code>
-doesn’t save you if no REPL is running at fire time.</p>
-<p>For <strong>short-delay polling within an active session</strong>
-(e.g. “check the build every 5 minutes while I work”),
-<code>CronCreate</code> is fine. For anything that must <strong>survive
-session termination</strong>, use <strong>Claude Code Routines</strong>
-(Apr 2026) instead. Routines run on Anthropic’s web infrastructure —
-your Mac does not need to be online for each fire. Use Routines for:
-scheduled audits, overnight batch work, autonomous execution while
-you’re away. See <code>.claude/references/audit-pet-peeves.md</code>
-entry 17 for the full comparison.</p>
-<h3
-id="precompact-keeps-blocking-even-after-i-approved-the-plan">PreCompact
-keeps blocking even after I approved the plan</h3>
-<p>You probably have <code>CLAUDE_PRECOMPACT_BLOCK_ON_DRAFT=1</code> set
-in your environment. The hook blocks compaction at most
-<strong>once</strong> per DRAFT plan — subsequent compactions of the
-same plan proceed normally. If it’s blocking repeatedly, either the
-plan’s status line hasn’t been updated from DRAFT to
-APPROVED/IN_PROGRESS (check the plan file header), or you’ve got a
-different DRAFT plan every time (the hook tracks by plan path). Unset
-the env var to disable the guard entirely:
-<code>unset CLAUDE_PRECOMPACT_BLOCK_ON_DRAFT</code>.</p>
-<h2 id="still-stuck">Still stuck?</h2>
-<ul>
-<li>Read the <a
-href="https://psantanna.com/claude-code-my-workflow/workflow-guide.html#troubleshooting">guide’s
-troubleshooting section</a> for longer-form recovery scenarios.</li>
-<li>Open an issue at <a
-href="https://github.com/pedrohcgs/claude-code-my-workflow/issues"
-class="uri">https://github.com/pedrohcgs/claude-code-my-workflow/issues</a>
-— the bug-report template asks for the environment details we need to
-help.</li>
-</ul>
+id="check_my_submission.py-says-no-submissions-folder-found"><code>check_my_submission.py</code>
+says “No submissions/ folder found”</h3>
+<p>Run it from the <strong>top of your clone</strong>, not from inside a
+subfolder:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> path/to/forecasting-env</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/check_my_submission.py</span></code></pre></div>
+<p>It takes no arguments and finds your folders itself.</p>
+<hr />
+<h2 id="results-and-grading">Results and grading</h2>
+<h3 id="my-numbers-do-not-match-the-lectures">My numbers do not match
+the lecture’s</h3>
+<p><strong>Expected, and not graded.</strong> Results depend on the
+random seed, your library versions, your hardware and your thread count.
+Two people running identical, correct code get different numbers.</p>
+<p>Quote <strong>your own</strong> output, and interpret what you
+actually got. Tuning toward a number you saw on a slide is the one way
+to turn this into a wrong answer.</p>
+<p>One caveat: the broad <em>ordering</em> of models usually survives.
+If yours comes out backwards from the lecture, say so in a sentence and
+offer a reason — either you found something real about your run, or
+there is a bug worth hunting. Both earn more than quietly reporting a
+number you do not believe.</p>
+<h3 id="i-went-over-the-prompt-budget">I went over the prompt
+budget</h3>
+<p>That is allowed. The budget is a <strong>target, not a limit</strong>
+— log the extra prompts and add a line saying where you got stuck. What
+costs you is a log that does not match the work you submit.</p>
+<hr />
+<h2 id="still-stuck">Still stuck</h2>
+<p>Post to the course discussion board — if you hit it, someone else did
+too, and the answer helps them. Include the <strong>exact error
+text</strong>, not a description of it, and say what you had already
+tried.</p>
 </body>
 </html>

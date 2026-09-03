@@ -12,7 +12,8 @@ in a browser before believing them dead.
 import re, sys, pathlib, urllib.request, urllib.error, ssl
 
 DOCS = ["syllabi/ECON8310_2026Fall.md", "ECON8310_About.md",
-        "ECON8310_Datasets.md", "ECON8310_Project_Rubric.md"]
+        "ECON8310_Datasets.md", "ECON8310_Project_Rubric.md",
+        "ECON8310_Troubleshooting.md"]
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 
 # Hosts that block automated requests to their web pages while serving data normally.

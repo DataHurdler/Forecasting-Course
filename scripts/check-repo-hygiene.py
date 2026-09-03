@@ -36,6 +36,7 @@ ROOT_ALLOW = {
     # visitor needs from the syllabus now that the syllabus itself is Canvas-only:
     # goals, prerequisites, the textbook discussion, pacing.
     "ECON8310_About.md",
+    "ECON8310_Troubleshooting.md",
     # Pinned environment (2026-08-25). requirements.txt is the full teaching
     # environment; requirements-core.txt is the subset that installs without a
     # compiler. Both are read by validate-setup.sh and quoted in the syllabus.

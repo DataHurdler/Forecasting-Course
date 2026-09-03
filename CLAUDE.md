@@ -52,7 +52,7 @@ TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
 # The published course URL lives in ONE place: scripts/course_url.txt
 python scripts/set_course_url.py                       # show it + where it appears
 python scripts/set_course_url.py https://new.host/path/ # rewrite all of them, then re-render
-# It spans BOTH repos: 4 documents here + 3 in the student repo (README, assignments/README,
+# It spans BOTH repos: 5 documents here + 3 in the student repo (README, assignments/README,
 # STUDENT_QUICKSTART). The student repo is found via $FORECASTING_ENV_REPO or a sibling
 # Forecasting-Env directory; if neither exists the script says so loudly rather than skipping.
 

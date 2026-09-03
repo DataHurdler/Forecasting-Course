@@ -123,7 +123,12 @@ sync_documents() {
      --metadata title="ECON 8310 — Course Datasets" -o "$DOCS/files/datasets.html"
   "$PANDOC" ECON8310_Project_Rubric.md -s --toc --toc-depth=2 -c docstyle.css \
      --metadata title="ECON 8310 — Final Project Rubric" -o "$DOCS/files/project-rubric.html"
-  "$PANDOC" TROUBLESHOOTING.md -s --toc --toc-depth=2 -c docstyle.css \
+  # ECON8310_Troubleshooting.md, NOT TROUBLESHOOTING.md. The latter is the workflow
+  # template's own troubleshooting -- `claude: command not found`, xelatex, pdf2svg,
+  # the peer-review pipeline -- and three gates depend on it, so it stays. It was
+  # published to students until 2026-09-03, which meant a student hitting a kernel
+  # error read instructions for installing Claude Code.
+  "$PANDOC" ECON8310_Troubleshooting.md -s --toc --toc-depth=2 -c docstyle.css \
      --metadata title="ECON 8310 — Troubleshooting" -o "$DOCS/files/troubleshooting.html"
   echo "  OK   about, datasets, project-rubric, troubleshooting"
   sync_student_docs
