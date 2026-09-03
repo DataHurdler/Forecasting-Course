@@ -1804,7 +1804,7 @@
     "href": "chapters/HW05_Part1_FFN_CNN.html#overview",
     "title": "20  Homework 5: Deep Learning for Time Series",
     "section": "",
-    "text": "Feedforward Network (FFN) — treats lagged sales as a flat feature vector\n1D Convolutional Network (CNN) — slides a learned filter across the sequence to detect local temporal patterns\nLSTM — processes the sequence step-by-step, maintaining a memory of past states\nTransformer — attends to all time steps simultaneously, learning which past weeks are most informative\n\n\n\n\nBuild a PyTorch Dataset and DataLoader for sliding-window time series data\nTrain FFN, CNN, LSTM, and Transformer models and monitor loss curves\nCompare all four architectures on holdout RMSE\nSynthesize results across all five homeworks into a full course comparison",
+    "text": "Feedforward Network (FFN) — treats lagged sales as a flat feature vector\n1D Convolutional Network (CNN) — slides a learned filter across the sequence to detect local temporal patterns\nLSTM — processes the sequence step-by-step, maintaining a memory of past states\nTransformer — attends to all time steps simultaneously, learning which past weeks are most informative\n\n\n\n\nBuild a PyTorch Dataset and DataLoader for sliding-window time series data\nTrain a feedforward network on windowed input and read its loss curve\nImplement a 1D convolutional network, and connect kernel size and dilation to its receptive field\nCompare the FFN and the CNN on holdout RMSE, and say what the receptive-field experiment showed about window length",
     "crumbs": [
       "Assignments",
       "<span class='chapter-number'>20</span>  <span class='chapter-title'>Homework 5: Deep Learning for Time Series</span>"
@@ -1914,7 +1914,18 @@
     "href": "chapters/HW05_Part3_Comparison.html",
     "title": "22  Homework 5: Deep Learning for Time Series",
     "section": "",
-    "text": "22.1 Overview\nThis part continues Homework 5. See Part 1 for the full framing.",
+    "text": "22.1 Overview\nThis part continues Homework 5. See Part 1 for the full framing.\nLearning objectives:",
+    "crumbs": [
+      "Assignments",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Homework 5: Deep Learning for Time Series</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/HW05_Part3_Comparison.html#overview",
+    "href": "chapters/HW05_Part3_Comparison.html#overview",
+    "title": "22  Homework 5: Deep Learning for Time Series",
+    "section": "",
+    "text": "Compare five architectures — FFN, CNN, RNN, LSTM and Transformer — on one held-out block and one metric\nPlace those results beside every earlier homework in a single course-wide table\nExplain an ordering that contradicts the reputations of the methods, from the data rather than from the architecture\nWrite a reflection that says which model you would ship, and why",
     "crumbs": [
       "Assignments",
       "<span class='chapter-number'>22</span>  <span class='chapter-title'>Homework 5: Deep Learning for Time Series</span>"

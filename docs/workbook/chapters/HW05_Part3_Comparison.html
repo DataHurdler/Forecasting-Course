@@ -388,12 +388,19 @@ Your numbers will not match mine, and that is fine
 <section id="overview" class="level2" data-number="22.1">
 <h2 data-number="22.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">22.1</span> Overview</h2>
 <p>This part continues Homework 5. See Part 1 for the full framing.</p>
+<p><strong>Learning objectives:</strong></p>
+<ul>
+<li>Compare five architectures — FFN, CNN, RNN, LSTM and Transformer — on one held-out block and one metric</li>
+<li>Place those results beside every earlier homework in a single course-wide table</li>
+<li>Explain an ordering that contradicts the reputations of the methods, from the data rather than from the architecture</li>
+<li>Write a reflection that says which model you would ship, and why</li>
+</ul>
 <hr>
 </section>
 <section id="dataset-and-setup" class="level2" data-number="22.2">
 <h2 data-number="22.2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">22.2</span> Dataset and Setup</h2>
 <p>We construct fixed-length sliding windows over each store-category series. Each input is a window of past weeks; the target is the next week’s units. <strong>Part A</strong> (FFN, CNN) uses a 26-week window; <strong>Part B</strong> (RNN, LSTM, Transformer) uses 52 weeks, so the sequence models get a full annual cycle.</p>
-<div id="17d365e9" class="cell" data-execution_count="1">
+<div id="3e779421" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -561,7 +568,7 @@ Confirm by responding with: HW05P3_CONTEXT_ACK</code></pre>
 </tbody>
 </table>
 <p>Plot actual vs predicted for one series over the test period, all five neural models on one axes.</p>
-<div id="8a0d9d62" class="cell" data-execution_count="2">
+<div id="94630798" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparison table and actual-vs-predicted plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
