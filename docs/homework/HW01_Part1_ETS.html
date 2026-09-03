@@ -2377,7 +2377,7 @@ window.Quarto = {
 <p>This course runs on the <strong>M5 / Walmart</strong> dataset — the spine described in <code>ECON8310_Datasets.md</code>. It covers daily unit sales for Walmart stores across California, Texas, and Wisconsin from <strong>29 January 2011 to 22 May 2016</strong>, and it was the data for the M5 forecasting competition.</p>
 <p>You will work with the prepared weekly file, <code>data/processed/m5_weekly.csv</code>: <strong>30 series</strong> (10 stores × 3 product categories), <strong>277 weeks each</strong>, with average price, SNAP benefit days, and event-day counts alongside the unit sales.</p>
 <p>If the file does not exist, run <code>python scripts/prep_m5.py</code> once first — it will tell you where to get the raw download.</p>
-<div id="aaef263f" class="cell" data-execution_count="1">
+<div id="a80649ed" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2484,11 +2484,27 @@ Confirm by responding with: HW01P1_CONTEXT_ACK</code></pre>
 </section>
 <section id="questions" class="level1">
 <h1>Questions</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+How the code cells work
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>A cell that is empty except for a comment is where you write.</strong> The comment states the task; your code goes underneath it.</p>
+<p><strong>Some cells already contain setup code</strong> — a train/test split, a rename, a cutoff date — and end with a comment marking where your part begins. Leave the setup as it is and write below the comment. It is there so that everyone’s results are computed on the same basis.</p>
+<p>Every cell runs as the document stands, so <strong>you can render at any point, finished or not</strong>. Doing that early and often is how you avoid finding a problem at the deadline.</p>
+<p><strong>The <code>Your response</code> blocks are written answers, not code.</strong> They are yours to write, in your own words — your assistant explains output to you, it does not draft these.</p>
+</div>
+</div>
 <section id="q1-exploratory-plot" class="level2">
 <h2 class="anchored" data-anchor-id="q1-exploratory-plot">Q1 — Exploratory Plot</h2>
 <p><em>(Suggested prompts: 1)</em></p>
 <p>Plot CA_1 FOODS weekly unit sales over the full 277-week window. After examining the plot, answer the written questions below.</p>
-<div id="0f12b80d" class="cell" data-execution_count="2">
+<div id="12f8bbda" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot CA_1 FOODS weekly units over time</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2520,7 +2536,7 @@ Why a 52-week test set works here
 <p>Each series has 277 weeks. Holding out 52 still leaves 225 for training, comfortably above the threshold, and a one-year holdout is the horizon a demand planner actually cares about. The assertion below makes the constraint explicit rather than letting it fail deep inside statsmodels.</p>
 </div>
 </div>
-<div id="af151f8b" class="cell" data-execution_count="3">
+<div id="7e0a9ea2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span>                                   <span class="co"># final year held out</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>

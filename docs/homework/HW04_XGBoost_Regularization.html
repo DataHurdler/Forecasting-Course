@@ -2397,7 +2397,7 @@ Your numbers will not match mine, and that is fine
 <p>We use the same weekly M5 data and the same temporal split as Homework 3 — but we engineer many more features first, and the reason matters.</p>
 <p>In Homework 3 you had 27 features and 5,160 training rows. With <span class="math inline">\(k\)</span> that much smaller than <span class="math inline">\(n\)</span>, there is very little for a shrinkage penalty to do: ordinary least squares is already stable, and Ridge or LASSO will select almost no penalty. Regularization earns its keep when <span class="math inline">\(k\)</span> is <em>large relative to</em> <span class="math inline">\(n\)</span>, which is exactly the situation Lecture 6 opened with.</p>
 <p>So we build the feature set a working analyst would actually build — ten lags, rolling means and standard deviations at four windows, Fourier terms for the annual cycle, calendar variables, and one-hot identity columns — and let the penalty decide which survive.</p>
-<div id="3b499815" class="cell" data-execution_count="1">
+<div id="fcedf7cd" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -2544,6 +2544,22 @@ Confirm by responding with: HW04_CONTEXT_ACK</code></pre>
 </section>
 <section id="questions" class="level2">
 <h2 class="anchored" data-anchor-id="questions">Questions</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+How the code cells work
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>A cell that is empty except for a comment is where you write.</strong> The comment states the task; your code goes underneath it.</p>
+<p><strong>Some cells already contain setup code</strong> — a train/test split, a rename, a cutoff date — and end with a comment marking where your part begins. Leave the setup as it is and write below the comment. It is there so that everyone’s results are computed on the same basis.</p>
+<p>Every cell runs as the document stands, so <strong>you can render at any point, finished or not</strong>. Doing that early and often is how you avoid finding a problem at the deadline.</p>
+<p><strong>The <code>Your response</code> blocks are written answers, not code.</strong> They are yours to write, in your own words — your assistant explains output to you, it does not draft these.</p>
+</div>
+</div>
 <section id="q1-xgboost-baseline-suggested-prompts-2" class="level3">
 <h3 class="anchored" data-anchor-id="q1-xgboost-baseline-suggested-prompts-2">Q1 — XGBoost Baseline <em>(Suggested prompts: 2)</em></h3>
 <p>Fit an <code>xgb.XGBRegressor</code> with the following hyperparameters:</p>
@@ -2556,7 +2572,7 @@ Confirm by responding with: HW04_CONTEXT_ACK</code></pre>
 <li><code>random_state=42</code></li>
 </ul>
 <p>Report the test RMSE. Compare it to the Random Forest RMSE you recorded in Homework 3 (enter that value in a comment) and to the seasonal-naive benchmark. Then plot the top-15 XGBoost feature importances using <code>importance_type=&quot;gain&quot;</code> as a horizontal bar chart sorted descending.</p>
-<div id="9c02b8dd" class="cell" data-execution_count="2">
+<div id="4008d2eb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit XGBoost baseline and plot feature importances</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -2573,7 +2589,7 @@ Confirm by responding with: HW04_CONTEXT_ACK</code></pre>
 </ul>
 <p>Hold <code>n_estimators=300</code> fixed. Use <code>TimeSeriesSplit(n_splits=3)</code> as the CV strategy and negative RMSE as the scoring metric. Report the best combination, its CV RMSE, and its test RMSE.</p>
 <p><strong>(b)</strong> Now a second, smaller search over <strong><code>reg_lambda</code></strong> in <code>[0.1, 1.0, 10.0, 100.0]</code>, holding the rest at the best values from (a). Report the best <code>reg_lambda</code> and the resulting test RMSE.</p>
-<div id="c1aae2ff" class="cell" data-execution_count="3">
+<div id="1aa78a6c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> TimeSeriesSplit, GridSearchCV</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>param_grid <span class="op">=</span> {</span>
@@ -2606,7 +2622,7 @@ Confirm by responding with: HW04_CONTEXT_ACK</code></pre>
 <h3 class="anchored" data-anchor-id="q3-lasso-regularization-path-suggested-prompts-2">Q3 — LASSO Regularization Path <em>(Suggested prompts: 2)</em></h3>
 <p>Standardize the features using <code>StandardScaler</code> (LASSO is sensitive to feature scale). Fit LASSO at 30 values of <code>alpha</code> spaced logarithmically from 1 to 10,000. Plot the regularization path: coefficient values on the y-axis, log₁₀(alpha) on the x-axis, one line per feature labeled by name.</p>
 <p>Identify: which features shrink to zero first (at the smallest alpha)? Which are the last to shrink (most robust to regularization)?</p>
-<div id="61b6d737" class="cell" data-execution_count="4">
+<div id="0d216d42" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>X_train_scaled <span class="op">=</span> scaler.fit_transform(X_train)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>X_test_scaled  <span class="op">=</span> scaler.transform(X_test)</span>
@@ -2643,7 +2659,7 @@ Do not fix alpha across all five models
 <p>For each <code>l1_ratio</code> in <code>[1.0, 0.9, 0.5, 0.1]</code>, use <code>ElasticNetCV</code> with <code>alphas=np.logspace(-2, 4, 50)</code> and <code>cv=TimeSeriesSplit(n_splits=5)</code> to select the best alpha. Then fit a <code>RidgeCV</code> with <code>alphas=np.logspace(-2, 7, 80)</code> and the same CV.</p>
 <p>Wrap each in <code>make_pipeline(StandardScaler(), ...)</code> so scaling is refit <strong>inside each fold</strong>.</p>
 <p>Report, in one table: the model, its selected alpha, its test RMSE, and its number of non-zero coefficients out of the total.</p>
-<div id="859f184d" class="cell" data-execution_count="5">
+<div id="5a67da25" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>tscv <span class="op">=</span> TimeSeriesSplit(n_splits<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># For each l1_ratio, fit ElasticNetCV inside a pipeline with StandardScaler</span></span>
@@ -2666,7 +2682,7 @@ Do not fix alpha across all five models
 <li>Ridge at its <code>RidgeCV</code>-selected alpha</li>
 </ul>
 <p>Report mean CV RMSE for each in a summary table, with the seasonal-naive benchmark as a reference row.</p>
-<div id="a56675ec" class="cell" data-execution_count="6">
+<div id="ce1eac07" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cutoffs <span class="op">=</span> pd.date_range(<span class="st">&quot;2014-01-05&quot;</span>, <span class="st">&quot;2015-05-17&quot;</span>, freq<span class="op">=</span><span class="st">&quot;13W&quot;</span>)   <span class="co"># 6 rounds, as in HW3</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(cutoffs)<span class="sc">}</span><span class="ss"> CV rounds:&quot;</span>, [<span class="bu">str</span>(c.date()) <span class="cf">for</span> c <span class="kw">in</span> cutoffs])</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
