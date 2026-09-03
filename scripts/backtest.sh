@@ -19,10 +19,13 @@
 #                         bound to its source (the Lecture 13 scoreboard, the chapter
 #                         list, the labs and assignments on disk), and a claim
 #                         reworded until it says nothing fails rather than skips
-#   7. assignment-sync    the two copies of every assignment agree. Assignments are
-#                         authored in Homework/ and COPIED to the student repo; every
-#                         other gate runs inside this repo, so cross-repo drift is
-#                         invisible to all of them by construction
+#   7. assignment-sync    the two copies of every assignment agree, AND the three
+#                         student-repo documents this site publishes were built from
+#                         their sources as they stand now. Assignments are authored in
+#                         Homework/ and COPIED to the student repo; the setup guide, AI
+#                         policy and quickstart are AUTHORED there and RENDERED here.
+#                         Every other gate runs inside one repo, so both kinds of
+#                         cross-repo drift are invisible to them by construction
 #   8. spec-conformance    every skill obeys the Agent Skills spec
 #   9. staleness           stale recommendations, source/render divergence, expired currency
 #  10. repo-hygiene       no scratch-as-main, no root clutter, archives documented
