@@ -234,20 +234,66 @@ your <code>.qmd</code></strong> — you edited, then forgot to re-render.
 This catches that.</p>
 <hr />
 <h2 id="submit">5. Submit</h2>
-<p>Three ways. Any of them is fine.</p>
-<p><strong>Command line</strong></p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add submissions/hw01_part1_<span class="op">&lt;</span>yourname<span class="op">&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;hw01_part1: submission&quot;</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push</span></code></pre></div>
-<p><strong>GitHub Desktop</strong> — <a
-href="https://desktop.github.com"
-class="uri">https://desktop.github.com</a>. Point it at this folder,
-write a summary, click Commit, then Push. No commands to remember.</p>
-<p><strong>Your browser</strong> — go to your repository on github.com,
-open the <code>submissions/</code> folder, <strong>Add file → Upload
-files</strong>, and drag your folder in. This needs no git knowledge at
-all.</p>
-<p>Push before the deadline. Push time is submission time.</p>
+<p><strong>Submit on Canvas.</strong> Open the assignment and upload the
+contents of your submission folder:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HWxx.html</code></td>
+<td>the rendered document — <strong>self-contained</strong>, so this one
+file carries all your code, output and figures</td>
+</tr>
+<tr>
+<td><code>HWxx.qmd</code></td>
+<td>the source</td>
+</tr>
+<tr>
+<td><code>PROMPT_LOG.md</code></td>
+<td>every prompt you sent, numbered</td>
+</tr>
+<tr>
+<td><code>INITIAL_PROMPT.md</code></td>
+<td>the context prompt you started with</td>
+</tr>
+<tr>
+<td><code>REPORT.md</code></td>
+<td>only where the assignment asks for one</td>
+</tr>
+</tbody>
+</table>
+<p>Attach them individually, or zip the folder and upload that. Either
+is fine.</p>
+<p><strong>Upload before the deadline. The Canvas timestamp is
+submission time.</strong></p>
+<h3 id="you-never-push-to-this-repository">You never push to this
+repository</h3>
+<p>This repository is your <strong>working folder</strong>, not your
+submission. It is mine, and you do not have write access —
+<code>git push</code> will fail, and that is expected, not something you
+have broken.</p>
+<p>Two things follow:</p>
+<ul>
+<li><strong><code>git pull</code> is useful.</strong> If an assignment
+is corrected during the term, pulling brings you the fix without
+re-downloading anything.</li>
+<li><strong>Committing locally still works.</strong> A clone with no
+remote is a perfectly good local history. Commit as often as you like;
+it costs nothing and it is a good habit.</li>
+</ul>
+<p>Keeping your own copy on GitHub is <strong>optional and entirely up
+to you</strong>. If you do it, <strong>make the repository
+private</strong> — a fork of a public repository is always public, and a
+public copy would put your work and your prompt log in front of the
+whole class.</p>
 </body>
 </html>

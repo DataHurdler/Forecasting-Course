@@ -433,7 +433,7 @@ Your numbers will not match mine, and that is fine
 </section>
 <section id="dataset-and-setup" class="level2" data-number="23.2">
 <h2 data-number="23.2" class="anchored" data-anchor-id="dataset-and-setup"><span class="header-section-number">23.2</span> Dataset and Setup</h2>
-<div id="a5270034" class="cell" data-execution_count="1">
+<div id="13dc3edd" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -555,7 +555,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <li>Likelihood: <code>obs ~ Binomial(n=277, p=theta)</code>, observed = the actual count</li>
 </ul>
 <p><strong>Before fitting anything</strong>, run <code>pm.sample_prior_predictive(500)</code> and plot what the prior alone implies about the number of high-SNAP weeks.</p>
-<div id="deeb1e07" class="cell" data-execution_count="2">
+<div id="9e761d2b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>n_total <span class="op">=</span> <span class="bu">len</span>(ca1)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>n_hi <span class="op">=</span> <span class="bu">int</span>(ca1.hi_snap.<span class="bu">sum</span>())</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"CA_1 FOODS: </span><span class="sc">{</span>n_hi<span class="sc">}</span><span class="ss"> high-SNAP weeks out of </span><span class="sc">{</span>n_total<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>n_hi<span class="op">/</span>n_total<span class="sc">:.0f}</span><span class="ss">%)"</span>)</span>
@@ -570,7 +570,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <section id="q2-posterior-inference-suggested-prompts-2" class="level3" data-number="23.4.2">
 <h3 data-number="23.4.2" class="anchored" data-anchor-id="q2-posterior-inference-suggested-prompts-2"><span class="header-section-number">23.4.2</span> Q2 — Posterior Inference <em>(Suggested prompts: 2)</em></h3>
 <p>Fit the model. Report the posterior mean and the 94% HDI, and report <span class="math inline">\(\hat{R}\)</span>, ESS and divergences.</p>
-<div id="8e50b4a7" class="cell" data-execution_count="3">
+<div id="e1a80c64" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit, then az.summary(idata, ci_kind="hdi", ci_prob=0.94) and az.plot_posterior</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
@@ -590,7 +590,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <li><code>sigma_level ~ Exponential(10)</code>, <code>sigma ~ Exponential(1)</code></li>
 <li><strong>Standardize <code>units</code> before fitting</strong>, and invert afterwards</li>
 </ul>
-<div id="b0a80bc1" class="cell" data-execution_count="4">
+<div id="19cda18a" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="op">=</span> <span class="dv">52</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> ca1.iloc[:<span class="op">-</span>N_TEST], ca1.iloc[<span class="op">-</span>N_TEST:]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -607,7 +607,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <p><strong>(a) Propagated</strong> — let the level keep random-walking forward, which is what the fitted model implies. <strong>(b) Held constant</strong> — carry the last level forward unchanged.</p>
 <p>Report coverage and mean interval width for each, and additionally <strong>split coverage by horizon</strong> (roughly weeks 1–13, 14–39, 40–52). The frozen version produces intervals of near-constant width; the propagated one widens with horizon. Which is better calibrated on this series is a question for your data, not for theory — answer it from your numbers.</p>
 <p>Report three things: RMSE, the seasonal-naive RMSE for comparison, and the <strong>coverage</strong> of your 94% interval (the fraction of held-out weeks falling inside).</p>
-<div id="1570ea9a" class="cell" data-execution_count="5">
+<div id="3fe9028d" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast both ways; compute RMSE, coverage and mean width for each</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Then split coverage by horizon</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -622,6 +622,7 @@ Confirm by responding with: HW06P1_CONTEXT_ACK</code></pre>
 <h2 data-number="23.6" class="anchored" data-anchor-id="submission-checklist"><span class="header-section-number">23.6</span> Submission Checklist</h2>
 <ul class="task-list">
 <li><label><input type="checkbox">All code cells run without errors from top to bottom</label></li>
+<li><label><input type="checkbox">Your name replaces the <code>author:</code> placeholder at the top of the document</label></li>
 <li><label><input type="checkbox">Written responses completed in your own words</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in <code>submissions/hw06_part1_&lt;your_name&gt;/</code></label></li>
 <li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with <strong>10 or fewer</strong> entries for Part 1</label></li>

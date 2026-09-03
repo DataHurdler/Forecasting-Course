@@ -384,7 +384,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This homework switches from weekly to <strong>daily</strong> data. Prophet and pyGAM both benefit from finer time granularity: daily data expose intra-week patterns that are averaged away in weekly aggregates, and Prophet’s changepoint detection is more reliable with a denser observation grid.</p>
 <p>You will work with <strong>store CA_1, FOODS category</strong> — 1,941 daily observations from the M5/Walmart data. Note that this is the same store and category you used in Homework 1 Part 1, but at daily rather than weekly frequency, so you can compare directly against what you already fitted.</p>
 <p>The preprocessed file is <code>data/processed/m5_daily.csv</code>. If it does not exist, run <code>python scripts/prep_m5.py</code> once from the repository root.</p>
-<div id="746e5b2a" class="cell" data-execution_count="1">
+<div id="8e70368c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -548,7 +548,7 @@ Confirm by responding with: HW02_CONTEXT_ACK</code></pre>
 <li>Forecast plot with uncertainty bands (use Prophet’s built-in <code>plot()</code> method)</li>
 <li>Component decomposition plot showing trend, weekly seasonality, and yearly seasonality (use <code>plot_components()</code>)</li>
 </ol>
-<div id="2a421ee4" class="cell" data-execution_count="2">
+<div id="c15cb486" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prophet requires columns named 'ds' (date) and 'y' (target)</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>prophet_df <span class="op">=</span> daily[[<span class="st">"date"</span>, <span class="st">"units"</span>]].rename(columns<span class="op">=</span>{<span class="st">"date"</span>: <span class="st">"ds"</span>, <span class="st">"units"</span>: <span class="st">"y"</span>})</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -585,7 +585,7 @@ Why SNAP is the interesting one
 <p>SNAP (the Supplemental Nutrition Assistance Program) benefits are disbursed on fixed calendar days that vary by state. California’s schedule puts them on roughly the first ten days of each month. This is a <strong>known, published, future-dated schedule</strong> — you always know next year’s SNAP days in advance. That is what makes it usable as a forecasting regressor, and it is the property you should look for when someone proposes a predictor.</p>
 </div>
 </div>
-<div id="dd969e69" class="cell" data-execution_count="3">
+<div id="07a1d8ad" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add regressor columns to the dataframe before fitting</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>prophet_reg_df <span class="op">=</span> daily[[<span class="st">"date"</span>, <span class="st">"units"</span>, <span class="st">"snap"</span>, <span class="st">"is_event"</span>]].rename(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">"date"</span>: <span class="st">"ds"</span>, <span class="st">"units"</span>: <span class="st">"y"</span>}</span>
@@ -649,7 +649,7 @@ Why SNAP is the interesting one
 </table>
 <p>Two of those choices are deliberate and you should be able to defend them. <strong><code>basis="cp"</code></strong> makes the spline <em>cyclic</em>, so the fitted curve meets itself at the year boundary instead of being free to jump between December 31 and January 1. And <strong><code>f(1)</code> rather than <code>s(1)</code></strong>: day of week takes seven discrete values with no meaningful “between,” so a factor term is the honest choice — a smooth spline would interpolate a fractional Wednesday-and-a-half.</p>
 <p>After fitting, compute test RMSE. Then plot the partial dependence curves for <code>day_of_year</code> and <code>day_of_week</code> using the model’s <code>plot_partial_dependence()</code> method or by calling <code>partial_dependence()</code> manually.</p>
-<div id="23e72003" class="cell" data-execution_count="4">
+<div id="9128e223" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pygam <span class="im">import</span> LinearGAM, s, l, f</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">"day_of_year"</span>] <span class="op">=</span> daily[<span class="st">"date"</span>].dt.dayofyear</span>
@@ -715,7 +715,7 @@ Why SNAP is the interesting one
 </table>
 <p>Compute the seasonal-naive benchmark yourself: predict each test day using the value 364 days earlier (364 rather than 365 keeps the day of week aligned). A model that cannot beat this is not earning its complexity.</p>
 <p>Then produce a single figure showing actual versus predicted for the three fitted models over the test period, with distinct colors and a legend.</p>
-<div id="1b4b4a76" class="cell" data-execution_count="5">
+<div id="6d368c5f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the seasonal-naive benchmark, then collect RMSE values from Q1, Q2, Q3</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot actual vs predicted for the test period for Prophet (both variants) and pyGAM</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a single figure with distinct colors and a legend</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -754,6 +754,7 @@ Comparing against Homework 1 honestly
 <p>Before submitting, confirm each item below is complete.</p>
 <ul class="task-list">
 <li><label><input type="checkbox">All code cells run without errors from a clean kernel restart</label></li>
+<li><label><input type="checkbox">Your name replaces the <code>author:</code> placeholder at the top of the document</label></li>
 <li><label><input type="checkbox">Written responses completed in your own words (not copied from your assistant’s output)</label></li>
 <li><label><input type="checkbox"><code>INITIAL_PROMPT.md</code> saved in your submission folder</label></li>
 <li><label><input type="checkbox"><code>PROMPT_LOG.md</code> complete with 10 or fewer entries</label></li>
