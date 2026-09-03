@@ -34,11 +34,11 @@ into it, `pip install ipykernel` is then correct.
 Same cause as above nine times out of ten: the packages went into one Python and you are running
 another. Check with the command above before installing anything twice.
 
-If the interpreter is right, install what is missing:
+If the interpreter is right, install everything the course needs in one command, from the top of
+your clone:
 
 ```bash
-pip install jupyter pandas numpy matplotlib statsmodels scikit-learn
-pip install prophet pygam xgboost torch pymc arviz
+pip install -r requirements.txt
 ```
 
 ### `FileNotFoundError: Could not find data/processed/m5_weekly.csv`

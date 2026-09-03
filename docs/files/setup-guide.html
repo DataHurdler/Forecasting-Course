@@ -168,10 +168,24 @@ class="uri">https://www.python.org/downloads/</a> — and on Windows,
 <strong>tick “Add Python to PATH”</strong> on the first screen of the
 installer. Missing that is the single most common Windows setup
 problem.</p>
-<p>Then install the packages:</p>
+<p>Then make an environment and install everything in one command:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install jupyter pandas numpy matplotlib statsmodels scikit-learn</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install prophet pygam xgboost torch pymc arviz</span></code></pre></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate        <span class="co"># Windows: .venv\Scripts\activate</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code></pre></div>
+<p>The <code>requirements.txt</code> in this repository lists every
+package the course needs. Using a virtual environment
+(<code>.venv</code>) is worth the extra line: it keeps this course’s
+packages separate from anything else on your machine, and it makes
+“which Python am I actually running?” answerable.</p>
+<p><strong>Then point your editor at it.</strong> In VS Code:
+<strong>⌘⇧P</strong> (Windows: <strong>Ctrl+Shift+P</strong>) →
+<code>Python: Select Interpreter</code> → choose the <code>.venv</code>
+you just made. Skipping this is the most common first-week error in this
+course — you install the packages into one Python and the editor runs a
+different one, and you get <code>requires the ipykernel package</code>
+or <code>ModuleNotFoundError</code> on code that is perfectly
+correct.</p>
 <p><code>jupyter</code> is not optional. Quarto runs your Python through
 a Jupyter kernel, so rendering fails without it — even though none of
 your code imports it.</p>
